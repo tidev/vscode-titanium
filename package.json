@@ -1,0 +1,76 @@
+{
+    "name": "appcelerator-titanium",
+    "displayName": "appcelerator-titanium",
+    "description": "Build tools for Appcelerator Titanium",
+    "version": "0.0.1",
+    "publisher": "Axway",
+    "engines": {
+        "vscode": "^1.20.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "workspaceContains:tiapp.xml"
+    ],
+    "main": "./src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.init",
+                "title": "Init",
+                "category": "Appcelerator"
+            },
+            {
+                "command": "extension.run",
+                "title": "Run",
+                "category": "Appcelerator"
+            },
+            {
+                "command": "extension.stop",
+                "title": "Stop",
+                "category": "Appcelerator"
+            },
+            {
+                "command": "extension.dist",
+                "title": "Distribute",
+                "category": "Appcelerator"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.run",
+                "key": "ctrl+alt+enter",
+                "mac": "cmd+alt+enter"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "javascript",
+                "path": "./snippets/titanium.json"
+            },
+            {
+                "language": "javascript",
+                "path": "./snippets/alloy.json"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test",
+        "lint": "eslint lib"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42",
+        "eslint": "^4.11.0",
+        "eslint-config-axway": "^2.0.7",
+        "eslint-plugin-jsx-a11y": "^6.0.2",
+        "eslint-plugin-react": "^7.5.1"
+    },
+    "dependencies": {
+        "path": "^0.12.7"
+    }
+}

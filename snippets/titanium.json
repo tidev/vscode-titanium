@@ -1,0 +1,186 @@
+{
+    "debug": {
+        "prefix": "tidebug",
+        "body": "Ti.API.debug($1);$2",
+        "description": "Debug log function"
+    },
+    "info": {
+        "prefix": "tiinfo",
+        "body": "Ti.API.info($1);$2",
+        "description": "Info log function"
+    },
+    "trace": {
+        "prefix": "titrace",
+        "body": "Ti.API.trace($1);$2",
+        "description": "Trace log function"
+    },
+    "warn": {
+        "prefix": "tiwarn",
+        "body": "Ti.API.warn($1);$2",
+        "description": "Warn log function"
+    },
+    "error": {
+        "prefix": "tierror",
+        "body": "Ti.API.error($1);$2",
+        "description": "Error log function"
+    },
+    "addEventListener": {
+        "prefix": "tiaddevent",
+        "body": "Ti.App.addEventListener(\"$1\", $2);$3",
+        "description": "Add event listener function"
+    },
+    "removeEventListener": {
+        "prefix": "tiremevent",
+        "body": "Ti.App.removeEventListener(\"$1\", $2);$3",
+        "description": "Remove event listener function"
+    },
+    "fireEvent": {
+        "prefix": "tifireevent",
+        "body": "Ti.App.fireEvent(\"$1\", $2);$3",
+        "description": "Fire event function"
+    },
+    "createAlertDialog": {
+        "prefix": "tialert",
+        "body": [
+            "var dialog = Ti.UI.createAlertDialog({",
+            "    title: '$1',",
+            "    message: '$2',",
+            "    buttonNames: ['${3:Cancel}', '${4:OK}'],",
+            "    cancel: 0",
+            "});",
+            "dialog.addEventListener('click', function(e) {",
+            "    if (e.index === e.source.cancel) {",
+            "        Ti.API.info('The cancel button was clicked');",
+            "    }",
+            "    Ti.API.info('e.index: ' + e.index);",
+            "});",
+            "dialog.show();",
+            "$5"
+        ],
+        "description": "Create alert dialog"
+    },
+    "createOptionDialog": {
+        "prefix": "tiopt",
+        "body": [
+            "var dialog = Ti.UI.createOptionDialog({",
+            "    title: '$1',",
+            "    options: ['${2:Delete}', '${3:Save}', '${4:Cancel}'],",
+            "    cancel: 2,",
+            "    selectedIndex: 2,",
+            "    destructive: 0",
+            "});",
+            "dialog.addEventListener('click', function(e) {",
+            "    if (e.index === e.source.cancel) {",
+            "        Ti.API.info('The cancel option was clicked');",
+            "    }",
+            "    Ti.API.info('e.index: ' + e.index);",
+            "});",
+            "dialog.show();",
+            "$5"
+        ],
+        "description": "Create option dialog"
+    },
+    "createAnimation": {
+        "prefix": "tianim",
+        "body": [
+            "var animation = Ti.UI.createAnimation({",
+            "    // set view properties",
+            "    ${1:duration: 250},",
+            "    ${2:opacity: 0}",
+            "});",
+            "animation.addEventListener('complete', function(){",
+            "    Ti.API.info('Animation complete');",
+            "});",
+            "${3:view}.animate(animation);",
+            "$4"
+        ],
+        "description": "Create animation"
+    },
+    "getFile": {
+        "prefix": "tifile",
+        "body": "var file = Ti.Filesystem.getFile(Ti.Filesystem.resourcesDirectory, '${1:filename}');$2",
+        "description": "Get file"
+    },
+    "playSound": {
+        "prefix": "tisound",
+        "body": [
+            "var sound = Ti.Media.createSound({url:'${1:sound.wav}'});",
+            "sound.play();",
+            "$2"
+        ],
+        "description": "Create sound"
+    },
+    "playAudio": {
+        "prefix": "tiaudio",
+        "body": [
+            "var player = Ti.Media.createAudioPlayer({",
+            "    url: '${1:http://www.example.com/podcast.mp3}',",
+            "    allowBackground: ${2:true}",
+            "});",
+            "player.addEventListener('progress', function(e) {",
+            "    Ti.API.info('Time Played: ' + Math.round(e.progress) + ' milliseconds');",
+            "});",
+            "player.addEventListener('change', function(e) {",
+            "    Ti.API.info('State: ' + e.description + ' (' + e.state + ')');",
+            "});",
+            "player.start();",
+            "$2"
+        ],
+        "description": "Create audio player"
+    },
+    "playVideo": {
+        "prefix": "tivideo",
+        "body": [
+            "var player;",
+            "var url = '${1:http://www.example.com/movie.mp4}';",
+            "if (OS_ANDROID) {",
+            "    player = Ti.Media.createVideoPlayer({",
+            "        url: url,",
+            "        mediaControlStyle: Ti.Media.VIDEO_CONTROL_DEFAULT,",
+            "        scalingMode: Ti.Media.VIDEO_SCALING_ASPECT_FILL,",
+            "        fullscreen: true,",
+            "        autoplay: true",
+            "    });",
+            "} else {",
+            "    player = Ti.Media.createVideoPlayer({",
+            "        url: url,",
+            "        mediaControlStyle: Ti.Media.VIDEO_CONTROL_DEFAULT,",
+            "        scalingMode: Ti.Media.VIDEO_SCALING_ASPECT_FILL,",
+            "        autoplay: true,",
+            "        width: 320,",
+            "        height: 180",
+            "    });",
+            "    ${2:view}.add(player);",
+            "}",
+            "$3"
+        ],
+        "description": "Create video player"
+    },
+    "showCamera": {
+        "prefix": "ticamera",
+        "body": [
+            "// Camera access requires user permission:",
+            "// http://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media-method-hasCameraPermissions.",
+            "Ti.Media.requestCameraPermissions(function(e) {",
+            "    if (e.success) {",
+            "        Ti.Media.showCamera({",
+            "            whichCamera: Ti.Media.CAMERA_REAR,",
+            "            success: function(e) {",
+            "                if (e.success) {",
+            "                    Ti.API.info('Success');",
+            "                    // Image can be accessed through e.media",
+            "                }",
+            "            },",
+            "            error: function(err) {",
+            "                Ti.API.error('Error: ' + err);",
+            "            }",
+            "        });",
+            "    } else {",
+            "        // Camera access not granted",
+            "    }",
+            "});"
+        ],
+        "description": "Show camera"
+    }
+}
+    

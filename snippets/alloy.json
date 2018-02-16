@@ -1,0 +1,60 @@
+{
+    "globals": {
+        "prefix": "alglo",
+        "body": "Alloy.Globals.$1",
+        "description": "Alloy Globals object"
+    },
+    "cfg": {
+        "prefix": "alcfg",
+        "body": "Alloy.CFG.$1",
+        "description": "Alloy CFG object"
+    },
+    "createController": {
+        "prefix": "alcon",
+        "body": "Alloy.createController('${1:name}', ${2:args});$3",
+        "description": "Alloy create controller function"
+    },
+    "createCollection": {
+        "prefix": "alcol",
+        "body": "Alloy.createCollection('${1:name}', ${2:args});$3",
+        "description": "Alloy create collection function"
+    },
+    "createModel": {
+        "prefix": "almod",
+        "body": "Alloy.createModel('${1:name}', ${2:args});$3",
+        "description": "Alloy create model function"
+    },
+    "createWidget": {
+        "prefix": "alwid",
+        "body": "Alloy.createWidget('${1:name}', ${2:'widget'}, ${3:args});$4",
+        "description": "Alloy create widget function"
+    },
+    "ifiOS": {
+        "prefix": "ifios",
+        "body": [
+            "if (OS_IOS) {",
+            "    $1",
+            "}$2"
+        ],
+        "description": "Alloy iOS conditional statement"
+    },
+    "ifAndroid": {
+        "prefix": "ifand",
+        "body": [
+            "if (OS_ANDROID) {",
+            "    $1",
+            "}$2"
+        ],
+        "description": "Alloy Android conditional statement"
+    },
+    "ifWindows": {
+        "prefix": "ifwin",
+        "body": [
+            "if (OS_WINDOWS) {",
+            "    $1",
+            "}$2"
+        ],
+        "description": "Alloy Windows conditional statement"
+    }
+}
+    
