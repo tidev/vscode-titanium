@@ -1,6 +1,6 @@
 {
     "name": "appcelerator-titanium",
-    "displayName": "appcelerator-titanium",
+    "displayName": "Appcelerator Titanium",
     "description": "Build tools for Appcelerator Titanium",
     "version": "0.0.1",
     "publisher": "Axway",
@@ -17,29 +17,29 @@
     "contributes": {
         "commands": [
             {
-                "command": "extension.init",
+                "command": "appcelerator-titanium.init",
                 "title": "Init",
                 "category": "Appcelerator"
             },
             {
-                "command": "extension.run",
+                "command": "appcelerator-titanium.run",
                 "title": "Run",
                 "category": "Appcelerator"
             },
             {
-                "command": "extension.stop",
+                "command": "appcelerator-titanium.stop",
                 "title": "Stop",
                 "category": "Appcelerator"
             },
             {
-                "command": "extension.dist",
+                "command": "appcelerator-titanium.dist",
                 "title": "Distribute",
                 "category": "Appcelerator"
             }
         ],
         "keybindings": [
             {
-                "command": "extension.run",
+                "command": "appcelerator-titanium.run",
                 "key": "ctrl+alt+enter",
                 "mac": "cmd+alt+enter"
             }
@@ -53,7 +53,68 @@
                 "language": "javascript",
                 "path": "./snippets/alloy.json"
             }
-        ]
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Appcelerator Titanium",
+            "properties": {
+                "appcelerator-titanium.general.appcCommandPath": {
+                    "type": "string",
+                    "default": "appc",
+                    "description": "Set the full path to the `appc` command if VS Code is unable to locate it. Run init command."
+                },
+                "appcelerator-titanium.general.displayBuildCommandInConsole": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "The executed build command is written to the console to aid debugging. This will include password arguments."
+                },
+                "appcelerator-titanium.general.generateAutoCompleteSuggestions": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Generate auto-complete suggestions for currently selected Titanium SDK. NOTE: Requires relaunch."
+                },
+                "appcelerator-titanium.project.defaultI18nLanguage": {
+                    "type": "string",
+                    "default": "en"
+                },
+                "appcelerator-titanium.build.distributionOutputDirectory": {
+                    "type": "string",
+                    "default": "dist",
+                    "description": "For iOS ad-hoc and App Store and Google Play builds. Ensure this location has write permission."
+                },
+                "appcelerator-titanium.codeTemplates.tssClass": {
+                    "type": "string",
+                    "default": "\\n'.${text}': {\\n}\\n",
+                    "description": "Style class (.) template"
+                },
+                "appcelerator-titanium.codeTemplates.tssId": {
+                    "type": "string",
+                    "default": "\\n'#${text}': {\\n}\\n",
+                    "description": "Style ID (#) template"
+                },
+                "appcelerator-titanium.codeTemplates.tssTag": {
+                    "type": "string",
+                    "default": "\\n'${text}': {\\n}\\n",
+                    "description": "Style tag template"
+                },
+                "appcelerator-titanium.codeTemplates.jsFunction": {
+                    "type": "string",
+                    "default": "\\nfunction ${text}(e){\\n}\\n",
+                    "description": "Event handler function template"
+                },
+                "appcelerator-titanium.android.keystorePath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Keystore path"
+                },
+                "appcelerator-titanium.android.keystoreAlias": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Keystore alias"
+                }
+            }
+        }
+        
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",

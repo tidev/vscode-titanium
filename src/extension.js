@@ -1,6 +1,7 @@
 
 const vscode = require('vscode');
 const Appc = require('./appc');
+const utils = require('./utils');
 
 let runOptions = {};
 
@@ -11,11 +12,11 @@ let runOptions = {};
  */
 function activate(context) {
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.init', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.init', () => {
 		init();
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.run', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.run', () => {
 		if (Appc.buildInProgress()) {
 			vscode.window.showErrorMessage('Build in progress');
 			return;
@@ -27,20 +28,16 @@ function activate(context) {
 
 		selectPlatform()
 			.then(platform => {
-				if (!platform) {
-					return;
+				if (platform) {
+					runOptions.platform = platform;
+					return selectTarget();
 				}
-
-				runOptions.platform = platform;
-				return selectTarget();
 			})
 			.then(targetType => {
 				if (!targetType) {
 					return;
 				}
-
 				runOptions.targetType = targetType;
-
 				if (runOptions.platform.id === 'ios') {
 					if (targetType.id === 'simulator') {
 						selectiOSSimulator()
@@ -87,7 +84,7 @@ function activate(context) {
 			});
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.dist', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.dist', () => {
 		if (Appc.buildInProgress()) {
 			vscode.window.showErrorMessage('Build in progress');
 			return;
@@ -97,10 +94,37 @@ function activate(context) {
 			buildCommand: 'dist-appstore'
 		};
 
-		vscode.window.showInformationMessage('Work in progress');
+		// vscode.window.showInformationMessage('Work in progress');
+
+		selectPlatform()
+			.then(platform => {
+				if (platform) {
+					runOptions.platform = platform;
+					if (runOptions.platform.id === 'ios') {
+						selectiOSDistribution()
+							.then(target => {
+								if (target) {
+									runOptions.target = target;
+									runOptions.buildCommand = target.id;
+									return selectiOSCodeSigning();
+								}
+							})
+							.then(profile => {
+								if (profile) {
+									runOptions.provisioningProfile = profile;
+									run(runOptions);
+								}
+							});
+					} else if (runOptions.platform.id === 'android') {
+
+					}
+				}
+			});
+
+
 	}));
 
-	context.subscriptions.push(vscode.commands.registerCommand('extension.stop', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
 		Appc.stop();
 	}));
 
@@ -211,7 +235,7 @@ function selectiOSCodeSigning() {
 				return;
 			}
 
-			const certificate = Appc.iOSCertificates().find(cert => cert.name === selectedCertificate.label);
+			const certificate = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').find(cert => cert.name === selectedCertificate.label);
 			runOptions.certificate = certificate;
 			return selectiOSProvisioningProfile();
 		});
@@ -298,23 +322,58 @@ function selectAndroidDevice() {
 }
 
 /**
+ * Select iOS distribution
+ *
+ * @returns {Thenable}
+*/
+function selectiOSDistribution() {
+	return vscode.window.showQuickPick([ {
+		label: 'App Store',
+		id: 'dist-appstore'
+	},
+	{
+		label: 'Ad-Hoc',
+		id: 'dist-adhoc'
+	} ]);
+}
+
+
+
+
+/**
  * Run
  *
  * @param {Object} opts 	run options
  */
 function run(opts) {
-	// console.log(JSON.stringify(opts, null, 4));
+	console.log(JSON.stringify(opts, null, 4));
 
-	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath, '--target', opts.targetType.id, '--device-id', opts.target.udid ];
+	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath ];
 
-	if (opts.targetType.id === 'device') {
-		args = args.concat([
-			'--developer-name', opts.certificate.name,
-			'--pp-uuid', opts.provisioningProfile.uuid
-		]);
+	if (opts.buildCommand === 'run') {
+		args = args.concat(['--target', opts.targetType.id, '--device-id', opts.target.udid]);
+
+		if (opts.targetType.id === 'device' && opts.platform.id === 'ios') {
+			args = args.concat([
+				'--developer-name', opts.certificate.name,
+				'--pp-uuid', opts.provisioningProfile.uuid
+			]);
+		}
+	} else if (opts.buildCommand) {
+		args = args.concat(['--target', opts.buildCommand, '--output-dir', utils.distributionOutputDirectory()]);
+		if (opts.platform.id === 'ios') {
+			args = args.concat([
+				'--distribution-name', opts.certificate.name,
+				'--pp-uuid', opts.provisioningProfile.uuid
+			]);
+		}
 	}
 
-	// console.log(JSON.stringify(args, null, 4));
+	console.log(JSON.stringify(args, null, 4));
+
+	return;
+
+	
 
 	if (opts.platform && opts.target) {
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: `Building for ${opts.platform.label} ${opts.target.label}...` }, p => {

@@ -304,8 +304,12 @@ const Appc = {
 			return;
 		}
 		let channel = vscode.window.createOutputChannel('Appcelerator');
+		const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
+		if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('displayBuildCommandInConsole')) {
+			channel.append(`${cmd} run ${opts.args.join(' ')}\n\n`);
+		}
 		this.killed = false;
-		this.proc = spawn('appc', [ 'run' ].concat(opts.args));
+		this.proc = spawn(cmd, [ 'run' ].concat(opts.args));
 		this.proc.stdout.on('data', data => {
 			if (!this.killed) {
 				let message = data.toString();
