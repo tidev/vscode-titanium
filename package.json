@@ -35,6 +35,26 @@
                 "command": "appcelerator-titanium.dist",
                 "title": "Distribute",
                 "category": "Appcelerator"
+            },
+            {
+                "command": "appcelerator-titanium.open-related-view",
+                "title": "Open related view",
+                "category": "Appcelerator"
+            },
+            {
+                "command": "appcelerator-titanium.open-related-style",
+                "title": "Open related style",
+                "category": "Appcelerator"
+            },
+            {
+                "command": "appcelerator-titanium.open-related-controller",
+                "title": "Open related controller",
+                "category": "Appcelerator"
+            },
+            {
+                "command": "appcelerator-titanium.toggle-related-files",
+                "title": "Toggle related files",
+                "category": "Appcelerator"
             }
         ],
         "keybindings": [
@@ -42,6 +62,26 @@
                 "command": "appcelerator-titanium.run",
                 "key": "ctrl+alt+enter",
                 "mac": "cmd+alt+enter"
+            },
+            {
+                "command": "appcelerator-titanium.open-related-view",
+                "key": "ctrl+alt+v",
+                "mac": "cmd+alt+v"
+            },
+            {
+                "command": "appcelerator-titanium.open-related-style",
+                "key": "ctrl+alt+s",
+                "mac": "cmd+alt+s"
+            },
+            {
+                "command": "appcelerator-titanium.open-related-controller",
+                "key": "ctrl+alt+x",
+                "mac": "cmd+alt+x"
+            },
+            {
+                "command": "appcelerator-titanium.toggle-related-files",
+                "key": "ctrl+alt+a",
+                "mac": "cmd+alt+a"
             }
         ],
         "snippets": [
@@ -114,7 +154,6 @@
                 }
             }
         }
-        
     },
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
@@ -122,16 +161,18 @@
         "lint": "eslint lib"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "@types/node": "^7.0.43",
         "@types/mocha": "^2.2.42",
+        "@types/node": "^7.0.43",
         "eslint": "^4.11.0",
         "eslint-config-axway": "^2.0.7",
         "eslint-plugin-jsx-a11y": "^6.0.2",
-        "eslint-plugin-react": "^7.5.1"
+        "eslint-plugin-react": "^7.5.1",
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6"
     },
     "dependencies": {
-        "path": "^0.12.7"
+        "find": "^0.2.9",
+        "path": "^0.12.7",
+        "underscore": "^1.8.3"
     }
 }

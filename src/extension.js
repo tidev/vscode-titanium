@@ -1,7 +1,8 @@
-
 const vscode = require('vscode');
 const Appc = require('./appc');
 const utils = require('./utils');
+const related = require('./related');
+const viewCodeCompletionProvider = require('./providers/viewCodeCompletionProvider');
 
 let runOptions = {};
 
@@ -11,6 +12,11 @@ let runOptions = {};
  * @param {Object} context 	extension context
  */
 function activate(context) {
+
+	// console.log(vscode.window.activeTextEditor);
+
+	// register code completion providers
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('xml', viewCodeCompletionProvider));
 
 	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.init', () => {
 		init();
@@ -126,6 +132,22 @@ function activate(context) {
 
 	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
 		Appc.stop();
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.open-related-view', () => {
+		related.openRelatedFile('xml');
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.open-related-style', () => {
+		related.openRelatedFile('tss');
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.open-related-controller', () => {
+		related.openRelatedFile('js');
+	}));
+
+	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.toggle-related-files', () => {
+		related.openAllFiles();
 	}));
 
 	init();

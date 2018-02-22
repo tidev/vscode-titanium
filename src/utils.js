@@ -1,7 +1,7 @@
-'use babel';
-
 const vscode = require('vscode');
 const path = require('path');
+const _ = require('underscore');
+const fs = require('fs');
 
 module.exports = {
 
@@ -93,5 +93,109 @@ module.exports = {
 			return path.join(vscode.workspace.rootPath, directory);
 		}
 		return directory;
-	}
+	},
+
+	/**
+	 * Returns string with capitalized first letter
+	 *
+	 * @param {String} string 	string
+	 * @returns {String}
+	 */
+	capitalizeFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	},
+
+	/**
+	 * Alloy app directory
+	 *
+	 * @returns {String}
+	 */
+	getAlloyRootPath() {
+		return path.join(vscode.workspace.rootPath, 'app');
+	},
+
+	/**
+	 * Returns true if current project is an Alloy project
+	 *
+	 * @returns {Boolean}
+	 */
+	isAlloyProject() {
+		return this.directoryExists(this.getAlloyRootPath());
+	},
+
+	/**
+	 * i18n project directory
+	 *
+	 * @returns {String}
+	 */
+	getI18nPath() {
+		if (this.isAlloyProject()) {
+			return path.join(this.getAlloyRootPath(), 'i18n');
+		}
+	},
+
+	/**
+	 * Returns true if file exists at given path
+	 *
+	 * @param {String} path		file path
+	 * @returns {Boolean}
+	 */
+	fileExists(path) {
+		try {
+			var stat = fs.statSync(path);
+			return stat.isFile();
+		} catch (err) {
+			return !(err && err.code === 'ENOENT');
+		}
+	},
+
+	/**
+	 * Returns true if directory exists at given path
+	 *
+	 * @param {String} path 	directory path
+	 * @returns {Boolean}
+	 */
+	directoryExists(path) {
+		try {
+			var stat = fs.statSync(path);
+			return stat.isDirectory();
+		} catch (err) {
+			return !(err && err.code === 'ENOENT');
+		}
+	},
+
+	/**
+	 * Convert to unix path
+	 *
+	 * @param {String} p 	path
+	 * @returns {String}
+	 */
+	toUnixPath(p) { // https://github.com/anodynos/upath
+		let double = /\/\//;
+		p = p.replace(/\\/g, '/');
+		while (p.match(double)) {
+			p = p.replace(double, '/');
+		}
+		return p;
+	},
+
+	/**
+	 * Returns recursive keys from given object
+	 *
+	 * @param {Object} obj 	object to get keys of
+	 * @returns {Array}
+	 */
+	getAllKeys(obj) {
+		if (!_.isObject(obj)) {
+			return [];
+		}
+		const result = [];
+		_.each(obj, function (value, key) {
+			result.push(key);
+			_.each(module.exports.getAllKeys(value), function (value) {
+				result.push(key + '.' + value);
+			});
+		});
+		return result;
+	},
 };
