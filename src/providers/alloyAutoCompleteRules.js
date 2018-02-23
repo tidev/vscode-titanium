@@ -43,38 +43,34 @@ module.exports = {
 		}
 	},
 
-	// i18n: {
-	// 	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
-	// 	getCompletions(linePrefix) {
-	// 		let completions;
-	// 		if (this.regExp.test(linePrefix)) {
-	// 			const defaultLang = atom.config.get('appcelerator-titanium.project.defaultI18nLanguage');
-	// 			const i18nPath = utils.getI18nPath();
-	// 			if (utils.directoryExists(i18nPath)) {
-	// 				const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
-	// 				completions = [];
-	// 				if (utils.fileExists(i18nStringPath)) {
-	// 					parseString(vscode.workspace.openTextDocument(i18nStringPath).getText(), (error, result) => {
-	// 						if (result && result.resources && result.resources.string) {
-	// 							for (let value of result.resources.string) {
-	// 								completions.push({
-	// 									// text: value.$.name,
-	// 									// leftLabel: defaultLang,
-	// 									// rightLabel: value._,
-	// 									// type: 'value',
-	// 									// replacementPrefix: utils.getCustomPrefix(request),
-	// 									label: value.$.name,
-	// 									kind: vscode.CompletionItemKind.Value
-	// 								});
-	// 							}
-	// 						}
-	// 					});
-	// 				}
-	// 			}
-	// 		}
-	// 		return completions;
-	// 	}
-	// },
+	i18n: {
+		regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
+		getCompletions(linePrefix) {
+			let completions;
+			if (this.regExp.test(linePrefix)) {
+				const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
+				const i18nPath = utils.getI18nPath();
+				if (utils.directoryExists(i18nPath)) {
+					const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
+					completions = [];
+					if (utils.fileExists(i18nStringPath)) {
+						parseString(fs.readFileSync(i18nStringPath, 'utf8'), (error, result) => {
+							if (result && result.resources && result.resources.string) {
+								for (let value of result.resources.string) {
+									completions.push({
+										label: value.$.name,
+										kind: vscode.CompletionItemKind.Reference,
+										detail: value._
+									});
+								}
+							}
+						});
+					}
+				}
+			}
+			return completions;
+		}
+	},
 	image: {
 		regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)$/,
 		getCompletions(linePrefix) {

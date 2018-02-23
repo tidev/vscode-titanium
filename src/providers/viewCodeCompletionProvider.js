@@ -4,6 +4,9 @@ const Range = vscode.Range;
 const utils = require('../utils');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
 const _ = require('underscore');
+const fs = require('fs');
+const related = require('../related');
+const path = require('path');
 
 module.exports = {
 
@@ -33,7 +36,7 @@ module.exports = {
             console.log('Attrinute...');
             return this.getAttributeNameCompletions(linePrefix, position, prefix);
         // attribute value <View backgroundColor="_"
-        } else if (/^\W*<\w+\W+\w*="[\w\.]*$/.test(linePrefix)) {
+        } else if (/^\W*<\w+\W+\w*="[\w('\.]*$/.test(linePrefix)) {
             console.log('Attrinute value...');
             let ruleResult;
 			// first attempt Alloy rules (i18n, image etc.)
@@ -41,7 +44,7 @@ module.exports = {
 			if (ruleResult) {
 				return ruleResult;
 			} else {
-                return this.getAttributeValueCompletions(linePrefix, position, prefix);
+                return this.getAttributeValueCompletions(linePrefix, position, prefix, document);
             }
         }
 
@@ -113,13 +116,6 @@ module.exports = {
 		//
 		for (const attribute of tagAttributes) {
 			if (!prefix || this.matches(attribute, prefix)) {
-				// completions.push(autoCompleteHelper.suggestion({
-				// 	type: 'property',
-				// 	snippet: `${attribute}="$1"$0`,
-				// 	displayText: attribute,
-				// 	api: apiName,
-				// 	property: attribute,
-                // }));
                 completions.push({
                     label: attribute,
                     insertText: new SnippetString(`${attribute}="$1"$0`),
@@ -134,13 +130,6 @@ module.exports = {
 		for (const event of events) {
 			const attribute = `on${utils.capitalizeFirstLetter(event)}`;
 			if (!prefix || this.matches(attribute, prefix)) {
-				// completions.push(autoCompleteHelper.suggestion({
-				// 	type: 'event',
-				// 	snippet: `${attribute}="$1"$0`,
-				// 	displayText: attribute,
-				// 	api: apiName,
-				// 	property: event,
-                // }));
                 completions.push({
                     label: attribute,
                     insertText: new SnippetString(`${attribute}="$1"$0`),
@@ -152,10 +141,10 @@ module.exports = {
 		return completions;
 	},
     
-    getAttributeValueCompletions(linePrefix, position, prefix) {
+    getAttributeValueCompletions(linePrefix, position, prefix, document) {
 		let values;
         let tag;
-        const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
+        let matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
         if (matches) {
             tag = matches[1];
         }
@@ -165,34 +154,36 @@ module.exports = {
 		let completions = [];
 
 		//
-		// realted TSS file
+		// realted and global TSS
 		//
-		// if ((attribute === 'id') || (attribute === 'class')) {
-		// 	let fileName;
-		// 	let textBuffer = Utils.getTextBuffer(related.getTargetPath('tss', currentPath));
-		// 	if (!textBuffer.isEmpty()) {
-		// 		values = this.tokenTextForSelector(textBuffer, attribute);
-		// 		fileName = textBuffer.getPath().split('/').pop();
-		// 		for (const value of values) {
-		// 			if (!prefix || Utils.firstCharsEqual(value, prefix)) {
-		// 				completions.push(this.buildStyleSelectorCompletion(attribute, value, fileName));
-		// 			}
-		// 		}
-		// 	}
+		if ((attribute === 'id') || (attribute === 'class')) {
+			const relatedFile = related.getTargetPath('tss', document.fileName);
+			const appTss = path.join(vscode.workspace.rootPath, 'app', 'styles', 'app.tss');
 
-		// 	//
-		// 	// app.tss file
-		// 	//
-		// 	textBuffer = Utils.getTextBuffer(path.join(atom.project.getPaths()[0], 'app', 'styles', 'app.tss'));
-		// 	if (!textBuffer.isEmpty()) {
-		// 		values = this.tokenTextForSelector(textBuffer, attribute);
-		// 		fileName = textBuffer.getPath().split('/').pop();
-		// 		for (const value of values) {
-		// 			if (!prefix || Utils.firstCharsEqual(value, prefix)) {
-		// 				completions.push(this.buildStyleSelectorCompletion(attribute, value, fileName));
-		// 			}
-		// 		}
-		// 	}
+			[ relatedFile, appTss ].forEach(file => {
+				let textBuffer = fs.readFileSync(file, 'utf8');
+				if (textBuffer.length > 0) {
+					let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
+					if (attribute === 'class') {
+						regex = /["'](\.)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
+					}
+					values = [];
+					while ((matches = regex.exec(textBuffer)) !== null) {
+						values.push(matches[2]);
+					}
+					const fileName = path.parse(file).name;
+					for (const value of values) {
+						if (!prefix || this.matches(value, prefix)) {
+							completions.push({
+								label: value,
+								kind: vscode.CodeActionKind.Reference,
+								detail: fileName
+							});
+						}
+					}
+				}
+			});
+        }
 
 		// } else if (attribute === 'src') {
 		// 	let alloyRootPath = Utils.getAlloyRootPath();
