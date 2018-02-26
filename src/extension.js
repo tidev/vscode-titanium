@@ -12,9 +12,6 @@ let runOptions = {};
  * @param {Object} context 	extension context
  */
 function activate(context) {
-
-	// console.log(vscode.window.activeTextEditor);
-
 	// register code completion providers
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('xml', viewCodeCompletionProvider));
 

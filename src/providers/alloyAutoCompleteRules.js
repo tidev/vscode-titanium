@@ -12,34 +12,36 @@ module.exports = {
 		getCompletions(linePrefix, position, prefix) {
 			let completions
 			if (this.regExp.test(linePrefix)) {
-				const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
-				completions = [];
-				if (utils.fileExists(cfgPath)) {
-					try {
-						// let cfgObj = JSON.parse(vscode.workspace.openTextDocument(cfgPath).getText());
-						let cfgObj = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-						cfgObj = _.reduce(cfgObj, function (memo, value, key) {
-							if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
-								return _.extend(memo, value);
-							} else {
-								return memo;
-							}
-						}, {});
+				return new Promise((resolve, reject) => {
+					const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
+					completions = [];
+					if (utils.fileExists(cfgPath)) {
+						try {
+							vscode.workspace.openTextDocument(cfgPath).then(document => {
+								let cfgObj = JSON.parse(document.getText());
+								cfgObj = _.reduce(cfgObj, function (memo, value, key) {
+									if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
+										return _.extend(memo, value);
+									} else {
+										return memo;
+									}
+								}, {});
 
-						const allKeys = utils.getAllKeys(cfgObj);
-						for (const key of allKeys) {
-							completions.push({
-								label: key,
-								kind: vscode.CompletionItemKind.Value
+								const allKeys = utils.getAllKeys(cfgObj);
+								for (const key of allKeys) {
+									completions.push({
+										label: key,
+										kind: vscode.CompletionItemKind.Value
+									});
+								}
+								resolve(completions);
 							});
+						} catch (error) {
+							console.log(error);
 						}
-					} catch (error) {
-						console.log(error);
 					}
-				}
+				});
 			}
-
-			return completions;
 		}
 	},
 
@@ -48,25 +50,30 @@ module.exports = {
 		getCompletions(linePrefix) {
 			let completions;
 			if (this.regExp.test(linePrefix)) {
-				const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
-				const i18nPath = utils.getI18nPath();
-				if (utils.directoryExists(i18nPath)) {
-					const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
-					completions = [];
-					if (utils.fileExists(i18nStringPath)) {
-						parseString(fs.readFileSync(i18nStringPath, 'utf8'), (error, result) => {
-							if (result && result.resources && result.resources.string) {
-								for (let value of result.resources.string) {
-									completions.push({
-										label: value.$.name,
-										kind: vscode.CompletionItemKind.Reference,
-										detail: value._
-									});
-								}
-							}
-						});
+				return new Promise((resolve, reject) => {
+					const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
+					const i18nPath = utils.getI18nPath();
+					if (utils.directoryExists(i18nPath)) {
+						const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
+						completions = [];
+						if (utils.fileExists(i18nStringPath)) {
+							vscode.workspace.openTextDocument(i18nStringPath).then(document => {
+								parseString(document.getText(), (error, result) => {
+									if (result && result.resources && result.resources.string) {
+										for (let value of result.resources.string) {
+											completions.push({
+												label: value.$.name,
+												kind: vscode.CompletionItemKind.Reference,
+												detail: value._
+											});
+										}
+										resolve(completions);
+									}
+								});
+							});
+						}
 					}
-				}
+				});
 			}
 			return completions;
 		}

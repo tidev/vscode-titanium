@@ -1,43 +1,49 @@
 const vscode = require('vscode');
 const SnippetString = vscode.SnippetString;
 const Range = vscode.Range;
-const utils = require('../utils');
-const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
 const _ = require('underscore');
-const fs = require('fs');
-const related = require('../related');
 const path = require('path');
+const find = require('find');
+const utils = require('../utils');
+const related = require('../related');
+const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
 
-module.exports = {
+/**
+ * Alloy View code completion provider
+*/
+const ViewCodeCompletionProvider = {
 
+	/**
+	 * Provide completion items
+	 *
+	 * @param {TextDocument} document active text document
+	 * @param {Position} position caret position
+	 * @param {CancellationToken} token cancellation token
+	 * @param {CompletionContext} context completion trgger
+	 *
+	 * @returns {Thenable|Array}
+	 */
     provideCompletionItems(document, position, token, context) {
-        // console.log(`position: ${position.line}:${position.character}`);
-        // console.log(`line: ${document.lineAt(position).text}`);
-
         const line = document.lineAt(position).text;
         const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
-        const wordRange = document.getWordRangeAtPosition(position);
-        const prefix = wordRange ? document.getText(wordRange) : null;
-
-        console.log(prefix);
-        // console.log(`range: ${wordRange}`);
-        // console.log(`${wordRange.start.character}-${wordRange.end.character} ${prefix}`);
+        const prefixRange = document.getWordRangeAtPosition(position);
+        const prefix = prefixRange ? document.getText(prefixRange) : null;
 
         if (!this.completions) {
 			this.loadCompletions();
 		}
 
         // opening tag <_ or <Vie_
-        if (/^\W*<\/?\w*$/.test(linePrefix)) {
-            console.log('Tag...');
-            return this.getTagNameCompletions(line, position, prefix);
+        if (/^\s*<\/?\w*$/.test(linePrefix)) {
+            // console.log('Tag...');
+            return this.getTagNameCompletions(line, linePrefix, prefix, position, prefixRange);
         // attribute <View _ or <View backg_
-        } else if (/^\W*<\/?\w+\W+\w*$/.test(linePrefix)) {
-            console.log('Attrinute...');
+        } else if (/^\s*<\w+[\s+\w*="()']*\s+\w*$/.test(linePrefix)) {
+            // console.log('Attrinute...');
             return this.getAttributeNameCompletions(linePrefix, position, prefix);
         // attribute value <View backgroundColor="_"
-        } else if (/^\W*<\w+\W+\w*="[\w('\.]*$/.test(linePrefix)) {
-            console.log('Attrinute value...');
+        } else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('\.]*$/.test(linePrefix)) {
+            // console.log('Attrinute value...');
             let ruleResult;
 			// first attempt Alloy rules (i18n, image etc.)
 			_.find(alloyAutoCompleteRules, rule => ruleResult = rule.getCompletions(linePrefix, position, prefix));
@@ -46,11 +52,15 @@ module.exports = {
 			} else {
                 return this.getAttributeValueCompletions(linePrefix, position, prefix, document);
             }
-        }
-
-        // return [];
+		}
+		
+		// outside tag, test localised string function
+		return alloyAutoCompleteRules.i18n.getCompletions(linePrefix, position, prefix); 
     },
 
+	/**
+	 * Load completions list
+	*/
     loadCompletions() {
 		this.completions = require('./completions');
 		return _.extend(this.completions.properties, {
@@ -72,30 +82,52 @@ module.exports = {
 			}
 		});
     },
-    
-    getTagNameCompletions(line, position, prefix) {
+	
+	/**
+	 * Get tag name completions
+	 *
+	 * @param {String} line line text
+	 * @param {String} linePrefix line prefix text
+	 * @param {String} prefix word prefix
+	 * @param {Position} position caret position
+	 * @param {Range} prefixRange work prefix range
+	 *
+	 * @returns {Array}
+	 */
+    getTagNameCompletions(line, linePrefix, prefix, position, prefixRange) {
 		// ensure prefix contains valid characters
 		if (!/^[a-zA-Z]+$/.test(prefix)) {
 			return [];
 		}
-		let completions = [];
-		// let isClosing = new RegExp(`</${prefix}$`).test(line);
+		const completions = [];
+		const isClosing = new RegExp(`</${prefix||''}$`).test(linePrefix);
+		const useSnippet = new RegExp(`^\\s*</?${prefix||''}\\s*>?\\s*$`).test(line);
+		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) :  new Range(position.line, position.character, position.line, line.length);
 		for (let tag in this.completions.tags) {
-            if (this.matches(tag, prefix)) {
-                completions.push({
-                    label: tag,
-                    // insertText: new SnippetString(`${tag}$1>$2</${tag}>`),
-                    kind: vscode.CompletionItemKind.Class,
-                    detail: this.completions.tags[tag].apiName
-                });
+            if (!prefix || this.matches(tag, prefix)) {
+				let completion = {
+					label: tag,
+						kind: vscode.CompletionItemKind.Class,
+						detail: this.completions.tags[tag].apiName
+				};
+				if (useSnippet) {
+					completion.insertText = isClosing ? new SnippetString(`${tag}>`) : new SnippetString(`${tag}$1>$2</${tag}>`);;
+					completion.range = range
+				}
+				completions.push(completion);
 			}
         }
 		return completions;
     },
 
+	/**
+	 * 
+	 * @param {String} linePrefix line prefix text
+	 * @param {Position} position caret posiiton
+	 * @param {String} prefix prefix text
+	 */
     getAttributeNameCompletions(linePrefix, position, prefix) {
 		let completions = [];
-        // let tagName = this.getPreviousTag(editor.getBuffer(), bufferPosition);
         let tagName;
         const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
         if (matches) {
@@ -140,7 +172,17 @@ module.exports = {
 
 		return completions;
 	},
-    
+	
+	/**
+	 * Get attribute value completions
+	 *
+	 * @param {String} linePrefix text string upto posiiton
+	 * @param {Position} position caret position
+	 * @param {String} prefix word prefix
+	 * @param {TextDocument} document active text document
+	 *
+	 * @returns {Thenable|Array}
+	 */
     getAttributeValueCompletions(linePrefix, position, prefix, document) {
 		let values;
         let tag;
@@ -149,101 +191,107 @@ module.exports = {
             tag = matches[1];
         }
 		let attribute = this.getPreviousAttribute(linePrefix, position);
-		// let currentPath = editor.getPath();
-		// let currentControllerName = path.basename(currentPath, path.extname(currentPath));
 		let completions = [];
 
 		//
 		// realted and global TSS
 		//
-		if ((attribute === 'id') || (attribute === 'class')) {
-			const relatedFile = related.getTargetPath('tss', document.fileName);
-			const appTss = path.join(vscode.workspace.rootPath, 'app', 'styles', 'app.tss');
+		if (utils.getAlloyRootPath()) {
 
-			[ relatedFile, appTss ].forEach(file => {
-				let textBuffer = fs.readFileSync(file, 'utf8');
-				if (textBuffer.length > 0) {
-					let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
-					if (attribute === 'class') {
-						regex = /["'](\.)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
-					}
-					values = [];
-					while ((matches = regex.exec(textBuffer)) !== null) {
-						values.push(matches[2]);
-					}
-					const fileName = path.parse(file).name;
-					for (const value of values) {
-						if (!prefix || this.matches(value, prefix)) {
-							completions.push({
-								label: value,
-								kind: vscode.CodeActionKind.Reference,
-								detail: fileName
+			return new Promise((resolve, reject) => {
+				
+				if ((attribute === 'id') || (attribute === 'class')) {
+					const relatedFile = related.getTargetPath('tss', document.fileName);
+					const appTss = path.join(vscode.workspace.rootPath, 'app', 'styles', 'app.tss');
+
+					const files = [];
+					[ relatedFile, appTss ].forEach(file => {
+						files.push(new Promise((resolve, reject) => {
+							vscode.workspace.openTextDocument(file).then(document => {
+								console.log('Loaded ' + file);
+								if (document.getText().length > 0) {
+									let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
+									if (attribute === 'class') {
+										regex = /["'](\.)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
+									}
+									values = [];
+									while ((matches = regex.exec(document.getText())) !== null) {
+										values.push(matches[2]);
+									}
+									const fileName = path.parse(file).name;
+									for (const value of values) {
+										if (!prefix || this.matches(value, prefix)) {
+											completions.push({
+												label: value,
+												kind: vscode.CodeActionKind.Reference,
+												detail: fileName
+											});
+										}
+									}
+								}
+								resolve();
 							});
+						}));
+					});
+
+					Promise.all(files).then(() => {
+						resolve(completions);
+					});
+
+				} else if (attribute === 'src') {
+
+					//
+					// Require src attribute
+					//
+					if (tag === 'Require') {
+						let controllerPath = path.join(utils.getAlloyRootPath(), 'controllers');
+						if (utils.directoryExists(controllerPath)) {
+							let files = find.fileSync(/\.js$/, controllerPath);
+							const relatedControllerFile = related.getTargetPath('js', document.fileName);
+							for (const file of files) {
+								if (relatedControllerFile === file) {
+									continue;
+								}
+								let value = utils.toUnixPath(file.replace(controllerPath, '').split('.')[0]);
+								completions.push({
+									label: value,
+									kind: vscode.CompletionItemKind.Reference
+								});
+							}
 						}
-					}
+
+						resolve(completions);
+
+					//
+					// Widget src attribute
+					//
+					} else if (tag === 'Widget') {
+						let alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
+						try {
+							vscode.workspace.openTextDocument(alloyConfigPath).then(document => {
+								let configObj = JSON.parse(document.getText());
+								for (let widgetName in (configObj ? configObj.dependencies : undefined)) {
+									completions.push({
+										label: widgetName,
+										kind: vscode.CompletionItemKind.Reference
+									});
+								}
+								resolve(completions);
+							});
+						} catch (e) {
+							return [];
+						}
+					}	
+				} else {
+					resolve([]);
 				}
 			});
-        }
+		}
 
-		// } else if (attribute === 'src') {
-		// 	let alloyRootPath = Utils.getAlloyRootPath();
-
-		// 	//
-		// 	// Require src attribute
-		// 	//
-		// 	if (tag === 'Require') {
-		// 		let controllerPath = path.join(alloyRootPath, 'controllers');
-		// 		if (Utils.directoryExists(controllerPath)) {
-		// 			let files = find.fileSync(/\.js$/, controllerPath);
-		// 			for (const file of files) {
-		// 				if (currentPath !== file) { // exclude current controller
-		// 					let prefix = Utils.getCustomPrefix({ bufferPosition, editor });
-		// 					let additionalPrefix = (prefix.startsWith('/') ? '' : '/');
-		// 					let value = Utils.toUnixPath(file.replace(controllerPath, '').split('.')[0]);
-		// 					completions.push(autoCompleteHelper.suggestion({
-		// 						type: 'require',
-		// 						text: value,
-		// 						replacementPrefix: additionalPrefix + prefix,
-		// 						onDidInsertSuggestion({ editor, triggerPosition, suggestion }) {
-		// 							let targetRange = [
-		// 								[ triggerPosition.row, 0 ],
-		// 								[ triggerPosition.row, triggerPosition.column ]
-		// 							];
-		// 							let originText = editor.getTextInRange(targetRange);
-		// 							if (!(new RegExp(`${suggestion.replacementPrefix}$`)).test(originText)) {
-		// 								return editor.setTextInBufferRange(targetRange, originText.replace(new RegExp(`${prefix}$`), `${value}`));
-		// 							}
-		// 						}
-		// 					}));
-		// 				}
-		// 			}
-		// 		}
-
-		// 	//
-		// 	// Widget src attribute
-		// 	//
-		// 	} else if (tag === 'Widget') {
-		// 		if (alloyRootPath) {
-		// 			let alloyConfigPath = path.join(alloyRootPath, 'config.json');
-		// 			try {
-		// 				let configObj = JSON.parse(fs.readFileSync(alloyConfigPath));
-		// 				for (let widgetName in (configObj ? configObj.dependencies : undefined)) {
-		// 					completions.push(autoCompleteHelper.suggestion({
-		// 						type: 'require',
-		// 						text: widgetName,
-		// 						replacementPrefix: Utils.getCustomPrefix({ bufferPosition, editor })
-		// 					}));
-		// 				}
-		// 			} catch (e) {
-		// 				return [];
-		// 			}
-		// 		}
-		// 	}
-
-		// 	//
-		// 	// Attribute values for prefix
-		// 	//
-		// } else {
+		//
+		// Attribute values for prefix
+		//
+		if (completions.length === 0) {
 			values = this.getAttributeValues(attribute);
 			for (let value of values) {
 				value = value.replace(/["']/g, '');
@@ -254,15 +302,30 @@ module.exports = {
                     });
 				}
 			}
-		// }
+		}
 
 		return completions;
     },
-    
-    matches(tag, prefix) {
-        return new RegExp(prefix, 'i').test(tag);
+	
+	/**
+	 * Matches
+	 *
+	 * @param {String} text text to test 
+	 * @param {String} test text to look for 
+	 *
+	 * @returns {Boolean}
+	 */
+    matches(text, test) {
+        return new RegExp(test, 'i').test(text);
     },
 
+	/**
+	 * Get tag attributes
+	 *
+	 * @param {String} tag tag name
+	 *
+	 * @returns {Array}
+	 */
     getTagAttributes(tag) {
 		const type = this.completions.types[this.completions.tags[tag] ? this.completions.tags[tag].apiName : undefined];
 		if (type) {
@@ -271,11 +334,22 @@ module.exports = {
 		return [];
 	},
 
+	/**
+	 * Get attribute values
+	 *
+	 * @param {String} attribute attribute name
+	 */
     getAttributeValues(attribute) {
 		attribute = this.completions.properties[attribute];
 		return (attribute ? attribute.values : undefined) ? (attribute  ? attribute.values : undefined) : [];
     },
-    
+
+	/**
+	 * Get previous attribute
+	 *
+	 * @param {String} linePrefix line prefix text
+	 * @param {Position} position caret position
+	 */
     getPreviousAttribute(linePrefix, position) {
 		// Remove everything until the opening quote
 		let quoteIndex = position.character - 1;
@@ -289,3 +363,5 @@ module.exports = {
 		}
 	},
 };
+
+module.exports = ViewCodeCompletionProvider;
