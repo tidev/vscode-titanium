@@ -44,8 +44,8 @@ const ViewCodeCompletionProvider = {
         // attribute value <View backgroundColor="_"
         } else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('\.]*$/.test(linePrefix)) {
             // console.log('Attrinute value...');
-            let ruleResult;
 			// first attempt Alloy rules (i18n, image etc.)
+			let ruleResult;
 			_.find(alloyAutoCompleteRules, rule => ruleResult = rule.getCompletions(linePrefix, position, prefix));
 			if (ruleResult) {
 				return ruleResult;

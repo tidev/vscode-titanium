@@ -3,6 +3,7 @@ const Appc = require('./appc');
 const utils = require('./utils');
 const related = require('./related');
 const viewCodeCompletionProvider = require('./providers/viewCodeCompletionProvider');
+const styleCodeCompletionProvider = require('./providers/styleCodeCompletionProvider');
 
 let runOptions = {};
 
@@ -14,6 +15,7 @@ let runOptions = {};
 function activate(context) {
 	// register code completion providers
 	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('xml', viewCodeCompletionProvider));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({pattern: '**/*.tss'}, styleCodeCompletionProvider));
 
 	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.init', () => {
 		init();
