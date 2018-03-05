@@ -1,7 +1,8 @@
-const vscode = require('vscode');
+const { workspace } = require('vscode');
 const path = require('path');
 const _ = require('underscore');
 const fs = require('fs');
+const Appc = require('./appc');
 
 module.exports = {
 
@@ -11,7 +12,7 @@ module.exports = {
 	 * @returns {Array}
 	 */
 	platforms () {
-		switch (platform()) {
+		switch (Appc.os()) {
 			case 'darwin':
 				return [ 'ios', 'android' ];
 			case 'win32':
@@ -37,9 +38,9 @@ module.exports = {
 			case 'windows':
 				return 'Windows';
 		}
-    },
+	},
 
-    /**
+	/**
 	 * Returns normalised name for platform
 	 *
 	 * @param {String} platform 	target platform
@@ -88,9 +89,9 @@ module.exports = {
 	 * @returns {String}
 	 */
 	distributionOutputDirectory() {
-		const directory = vscode.workspace.getConfiguration('appcelerator-titanium.build').get('distributionOutputDirectory');
+		const directory = workspace.getConfiguration('appcelerator-titanium.build').get('distributionOutputDirectory');
 		if (!path.isAbsolute(directory)) {
-			return path.join(vscode.workspace.rootPath, directory);
+			return path.join(workspace.rootPath, directory);
 		}
 		return directory;
 	},
@@ -111,7 +112,7 @@ module.exports = {
 	 * @returns {String}
 	 */
 	getAlloyRootPath() {
-		return path.join(vscode.workspace.rootPath, 'app');
+		return path.join(workspace.rootPath, 'app');
 	},
 
 	/**

@@ -2,8 +2,10 @@ const vscode = require('vscode');
 const Appc = require('./appc');
 const utils = require('./utils');
 const related = require('./related');
-const viewCodeCompletionProvider = require('./providers/viewCodeCompletionProvider');
-const styleCodeCompletionProvider = require('./providers/styleCodeCompletionProvider');
+const viewCompletionProvider = require('./providers/viewCompletionProvider');
+const styleCompletionProvider = require('./providers/styleCompletionProvider');
+const controllerCompletionProvider = require('./providers/controllerCompletionProvider');
+const tiappCompletionProvider = require('./providers/tiappCompletionProvider');
 
 let runOptions = {};
 
@@ -14,140 +16,133 @@ let runOptions = {};
  */
 function activate(context) {
 	// register code completion providers
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider('xml', viewCodeCompletionProvider));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({pattern: '**/*.tss'}, styleCodeCompletionProvider));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/app/{views,widgets}/**/*.xml' }, viewCompletionProvider));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/*.tss' }, styleCompletionProvider));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}' }, controllerCompletionProvider, '.'));
+	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionProvider));
 
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.init', () => {
-		init();
-	}));
+	context.subscriptions.push(
+		vscode.commands.registerCommand('appcelerator-titanium.init', () => {
+			init();
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.run', () => {
+			if (Appc.buildInProgress()) {
+				vscode.window.showErrorMessage('Build in progress');
+				return;
+			}
 
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.run', () => {
-		if (Appc.buildInProgress()) {
-			vscode.window.showErrorMessage('Build in progress');
-			return;
-		}
+			runOptions = {
+				buildCommand: 'run'
+			};
 
-		runOptions = {
-			buildCommand: 'run'
-		};
-
-		selectPlatform()
-			.then(platform => {
-				if (platform) {
-					runOptions.platform = platform;
-					return selectTarget();
-				}
-			})
-			.then(targetType => {
-				if (!targetType) {
-					return;
-				}
-				runOptions.targetType = targetType;
-				if (runOptions.platform.id === 'ios') {
-					if (targetType.id === 'simulator') {
-						selectiOSSimulator()
-							.then(target => {
-								if (target) {
-									runOptions.target = target;
-									run(runOptions);
-								}
-							});
-					} else if (targetType.id === 'device') {
-						selectiOSDevice()
-							.then(target => {
-								if (target) {
-									runOptions.target = target;
-									return selectiOSCodeSigning();
-								}
-							})
-							.then(profile => {
-								if (profile) {
-									runOptions.provisioningProfile = profile;
-									run(runOptions);
-								}
-							});
+			selectPlatform()
+				.then(platform => {
+					if (platform) {
+						runOptions.platform = platform;
+						return selectTarget();
 					}
-				} else if (runOptions.platform.id === 'android') {
-					if (targetType.id === 'emulator') {
-						selectAndroidEmulator()
-							.then(target => {
-								if (target) {
-									runOptions.target = target;
-									run(runOptions);
-								}
-							});
-					} else if (targetType.id === 'device') {
-						selectAndroidDevice()
-							.then(target => {
-								if (target) {
-									runOptions.target = target;
-									run(runOptions);
-								}
-							});
+				})
+				.then(targetType => {
+					if (!targetType) {
+						return;
 					}
-				}
-			});
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.dist', () => {
-		if (Appc.buildInProgress()) {
-			vscode.window.showErrorMessage('Build in progress');
-			return;
-		}
-
-		runOptions = {
-			buildCommand: 'dist-appstore'
-		};
-
-		// vscode.window.showInformationMessage('Work in progress');
-
-		selectPlatform()
-			.then(platform => {
-				if (platform) {
-					runOptions.platform = platform;
+					runOptions.targetType = targetType;
 					if (runOptions.platform.id === 'ios') {
-						selectiOSDistribution()
-							.then(target => {
-								if (target) {
-									runOptions.target = target;
-									runOptions.buildCommand = target.id;
-									return selectiOSCodeSigning();
-								}
-							})
-							.then(profile => {
-								if (profile) {
-									runOptions.provisioningProfile = profile;
-									run(runOptions);
-								}
-							});
+						if (targetType.id === 'simulator') {
+							selectiOSSimulator()
+								.then(target => {
+									if (target) {
+										runOptions.target = target;
+										run(runOptions);
+									}
+								});
+						} else if (targetType.id === 'device') {
+							selectiOSDevice()
+								.then(target => {
+									if (target) {
+										runOptions.target = target;
+										return selectiOSCodeSigning();
+									}
+								})
+								.then(profile => {
+									if (profile) {
+										runOptions.provisioningProfile = profile;
+										run(runOptions);
+									}
+								});
+						}
 					} else if (runOptions.platform.id === 'android') {
-
+						if (targetType.id === 'emulator') {
+							selectAndroidEmulator()
+								.then(target => {
+									if (target) {
+										runOptions.target = target;
+										run(runOptions);
+									}
+								});
+						} else if (targetType.id === 'device') {
+							selectAndroidDevice()
+								.then(target => {
+									if (target) {
+										runOptions.target = target;
+										run(runOptions);
+									}
+								});
+						}
 					}
-				}
-			});
+				});
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.dist', () => {
+			if (Appc.buildInProgress()) {
+				vscode.window.showErrorMessage('Build in progress');
+				return;
+			}
 
+			runOptions = {
+				buildCommand: 'dist-appstore'
+			};
 
-	}));
+			selectPlatform()
+				.then(platform => {
+					if (platform) {
+						runOptions.platform = platform;
+						if (runOptions.platform.id === 'ios') {
+							selectiOSDistribution()
+								.then(target => {
+									if (target) {
+										runOptions.target = target;
+										runOptions.buildCommand = target.id;
+										return selectiOSCodeSigning();
+									}
+								})
+								.then(profile => {
+									if (profile) {
+										runOptions.provisioningProfile = profile;
+										run(runOptions);
+									}
+								});
+						} else if (runOptions.platform.id === 'android') {
 
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
-		Appc.stop();
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.open-related-view', () => {
-		related.openRelatedFile('xml');
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.open-related-style', () => {
-		related.openRelatedFile('tss');
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.open-related-controller', () => {
-		related.openRelatedFile('js');
-	}));
-
-	context.subscriptions.push(vscode.commands.registerCommand('appcelerator-titanium.toggle-related-files', () => {
-		related.openAllFiles();
-	}));
+						}
+					}
+				});
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
+			Appc.stop();
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.open-related-view', () => {
+			related.openRelatedFile('xml');
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.open-related-style', () => {
+			related.openRelatedFile('tss');
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.open-related-controller', () => {
+			related.openRelatedFile('js');
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.toggle-related-files', () => {
+			related.openAllFiles();
+		})
+	);
 
 	init();
 }
@@ -358,21 +353,18 @@ function selectiOSDistribution() {
 	} ]);
 }
 
-
-
-
 /**
  * Run
  *
  * @param {Object} opts 	run options
  */
 function run(opts) {
-	console.log(JSON.stringify(opts, null, 4));
+	// console.log(JSON.stringify(opts, null, 4));
 
 	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath ];
 
 	if (opts.buildCommand === 'run') {
-		args = args.concat(['--target', opts.targetType.id, '--device-id', opts.target.udid]);
+		args = args.concat([ '--target', opts.targetType.id, '--device-id', opts.target.udid ]);
 
 		if (opts.targetType.id === 'device' && opts.platform.id === 'ios') {
 			args = args.concat([
@@ -381,7 +373,7 @@ function run(opts) {
 			]);
 		}
 	} else if (opts.buildCommand) {
-		args = args.concat(['--target', opts.buildCommand, '--output-dir', utils.distributionOutputDirectory()]);
+		args = args.concat([ '--target', opts.buildCommand, '--output-dir', utils.distributionOutputDirectory() ]);
 		if (opts.platform.id === 'ios') {
 			args = args.concat([
 				'--distribution-name', opts.certificate.name,
@@ -390,15 +382,13 @@ function run(opts) {
 		}
 	}
 
-	console.log(JSON.stringify(args, null, 4));
+	// console.log(JSON.stringify(args, null, 4));
 
 	return;
 
-	
-
 	if (opts.platform && opts.target) {
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: `Building for ${opts.platform.label} ${opts.target.label}...` }, p => {
-			return new Promise((resolve, reject) => {
+			return new Promise((resolve) => {
 				Appc.run({
 					args,
 					error: () => {

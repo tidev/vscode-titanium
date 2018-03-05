@@ -3,42 +3,36 @@ const utils = require('../utils');
 const _ = require('underscore');
 const find = require('find');
 const path = require('path');
-const fs = require('fs');
 const parseString = require('xml2js').parseString;
 
 module.exports = {
 	cfg: {
 		regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)$/,
-		getCompletions(linePrefix, position, prefix) {
-			let completions
+		getCompletions(linePrefix) {
 			if (this.regExp.test(linePrefix)) {
-				return new Promise((resolve, reject) => {
+				return new Promise((resolve) => {
 					const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
-					completions = [];
+					let completions = [];
 					if (utils.fileExists(cfgPath)) {
-						try {
-							vscode.workspace.openTextDocument(cfgPath).then(document => {
-								let cfgObj = JSON.parse(document.getText());
-								cfgObj = _.reduce(cfgObj, function (memo, value, key) {
-									if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
-										return _.extend(memo, value);
-									} else {
-										return memo;
-									}
-								}, {});
-
-								const allKeys = utils.getAllKeys(cfgObj);
-								for (const key of allKeys) {
-									completions.push({
-										label: key,
-										kind: vscode.CompletionItemKind.Value
-									});
+						vscode.workspace.openTextDocument(cfgPath).then(document => {
+							let cfgObj = JSON.parse(document.getText());
+							cfgObj = _.reduce(cfgObj, function (memo, value, key) {
+								if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
+									return _.extend(memo, value);
+								} else {
+									return memo;
 								}
-								resolve(completions);
-							});
-						} catch (error) {
-							console.log(error);
-						}
+							}, {});
+
+							const allKeys = utils.getAllKeys(cfgObj);
+							for (const key of allKeys) {
+								completions.push({
+									label: key,
+									kind: vscode.CompletionItemKind.Value
+								});
+							}
+							resolve(completions);
+						});
 					}
 				});
 			}
@@ -48,14 +42,13 @@ module.exports = {
 	i18n: {
 		regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
 		getCompletions(linePrefix) {
-			let completions;
 			if (this.regExp.test(linePrefix)) {
-				return new Promise((resolve, reject) => {
+				return new Promise((resolve) => {
 					const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
 					const i18nPath = utils.getI18nPath();
 					if (utils.directoryExists(i18nPath)) {
 						const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
-						completions = [];
+						let completions = [];
 						if (utils.fileExists(i18nStringPath)) {
 							vscode.workspace.openTextDocument(i18nStringPath).then(document => {
 								parseString(document.getText(), (error, result) => {
@@ -75,17 +68,15 @@ module.exports = {
 					}
 				});
 			}
-			return completions;
 		}
 	},
 	image: {
 		regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)$/,
 		getCompletions(linePrefix) {
-			let completions;
 			if (this.regExp.test(linePrefix)) {
 				const alloyRootPath = utils.getAlloyRootPath();
 				const assetPath = path.join(alloyRootPath, 'assets');
-				completions = [];
+				let completions = [];
 				// limit search to these sub-directories
 				let paths = [ 'images', 'iphone', 'android', 'windows' ];
 				paths = paths.map(aPath => path.join(assetPath, aPath));
@@ -145,8 +136,8 @@ module.exports = {
 						});
 					}
 				}
+				return completions;
 			}
-			return completions;
 		}
 	}
 };

@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const { spawn } = require('child_process');
 // const path = require('path');
+const utils = require('./utils');
 
 const Appc = {
 
@@ -17,7 +18,7 @@ const Appc = {
 		const proc = spawn('appc', [ 'info', '-o', 'json' ]);
 		proc.stdout.on('data', data => result += data);
 		// proc.stderr.on('data', data => console.log(data));
-		proc.on('close', (code) => {
+		proc.on('close', () => {
 			if (result && result.length) {
 				Appc.info = JSON.parse(result);
 				callback && callback(Appc.info);
@@ -25,6 +26,21 @@ const Appc = {
 				callback && callback({});
 			}
 		});
+	},
+
+	/**
+	 * Returns OS name for current platform
+	 *
+	 * @returns {String}
+	*/
+	os () {
+		const name = Appc.info.os.name;
+		if (/mac/i.test(name)) {
+			return 'darwin';
+		} else if (/win/i.test(name)) {
+			return 'win32';
+		}
+		return 'linux';
 	},
 
 	/**
@@ -276,8 +292,8 @@ const Appc = {
 					profile.disabled = true;
 				} else if (pem && profile.certs.indexOf(pem) === -1) {
 					profile.disabled = true;
-				// } else if (appId && !Utils.iOSProvisioinngProfileMatchesAppId(profile.appId, appId)) {
-				// 	profile.disabled = true;
+				} else if (appId && !utils.iOSProvisioinngProfileMatchesAppId(profile.appId, appId)) {
+					profile.disabled = true;
 				}
 				profiles.push(profile);
 			}
@@ -293,11 +309,6 @@ const Appc = {
 	 * Run `appc run` command
 	 *
 	 * @param {Object} opts				arguments
-	 * @param {Array} opts.args         arguments to pass to 'appc run' command
-	 * @param {Function} opts.log       output log callback
-	 * @param {Function} opts.error     error callback
-	 * @param {Function} opts.exit      exit callback
-	 * @returns {Object}
 	 */
 	run(opts) {
 		if (this.proc) {

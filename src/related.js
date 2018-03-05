@@ -24,7 +24,7 @@ module.exports = {
 		}
 		const relatedPath = this.getTargetPath(type);
 		if (!vscode.window.visibleTextEditors.find(editor => editor.document.fileName === relatedPath)) {
-			return vscode.window.showTextDocument(Uri.file(relatedPath), {preview: false});
+			return vscode.window.showTextDocument(Uri.file(relatedPath), { preview: false });
 		}
 	},
 
@@ -55,7 +55,7 @@ module.exports = {
 
 		// // if hanve 3 pane and active is already relatedfiles
 		// if (editorPanes.length < 3 || !isAlreadyAllFocused) {
-			this.openAllFiles();
+		this.openAllFiles();
 		// } else {
 		// 	this.closeRelatedFiles();
 		// }
@@ -77,7 +77,7 @@ module.exports = {
 		// 	return;
 		// }
 
-		['xml', 'tss', 'js'].forEach(type => {
+		[ 'xml', 'tss', 'js' ].forEach(type => {
 			this.openRelatedFile(type);
 		});
 
@@ -116,11 +116,8 @@ module.exports = {
 
 	/**
 	 * Close related files
-	 *
-	 * @param {Object}	args				function args
-	 * @param {Boolean} args.forceAllClose	close current file
 	 */
-	closeRelatedFiles(args = {}) {
+	closeRelatedFiles() {
 		// let { forceAllClose } = args;
 		// let activeEditor = atom.workspace.getActiveTextEditor();
 		// if (!activeEditor) {
