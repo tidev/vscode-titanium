@@ -6,6 +6,10 @@ const viewCompletionProvider = require('./providers/viewCompletionProvider');
 const styleCompletionProvider = require('./providers/styleCompletionProvider');
 const controllerCompletionProvider = require('./providers/controllerCompletionProvider');
 const tiappCompletionProvider = require('./providers/tiappCompletionProvider');
+const viewDefinitionProvider = require('./providers/viewDefinitionProvider');
+const styleDefinitionProvider = require('./providers/styleDefinitionProvider');
+const controllerDefinitionProvider = require('./providers/controllerDefinitionProvider');
+const definitionProviderHelper = require('./providers/definitionProviderHelper');
 
 let runOptions = {};
 
@@ -15,13 +19,32 @@ let runOptions = {};
  * @param {Object} context 	extension context
  */
 function activate(context) {
-	// register code completion providers
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/app/{views,widgets}/**/*.xml' }, viewCompletionProvider));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/*.tss' }, styleCompletionProvider));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}' }, controllerCompletionProvider, '.'));
-	context.subscriptions.push(vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionProvider));
+
+	definitionProviderHelper.activate(context.subscriptions);
+
+	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
+	const styleFilePattern = '**/*.tss';
+	const controllerFilePattern = '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}';
 
 	context.subscriptions.push(
+		// register completion providers
+		vscode.languages.registerCompletionItemProvider({ pattern: viewFilePattern }, viewCompletionProvider),
+		vscode.languages.registerCompletionItemProvider({ pattern: styleFilePattern }, styleCompletionProvider),
+		vscode.languages.registerCompletionItemProvider({ pattern: controllerFilePattern }, controllerCompletionProvider, '.'),
+		vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionProvider),
+
+		// register hover providers
+		vscode.languages.registerHoverProvider({ pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
+
+		// register definition providers
+		vscode.languages.registerDefinitionProvider({ pattern: viewFilePattern }, viewDefinitionProvider),
+		vscode.languages.registerDefinitionProvider({ pattern: styleFilePattern }, styleDefinitionProvider),
+		vscode.languages.registerDefinitionProvider({ pattern: controllerFilePattern }, controllerDefinitionProvider),
+
+		// register code action providers
+		vscode.languages.registerCodeActionsProvider({ pattern: viewFilePattern }, viewDefinitionProvider),
+
+		// register commands
 		vscode.commands.registerCommand('appcelerator-titanium.init', () => {
 			init();
 		}),
