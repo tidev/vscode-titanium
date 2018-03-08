@@ -2,11 +2,11 @@
 
 Appcelerator Titanium build tools for [Visual Studio Code](https://code.visualstudio.com).
 
-## Installation 
+## Installation
 
 ### Development
 
-* ``cd /path/to/extension`` and run ``npm inatall``
+* ``cd /path/to/extension`` and run ``npm install``
 * Open project in VS Code
 * Debug > Run. This will open a VS Code window with extension loaded
 
@@ -40,4 +40,3 @@ Generate code completions list    | ⛔️		|
 Jump to definition  	            | ✅		   | Path values are not highlighted correctly; images are previewed on hover
 Open related files                | ✅		   |
 Snippets							| ✅		   |
-
