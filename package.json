@@ -168,7 +168,8 @@
         "eslint-plugin-jsx-a11y": "^6.0.2",
         "eslint-plugin-react": "^7.5.1",
         "typescript": "^2.6.1",
-        "vscode": "^1.1.6"
+        "vscode": "^1.1.6",
+        "xml2js": "^0.4.19"
     },
     "dependencies": {
         "find": "^0.2.9",
