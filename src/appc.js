@@ -1,12 +1,38 @@
 const vscode = require('vscode');
 const { spawn } = require('child_process');
-// const path = require('path');
+const fs = require('fs');
+const path = require('path');
 const utils = require('./utils');
+const { homedir } = require('os');
 
 const Appc = {
 
 	info: {},
 	proc: null,
+
+	/**
+	 * Returns appc CLI session for current user
+	 *
+	 * @returns {Object}
+	 */
+	session() {
+		const sessionPath = path.join(homedir(), '.appcelerator/appc-cli.json');
+		if (fs.existsSync(sessionPath)) {
+			return JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+		}
+	},
+
+	/**
+	 * Returns true if user has active session
+	 *
+	 * @returns {Boolean}
+	 */
+	isUserLoggedIn() {
+		const session = this.session();
+		if (session && session.hasOwnProperty('session') && session.hasOwnProperty('expiry')) {
+			return (session.expiry - +new Date() > 0);
+		}
+	},
 
 	/**
 	 * Get info
@@ -117,8 +143,17 @@ const Appc = {
 	selectedSdk() {
 		if (Appc.info.titaniumCLI) {
 			const selectedVersion = Appc.info.titaniumCLI.selectedSDK;
-			let sdk = Appc.info.titanium[selectedVersion];
-			sdk.fullversion = selectedVersion;
+			let sdk;
+			if (selectedVersion) {
+				sdk = Appc.info.titanium[selectedVersion];
+				sdk.fullversion = selectedVersion;
+			}
+			if (!sdk) {
+				sdk = this.latestSdk();
+				if (!sdk) {
+					sdk = this.latestSdk(false);
+				}
+			}
 			return sdk;
 		}
 	},

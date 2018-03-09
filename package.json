@@ -55,7 +55,12 @@
                 "command": "appcelerator-titanium.toggle-related-files",
                 "title": "Toggle related files",
                 "category": "Appcelerator"
-            }
+            },
+			{
+				"command": "appcelerator-titanium.generate-autocomplete-suggestions",
+				"title": "Generate autocomplete list",
+				"category": "Appcelerator"
+			}
         ],
         "keybindings": [
             {

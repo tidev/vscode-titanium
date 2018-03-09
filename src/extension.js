@@ -10,6 +10,7 @@ const viewDefinitionProvider = require('./providers/viewDefinitionProvider');
 const styleDefinitionProvider = require('./providers/styleDefinitionProvider');
 const controllerDefinitionProvider = require('./providers/controllerDefinitionProvider');
 const definitionProviderHelper = require('./providers/definitionProviderHelper');
+const completionsGenerator = require('./providers/completionsGenerator');
 
 let runOptions = {};
 
@@ -164,6 +165,19 @@ function activate(context) {
 		}),
 		vscode.commands.registerCommand('appcelerator-titanium.toggle-related-files', () => {
 			related.openAllFiles();
+		}),
+		vscode.commands.registerCommand('appcelerator-titanium.generate-autocomplete-suggestions', () => {
+			vscode.workspace.getConfiguration('appcelerator-titanium.general').update('generateAutoCompleteSuggestions', true, true).then(() => {
+				completionsGenerator.generateCompletions(null, (success) => {
+					if (success) {
+						delete require.cache[require.resolve('./providers/completions')];
+						viewCompletionProvider.loadCompletions();
+						styleCompletionProvider.loadCompletions();
+						controllerCompletionProvider.loadCompletions();
+					}
+				});
+				
+			});
 		})
 	);
 
@@ -186,11 +200,17 @@ function init() {
 		return new Promise((resolve, reject) => {
 			Appc.getInfo((info) => {
 				if (info) {
-					p.report({ message: 'Fetching Appcelerator envionment... Done' });
-					setTimeout(resolve, 1000);
+					completionsGenerator.generateCompletions(p, (success) => {
+						if (success) {
+							resolve();
+						} else {
+							vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+							reject();
+						}
+					});
 				} else {
 					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-					setTimeout(reject, 1000);
+					reject();
 				}
 			});
 		});

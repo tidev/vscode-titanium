@@ -2,7 +2,7 @@ const { workspace } = require('vscode');
 const path = require('path');
 const _ = require('underscore');
 const fs = require('fs');
-const Appc = require('./appc');
+const { platform } = require('os');
 
 module.exports = {
 
@@ -12,7 +12,7 @@ module.exports = {
 	 * @returns {Array}
 	 */
 	platforms () {
-		switch (Appc.os()) {
+		switch (platform()) {
 			case 'darwin':
 				return [ 'ios', 'android' ];
 			case 'win32':
