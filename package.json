@@ -15,6 +15,24 @@
     ],
     "main": "./src/extension",
     "contributes": {
+		"languages":[
+			{
+				"id": "alloy-tss",
+				"aliases": [
+					"Alloy Style (TSS)"
+				],
+				"extensions": [
+					".tss"
+				]
+			}
+		],
+		"grammars": [
+			{
+				"language": "alloy-tss",
+				"scopeName": "source.css.tss",
+				"path": "./grammars/tss.tmLanguage"
+			}
+		],
         "commands": [
             {
                 "command": "appcelerator-titanium.init",

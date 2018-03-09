@@ -34,7 +34,7 @@ Distribution (Android)              | ⛔️        | Need to look at entering k
 **Project creation**                | ⛔️        |
 **Alloy component generation**      | ⛔️        |
 **Editor tools**					| 🔜		|
-Code highlighting					| ⛔️		| Built-in support for JS and XML, need launguage support for TSS
+Code highlighting					| ✅		   | Built-in support for JS and XML, added launguage support for TSS
 Code completion	                    | ✅        | Functionally complete but needs some refactoring
 Generate code completions list      | ✅️		|
 Jump to definition  	            | ✅		   | Path values are not highlighted correctly; images are previewed on hover
