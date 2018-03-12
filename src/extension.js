@@ -2,15 +2,15 @@ const vscode = require('vscode');
 const Appc = require('./appc');
 const utils = require('./utils');
 const related = require('./related');
-const viewCompletionProvider = require('./providers/viewCompletionProvider');
-const styleCompletionProvider = require('./providers/styleCompletionProvider');
-const controllerCompletionProvider = require('./providers/controllerCompletionProvider');
-const tiappCompletionProvider = require('./providers/tiappCompletionProvider');
+const viewCompletionItemProvider = require('./providers/viewCompletionItemProvider');
+const styleCompletionItemProvider = require('./providers/styleCompletionItemProvider');
+const controllerCompletionItemProvider = require('./providers/controllerCompletionItemProvider');
+const tiappCompletionItemProvider = require('./providers/tiappCompletionItemProvider');
 const viewDefinitionProvider = require('./providers/viewDefinitionProvider');
 const styleDefinitionProvider = require('./providers/styleDefinitionProvider');
 const controllerDefinitionProvider = require('./providers/controllerDefinitionProvider');
 const definitionProviderHelper = require('./providers/definitionProviderHelper');
-const completionsGenerator = require('./providers/completionsGenerator');
+const completionItemProviderHelper = require('./providers/completionItemProviderHelper');
 
 let runOptions = {};
 
@@ -29,10 +29,10 @@ function activate(context) {
 
 	context.subscriptions.push(
 		// register completion providers
-		vscode.languages.registerCompletionItemProvider({ pattern: viewFilePattern }, viewCompletionProvider),
-		vscode.languages.registerCompletionItemProvider({ pattern: styleFilePattern }, styleCompletionProvider),
-		vscode.languages.registerCompletionItemProvider({ pattern: controllerFilePattern }, controllerCompletionProvider, '.'),
-		vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionProvider),
+		vscode.languages.registerCompletionItemProvider({ pattern: viewFilePattern }, viewCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ pattern: styleFilePattern }, styleCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ pattern: controllerFilePattern }, controllerCompletionItemProvider, '.'),
+		vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
 
 		// register hover providers
 		vscode.languages.registerHoverProvider({ pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
@@ -168,12 +168,12 @@ function activate(context) {
 		}),
 		vscode.commands.registerCommand('appcelerator-titanium.generate-autocomplete-suggestions', () => {
 			vscode.workspace.getConfiguration('appcelerator-titanium.general').update('generateAutoCompleteSuggestions', true, true).then(() => {
-				completionsGenerator.generateCompletions(null, (success) => {
+				completionItemProviderHelper.generateCompletions(null, (success) => {
 					if (success) {
 						delete require.cache[require.resolve('./providers/completions')];
-						viewCompletionProvider.loadCompletions();
-						styleCompletionProvider.loadCompletions();
-						controllerCompletionProvider.loadCompletions();
+						viewCompletionItemProvider.loadCompletions();
+						styleCompletionItemProvider.loadCompletions();
+						controllerCompletionItemProvider.loadCompletions();
 					}
 				});
 				
@@ -200,7 +200,7 @@ function init() {
 		return new Promise((resolve, reject) => {
 			Appc.getInfo((info) => {
 				if (info) {
-					completionsGenerator.generateCompletions(p, (success) => {
+					completionItemProviderHelper.generateCompletions(p, (success) => {
 						if (success) {
 							resolve();
 						} else {

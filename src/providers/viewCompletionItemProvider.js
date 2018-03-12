@@ -7,11 +7,12 @@ const find = require('find');
 const utils = require('../utils');
 const related = require('../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
+const completionItemProviderHelper = require('./completionItemProviderHelper');
 
 /**
  * Alloy View completion provider
 */
-const ViewCompletionProvider = {
+const ViewCompletionItemProvider = {
 
 	/**
 	 * Provide completion items
@@ -28,7 +29,7 @@ const ViewCompletionProvider = {
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
 		if (!this.completions) {
-			this.loadCompletions();
+			this.completions = completionItemProviderHelper.loadCompletions();
 		}
 
 		// opening tag <_ or <Vie_
@@ -53,33 +54,6 @@ const ViewCompletionProvider = {
 	},
 
 	/**
-	 * Load completions list
-	 *
-	 * @returns {Object}
-	*/
-	loadCompletions() {
-		this.completions = require('./completions');
-		return _.extend(this.completions.properties, {
-			id: {
-				description: 'TSS id'
-			},
-			class: {
-				description: 'TSS class'
-			},
-			platform: {
-				type: 'String',
-				description: 'Platform condition',
-				values: [
-					'android',
-					'ios',
-					'mobileweb',
-					'windows'
-				]
-			}
-		});
-	},
-
-	/**
 	 * Get tag name completions
 	 *
 	 * @param {String} line line text
@@ -100,7 +74,7 @@ const ViewCompletionProvider = {
 		const useSnippet = new RegExp(`^\\s*</?${prefix || ''}\\s*>?\\s*$`).test(line);
 		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) : new Range(position.line, position.character, position.line, line.length);
 		for (let tag in this.completions.tags) {
-			if (!prefix || this.matches(tag, prefix)) {
+			if (!prefix || completionItemProviderHelper.matches(tag, prefix)) {
 				let completion = {
 					label: tag,
 					kind: vscode.CompletionItemKind.Class,
@@ -146,7 +120,7 @@ const ViewCompletionProvider = {
 		// Class properties
 		//
 		for (const attribute of tagAttributes) {
-			if (!prefix || this.matches(attribute, prefix)) {
+			if (!prefix || completionItemProviderHelper.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
 					insertText: new SnippetString(`${attribute}="$1"$0`),
@@ -160,7 +134,7 @@ const ViewCompletionProvider = {
 		//
 		for (const event of events) {
 			const attribute = `on${utils.capitalizeFirstLetter(event)}`;
-			if (!prefix || this.matches(attribute, prefix)) {
+			if (!prefix || completionItemProviderHelper.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
 					kind: vscode.CompletionItemKind.Event,
@@ -217,7 +191,7 @@ const ViewCompletionProvider = {
 									}
 									const fileName = path.parse(file).name;
 									for (const value of values) {
-										if (!prefix || this.matches(value, prefix)) {
+										if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
 											completions.push({
 												label: value,
 												kind: vscode.CodeActionKind.Reference,
@@ -259,9 +233,9 @@ const ViewCompletionProvider = {
 
 						resolve(completions);
 
-						//
-						// Widget src attribute
-						//
+					//
+					// Widget src attribute
+					//
 					} else if (tag === 'Widget') {
 						let alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
 						vscode.workspace.openTextDocument(alloyConfigPath).then(document => {
@@ -288,7 +262,7 @@ const ViewCompletionProvider = {
 			values = this.getAttributeValues(attribute);
 			for (let value of values) {
 				value = value.replace(/["']/g, '');
-				if (!prefix || this.matches(value, prefix)) {
+				if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
 					completions.push({
 						label: value,
 						kind: vscode.CompletionItemKind.Value
@@ -298,18 +272,6 @@ const ViewCompletionProvider = {
 		}
 
 		return completions;
-	},
-
-	/**
-	 * Matches
-	 *
-	 * @param {String} text text to test
-	 * @param {String} test text to look for
-	 *
-	 * @returns {Boolean}
-	 */
-	matches(text, test) {
-		return new RegExp(test, 'i').test(text);
 	},
 
 	/**
@@ -361,4 +323,4 @@ const ViewCompletionProvider = {
 	},
 };
 
-module.exports = ViewCompletionProvider;
+module.exports = ViewCompletionItemProvider;

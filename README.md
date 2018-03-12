@@ -33,7 +33,7 @@ Distribution (iOS)                  | 🔜        |
 Distribution (Android)              | ⛔️        | Need to look at entering keystore credentials
 **Project creation**                | ⛔️        |
 **Alloy component generation**      | ⛔️        |
-**Editor tools**					| 🔜		|
+**Editor tools**					| ✅		   |
 Code highlighting					| ✅		   | Built-in support for JS and XML, added launguage support for TSS
 Code completion	                    | ✅        | Functionally complete but needs some refactoring
 Generate code completions list      | ✅️		|

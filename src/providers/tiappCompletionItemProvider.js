@@ -9,7 +9,7 @@ const Appc = require('../appc');
 /**
  * Tiapp.xml completion provider
 */
-const TiappCompletionProvider = {
+const TiappCompletionItemProvider = {
 
 	/**
 	 * Provide completion items
@@ -42,9 +42,9 @@ const TiappCompletionProvider = {
 				return;
 			}
 			const modules = {};
-			_.each(TiappCompletionProvider.getDirectories(modulePath), platform => {
+			_.each(TiappCompletionItemProvider.getDirectories(modulePath), platform => {
 				const platformModulePath = path.join(vscode.workspace.rootPath, 'modules', platform);
-				return _.each(TiappCompletionProvider.getDirectories(platformModulePath), moduleName => {
+				return _.each(TiappCompletionItemProvider.getDirectories(platformModulePath), moduleName => {
 					if (!modules[moduleName]) {
 						modules[moduleName] = {};
 					}
@@ -75,4 +75,4 @@ const TiappCompletionProvider = {
 	}
 };
 
-module.exports = TiappCompletionProvider;
+module.exports = TiappCompletionItemProvider;

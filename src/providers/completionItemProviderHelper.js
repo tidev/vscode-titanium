@@ -3,8 +3,49 @@ const fs = require('fs');
 const path = require('path');
 const Appc = require('../appc');
 const { homedir } = require('os');
+const _ = require('underscore');
 
-const CompletionsGenerator = {
+const completionItemProviderHelper = {
+
+	/**
+	 * Load completions list
+	 *
+	 * @returns {Object}
+	*/
+	loadCompletions() {
+		let completions = require('./completions');
+		_.extend(completions.properties, {
+			id: {
+				description: 'TSS id'
+			},
+			class: {
+				description: 'TSS class'
+			},
+			platform: {
+				type: 'String',
+				description: 'Platform condition',
+				values: [
+					'android',
+					'ios',
+					'mobileweb',
+					'windows'
+				]
+			}
+		});
+		return completions;
+	},
+
+	/**
+	 * Matches
+	 *
+	 * @param {String} text text to test
+	 * @param {String} test text to match aginst
+	 *
+	 * @returns {Boolean}
+	 */
+	matches(text, test) {
+		return new RegExp(test, 'i').test(text);
+	},
 
 	/**
 	 *
@@ -217,4 +258,4 @@ const CompletionsGenerator = {
 	}
 };
 
-module.exports = CompletionsGenerator;
+module.exports = completionItemProviderHelper;

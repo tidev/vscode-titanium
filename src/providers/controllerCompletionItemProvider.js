@@ -7,11 +7,12 @@ const find = require('find');
 const utils = require('../utils');
 const related = require('../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
+const completionItemProviderHelper = require('./completionItemProviderHelper');
 
 /**
  * Alloy Controller completion provider
 */
-const ControllerCompletionProvider = {
+const ControllerCompletionItemProvider = {
 
 	/**
 	 * Provide completion items
@@ -27,7 +28,7 @@ const ControllerCompletionProvider = {
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
 		if (!this.completions) {
-			this.loadCompletions();
+			this.completions = completionItemProviderHelper.loadCompletions();
 		}
 
 		// Alloy XML ID - $._
@@ -64,33 +65,6 @@ const ControllerCompletionProvider = {
 				return ruleResult;
 			}
 		}
-	},
-
-	/**
-	 * Load completions list
-	 *
-	 * @returns {Object}
-	*/
-	loadCompletions() {
-		this.completions = require('./completions');
-		return _.extend(this.completions.properties, {
-			id: {
-				description: 'TSS id'
-			},
-			class: {
-				description: 'TSS class'
-			},
-			platform: {
-				type: 'String',
-				description: 'Platform condition',
-				values: [
-					'android',
-					'ios',
-					'mobileweb',
-					'windows'
-				]
-			}
-		});
 	},
 
 	/**
@@ -170,15 +144,6 @@ const ControllerCompletionProvider = {
 								insertText: new SnippetString(`${value} = $1$0`)
 							});
 						}
-
-						// for (const value of this.completions.types[apiName].events) {
-						//     const attribute = `on${utils.capitalizeFirstLetter(value)}`;
-						//     completions.push({
-						//         label: attribute,
-						//         kind: vscode.CompletionItemKind.Event,
-						//         insertText: new SnippetString(`${attribute} = $1$0`)
-						//     });
-						// }
 					}
 				}
 				resolve(completions);
@@ -227,7 +192,7 @@ const ControllerCompletionProvider = {
 		const apiObj = this.completions.types[apiName];
 		if (apiObj) {
 			for (const func of apiObj.functions) {
-				if ((!attribute || ControllerCompletionProvider.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
+				if ((!attribute || completionItemProviderHelper.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
 					completions.push({
 						label: func,
 						kind: vscode.CompletionItemKind.Method
@@ -235,7 +200,7 @@ const ControllerCompletionProvider = {
 				}
 			}
 			for (const property of apiObj.properties) {
-				if ((!attribute || ControllerCompletionProvider.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
+				if ((!attribute || completionItemProviderHelper.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
 					completions.push({
 						label: property,
 						kind: vscode.CompletionItemKind.Property
@@ -338,18 +303,6 @@ const ControllerCompletionProvider = {
 			});
 		});
 	},
-
-	/**
-	 * Matches
-	 *
-	 * @param {String} text text to test
-	 * @param {String} test text to look for
-	 *
-	 * @returns {Boolean}
-	 */
-	matches(text, test) {
-		return new RegExp(test, 'i').test(text);
-	},
 };
 
-module.exports = ControllerCompletionProvider;
+module.exports = ControllerCompletionItemProvider;

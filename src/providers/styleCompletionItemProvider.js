@@ -4,11 +4,12 @@ const Range = vscode.Range;
 const _ = require('underscore');
 const related = require('../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
+const completionItemProviderHelper = require('./completionItemProviderHelper');
 
 /**
  * Alloy Style completion provider
 */
-const StyleCompletionProvider = {
+const StyleCompletionItemProvider = {
 
 	/**
 	 * Provide completion items
@@ -24,7 +25,7 @@ const StyleCompletionProvider = {
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
 		if (!this.completions) {
-			this.loadCompletions();
+			this.completions = completionItemProviderHelper.loadCompletions();
 		}
 
 		// property value - foo: _ or foo: ba_
@@ -50,33 +51,6 @@ const StyleCompletionProvider = {
 	},
 
 	/**
-	 * Load completions list
-	 *
-	 * @returns {Object}
-	*/
-	loadCompletions() {
-		this.completions = require('./completions');
-		return _.extend(this.completions.properties, {
-			id: {
-				description: 'TSS id'
-			},
-			class: {
-				description: 'TSS class'
-			},
-			platform: {
-				type: 'String',
-				description: 'Platform condition',
-				values: [
-					'android',
-					'ios',
-					'mobileweb',
-					'windows'
-				]
-			}
-		});
-	},
-
-	/**
      * Get class or ID completions
      *
      * @param {String} linePrefix line prefix text
@@ -98,7 +72,7 @@ const StyleCompletionProvider = {
 				let matches;
 				while ((matches = regex.exec(document.getText())) !== null) {
 					for (const value of matches[1].split(' ')) {
-						if (value && value.length > 0 && !values.includes(value) && (!prefix || this.matches(value, prefix))) {
+						if (value && value.length > 0 && !values.includes(value) && (!prefix || completionItemProviderHelper.matches(value, prefix))) {
 							completions.push({
 								label: value,
 								kind: vscode.CompletionItemKind.Reference,
@@ -124,7 +98,7 @@ const StyleCompletionProvider = {
 	getTagCompletions(linePrefix, prefix) {
 		const completions = [];
 		_.each(this.completions.tags, function (value, key) {
-			if (!prefix || this.matches(key, prefix)) {
+			if (!prefix || completionItemProviderHelper.matches(key, prefix)) {
 				completions.push({
 					label: key,
 					kind: vscode.CompletionItemKind.Class,
@@ -159,7 +133,7 @@ const StyleCompletionProvider = {
 		const completions = [];
 		const candidateProperties = _.isEmpty(innerProperties) ? this.completions.properties : innerProperties;
 		for (let property in candidateProperties) {
-			if (!prefix || this.matches(property, prefix)) {
+			if (!prefix || completionItemProviderHelper.matches(property, prefix)) {
 
 				//
 				// Object types
@@ -214,7 +188,7 @@ const StyleCompletionProvider = {
 
 		const completions = [];
 		for (const value of values) {
-			if (!prefix || this.matches(value, prefix)) {
+			if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
 				completions.push({
 					label: value,
 					kind: vscode.CompletionItemKind.Value
@@ -250,19 +224,6 @@ const StyleCompletionProvider = {
 			lineNumber--;
 		}
 	},
-
-	/**
-	 * Matches
-	 *
-	 * @param {String} text text to test
-	 * @param {String} test text to look for
-	 *
-	 * @returns {Boolean}
-	 */
-	matches(text, test) {
-		return new RegExp(test, 'i').test(text);
-	},
-
 };
 
-module.exports = StyleCompletionProvider;
+module.exports = StyleCompletionItemProvider;

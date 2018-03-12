@@ -8,6 +8,7 @@
 		"module": false
 	},
 	"rules": {
-		"security/detect-non-literal-regexp": "off"
+		"security/detect-non-literal-regexp": "off",
+		"security/detect-child-process": "off"
 	}
 }

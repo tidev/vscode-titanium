@@ -15,24 +15,24 @@
     ],
     "main": "./src/extension",
     "contributes": {
-		"languages":[
-			{
-				"id": "alloy-tss",
-				"aliases": [
-					"Alloy Style (TSS)"
-				],
-				"extensions": [
-					".tss"
-				]
-			}
-		],
-		"grammars": [
-			{
-				"language": "alloy-tss",
-				"scopeName": "source.css.tss",
-				"path": "./grammars/tss.tmLanguage"
-			}
-		],
+        "languages": [
+            {
+                "id": "alloy-tss",
+                "aliases": [
+                    "Alloy Style (TSS)"
+                ],
+                "extensions": [
+                    ".tss"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "alloy-tss",
+                "scopeName": "source.css.tss",
+                "path": "./grammars/tss.tmLanguage"
+            }
+        ],
         "commands": [
             {
                 "command": "appcelerator-titanium.init",
@@ -74,11 +74,11 @@
                 "title": "Toggle related files",
                 "category": "Appcelerator"
             },
-			{
-				"command": "appcelerator-titanium.generate-autocomplete-suggestions",
-				"title": "Generate autocomplete list",
-				"category": "Appcelerator"
-			}
+            {
+                "command": "appcelerator-titanium.generate-autocomplete-suggestions",
+                "title": "Generate autocomplete list",
+                "category": "Appcelerator"
+            }
         ],
         "keybindings": [
             {
@@ -196,6 +196,7 @@
     },
     "dependencies": {
         "find": "^0.2.9",
+        "fs-extra": "^5.0.0",
         "path": "^0.12.7",
         "underscore": "^1.8.3"
     }

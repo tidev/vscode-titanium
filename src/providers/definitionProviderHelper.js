@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const fs = require('fs-extra');
 const path = require('path');
 const find = require('find');
 const utils = require('../utils');
@@ -11,6 +12,7 @@ const utils = require('../utils');
 const DefinitionProviderHelper = {
 
 	insertCommandId: 'appcelerator-titanium.insertCodeAction',
+	insertI18nStringCommandId: 'appcelerator-titanium.insertI18nStringCodeAction',
 
 	suggestions: [
 		{ // i18n
@@ -21,34 +23,7 @@ const DefinitionProviderHelper = {
 			files: function () {
 				return [ path.join(utils.getI18nPath(), vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage'), 'strings.xml') ];
 			},
-			// didGenerateCallback: function (text) {
-			// 	const defaultLang = atom.config.get('appcelerator-titanium.project.defaultI18nLanguage');
-			// 	const i18nStringPath = path.join(Utils.getI18nPath(), defaultLang, 'strings.xml');
-			// 	return {
-			// 		title: 'Generate i18n string',
-			// 		rightLabel: defaultLang,
-			// 		showAlways: true,
-			// 		callback: function () {
-
-			// 			if (!Utils.fileExists(i18nStringPath)) {
-			// 				mkdirp.sync(path.join(Utils.getI18nPath(), defaultLang));
-			// 				fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
-			// 			}
-			// 			atom.workspace.open(i18nStringPath, {
-			// 				searchAllPanes: true
-			// 			}).then(function (te) {
-			// 				let insertText;
-			// 				te.scan(/<\/resources>/, function (iter) {
-			// 					insertText = `\t<string name="${text}"></string>\n</resources>`;
-			// 					te.setTextInBufferRange(iter.range, insertText);
-			// 					te.setCursorBufferPosition([ iter.range.start.row, insertText.split('><')[0].length + 1 ]);
-			// 				});
-			// 				te.scrollToCursorPosition();
-			// 			});
-
-			// 		}
-			// 	};
-			// }
+			i18nString: true
 		}
 	],
 
@@ -59,6 +34,7 @@ const DefinitionProviderHelper = {
 	 */
 	activate(subscriptions) {
 		subscriptions.push(vscode.commands.registerCommand(this.insertCommandId, this.insert, this));
+		subscriptions.push(vscode.commands.registerCommand(this.insertI18nStringCommandId, this.insertI18nString, this));
 	},
 
 	/**
@@ -184,13 +160,15 @@ const DefinitionProviderHelper = {
 			return;
 		}
 
+		suggestions = suggestions.concat(this.suggestions);
+
 		return new Promise((resolve) => {
 			for (const suggestion of suggestions) {
 				if (suggestion.regExp.test(linePrefix)) {
 					this.getReferences(suggestion.files(document, word), suggestion.definitionRegExp(word), () => { return {}; })
 						.then(definitions => {
-							if (definitions.length === 0 && suggestion.insertText) {
-								const codeActions = [];
+							const codeActions = [];
+							if ((!definitions || definitions.length === 0) && suggestion.insertText) {
 								const insertText = suggestion.insertText(word);
 								if (insertText) {
 									suggestion.files(document, word).forEach(file => {
@@ -201,6 +179,13 @@ const DefinitionProviderHelper = {
 										});
 									});
 								}
+								resolve(codeActions);
+							} else if ((!definitions || definitions.length === 0) && suggestion.i18nString) {
+								codeActions.push({
+									title: 'Generate i18n string',
+									command: DefinitionProviderHelper.insertI18nStringCommandId,
+									arguments: [ word ]
+								});
 								resolve(codeActions);
 							} else {
 								resolve([]);
@@ -243,6 +228,8 @@ const DefinitionProviderHelper = {
 
 			Promise.all(searches).then(() => {
 				resolve(definitions);
+			}, () => {
+				resolve([]);
 			});
 		});
 	},
@@ -254,16 +241,40 @@ const DefinitionProviderHelper = {
 	 * @param {String} filePath file in which to insert text
 	 */
 	insert(text, filePath) {
-		const edit = new vscode.WorkspaceEdit();
 		vscode.workspace.openTextDocument(filePath).then(document => {
 			let position = new vscode.Position(document.lineCount, 0);
 			if (document.lineAt(position.line - 1).text.trim().length) {
 				text = `\n${text}`;
 			}
+			const edit = new vscode.WorkspaceEdit();
 			edit.insert(vscode.Uri.file(filePath), position, text);
 			vscode.workspace.applyEdit(edit);
 		});
+	},
+
+	/**
+	 * Insert i18n string to end of given file and generate file if necessary
+	 *
+	 * @param {String} text text to insert
+	 */
+	insertI18nString(text) {
+		const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
+		const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
+		if (!utils.fileExists(i18nStringPath)) {
+			fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
+		}
+		vscode.workspace.openTextDocument(i18nStringPath).then(document => {
+			const insertText = `\t<string name="${text}"></string>\n`;
+			const index = document.getText().indexOf('<\/resources>');
+			if (index !== -1) {
+				const position = document.positionAt(index);
+				const edit = new vscode.WorkspaceEdit();
+				edit.insert(vscode.Uri.file(i18nStringPath), position, insertText);
+				vscode.workspace.applyEdit(edit);
+			}
+		});
 	}
+
 };
 
 module.exports = DefinitionProviderHelper;
