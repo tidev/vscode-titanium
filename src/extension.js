@@ -13,6 +13,7 @@ const definitionProviderHelper = require('./providers/definitionProviderHelper')
 const completionItemProviderHelper = require('./providers/completionItemProviderHelper');
 
 let runOptions = {};
+let extensionContext = {};
 
 /**
  * Activate
@@ -20,6 +21,8 @@ let runOptions = {};
  * @param {Object} context 	extension context
  */
 function activate(context) {
+
+	extensionContext = context;
 
 	definitionProviderHelper.activate(context.subscriptions);
 
@@ -62,8 +65,13 @@ function activate(context) {
 			selectPlatform()
 				.then(platform => {
 					if (platform) {
-						runOptions.platform = platform;
-						return selectTarget();
+						if (platform.id === 'lastRun') {
+							runOptions = extensionContext.workspaceState.get('lastRunOptions');
+							run(runOptions);
+						} else {
+							runOptions.platform = platform;
+							return selectTarget();
+						}
 					}
 				})
 				.then(targetType => {
@@ -223,14 +231,33 @@ function init() {
  * @returns {Thenable}
 */
 function selectPlatform() {
-	return vscode.window.showQuickPick([ {
+	const opts = [ {
 		label: 'iOS',
 		id: 'ios'
 	},
 	{
 		label: 'Android',
 		id: 'android'
-	} ]);
+	} ];
+
+	const lastRunOptions = extensionContext.workspaceState.get('lastRunOptions');
+	if (lastRunOptions) {
+		opts.splice(0, 0, { label: lastRunDescription(lastRunOptions), id: 'lastRun' });
+	}
+	return vscode.window.showQuickPick(opts);
+}
+
+/**
+ * Returns description for last run
+ *
+ * @param {Object} opts run options
+ */
+function lastRunDescription(opts) {
+	if (opts.platform.id === 'ios' && opts.targetType.id === 'device') {
+		return `Run on ${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
+	} else {
+		return `Run on ${opts.platform.label} ${opts.targetType.id} ${opts.target.label}`;
+	} 
 }
 
 /**
@@ -403,10 +430,10 @@ function selectiOSDistribution() {
  */
 function run(opts) {
 	// console.log(JSON.stringify(opts, null, 4));
-
 	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath ];
 
 	if (opts.buildCommand === 'run') {
+		extensionContext.workspaceState.update('lastRunOptions', opts);
 		args = args.concat([ '--target', opts.targetType.id, '--device-id', opts.target.udid ]);
 
 		if (opts.targetType.id === 'device' && opts.platform.id === 'ios') {
