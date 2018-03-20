@@ -45,13 +45,18 @@
                 "category": "Appcelerator"
             },
             {
+                "command": "appcelerator-titanium.dist",
+                "title": "Distribute",
+                "category": "Appcelerator"
+            },
+            {
                 "command": "appcelerator-titanium.stop",
                 "title": "Stop",
                 "category": "Appcelerator"
             },
             {
-                "command": "appcelerator-titanium.dist",
-                "title": "Distribute",
+                "command": "appcelerator-titanium.set-log-level",
+                "title": "Set log level",
                 "category": "Appcelerator"
             },
             {
@@ -165,6 +170,11 @@
                     "default": "\\nfunction ${text}(e){\\n}\\n",
                     "description": "Event handler function template"
                 },
+                "appcelerator-titanium.iOS.showProvisioningProfileDetail": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Show provisioning profile app ID and expiry information in picker"
+                },
                 "appcelerator-titanium.android.keystorePath": {
                     "type": "string",
                     "default": "",
@@ -197,6 +207,7 @@
     "dependencies": {
         "find": "^0.2.9",
         "fs-extra": "^5.0.0",
+        "moment": "^2.21.0",
         "path": "^0.12.7",
         "underscore": "^1.8.3"
     }

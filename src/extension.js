@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const moment = require('moment');
 const Appc = require('./appc');
 const utils = require('./utils');
 const related = require('./related');
@@ -162,6 +163,13 @@ function activate(context) {
 		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
 			Appc.stop();
 		}),
+		vscode.commands.registerCommand('appcelerator-titanium.set-log-level', () => {
+			vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], {placeHolder: 'Select log level'}).then(level => {
+				if (level) {
+					extensionContext.globalState.update('logLevel', level.toLowerCase());
+				}
+			});
+		}),
 		vscode.commands.registerCommand('appcelerator-titanium.open-related-view', () => {
 			related.openRelatedFile('xml');
 		}),
@@ -231,20 +239,29 @@ function init() {
  * @returns {Thenable}
 */
 function selectPlatform() {
-	const opts = [ {
-		label: 'iOS',
-		id: 'ios'
-	},
-	{
-		label: 'Android',
-		id: 'android'
-	} ];
+	const items = [
+		{
+			label: 'iOS',
+			id: 'ios'
+		},
+		{
+			label: 'Android',
+			id: 'android'
+		}
+	];
+
+	const opts = {placeHolder: 'Select platform'};
 
 	const lastRunOptions = extensionContext.workspaceState.get('lastRunOptions');
 	if (lastRunOptions) {
-		opts.splice(0, 0, { label: lastRunDescription(lastRunOptions), id: 'lastRun' });
+		items.splice(0, 0, { 
+			label: 'Last run',
+			description: lastRunDescription(lastRunOptions),
+			id: 'lastRun' 
+		});
+		opts.placeHolder = 'Select platform or last run destination';
 	}
-	return vscode.window.showQuickPick(opts);
+	return vscode.window.showQuickPick(items, opts);
 }
 
 /**
@@ -254,9 +271,9 @@ function selectPlatform() {
  */
 function lastRunDescription(opts) {
 	if (opts.platform.id === 'ios' && opts.targetType.id === 'device') {
-		return `Run on ${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
+		return `${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
 	} else {
-		return `Run on ${opts.platform.label} ${opts.targetType.id} ${opts.target.label}`;
+		return `${opts.platform.label} ${opts.targetType.id} ${opts.target.label}`;
 	} 
 }
 
@@ -273,7 +290,7 @@ function selectTarget() {
 	{
 		label: 'Device',
 		id: 'device'
-	} ]);
+	} ], {placeHolder: 'Select target'});
 }
 
 /**
@@ -282,7 +299,7 @@ function selectTarget() {
  * @returns {Thenable}
 */
 function selectiOSSimulator() {
-	return vscode.window.showQuickPick(Object.keys(Appc.iOSSimulators())).then(version => {
+	return vscode.window.showQuickPick(Object.keys(Appc.iOSSimulators()), {placeHolder: 'Select iOS version'}).then(version => {
 		const simulators = Appc.iOSSimulators()[version].map(simulator => {
 			return {
 				udid: simulator.udid,
@@ -290,7 +307,7 @@ function selectiOSSimulator() {
 				version: version
 			};
 		});
-		return vscode.window.showQuickPick(simulators);
+		return vscode.window.showQuickPick(simulators, {placeHolder: 'Select simulator'});
 	});
 }
 
@@ -306,7 +323,7 @@ function selectiOSDevice() {
 			label: device.name
 		};
 	});
-	return vscode.window.showQuickPick(devices);
+	return vscode.window.showQuickPick(devices, {placeHolder: 'Select device'});
 }
 
 /**
@@ -321,7 +338,7 @@ function selectiOSCodeSigning() {
 				return;
 			}
 
-			const certificate = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').find(cert => cert.name === selectedCertificate.label);
+			const certificate = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
 			runOptions.certificate = certificate;
 			return selectiOSProvisioningProfile();
 		});
@@ -335,10 +352,12 @@ function selectiOSCodeSigning() {
 function selectiOSCertificate() {
 	const certificates = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').map(certificate => {
 		return {
-			label: certificate.name
+			label: `${certificate.name}`,
+			description: `expires ${moment(certificate.after).format('D MMM YYYY HH:mm')}`,
+			pem: certificate.pem
 		};
 	});
-	return vscode.window.showQuickPick(certificates);
+	return vscode.window.showQuickPick(certificates, {placeHolder: 'Select certificate'});
 }
 
 /**
@@ -356,13 +375,18 @@ function selectiOSProvisioningProfile() {
 	}
 	Appc.iOSProvisioningProfiles(deployment, runOptions.certificate).forEach(profile => {
 		if (!profile.disabled) {
-			profiles.push({
+			const item = {
 				label: profile.name,
+				description: profile.uuid,
 				uuid: profile.uuid
-			});
+			};
+			if (vscode.workspace.getConfiguration('appcelerator-titanium.iOS').get('showProvisioningProfileDetail')) {
+				item.detail = `expires ${moment(profile.expirationDate).format('D MMM YYYY HH:mm')} | ${profile.appId}`;
+			}
+			profiles.push(item);
 		}
 	});
-	return vscode.window.showQuickPick(profiles);
+	return vscode.window.showQuickPick(profiles, {placeHolder: 'Select provisioning profile'});
 }
 
 /**
@@ -389,7 +413,7 @@ function selectAndroidEmulator() {
 			});
 		});
 	}
-	return vscode.window.showQuickPick(options);
+	return vscode.window.showQuickPick(options, {placeHolder: 'Select emulator'});
 }
 
 /**
@@ -404,7 +428,7 @@ function selectAndroidDevice() {
 			label: device.name
 		};
 	});
-	return vscode.window.showQuickPick(devices);
+	return vscode.window.showQuickPick(devices, {placeHolder: 'Select device'});
 }
 
 /**
@@ -430,7 +454,7 @@ function selectiOSDistribution() {
  */
 function run(opts) {
 	// console.log(JSON.stringify(opts, null, 4));
-	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath ];
+	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath, '--log-level', extensionContext.globalState.get('logLevel', 'info') ];
 
 	if (opts.buildCommand === 'run') {
 		extensionContext.workspaceState.update('lastRunOptions', opts);
@@ -454,7 +478,7 @@ function run(opts) {
 
 	// console.log(JSON.stringify(args, null, 4));
 
-	return;
+	// return;
 
 	if (opts.platform && opts.target) {
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: `Building for ${opts.platform.label} ${opts.target.label}...` }, p => {

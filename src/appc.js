@@ -343,7 +343,7 @@ const Appc = {
 	/**
 	 * Run `appc run` command
 	 *
-	 * @param {Object} opts				arguments
+	 * @param {Object} opts arguments
 	 */
 	run(opts) {
 		if (this.proc) {
@@ -370,6 +370,10 @@ const Appc = {
 			}
 		});
 		this.proc.on('close', (code) => {
+			// console.log(`Exited with code ${code}`);
+			opts.exit && opts.exit(code);
+		});
+		this.proc.on('exit', (code) => {
 			// console.log(`Exited with code ${code}`);
 			opts.exit && opts.exit(code);
 		});
