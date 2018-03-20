@@ -372,10 +372,12 @@ const Appc = {
 		this.proc.on('close', (code) => {
 			// console.log(`Exited with code ${code}`);
 			opts.exit && opts.exit(code);
+			this.proc = null;
 		});
 		this.proc.on('exit', (code) => {
 			// console.log(`Exited with code ${code}`);
 			opts.exit && opts.exit(code);
+			this.proc = null;
 		});
 
 		channel.show();

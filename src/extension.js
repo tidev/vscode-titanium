@@ -1,6 +1,7 @@
 const vscode = require('vscode');
 const moment = require('moment');
 const Appc = require('./appc');
+const project = require('./project');
 const utils = require('./utils');
 const related = require('./related');
 const viewCompletionItemProvider = require('./providers/viewCompletionItemProvider');
@@ -24,7 +25,7 @@ let extensionContext = {};
 function activate(context) {
 
 	extensionContext = context;
-
+	project.load();
 	definitionProviderHelper.activate(context.subscriptions);
 
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
@@ -63,12 +64,20 @@ function activate(context) {
 				buildCommand: 'run'
 			};
 
-			selectPlatform()
+			let last;
+			const lastOptions = extensionContext.workspaceState.get('lastRunOptions');
+			if (lastOptions) {
+				last = {
+					label: 'Last run',
+					description: lastRunDescription(lastOptions)
+				};				
+			}
+
+			selectPlatform(last)
 				.then(platform => {
 					if (platform) {
-						if (platform.id === 'lastRun') {
-							runOptions = extensionContext.workspaceState.get('lastRunOptions');
-							run(runOptions);
+						if (platform.id === 'last') {
+							run(lastOptions);
 						} else {
 							runOptions.platform = platform;
 							return selectTarget();
@@ -135,27 +144,41 @@ function activate(context) {
 				buildCommand: 'dist-appstore'
 			};
 
-			selectPlatform()
+			let last;
+			const lastOptions = extensionContext.workspaceState.get('lastDistOptions');
+			if (lastOptions) {
+				last = {
+					label: 'Last build',
+					description: lastDistDescription(lastOptions)
+				};				
+			}
+
+			selectPlatform(last)
 				.then(platform => {
 					if (platform) {
-						runOptions.platform = platform;
-						if (runOptions.platform.id === 'ios') {
-							selectiOSDistribution()
-								.then(target => {
-									if (target) {
-										runOptions.target = target;
-										runOptions.buildCommand = target.id;
-										return selectiOSCodeSigning();
-									}
-								})
-								.then(profile => {
-									if (profile) {
-										runOptions.provisioningProfile = profile;
-										run(runOptions);
-									}
-								});
-						} else if (runOptions.platform.id === 'android') {
+						if (platform.id === 'last') {
+							// runOptions = extensionContext.workspaceState.get('lastDistOptions');
+							run(lastOptions);
+						} else {
+							runOptions.platform = platform;
+							if (runOptions.platform.id === 'ios') {
+								selectiOSDistribution()
+									.then(target => {
+										if (target) {
+											runOptions.target = target;
+											runOptions.buildCommand = target.id;
+											return selectiOSCodeSigning();
+										}
+									})
+									.then(profile => {
+										if (profile) {
+											runOptions.provisioningProfile = profile;
+											run(runOptions);
+										}
+									});
+							} else if (runOptions.platform.id === 'android') {
 
+							}
 						}
 					}
 				});
@@ -238,7 +261,7 @@ function init() {
  *
  * @returns {Thenable}
 */
-function selectPlatform() {
+function selectPlatform(last) {
 	const items = [
 		{
 			label: 'iOS',
@@ -249,18 +272,17 @@ function selectPlatform() {
 			id: 'android'
 		}
 	];
-
 	const opts = {placeHolder: 'Select platform'};
 
-	const lastRunOptions = extensionContext.workspaceState.get('lastRunOptions');
-	if (lastRunOptions) {
+	if (last) {
 		items.splice(0, 0, { 
-			label: 'Last run',
-			description: lastRunDescription(lastRunOptions),
-			id: 'lastRun' 
+			label: last.label,
+			description: last.description,
+			id: 'last'
 		});
-		opts.placeHolder = 'Select platform or last run destination';
+		opts.placeHolder = 'Select platform or last destination';
 	}
+
 	return vscode.window.showQuickPick(items, opts);
 }
 
@@ -274,6 +296,19 @@ function lastRunDescription(opts) {
 		return `${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
 	} else {
 		return `${opts.platform.label} ${opts.targetType.id} ${opts.target.label}`;
+	} 
+}
+
+/**
+ * Returns description for last disribution build
+ *
+ * @param {Object} opts run options
+ */
+function lastDistDescription(opts) {
+	if (opts.platform.id === 'ios') {
+		return `iOS ${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
+	} else {
+		return `${opts.platform.label} ${opts.target.label}`;
 	} 
 }
 
@@ -373,7 +408,7 @@ function selectiOSProvisioningProfile() {
 	} else if (runOptions.buildCommand === 'dist-appstore') {
 		deployment = 'appstore';
 	}
-	Appc.iOSProvisioningProfiles(deployment, runOptions.certificate).forEach(profile => {
+	Appc.iOSProvisioningProfiles(deployment, runOptions.certificate, project.appId()).forEach(profile => {
 		if (!profile.disabled) {
 			const item = {
 				label: profile.name,
@@ -467,6 +502,7 @@ function run(opts) {
 			]);
 		}
 	} else if (opts.buildCommand) {
+		extensionContext.workspaceState.update('lastDistOptions', opts);
 		args = args.concat([ '--target', opts.buildCommand, '--output-dir', utils.distributionOutputDirectory() ]);
 		if (opts.platform.id === 'ios') {
 			args = args.concat([
