@@ -14,8 +14,11 @@ const controllerDefinitionProvider = require('./providers/controllerDefinitionPr
 const definitionProviderHelper = require('./providers/definitionProviderHelper');
 const completionItemProviderHelper = require('./providers/completionItemProviderHelper');
 
+const openDashboardCommandId = 'appcelerator-titanium.openDashboard';
+
 let runOptions = {};
 let extensionContext = {};
+let projectStatusBarItem;
 
 /**
  * Activate
@@ -23,9 +26,11 @@ let extensionContext = {};
  * @param {Object} context 	extension context
  */
 function activate(context) {
-
 	extensionContext = context;
 	project.load();
+	setStatusBar();
+	project.onModified(setStatusBar);
+
 	definitionProviderHelper.activate(context.subscriptions);
 
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
@@ -50,10 +55,12 @@ function activate(context) {
 		// register code action providers
 		vscode.languages.registerCodeActionsProvider({ pattern: viewFilePattern }, viewDefinitionProvider),
 
-		// register commands
+		// register init command
 		vscode.commands.registerCommand('appcelerator-titanium.init', () => {
 			init();
 		}),
+
+		// register run command
 		vscode.commands.registerCommand('appcelerator-titanium.run', () => {
 			if (Appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
@@ -134,6 +141,8 @@ function activate(context) {
 					}
 				});
 		}),
+
+		// register distribute command
 		vscode.commands.registerCommand('appcelerator-titanium.dist', () => {
 			if (Appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
@@ -157,7 +166,6 @@ function activate(context) {
 				.then(platform => {
 					if (platform) {
 						if (platform.id === 'last') {
-							// runOptions = extensionContext.workspaceState.get('lastDistOptions');
 							run(lastOptions);
 						} else {
 							runOptions.platform = platform;
@@ -183,9 +191,13 @@ function activate(context) {
 					}
 				});
 		}),
+
+		// register stop command
 		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
 			Appc.stop();
 		}),
+
+		// register set log level command
 		vscode.commands.registerCommand('appcelerator-titanium.set-log-level', () => {
 			vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], {placeHolder: 'Select log level'}).then(level => {
 				if (level) {
@@ -193,6 +205,8 @@ function activate(context) {
 				}
 			});
 		}),
+
+		// register related view commands
 		vscode.commands.registerCommand('appcelerator-titanium.open-related-view', () => {
 			related.openRelatedFile('xml');
 		}),
@@ -205,6 +219,8 @@ function activate(context) {
 		vscode.commands.registerCommand('appcelerator-titanium.toggle-related-files', () => {
 			related.openAllFiles();
 		}),
+
+		// register generate autocomplete suggestions command
 		vscode.commands.registerCommand('appcelerator-titanium.generate-autocomplete-suggestions', () => {
 			vscode.workspace.getConfiguration('appcelerator-titanium.general').update('generateAutoCompleteSuggestions', true, true).then(() => {
 				completionItemProviderHelper.generateCompletions(null, (success) => {
@@ -217,6 +233,10 @@ function activate(context) {
 				});
 				
 			});
+		}),
+
+		vscode.commands.registerCommand(openDashboardCommandId, () => {
+			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()));
 		})
 	);
 
@@ -228,6 +248,7 @@ exports.activate = activate;
  * Deactivate
 */
 function deactivate() {
+	project.dispose();
 }
 exports.deactivate = deactivate;
 
@@ -254,6 +275,26 @@ function init() {
 			});
 		});
 	});
+}
+
+/**
+ * Set project name and link to dashboard in status bar
+ */
+function setStatusBar() {
+	if (!projectStatusBarItem) {
+		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
+	}
+	if (project.isTitaniumApp) {	
+		projectStatusBarItem.text = `$(device-mobile)  ${project.appName()} (${project.sdk()})`;
+		if (project.dashboardUrl()) {
+			projectStatusBarItem.command = openDashboardCommandId;
+			projectStatusBarItem.tooltip = 'Open Axway Dashboard';
+		} else {
+			projectStatusBarItem.comand = null;
+			projectStatusBarItem.tooltip = null;
+		}
+		projectStatusBarItem.show();
+	}
 }
 
 /**

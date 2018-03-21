@@ -8,6 +8,7 @@ const TIAPP_FILENAME = 'tiapp.xml';
 const EVENT_MODIFIED = 'modified';
 const TIMODULEXML_FILENAME = 'timodule.xml';
 const MANIFEST_FILENAME = 'manifest';
+const DASHBOARD_URL_ROOT = 'https://platform.axway.com/#/app/';
 
 const Project = {
 
@@ -15,7 +16,7 @@ const Project = {
 	isTitaniumModule: false,
 	tiapp: undefined,
 	modules: [],
-	// emitter: new Emitter(),
+	emitter: undefined,
 
 	/**
 	 * Load tiapp.xml file
@@ -54,17 +55,16 @@ const Project = {
 				this.tiapp = json['ti:app'];
 				this.isTitaniumApp = true;
 			}
-
-			// if (!this.watcher) {
-			// 	this.watcher = atom.project.onDidChangeFiles(events => {
-			// 		for (const event of events) {
-			// 			if (event.path === filePath && event.action === 'modified') {
-			// 				this.loadTiappFile();
-			// 				this.emitter.emit(EVENT_MODIFIED);
-			// 			}
-			// 		}
-			// 	});
-			// }
+            
+            if (!this.emitter) {
+                this.emitter = new vscode.EventEmitter();
+                vscode.workspace.onDidSaveTextDocument((event) => {
+                    if (event.fileName === filePath) {
+                        this.loadTiappFile();
+                        this.emitter.fire();
+                    }
+                });
+            }
 		}
 	},
 
@@ -136,9 +136,9 @@ const Project = {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	// onModified(callback) {
-	// 	this.emitter.on(EVENT_MODIFIED, callback);
-	// },
+	onModified(callback) {
+        this.emitter.event(callback);
+	},
 
 	/**
 	 * App ID
@@ -162,7 +162,15 @@ const Project = {
 		} else {
 			return this.modules[0].name;
 		}
-	},
+    },
+    
+    dashboardUrl() {
+        // this.tiapp.property[2].$.name
+        const appcAppIdProperty = this.tiapp.property.find((property) => property.$.name === 'appc-app-id');
+        if (appcAppIdProperty) {
+            return path.join(DASHBOARD_URL_ROOT, appcAppIdProperty._);
+        }
+    },
 
 	/**
 	 * Returns platforms for module project
@@ -219,10 +227,9 @@ const Project = {
 	/**
 	 * Dispose of resources
 	 */
-	// destroy() {
-	// 	this.emitter.dispose();
-	// 	this.watcher.dispose();
-	// }
+	dispose() {
+		this.emitter.dispose();
+	}
 };
 
 module.exports = Project;
