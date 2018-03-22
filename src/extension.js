@@ -19,6 +19,7 @@ const openDashboardCommandId = 'appcelerator-titanium.openDashboard';
 let runOptions = {};
 let extensionContext = {};
 let projectStatusBarItem;
+let terminal;
 
 /**
  * Activate
@@ -62,6 +63,10 @@ function activate(context) {
 
 		// register run command
 		vscode.commands.registerCommand('appcelerator-titanium.run', () => {
+			if (checkLoginAndPrompt()) {
+				return;
+			}
+
 			if (Appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
 				return;
@@ -144,6 +149,10 @@ function activate(context) {
 
 		// register distribute command
 		vscode.commands.registerCommand('appcelerator-titanium.dist', () => {
+			if (checkLoginAndPrompt()) {
+				return;
+			}
+
 			if (Appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
 				return;
@@ -256,7 +265,7 @@ exports.deactivate = deactivate;
  * Initialise extension - fetch appc info
 */
 function init() {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Fetching Appcelerator envionment...' }, p => {
+	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator envionment...' }, p => {
 		return new Promise((resolve, reject) => {
 			Appc.getInfo((info) => {
 				if (info) {
@@ -521,6 +530,33 @@ function selectiOSDistribution() {
 		label: 'Ad-Hoc',
 		id: 'dist-adhoc'
 	} ]);
+}
+
+/**
+ * Check Appcelerator login and prompt if necessary
+ */
+function checkLoginAndPrompt() {
+	if (!Appc.isUserLoggedIn()) {
+		vscode.window.showInformationMessage('Please log in to the Appcelerator platform');
+		runTerminalCommand(`${vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath')} login`);
+		return true;
+	}
+}
+
+/**
+ * Open terminal and run command
+ *
+ * @param {String} cmd command to run
+ */
+function runTerminalCommand(cmd) {
+	if (!terminal) {
+		terminal = vscode.window.createTerminal('Appcelerator');
+	} else {
+		terminal.sendText('\003');
+	}
+	terminal.show();
+	terminal.sendText('clear');
+	terminal.sendText(cmd);
 }
 
 /**
