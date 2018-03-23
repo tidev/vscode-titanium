@@ -57,16 +57,16 @@ code /path/to/titanium/project
 
 Command                           | Keymap                | Description
 ---                               | ---                   | ---
-Run                               | `cmd|ctrl-alt-enter`  | Build and run on simulator or device
+Run                               | `cmd/ctrl-alt-enter`  | Build and run on simulator or device
 Distribute                        | -                     | Build project for Ad-Hoc or App Store distribution
-Stop                              | `cmd|ctrl-alt-.`      | Stop the current build
+Stop                              | `cmd/ctrl-alt-.`      | Stop the current build
 Set log level                     | -                     | Set the output log level
 Init                              | -                     | Reload Appcelerator environment information
 Generate autocomplete suggestions | -                     | Build autocomplete database for current default SDK version
-Open related view                 | `cmd|ctrl-alt-v`      | Open the related Alloy XML file
-Open related style                | `cmd|ctrl-alt-s`      | Open the related Alloy TSS file
-Open related controller           | `cmd|ctrl-alt-x`      | Open the related JavaScript file
-Toggle related files              | `cmd|ctrl-alt-a`      | Toggle the related Alloy XML, TSS and Javascript files
+Open related view                 | `cmd/ctrl-alt-v`      | Open the related Alloy XML file
+Open related style                | `cmd/ctrl-alt-s`      | Open the related Alloy TSS file
+Open related controller           | `cmd/ctrl-alt-x`      | Open the related JavaScript file
+Toggle related files              | `cmd/ctrl-alt-a`      | Toggle the related Alloy XML, TSS and Javascript files
 
 ### Build tools
 
