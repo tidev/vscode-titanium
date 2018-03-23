@@ -92,6 +92,11 @@
                 "mac": "cmd+alt+enter"
             },
             {
+                "command": "appcelerator-titanium.stop",
+                "key": "ctrl+alt+.",
+                "mac": "cmd+alt+."
+            },
+            {
                 "command": "appcelerator-titanium.open-related-view",
                 "key": "ctrl+alt+v",
                 "mac": "cmd+alt+v"
@@ -135,6 +140,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "The executed build command is written to the console to aid debugging. This will include password arguments."
+                },
+                "appcelerator-titanium.general.useTerminalForBuild": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Build command will be run using the integrated terminal."
                 },
                 "appcelerator-titanium.general.generateAutoCompleteSuggestions": {
                     "type": "boolean",

@@ -26,17 +26,17 @@
     },
     "addEventListener": {
         "prefix": "tiaddevent",
-        "body": "Ti.App.addEventListener(\"$1\", $2);$3",
+        "body": "Ti.App.addEventListener('$1', $2);$3",
         "description": "Add event listener function"
     },
     "removeEventListener": {
         "prefix": "tiremevent",
-        "body": "Ti.App.removeEventListener(\"$1\", $2);$3",
+        "body": "Ti.App.removeEventListener('$1', $2);$3",
         "description": "Remove event listener function"
     },
     "fireEvent": {
         "prefix": "tifireevent",
-        "body": "Ti.App.fireEvent(\"$1\", $2);$3",
+        "body": "Ti.App.fireEvent('$1', $2);$3",
         "description": "Fire event function"
     },
     "createAlertDialog": {

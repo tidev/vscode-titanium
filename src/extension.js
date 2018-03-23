@@ -194,7 +194,7 @@ function activate(context) {
 										}
 									});
 							} else if (runOptions.platform.id === 'android') {
-
+								vscode.window.showInformationMessage('TBD :)');
 							}
 						}
 					}
@@ -203,7 +203,13 @@ function activate(context) {
 
 		// register stop command
 		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
-			Appc.stop();
+			if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
+				if (terminal) {
+					runTerminalCommand('\003');
+				}
+			} else {
+				Appc.stop();
+			}
 		}),
 
 		// register set log level command
@@ -312,16 +318,9 @@ function setStatusBar() {
  * @returns {Thenable}
 */
 function selectPlatform(last) {
-	const items = [
-		{
-			label: 'iOS',
-			id: 'ios'
-		},
-		{
-			label: 'Android',
-			id: 'android'
-		}
-	];
+	const items = utils.platforms().map(platform => {
+		return {label: utils.nameForPlatform(platform), id: platform}
+	});
 	const opts = {placeHolder: 'Select platform'};
 
 	if (last) {
@@ -562,10 +561,9 @@ function runTerminalCommand(cmd) {
 /**
  * Run
  *
- * @param {Object} opts 	run options
+ * @param {Object} opts run options
  */
 function run(opts) {
-	// console.log(JSON.stringify(opts, null, 4));
 	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath, '--log-level', extensionContext.globalState.get('logLevel', 'info') ];
 
 	if (opts.buildCommand === 'run') {
@@ -589,23 +587,24 @@ function run(opts) {
 		}
 	}
 
-	// console.log(JSON.stringify(args, null, 4));
-
-	// return;
-
 	if (opts.platform && opts.target) {
-		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: `Building for ${opts.platform.label} ${opts.target.label}...` }, p => {
-			return new Promise((resolve) => {
-				Appc.run({
-					args,
-					error: () => {
-						resolve();
-					},
-					exit: () => {
-						resolve();
-					}
+		if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
+			const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
+			runTerminalCommand(`${cmd} run ${args.join(' ')}`);
+		} else {
+			vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: `Building for ${opts.platform.label} ${opts.target.label}...` }, p => {
+				return new Promise((resolve) => {
+					Appc.run({
+						args,
+						error: () => {
+							resolve();
+						},
+						exit: () => {
+							resolve();
+						}
+					});
 				});
 			});
-		});
+		}
 	}
 }
