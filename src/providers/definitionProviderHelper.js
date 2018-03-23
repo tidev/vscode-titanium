@@ -216,7 +216,7 @@ const DefinitionProviderHelper = {
 							let matches;
 							while ((matches = regExp.exec(document.getText())) !== null) {
 								const position = document.positionAt(matches.index);
-								definitions.push(callback(file, new vscode.Range(position.line, position.character, position.line + 3, 0)));
+								definitions.push(callback(file, new vscode.Range(position.line, position.character, position.line, 0)));
 							}
 						}
 						resolve();
