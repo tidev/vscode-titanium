@@ -90,7 +90,7 @@ $ appc ti sdk
 ...
 
 Installed SDKs:
-   7.0.0.GA [selected]  7.0.0.GA
+   7.1.0.GA [selected]  7.1.0.GA
 ```
 
 ```
