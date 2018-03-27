@@ -11,7 +11,8 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:tiapp.xml"
+        "workspaceContains:tiapp.xml",
+        "workspaceContains:**/timodule.xml"
     ],
     "main": "./src/extension",
     "contributes": {

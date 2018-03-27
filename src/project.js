@@ -137,7 +137,9 @@ const Project = {
 	 * @param {Function} callback	callback function
 	 */
 	onModified(callback) {
-        this.emitter.event(callback);
+		if (this.isTitaniumApp) {
+			this.emitter.event(callback);
+		}
 	},
 
 	/**

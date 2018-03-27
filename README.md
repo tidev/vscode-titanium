@@ -24,7 +24,7 @@ Feature                             | Status    | Notes
 ---                                 | ---      	| ---
 **Project support**                 | 🔜        |
 App                                 | ✅        |
-Native module                       | ⛔️        |
+Native module                       | ✅        |
 **Build**                           | 🔜        | VS Code does not allow a custom toolbar, interaction through command palette
 Keymap                              | ✅        |
 Command palette                     | ✅        |

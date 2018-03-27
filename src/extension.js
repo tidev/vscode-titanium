@@ -72,6 +72,11 @@ function activate(context) {
 				return;
 			}
 
+			if (project.isTitaniumModule) {
+				buildNativeModule();
+				return;
+			}
+
 			runOptions = {
 				buildCommand: 'run'
 			};
@@ -155,6 +160,11 @@ function activate(context) {
 
 			if (Appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
+				return;
+			}
+
+			if (project.isTitaniumModule) {
+				vscode.window.showErrorMessage('Use run command to build native module');
 				return;
 			}
 
@@ -300,7 +310,7 @@ function setStatusBar() {
 		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
 	}
 	if (project.isTitaniumApp) {	
-		projectStatusBarItem.text = `$(device-mobile)  ${project.appName()} (${project.sdk()})`;
+		projectStatusBarItem.text = `$(device-mobile) ${project.appName()} (${project.sdk()})`;
 		if (project.dashboardUrl()) {
 			projectStatusBarItem.command = openDashboardCommandId;
 			projectStatusBarItem.tooltip = 'Open Axway Dashboard';
@@ -309,18 +319,38 @@ function setStatusBar() {
 			projectStatusBarItem.tooltip = null;
 		}
 		projectStatusBarItem.show();
+	} else if (project.isTitaniumModule) {
+		projectStatusBarItem.text = `$(package) ${project.appName()}`;
 	}
+	projectStatusBarItem.show();
 }
 
 /**
- * Select platform
+ * Select platform or last destination
+ *
+ * @param {Array} platforms valid build platforms
+ * @param {Object} last last build destination
  *
  * @returns {Thenable}
 */
-function selectPlatform(last) {
-	const items = utils.platforms().map(platform => {
+function selectPlatform(platforms, last) {
+	if (platforms && !Array.isArray(platforms)) {
+		last = platforms;
+		platforms = null;
+	}
+	if (!platforms) {
+		platforms = utils.platforms();
+	} 
+	const items = platforms.map(platform => {
 		return {label: utils.nameForPlatform(platform), id: platform}
 	});
+
+	if (items.length === 1) {
+		return new Promise(resolve => {
+			resolve(items[0]);
+		});
+	}
+
 	const opts = {placeHolder: 'Select platform'};
 
 	if (last) {
@@ -559,16 +589,40 @@ function runTerminalCommand(cmd) {
 }
 
 /**
+ * Build native module
+ */
+function buildNativeModule() {
+	runOptions = {
+		buildCommand: 'build'
+	};
+
+	selectPlatform(project.platforms())
+		.then(platform => {
+			if (platform) {
+				runOptions.platform = platform;
+				run(runOptions);
+			}
+		});
+}
+
+/**
  * Run
  *
  * @param {Object} opts run options
  */
 function run(opts) {
-	let args = [ '-p', opts.platform.id, '--project-dir', vscode.workspace.rootPath, '--log-level', extensionContext.globalState.get('logLevel', 'info') ];
+	let args = [
+		'--platform', opts.platform.id,
+		'--log-level', extensionContext.globalState.get('logLevel', 'info')
+	];
 
 	if (opts.buildCommand === 'run') {
 		extensionContext.workspaceState.update('lastRunOptions', opts);
-		args = args.concat([ '--target', opts.targetType.id, '--device-id', opts.target.udid ]);
+		args = args.concat([
+			'--project-dir', vscode.workspace.rootPath,
+			'--target', opts.targetType.id,
+			'--device-id', opts.target.udid
+		]);
 
 		if (opts.targetType.id === 'device' && opts.platform.id === 'ios') {
 			args = args.concat([
@@ -576,9 +630,20 @@ function run(opts) {
 				'--pp-uuid', opts.provisioningProfile.uuid
 			]);
 		}
+
+	} else if (opts.buildCommand === 'build') {
+		args = args.concat([
+			'--project-dir', project.pathForPlatform(opts.platform.id),
+			'--build-only'
+		]);
+
 	} else if (opts.buildCommand) {
 		extensionContext.workspaceState.update('lastDistOptions', opts);
-		args = args.concat([ '--target', opts.buildCommand, '--output-dir', utils.distributionOutputDirectory() ]);
+		args = args.concat([
+			'--project-dir', vscode.workspace.rootPath,
+			'--target', opts.buildCommand,
+			'--output-dir', utils.distributionOutputDirectory()
+		]);
 		if (opts.platform.id === 'ios') {
 			args = args.concat([
 				'--distribution-name', opts.certificate.name,
@@ -587,24 +652,27 @@ function run(opts) {
 		}
 	}
 
-	if (opts.platform && opts.target) {
-		if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
-			const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
-			runTerminalCommand(`${cmd} run ${args.join(' ')}`);
-		} else {
-			vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: `Building for ${opts.platform.label} ${opts.target.label}...` }, p => {
-				return new Promise((resolve) => {
-					Appc.run({
-						args,
-						error: () => {
-							resolve();
-						},
-						exit: () => {
-							resolve();
-						}
-					});
+	if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
+		const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
+		runTerminalCommand(`${cmd} run ${args.join(' ')}`);
+	} else {
+		let message = `Building for ${opts.platform.label}...`;
+		if (opts.target) {
+			message = `Building for ${opts.platform.label} ${opts.target.label}...`;
+		}
+		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: message }, p => {
+			return new Promise((resolve) => {
+				Appc.run({
+					args,
+					error: () => {
+						resolve();
+					},
+					exit: () => {
+						resolve();
+					}
 				});
 			});
-		}
+		});
 	}
+	
 }
