@@ -22,7 +22,7 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 
 Feature                             | Status    | Notes
 ---                                 | ---      	| ---
-**Project support**                 | 🔜        |
+**Project support**                 | ✅        |
 App                                 | ✅        |
 Native module                       | ✅        |
 **Build**                           | 🔜        | VS Code does not allow a custom toolbar, interaction through command palette
