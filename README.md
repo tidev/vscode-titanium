@@ -15,7 +15,7 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 ### Testing
 
 * Create symlink to ``~/.vscode/extensions/``
-* ``cd /path/to/extension`` and run ``npm inatall``
+* ``cd /path/to/extension`` and run ``npm install``
 * Restart VS Code
 
 ## Status
