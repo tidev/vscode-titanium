@@ -23,7 +23,7 @@ module.exports = {
 			return;
 		}
 		const relatedPath = this.getTargetPath(type);
-		if (!vscode.window.visibleTextEditors.find(editor => editor.document.fileName === relatedPath)) {
+		if (relatedPath && !vscode.window.visibleTextEditors.find(editor => editor.document.fileName === relatedPath)) {
 			return vscode.window.showTextDocument(Uri.file(relatedPath), { preview: false });
 		}
 	},
@@ -186,6 +186,10 @@ module.exports = {
 	getTargetPath(type, currentFilePath) {
 		if (!currentFilePath) {
 			currentFilePath = vscode.window.activeTextEditor.document.fileName;
+		}
+
+		if (currentFilePath.indexOf(utils.getAlloyRootPath()) === -1) {
+			return;
 		}
 
 		let pathUnderAlloy = path.relative(utils.getAlloyRootPath(), currentFilePath);

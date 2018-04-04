@@ -413,6 +413,10 @@ function selectTarget() {
  * @returns {Thenable}
 */
 function selectiOSSimulator() {
+	if (!Appc.iOSSimulators() || Appc.iOSSimulators() === {}) {
+		vscode.workspace.showErrorMessage('Error fetching iOS simulators. Check your environment and run `Appcelerator: init`.');
+		return;
+	}
 	return vscode.window.showQuickPick(Object.keys(Appc.iOSSimulators()), {placeHolder: 'Select iOS version'}).then(version => {
 		const simulators = Appc.iOSSimulators()[version].map(simulator => {
 			return {
