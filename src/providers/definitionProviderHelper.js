@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const find = require('find');
 const utils = require('../utils');
+const mkdirp = require('mkdirp');
 
 /**
  * Definition provider helper
@@ -261,6 +262,7 @@ const DefinitionProviderHelper = {
 		const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
 		const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
 		if (!utils.fileExists(i18nStringPath)) {
+			mkdirp.sync(path.join(utils.getI18nPath(), defaultLang));
 			fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
 		}
 		vscode.workspace.openTextDocument(i18nStringPath).then(document => {
