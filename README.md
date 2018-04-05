@@ -32,8 +32,8 @@ Console output                      | ✅        | Using built-in console
 Local development (iOS)             | ✅        |
 Local development (Android)         | ✅        |
 Distribution (iOS)                  | ✅        |
-Distribution (Android)              | ⛔️        | Need to look at entering keystore credentials
-**Project creation**                | ⛔️        |
+Distribution (Android)              | 🔜        | Initial attempt at keystore credentials
+**Project creation**                | ⛔️        | 
 **Alloy component generation**      | ⛔️        |
 **Editor tools**					| ✅		   |
 Code highlighting					| ✅		   | Built-in support for JS and XML, added launguage support for TSS

@@ -204,7 +204,33 @@ function activate(context) {
 										}
 									});
 							} else if (runOptions.platform.id === 'android') {
-								vscode.window.showInformationMessage('TBD :)');
+								runOptions.keystore = {};
+								const lastKeystorePath = extensionContext.workspaceState.get('lastKeystorePath');
+								selectAndroidKeystore(lastKeystorePath)
+									.then(path => {
+										if (path) {
+											runOptions.keystore.path = path;
+											vscode.window.showInputBox({placeHolder: 'Keystore alias'})
+												.then(alias => {
+													if (alias && alias.length) {
+														runOptions.keystore.alias = alias;
+														return vscode.window.showInputBox({placeHolder: 'Keystore password', password: true});
+													}
+												})
+												.then(password => {
+													if (password && password.length) {
+														runOptions.keystore.password = password;
+														return vscode.window.showInputBox({placeHolder: 'Private key password', password: true});
+													}
+												})
+												.then(privateKeyPassword => {
+													if (privateKeyPassword && privateKeyPassword.length) {
+														runOptions.keystore.privateKeyPassword = privateKeyPassword;
+														run(runOptions);		
+													}
+												})
+										}
+									});
 							}
 						}
 					}
@@ -385,9 +411,9 @@ function lastRunDescription(opts) {
  */
 function lastDistDescription(opts) {
 	if (opts.platform.id === 'ios') {
-		return `iOS ${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
+		return `iOS (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
 	} else {
-		return `${opts.platform.label} ${opts.target.label}`;
+		return `${opts.platform.label}`;
 	} 
 }
 
@@ -565,6 +591,37 @@ function selectiOSDistribution() {
 	} ]);
 }
 
+function selectAndroidKeystore(last) {
+	return new Promise(resolve => {
+		const items = [{
+			label: 'Browse...',
+			id: 'browse'
+		}];
+
+		if (last) {
+			items.splice(0, 0, { 
+				label: 'Last used',
+				description: last,
+				id: 'last'
+			});
+		}
+
+		vscode.window.showQuickPick(items, {placeHolder: 'Select Keystore'}).then(path => {
+			if (!path) {
+				resolve();
+				return;
+			}
+			if (path.id === 'browse') {
+				vscode.window.showOpenDialog({canSelectFolders: false}).then(uri => {
+					resolve(uri[0].path);
+				});
+			} else {
+				resolve(last);
+			}
+		})
+	});
+}
+
 /**
  * Check Appcelerator login and prompt if necessary
  */
@@ -653,6 +710,16 @@ function run(opts) {
 				'--distribution-name', opts.certificate.name,
 				'--pp-uuid', opts.provisioningProfile.uuid
 			]);
+		} else if (opts.platform.id === 'android') {
+			extensionContext.workspaceState.update('lastKeystorePath', opts.keystore.path);
+			args = args.concat([
+				'--keystore', opts.keystore.path,
+				'--store-password', opts.keystore.password,
+				'--alias', opts.keystore.alias
+			]);
+			if (opts.keystore.privateKeyPassword) {
+				args.push('--key-password', opts.keystore.privateKeyPassword);
+			}
 		}
 	}
 
