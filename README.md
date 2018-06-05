@@ -18,23 +18,21 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 * ``cd /path/to/extension`` and run ``npm install``
 * Restart VS Code
 
-## Status
+## Roadmap
+
+### Finished
 
 Feature                             | Status    | Notes
 ---                                 | ---      	| ---
 **Project support**                 | ✅        |
 App                                 | ✅        |
 Native module                       | ✅        |
-**Build**                           | 🔜        | VS Code does not allow a custom toolbar, interaction through command palette
 Keymap                              | ✅        |
 Command palette                     | ✅        |
 Console output                      | ✅        | Using built-in console
 Local development (iOS)             | ✅        |
 Local development (Android)         | ✅        |
 Distribution (iOS)                  | ✅        |
-Distribution (Android)              | 🔜        | Initial attempt at keystore credentials
-**Project creation**                | ⛔️        | 
-**Alloy component generation**      | ⛔️        |
 **Editor tools**					| ✅		   |
 Code highlighting					| ✅		   | Built-in support for JS and XML, added launguage support for TSS
 Code completion	                    | ✅        | Functionally complete but needs some refactoring
@@ -42,6 +40,20 @@ Generate code completions list      | ✅️		|
 Jump to definition  	            | ✅		   | Path values are not highlighted correctly; images are previewed on hover
 Open related files                  | ✅		   |
 Snippets							| ✅		   |
+
+### In Progress
+
+Feature                             | Status    | Notes
+---                                 | ---      	| ---
+**Build**                           | 🔜        | VS Code does not allow a custom toolbar, interaction through command palette
+Distribution (Android)              | 🔜        | Initial attempt at keystore credentials
+
+### Planned
+
+Feature                             | Status    | Notes
+---                                 | ---      	| ---
+**Project creation**                | ⛔️        | 
+**Alloy component generation**      | ⛔️        |
 
 ## Open a Titanium project
 
