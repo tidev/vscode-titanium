@@ -9,8 +9,8 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 ### Development
 
 * ``cd /path/to/extension`` and run ``npm install``
-* Open project in VS Code
-* Debug > Run. This will open a VS Code window with extension loaded
+* Open project in VS Code (e.g. `code .`)
+* `Debug > Run` (or `F5`). This will open the debug mode with the extension loaded
 
 ### Testing
 
