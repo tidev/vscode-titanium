@@ -39,21 +39,21 @@ function activate(context) {
 
 	context.subscriptions.push(
 		// register completion providers
-		vscode.languages.registerCompletionItemProvider({ pattern: viewFilePattern }, viewCompletionItemProvider),
-		vscode.languages.registerCompletionItemProvider({ pattern: styleFilePattern }, styleCompletionItemProvider),
-		vscode.languages.registerCompletionItemProvider({ pattern: controllerFilePattern }, controllerCompletionItemProvider, '.'),
-		vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, styleCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerCompletionItemProvider, '.'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
 
 		// register hover providers
 		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
 
 		// register definition providers
-		vscode.languages.registerDefinitionProvider({ pattern: viewFilePattern }, viewDefinitionProvider),
-		vscode.languages.registerDefinitionProvider({ pattern: styleFilePattern }, styleDefinitionProvider),
-		vscode.languages.registerDefinitionProvider({ pattern: controllerFilePattern }, controllerDefinitionProvider),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, viewDefinitionProvider),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: styleFilePattern }, styleDefinitionProvider),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerDefinitionProvider),
 
 		// register code action providers
-		vscode.languages.registerCodeActionsProvider({ pattern: viewFilePattern }, viewDefinitionProvider),
+		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, viewDefinitionProvider),
 
 		// register init command
 		vscode.commands.registerCommand('appcelerator-titanium.init', () => {
