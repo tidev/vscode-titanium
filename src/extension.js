@@ -1,5 +1,4 @@
 const vscode = require('vscode');
-const moment = require('moment');
 const Appc = require('./appc');
 const project = require('./project');
 const utils = require('./utils');
@@ -497,7 +496,7 @@ function selectiOSCertificate() {
 	const certificates = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').map(certificate => {
 		return {
 			label: `${certificate.name}`,
-			description: `expires ${moment(certificate.after).format('D MMM YYYY HH:mm')}`,
+			description: `expires ${new Date(certificate.after).toLocaleString('en-US')}`,
 			pem: certificate.pem
 		};
 	});
@@ -525,7 +524,7 @@ function selectiOSProvisioningProfile() {
 				uuid: profile.uuid
 			};
 			if (vscode.workspace.getConfiguration('appcelerator-titanium.iOS').get('showProvisioningProfileDetail')) {
-				item.detail = `expires ${moment(profile.expirationDate).format('D MMM YYYY HH:mm')} | ${profile.appId}`;
+				item.detail = `expires ${new Date(profile.expirationDate).toLocaleString('en-US')} | ${profile.appId}`;
 			}
 			profiles.push(item);
 		}
