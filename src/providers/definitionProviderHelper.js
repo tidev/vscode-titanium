@@ -166,7 +166,10 @@ const DefinitionProviderHelper = {
 		return new Promise((resolve) => {
 			for (const suggestion of suggestions) {
 				if (suggestion.regExp.test(linePrefix)) {
-					this.getReferences(suggestion.files(document, word), suggestion.definitionRegExp(word), () => { return {}; })
+					const suggestionsRegex = suggestion.definitionRegExp(word);
+					this.getReferences(suggestion.files(document, word), suggestionsRegex, () => {
+						return {};
+					})
 						.then(definitions => {
 							const codeActions = [];
 							if ((!definitions || definitions.length === 0) && suggestion.insertText) {
@@ -267,7 +270,7 @@ const DefinitionProviderHelper = {
 		}
 		vscode.workspace.openTextDocument(i18nStringPath).then(document => {
 			const insertText = `\t<string name="${text}"></string>\n`;
-			const index = document.getText().indexOf('<\/resources>');
+			const index = document.getText().indexOf('<\/resources>'); // eslint-disable-line no-useless-escape
 			if (index !== -1) {
 				const position = document.positionAt(index);
 				const edit = new vscode.WorkspaceEdit();

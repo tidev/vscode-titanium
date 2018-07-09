@@ -1,5 +1,5 @@
 {
-	"extends": [ "axway", "axway/+react" ],
+	"extends": [ "axway" ],
 	"globals": {
 		"atom": false,
 		"setTimeout": false,

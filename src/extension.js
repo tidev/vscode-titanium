@@ -45,7 +45,7 @@ function activate(context) {
 		vscode.languages.registerCompletionItemProvider({ pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
 
 		// register hover providers
-		vscode.languages.registerHoverProvider({ pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
+		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
 
 		// register definition providers
 		vscode.languages.registerDefinitionProvider({ pattern: viewFilePattern }, viewDefinitionProvider),
@@ -86,7 +86,7 @@ function activate(context) {
 				last = {
 					label: 'Last run',
 					description: lastRunDescription(lastOptions)
-				};				
+				};
 			}
 
 			selectPlatform(last)
@@ -177,7 +177,7 @@ function activate(context) {
 				last = {
 					label: 'Last build',
 					description: lastDistDescription(lastOptions)
-				};				
+				};
 			}
 
 			selectPlatform(last)
@@ -209,25 +209,25 @@ function activate(context) {
 									.then(path => {
 										if (path) {
 											runOptions.keystore.path = path;
-											vscode.window.showInputBox({placeHolder: 'Keystore alias'})
+											vscode.window.showInputBox({ placeHolder: 'Keystore alias' })
 												.then(alias => {
 													if (alias && alias.length) {
 														runOptions.keystore.alias = alias;
-														return vscode.window.showInputBox({placeHolder: 'Keystore password', password: true});
+														return vscode.window.showInputBox({ placeHolder: 'Keystore password', password: true });
 													}
 												})
 												.then(password => {
 													if (password && password.length) {
 														runOptions.keystore.password = password;
-														return vscode.window.showInputBox({placeHolder: 'Private key password', password: true});
+														return vscode.window.showInputBox({ placeHolder: 'Private key password', password: true });
 													}
 												})
 												.then(privateKeyPassword => {
 													if (privateKeyPassword && privateKeyPassword.length) {
 														runOptions.keystore.privateKeyPassword = privateKeyPassword;
-														run(runOptions);		
+														run(runOptions);
 													}
-												})
+												});
 										}
 									});
 							}
@@ -249,7 +249,7 @@ function activate(context) {
 
 		// register set log level command
 		vscode.commands.registerCommand('appcelerator-titanium.set-log-level', () => {
-			vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], {placeHolder: 'Select log level'}).then(level => {
+			vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' }).then(level => {
 				if (level) {
 					extensionContext.globalState.update('logLevel', level.toLowerCase());
 				}
@@ -281,7 +281,7 @@ function activate(context) {
 						controllerCompletionItemProvider.loadCompletions();
 					}
 				});
-				
+
 			});
 		}),
 
@@ -292,7 +292,7 @@ function activate(context) {
 
 	init();
 }
-exports.activate = activate;
+exports.activate = activate; // eslint-disable-line no-undef
 
 /**
  * Deactivate
@@ -300,13 +300,13 @@ exports.activate = activate;
 function deactivate() {
 	project.dispose();
 }
-exports.deactivate = deactivate;
+exports.deactivate = deactivate;  // eslint-disable-line no-undef
 
 /**
  * Initialise extension - fetch appc info
 */
 function init() {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator envionment...' }, p => {
+	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, p => {
 		return new Promise((resolve, reject) => {
 			Appc.getInfo((info) => {
 				if (info) {
@@ -334,7 +334,7 @@ function setStatusBar() {
 	if (!projectStatusBarItem) {
 		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
 	}
-	if (project.isTitaniumApp) {	
+	if (project.isTitaniumApp) {
 		projectStatusBarItem.text = `$(device-mobile) ${project.appName()} (${project.sdk()})`;
 		if (project.dashboardUrl()) {
 			projectStatusBarItem.command = openDashboardCommandId;
@@ -365,9 +365,9 @@ function selectPlatform(platforms, last) {
 	}
 	if (!platforms) {
 		platforms = utils.platforms();
-	} 
+	}
 	const items = platforms.map(platform => {
-		return {label: utils.nameForPlatform(platform), id: platform}
+		return { label: utils.nameForPlatform(platform), id: platform };
 	});
 
 	if (items.length === 1) {
@@ -376,10 +376,10 @@ function selectPlatform(platforms, last) {
 		});
 	}
 
-	const opts = {placeHolder: 'Select platform'};
+	const opts = { placeHolder: 'Select platform' };
 
 	if (last) {
-		items.splice(0, 0, { 
+		items.splice(0, 0, {
 			label: last.label,
 			description: last.description,
 			id: 'last'
@@ -394,26 +394,28 @@ function selectPlatform(platforms, last) {
  * Returns description for last run
  *
  * @param {Object} opts run options
+ * @returns {String} The description for the last run
  */
 function lastRunDescription(opts) {
 	if (opts.platform.id === 'ios' && opts.targetType.id === 'device') {
 		return `${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
 	} else {
 		return `${opts.platform.label} ${opts.targetType.id} ${opts.target.label}`;
-	} 
+	}
 }
 
 /**
- * Returns description for last disribution build
+ * Returns description for last distribution build
  *
  * @param {Object} opts run options
+ * @returns {String} The description for the last distribution build
  */
 function lastDistDescription(opts) {
 	if (opts.platform.id === 'ios') {
 		return `iOS (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
 	} else {
 		return `${opts.platform.label}`;
-	} 
+	}
 }
 
 /**
@@ -429,7 +431,7 @@ function selectTarget() {
 	{
 		label: 'Device',
 		id: 'device'
-	} ], {placeHolder: 'Select target'});
+	} ], { placeHolder: 'Select target' });
 }
 
 /**
@@ -442,7 +444,7 @@ function selectiOSSimulator() {
 		vscode.workspace.showErrorMessage('Error fetching iOS simulators. Check your environment and run `Appcelerator: init`.');
 		return;
 	}
-	return vscode.window.showQuickPick(Object.keys(Appc.iOSSimulators()), {placeHolder: 'Select iOS version'}).then(version => {
+	return vscode.window.showQuickPick(Object.keys(Appc.iOSSimulators()), { placeHolder: 'Select iOS version' }).then(version => {
 		const simulators = Appc.iOSSimulators()[version].map(simulator => {
 			return {
 				udid: simulator.udid,
@@ -450,7 +452,7 @@ function selectiOSSimulator() {
 				version: version
 			};
 		});
-		return vscode.window.showQuickPick(simulators, {placeHolder: 'Select simulator'});
+		return vscode.window.showQuickPick(simulators, { placeHolder: 'Select simulator' });
 	});
 }
 
@@ -466,7 +468,7 @@ function selectiOSDevice() {
 			label: device.name
 		};
 	});
-	return vscode.window.showQuickPick(devices, {placeHolder: 'Select device'});
+	return vscode.window.showQuickPick(devices, { placeHolder: 'Select device' });
 }
 
 /**
@@ -500,7 +502,7 @@ function selectiOSCertificate() {
 			pem: certificate.pem
 		};
 	});
-	return vscode.window.showQuickPick(certificates, {placeHolder: 'Select certificate'});
+	return vscode.window.showQuickPick(certificates, { placeHolder: 'Select certificate' });
 }
 
 /**
@@ -529,7 +531,7 @@ function selectiOSProvisioningProfile() {
 			profiles.push(item);
 		}
 	});
-	return vscode.window.showQuickPick(profiles, {placeHolder: 'Select provisioning profile'});
+	return vscode.window.showQuickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
 
 /**
@@ -556,7 +558,7 @@ function selectAndroidEmulator() {
 			});
 		});
 	}
-	return vscode.window.showQuickPick(options, {placeHolder: 'Select emulator'});
+	return vscode.window.showQuickPick(options, { placeHolder: 'Select emulator' });
 }
 
 /**
@@ -571,7 +573,7 @@ function selectAndroidDevice() {
 			label: device.name
 		};
 	});
-	return vscode.window.showQuickPick(devices, {placeHolder: 'Select device'});
+	return vscode.window.showQuickPick(devices, { placeHolder: 'Select device' });
 }
 
 /**
@@ -592,37 +594,38 @@ function selectiOSDistribution() {
 
 function selectAndroidKeystore(last) {
 	return new Promise(resolve => {
-		const items = [{
-			label: 'Browse...',
+		const items = [ {
+			label: 'Browse ...',
 			id: 'browse'
-		}];
+		} ];
 
 		if (last) {
-			items.splice(0, 0, { 
+			items.splice(0, 0, {
 				label: 'Last used',
 				description: last,
 				id: 'last'
 			});
 		}
 
-		vscode.window.showQuickPick(items, {placeHolder: 'Select Keystore'}).then(path => {
+		vscode.window.showQuickPick(items, { placeHolder: 'Select Keystore' }).then(path => {
 			if (!path) {
 				resolve();
 				return;
 			}
 			if (path.id === 'browse') {
-				vscode.window.showOpenDialog({canSelectFolders: false}).then(uri => {
+				vscode.window.showOpenDialog({ canSelectFolders: false }).then(uri => {
 					resolve(uri[0].path);
 				});
 			} else {
 				resolve(last);
 			}
-		})
+		});
 	});
 }
 
 /**
  * Check Appcelerator login and prompt if necessary
+ * @returns {Boolean} Whether or not the login prompt should be shown
  */
 function checkLoginAndPrompt() {
 	if (!Appc.isUserLoggedIn()) {
@@ -630,6 +633,8 @@ function checkLoginAndPrompt() {
 		runTerminalCommand(`${vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath')} login`);
 		return true;
 	}
+
+	return false;
 }
 
 /**
@@ -726,11 +731,13 @@ function run(opts) {
 		const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
 		runTerminalCommand(`${cmd} run ${args.join(' ')}`);
 	} else {
-		let message = `Building for ${opts.platform.label}...`;
+		let message = `Building for ${opts.platform.label} ...`;
 		if (opts.target) {
-			message = `Building for ${opts.platform.label} ${opts.target.label}...`;
+			message = `Building for ${opts.platform.label} ${opts.target.label} ...`;
 		}
-		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: message }, p => {
+		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: message }, progress => {
+			progress && progress.report(message);
+
 			return new Promise((resolve) => {
 				Appc.run({
 					args,
@@ -744,5 +751,5 @@ function run(opts) {
 			});
 		});
 	}
-	
+
 }

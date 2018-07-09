@@ -216,15 +216,13 @@
     "scripts": {
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test",
-        "lint": "eslint lib"
+        "lint": "eslint src"
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
         "eslint": "^5.1.0",
         "eslint-config-axway": "^2.0.7",
-        "eslint-plugin-jsx-a11y": "^6.0.2",
-        "eslint-plugin-react": "^7.5.1",
         "typescript": "^2.6.1",
         "vscode": "^1.1.18",
         "xml2js": "^0.4.19"
