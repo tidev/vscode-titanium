@@ -335,7 +335,7 @@ function setStatusBar() {
 		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
 	}
 	if (project.isTitaniumApp) {
-		projectStatusBarItem.text = `$(device-mobile) ${project.appName()} (${project.sdk()})`;
+		projectStatusBarItem.text = `$(device-mobile)  ${project.appName()} (${project.sdk()})`;
 		if (project.dashboardUrl()) {
 			projectStatusBarItem.command = openDashboardCommandId;
 			projectStatusBarItem.tooltip = 'Open Axway Dashboard';
