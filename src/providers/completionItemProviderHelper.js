@@ -62,7 +62,7 @@ const completionItemProviderHelper = {
 			return;
 		}
 		vscode.workspace.getConfiguration('appcelerator-titanium.general').update('generateAutoCompleteSuggestions', false, true);
-		progress && progress.report({ message: 'Generating autocomplete suggestions...' });
+		progress && progress.report({ message: 'Generating autocomplete suggestions ...' });
 
 		const appcPath = path.join(homedir(), '.appcelerator/install');
 		const version = fs.readFileSync(path.join(appcPath, '.version'), 'utf8');

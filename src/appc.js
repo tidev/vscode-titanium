@@ -399,7 +399,7 @@ const Appc = {
 	 * @param {Array} opts.args         arguments to pass to alloy generate command
 	 * @param {Function} opts.error		error callback function
 	 */
-	generate(opts) {
+	generate(opts) { // eslint-disable-line no-unused-vars
 		// var args = [ 'alloy', 'generate', opts.type ];
 		// if (opts.args && opts.args.length) {
 		// 	args = args.concat(opts.args);

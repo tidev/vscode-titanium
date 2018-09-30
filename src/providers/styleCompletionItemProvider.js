@@ -127,7 +127,8 @@ const StyleCompletionItemProvider = {
 		const innerProperties = {};
 		const type = this.completions.types[this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined];
 		if ((this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined) && type.properties && type.properties.length) {
-			_.each(this.completions.types[this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined].properties, innerKey => innerProperties[innerKey] = {});
+			const completionProperty = this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined;
+			_.each(this.completions.types[completionProperty].properties, innerKey => innerProperties[innerKey] = {});
 		}
 
 		const completions = [];

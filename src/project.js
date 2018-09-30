@@ -5,7 +5,6 @@ const xml2js = require('xml2js');
 const utils = require('./utils');
 
 const TIAPP_FILENAME = 'tiapp.xml';
-const EVENT_MODIFIED = 'modified';
 const TIMODULEXML_FILENAME = 'timodule.xml';
 const MANIFEST_FILENAME = 'manifest';
 const DASHBOARD_URL_ROOT = 'https://platform.axway.com/#/app/';
@@ -55,16 +54,16 @@ const Project = {
 				this.tiapp = json['ti:app'];
 				this.isTitaniumApp = true;
 			}
-            
-            if (!this.emitter) {
-                this.emitter = new vscode.EventEmitter();
-                vscode.workspace.onDidSaveTextDocument((event) => {
-                    if (event.fileName === filePath) {
-                        this.loadTiappFile();
-                        this.emitter.fire();
-                    }
-                });
-            }
+
+			if (!this.emitter) {
+				this.emitter = new vscode.EventEmitter();
+				vscode.workspace.onDidSaveTextDocument((event) => {
+					if (event.fileName === filePath) {
+						this.loadTiappFile();
+						this.emitter.fire();
+					}
+				});
+			}
 		}
 	},
 
@@ -164,15 +163,15 @@ const Project = {
 		} else {
 			return this.modules[0].name;
 		}
-    },
-    
-    dashboardUrl() {
-        // this.tiapp.property[2].$.name
-        const appcAppIdProperty = this.tiapp.property.find((property) => property.$.name === 'appc-app-id');
-        if (appcAppIdProperty) {
-            return path.join(DASHBOARD_URL_ROOT, appcAppIdProperty._);
-        }
-    },
+	},
+
+	dashboardUrl() {
+		// this.tiapp.property[2].$.name
+		const appcAppIdProperty = this.tiapp.property.find((property) => property.$.name === 'appc-app-id');
+		if (appcAppIdProperty) {
+			return path.join(DASHBOARD_URL_ROOT, appcAppIdProperty._);
+		}
+	},
 
 	/**
 	 * Returns platforms for module project
