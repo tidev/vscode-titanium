@@ -1,7 +1,6 @@
 {
 	"extends": [ "axway" ],
 	"globals": {
-		"atom": false,
 		"setTimeout": false,
 		"__dirname": false,
 		"require": false,

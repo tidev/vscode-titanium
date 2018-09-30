@@ -240,7 +240,7 @@ function activate(context) {
 		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
 			if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
 				if (terminal) {
-					runTerminalCommand('\003');
+					runTerminalCommand('\x03');
 				}
 			} else {
 				Appc.stop();
@@ -646,7 +646,7 @@ function runTerminalCommand(cmd) {
 	if (!terminal) {
 		terminal = vscode.window.createTerminal('Appcelerator');
 	} else {
-		terminal.sendText('\003');
+		terminal.sendText('\x03');
 	}
 	terminal.show();
 	terminal.sendText('clear');
