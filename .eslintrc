@@ -1,5 +1,5 @@
 {
-	"extends": [ "axway" ],
+	"extends": [ "axway", "axway/env-node" ],
 	"globals": {
 		"setTimeout": false,
 		"__dirname": false,

@@ -23,9 +23,6 @@ const Project = {
 	load() {
 		this.isTitaniumApp = false;
 		this.isTitaniumModule = false;
-		// if (!atom.project.getPaths() || atom.project.getPaths().length === 0) {
-		// 	return;
-		// }
 
 		this.loadTiappFile();
 
@@ -205,23 +202,6 @@ const Project = {
 	sdk() {
 		if (this.isTitaniumApp) {
 			return this.tiapp['sdk-version'];
-		}
-	},
-
-	/**
-	 * App icon file path
-	 *
-	 * @returns {String}
-	 */
-	appIcon() {
-		if (this.isTitaniumApp) {
-			const files = [ 'app/DefaultIcon.png', 'app/DefaultIcon-ios.png', 'DefaultIcon.png', 'DefaultIcon-ios.png' ];
-			for (const file of files) {
-				const filePath = path.join(atom.project.getPaths()[0], file);
-				if (fs.existsSync(filePath)) {
-					return filePath;
-				}
-			}
 		}
 	},
 

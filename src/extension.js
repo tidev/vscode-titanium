@@ -15,7 +15,6 @@ const completionItemProviderHelper = require('./providers/completionItemProvider
 
 const openDashboardCommandId = 'appcelerator-titanium.openDashboard';
 
-let runOptions = {};
 let extensionContext = {};
 let projectStatusBarItem;
 let terminal;
@@ -36,7 +35,6 @@ function activate(context) {
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
 	const styleFilePattern = '**/*.tss';
 	const controllerFilePattern = '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}';
-
 	context.subscriptions.push(
 		// register completion providers
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider),
@@ -61,7 +59,8 @@ function activate(context) {
 		}),
 
 		// register run command
-		vscode.commands.registerCommand('appcelerator-titanium.run', () => {
+		vscode.commands.registerCommand('appcelerator-titanium.run', async () => {
+
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -71,17 +70,13 @@ function activate(context) {
 				return;
 			}
 
-			if (project.isTitaniumModule) {
-				buildNativeModule();
-				return;
-			}
-
-			runOptions = {
-				buildCommand: 'run'
+			const runOptions = {
+				buildType: 'run'
 			};
 
 			let last;
 			const lastOptions = extensionContext.workspaceState.get('lastRunOptions');
+
 			if (lastOptions) {
 				last = {
 					label: 'Last run',
@@ -89,70 +84,68 @@ function activate(context) {
 				};
 			}
 
-			selectPlatform(last)
-				.then(platform => {
-					if (platform) {
-						if (platform.id === 'last') {
-							run(lastOptions);
-						} else {
-							runOptions.platform = platform;
-							return selectTarget();
-						}
-					}
-				})
-				.then(targetType => {
-					if (!targetType) {
-						return;
-					}
-					runOptions.targetType = targetType;
-					if (runOptions.platform.id === 'ios') {
-						if (targetType.id === 'simulator') {
-							selectiOSSimulator()
-								.then(target => {
-									if (target) {
-										runOptions.target = target;
-										run(runOptions);
-									}
-								});
-						} else if (targetType.id === 'device') {
-							selectiOSDevice()
-								.then(target => {
-									if (target) {
-										runOptions.target = target;
-										return selectiOSCodeSigning();
-									}
-								})
-								.then(profile => {
-									if (profile) {
-										runOptions.provisioningProfile = profile;
-										run(runOptions);
-									}
-								});
-						}
-					} else if (runOptions.platform.id === 'android') {
-						if (targetType.id === 'emulator') {
-							selectAndroidEmulator()
-								.then(target => {
-									if (target) {
-										runOptions.target = target;
-										run(runOptions);
-									}
-								});
-						} else if (targetType.id === 'device') {
-							selectAndroidDevice()
-								.then(target => {
-									if (target) {
-										runOptions.target = target;
-										run(runOptions);
-									}
-								});
-						}
-					}
-				});
+			const platform = await selectPlatform(last);
+
+			if (!platform) {
+				return;
+			}
+
+			if (platform.id === 'last') {
+				run(lastOptions);
+				return;
+			}
+
+			runOptions.platform = platform.id;
+
+			if (project.isTitaniumModule) {
+				run(runOptions);
+				return;
+			}
+
+			const target = await selectTarget(platform.id);
+
+			if (!target) {
+				return;
+			}
+
+			runOptions.target = target.id;
+
+			let deviceId;
+			if (platform.id === 'ios') {
+				if (target.id === 'simulator') {
+					deviceId = await selectiOSSimulator();
+				} else if (target.id === 'device') {
+					deviceId = await selectiOSDevice();
+				}
+			} else if (runOptions.platform === 'android') {
+				if (target.id === 'emulator') {
+					deviceId = await selectAndroidEmulator();
+				} else if (target.id === 'device') {
+					deviceId = await selectAndroidDevice();
+				}
+			}
+
+			if (!deviceId) {
+				return;
+			}
+
+			runOptions.deviceId = deviceId.udid;
+			runOptions.deviceLabel = deviceId.label;
+			if (platform.id === 'ios' && target.id === 'device') {
+				const { certificate, provisioning } = await selectiOSCodeSigning(runOptions);
+				if (!certificate || !provisioning) {
+					return;
+				}
+				runOptions.certificate = certificate;
+				runOptions.provisioningProfile = provisioning;
+			}
+
+			extensionContext.workspaceState.update('lastRunOptions', runOptions);
+			run(runOptions);
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand('appcelerator-titanium.dist', () => {
+		vscode.commands.registerCommand('appcelerator-titanium.dist', async () => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -167,8 +160,8 @@ function activate(context) {
 				return;
 			}
 
-			runOptions = {
-				buildCommand: 'dist-appstore'
+			const runOptions = {
+				buildType: 'dist'
 			};
 
 			let last;
@@ -180,60 +173,52 @@ function activate(context) {
 				};
 			}
 
-			selectPlatform(last)
-				.then(platform => {
-					if (platform) {
-						if (platform.id === 'last') {
-							run(lastOptions);
-						} else {
-							runOptions.platform = platform;
-							if (runOptions.platform.id === 'ios') {
-								selectiOSDistribution()
-									.then(target => {
-										if (target) {
-											runOptions.target = target;
-											runOptions.buildCommand = target.id;
-											return selectiOSCodeSigning();
-										}
-									})
-									.then(profile => {
-										if (profile) {
-											runOptions.provisioningProfile = profile;
-											run(runOptions);
-										}
-									});
-							} else if (runOptions.platform.id === 'android') {
-								runOptions.keystore = {};
-								const lastKeystorePath = extensionContext.workspaceState.get('lastKeystorePath');
-								selectAndroidKeystore(lastKeystorePath)
-									.then(path => {
-										if (path) {
-											runOptions.keystore.path = path;
-											vscode.window.showInputBox({ placeHolder: 'Keystore alias' })
-												.then(alias => {
-													if (alias && alias.length) {
-														runOptions.keystore.alias = alias;
-														return vscode.window.showInputBox({ placeHolder: 'Keystore password', password: true });
-													}
-												})
-												.then(password => {
-													if (password && password.length) {
-														runOptions.keystore.password = password;
-														return vscode.window.showInputBox({ placeHolder: 'Private key password', password: true });
-													}
-												})
-												.then(privateKeyPassword => {
-													if (privateKeyPassword && privateKeyPassword.length) {
-														runOptions.keystore.privateKeyPassword = privateKeyPassword;
-														run(runOptions);
-													}
-												});
-										}
-									});
-							}
-						}
+			const platform = await selectPlatform(last);
+			if (!platform) {
+				return;
+			}
+			if (platform.id === 'last') {
+				run(lastOptions);
+				return;
+			}
+			runOptions.platform = platform.id;
+
+			if (platform.id === 'ios') {
+				const target = await selectiOSDistribution();
+				if (!target) {
+					return;
+				}
+				runOptions.target = target.id;
+				const profile = await selectiOSCodeSigning(runOptions);
+				if (!profile) {
+					return;
+				}
+				runOptions.provisioningProfile = profile;
+			} else if (platform.id === 'android') {
+				runOptions.keystore = {};
+				const lastKeystorePath = extensionContext.workspaceState.get('lastKeystorePath');
+				const keyStorePath = await selectAndroidKeystore(lastKeystorePath);
+				if (keyStorePath) {
+					runOptions.keystore.path = keyStorePath;
+					const alias = await vscode.window.showInputBox({ placeHolder: 'Keystore alias' });
+					if (!alias || !alias.length) {
+						return;
 					}
-				});
+					runOptions.keystore.alias = alias;
+					const password = await vscode.window.showInputBox({ placeHolder: 'Keystore password', password: true });
+					if (!password || !password.length) {
+						return;
+					}
+					runOptions.keystore.password = password;
+					const privateKeyPassword = await vscode.window.showInputBox({ placeHolder: 'Private key password', password: true });
+					if (!privateKeyPassword || !privateKeyPassword.length) {
+						return;
+					}
+					runOptions.keystore.privateKeyPassword = privateKeyPassword;
+				}
+			}
+			extensionContext.workspaceState.update('lastDistOptions', runOptions);
+			run(runOptions);
 		}),
 
 		// register stop command
@@ -397,11 +382,7 @@ function selectPlatform(platforms, last) {
  * @returns {String} The description for the last run
  */
 function lastRunDescription(opts) {
-	if (opts.platform.id === 'ios' && opts.targetType.id === 'device') {
-		return `${opts.target.label} (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
-	} else {
-		return `${opts.platform.label} ${opts.targetType.id} ${opts.target.label}`;
-	}
+	return `${utils.nameForPlatform(opts.platform)} ${utils.nameForTarget(opts.target)} ${opts.deviceLabel}`;
 }
 
 /**
@@ -421,12 +402,13 @@ function lastDistDescription(opts) {
 /**
  * Select target: simulator/emulator or device
  *
+ * @param {String} platform - Platform that is being built to.
  * @returns {Thenable}
 */
-function selectTarget() {
+function selectTarget(platform) {
 	return vscode.window.showQuickPick([ {
-		label: (runOptions.platform.id === 'android') ? 'Emulator' : 'Simulator',
-		id: (runOptions.platform.id === 'android') ? 'emulator' : 'simulator'
+		label: (platform === 'android') ? 'Emulator' : 'Simulator',
+		id: (platform === 'android') ? 'emulator' : 'simulator'
 	},
 	{
 		label: 'Device',
@@ -476,26 +458,32 @@ function selectiOSDevice() {
  *
  * @returns {Thenable}
 */
-function selectiOSCodeSigning() {
-	return selectiOSCertificate()
-		.then(selectedCertificate => {
-			if (!selectedCertificate) {
-				return;
-			}
+async function selectiOSCodeSigning({ buildType, target }) {
+	const selectedCertificate = await selectiOSCertificate(buildType);
+	if (!selectedCertificate) {
+		return;
+	}
 
-			const certificate = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
-			runOptions.certificate = certificate;
-			return selectiOSProvisioningProfile();
-		});
+	const certificate = Appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
+
+	const provisioning = await selectiOSProvisioningProfile({ certificate, target });
+	if (!provisioning) {
+		return;
+	}
+	return {
+		certificate,
+		provisioning
+	};
 }
 
 /**
  * Select iOS certificate
  *
+ * @param {String} buildType - Type of build being performed, either run or dist.
  * @returns {Thenable}
  */
-function selectiOSCertificate() {
-	const certificates = Appc.iOSCertificates(runOptions.buildCommand === 'run' ? 'developer' : 'distribution').map(certificate => {
+function selectiOSCertificate(buildType) {
+	const certificates = Appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').map(certificate => {
 		return {
 			label: `${certificate.name}`,
 			description: `expires ${new Date(certificate.after).toLocaleString('en-US')}`,
@@ -510,15 +498,15 @@ function selectiOSCertificate() {
  *
  * @returns {Thenable}
 */
-function selectiOSProvisioningProfile() {
+function selectiOSProvisioningProfile({ certificate, target }) {
 	const profiles = [];
 	let deployment = 'development';
-	if (runOptions.buildCommand === 'dist-adhoc') {
+	if (target === 'dist-adhoc') {
 		deployment = 'distribution';
-	} else if (runOptions.buildCommand === 'dist-appstore') {
+	} else if (target === 'dist-appstore') {
 		deployment = 'appstore';
 	}
-	Appc.iOSProvisioningProfiles(deployment, runOptions.certificate, project.appId()).forEach(profile => {
+	Appc.iOSProvisioningProfiles(deployment, certificate, project.appId()).forEach(profile => {
 		if (!profile.disabled) {
 			const item = {
 				label: profile.name,
@@ -558,6 +546,12 @@ function selectAndroidEmulator() {
 			});
 		});
 	}
+
+	if (!emulators.length) {
+		vscode.window.showErrorMessage('No Android emulators detected');
+		return;
+	}
+
 	return vscode.window.showQuickPick(options, { placeHolder: 'Select emulator' });
 }
 
@@ -569,10 +563,16 @@ function selectAndroidEmulator() {
 function selectAndroidDevice() {
 	const devices = Appc.androidDevices().map(device => {
 		return {
-			udid: device.udid,
+			udid: device.id,
 			label: device.name
 		};
 	});
+
+	if (!devices.length) {
+		vscode.window.showErrorMessage('No Android devices connected');
+		return;
+	}
+
 	return vscode.window.showQuickPick(devices, { placeHolder: 'Select device' });
 }
 
@@ -592,40 +592,35 @@ function selectiOSDistribution() {
 	} ]);
 }
 
-function selectAndroidKeystore(last) {
-	return new Promise(resolve => {
-		const items = [ {
-			label: 'Browse ...',
-			id: 'browse'
-		} ];
+async function selectAndroidKeystore(last) {
+	const items = [ {
+		label: 'Browse ...',
+		id: 'browse'
+	} ];
 
-		if (last) {
-			items.splice(0, 0, {
-				label: 'Last used',
-				description: last,
-				id: 'last'
-			});
-		}
-
-		vscode.window.showQuickPick(items, { placeHolder: 'Select Keystore' }).then(path => {
-			if (!path) {
-				resolve();
-				return;
-			}
-			if (path.id === 'browse') {
-				vscode.window.showOpenDialog({ canSelectFolders: false }).then(uri => {
-					resolve(uri[0].path);
-				});
-			} else {
-				resolve(last);
-			}
+	if (last) {
+		items.splice(0, 0, {
+			label: 'Last used',
+			description: last,
+			id: 'last'
 		});
-	});
+	}
+
+	const keystorePath = await vscode.window.showQuickPick(items, { placeHolder: 'Select Keystore' });
+	if (!keystorePath) {
+		return;
+	}
+	if (keystorePath.id === 'browse') {
+		const uri = await vscode.window.showOpenDialog({ canSelectFolders: false });
+		return uri[0].path;
+	} else {
+		return last;
+	}
 }
 
 /**
- * Check Appcelerator login and prompt if necessary
- * @returns {Boolean} Whether or not the login prompt should be shown
+ * Check Appcelerator login and prompt if necessary.
+ * @returns {Boolean} Whether or not the login prompt should be shown.
  */
 function checkLoginAndPrompt() {
 	if (!Appc.isUserLoggedIn()) {
@@ -654,73 +649,55 @@ function runTerminalCommand(cmd) {
 }
 
 /**
- * Build native module
- */
-function buildNativeModule() {
-	runOptions = {
-		buildCommand: 'build'
-	};
-
-	selectPlatform(project.platforms())
-		.then(platform => {
-			if (platform) {
-				runOptions.platform = platform;
-				run(runOptions);
-			}
-		});
-}
-
-/**
  * Run
  *
  * @param {Object} opts run options
  */
 function run(opts) {
-	let args = [
-		'--platform', opts.platform.id,
+
+	const args = [
+		'--platform', opts.platform,
 		'--log-level', extensionContext.globalState.get('logLevel', 'info')
 	];
 
-	if (opts.buildCommand === 'run') {
-		extensionContext.workspaceState.update('lastRunOptions', opts);
-		args = args.concat([
-			'--project-dir', vscode.workspace.rootPath,
-			'--target', opts.targetType.id,
-			'--device-id', opts.target.udid
-		]);
+	if (project.isTitaniumModule) {
+		args.push(
+			'--project-dir', opts.platform,
+			'--build-only'
+		);
+	}
 
-		if (opts.targetType.id === 'device' && opts.platform.id === 'ios') {
-			args = args.concat([
+	if (opts.buildType === 'run' && project.isTitaniumApp) {
+
+		args.push(
+			'--target', opts.target,
+			'--device-id', opts.deviceId
+		);
+
+		if (opts.target === 'device' && opts.platform === 'ios') {
+			args.push(
 				'--developer-name', opts.certificate.name,
 				'--pp-uuid', opts.provisioningProfile.uuid
-			]);
+			);
 		}
 
-	} else if (opts.buildCommand === 'build') {
-		args = args.concat([
-			'--project-dir', project.pathForPlatform(opts.platform.id),
-			'--build-only'
-		]);
-
-	} else if (opts.buildCommand) {
-		extensionContext.workspaceState.update('lastDistOptions', opts);
-		args = args.concat([
-			'--project-dir', vscode.workspace.rootPath,
-			'--target', opts.buildCommand,
+	} else if (opts.buildType === 'dist') {
+		args.push(
+			'--target', opts.target,
 			'--output-dir', utils.distributionOutputDirectory()
-		]);
+		);
 		if (opts.platform.id === 'ios') {
-			args = args.concat([
+			args.push(
 				'--distribution-name', opts.certificate.name,
 				'--pp-uuid', opts.provisioningProfile.uuid
-			]);
+			);
 		} else if (opts.platform.id === 'android') {
 			extensionContext.workspaceState.update('lastKeystorePath', opts.keystore.path);
-			args = args.concat([
+			args.push(
 				'--keystore', opts.keystore.path,
 				'--store-password', opts.keystore.password,
 				'--alias', opts.keystore.alias
-			]);
+			);
 			if (opts.keystore.privateKeyPassword) {
 				args.push('--key-password', opts.keystore.privateKeyPassword);
 			}
@@ -731,9 +708,9 @@ function run(opts) {
 		const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
 		runTerminalCommand(`${cmd} run ${args.join(' ')}`);
 	} else {
-		let message = `Building for ${opts.platform.label} ...`;
+		let message = `Building for ${utils.nameForPlatform(opts.platform)}`;
 		if (opts.target) {
-			message = `Building for ${opts.platform.label} ${opts.target.label} ...`;
+			message = `${message} ${utils.nameForTarget(opts.target)}`;
 		}
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: message }, progress => {
 			progress && progress.report(message);
@@ -751,5 +728,4 @@ function run(opts) {
 			});
 		});
 	}
-
 }
