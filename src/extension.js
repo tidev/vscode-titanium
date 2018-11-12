@@ -3,6 +3,7 @@ const Appc = require('./appc');
 const project = require('./project');
 const utils = require('./utils');
 const related = require('./related');
+const Terminal = require('./terminal');
 const viewCompletionItemProvider = require('./providers/viewCompletionItemProvider');
 const styleCompletionItemProvider = require('./providers/styleCompletionItemProvider');
 const controllerCompletionItemProvider = require('./providers/controllerCompletionItemProvider');
@@ -12,13 +13,11 @@ const styleDefinitionProvider = require('./providers/styleDefinitionProvider');
 const controllerDefinitionProvider = require('./providers/controllerDefinitionProvider');
 const definitionProviderHelper = require('./providers/definitionProviderHelper');
 const completionItemProviderHelper = require('./providers/completionItemProviderHelper');
-
 const openDashboardCommandId = 'appcelerator-titanium.openDashboard';
 
 let extensionContext = {};
 let projectStatusBarItem;
 let terminal;
-
 /**
  * Activate
  *
@@ -29,7 +28,6 @@ function activate(context) {
 	project.load();
 	setStatusBar();
 	project.onModified(setStatusBar);
-
 	definitionProviderHelper.activate(context.subscriptions);
 
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
@@ -225,7 +223,7 @@ function activate(context) {
 		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
 			if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
 				if (terminal) {
-					runTerminalCommand('\x03');
+					terminal.clear();
 				}
 			} else {
 				Appc.stop();
@@ -625,7 +623,7 @@ async function selectAndroidKeystore(last) {
 function checkLoginAndPrompt() {
 	if (!Appc.isUserLoggedIn()) {
 		vscode.window.showInformationMessage('Please log in to the Appcelerator platform');
-		runTerminalCommand(`${vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath')} login`);
+		runTerminalCommand([ 'login' ]);
 		return true;
 	}
 
@@ -635,17 +633,13 @@ function checkLoginAndPrompt() {
 /**
  * Open terminal and run command
  *
- * @param {String} cmd command to run
+ * @param {Array} args Array of arguments to be ran.
  */
-function runTerminalCommand(cmd) {
+function runTerminalCommand(args) {
 	if (!terminal) {
-		terminal = vscode.window.createTerminal('Appcelerator');
-	} else {
-		terminal.sendText('\x03');
+		terminal = new Terminal({ name: 'Appcelerator' });
 	}
-	terminal.show();
-	terminal.sendText('clear');
-	terminal.sendText(cmd);
+	terminal.runCommand({ args });
 }
 
 /**
@@ -705,8 +699,7 @@ function run(opts) {
 	}
 
 	if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
-		const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
-		runTerminalCommand(`${cmd} run ${args.join(' ')}`);
+		runTerminalCommand([ 'run', ...args ]);
 	} else {
 		let message = `Building for ${utils.nameForPlatform(opts.platform)}`;
 		if (opts.target) {
