@@ -13,9 +13,18 @@ const Project = {
 
 	isTitaniumApp: false,
 	isTitaniumModule: false,
+
 	tiapp: undefined,
 	modules: [],
 	emitter: undefined,
+
+	/**
+	 * Check if the current project is a Titanium app or module.
+	 * @returns {Boolean} Whether the project is a Titanium app or module.
+	 */
+	isTitaniumProject() {
+		return this.isTitaniumApp || this.isTitaniumModule;
+	},
 
 	/**
 	 * Load tiapp.xml file
@@ -47,6 +56,7 @@ const Project = {
 					json = result;
 				}
 			});
+
 			if (json && json['ti:app']) {
 				this.tiapp = json['ti:app'];
 				this.isTitaniumApp = true;

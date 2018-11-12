@@ -55,6 +55,11 @@
                 "category": "Appcelerator"
             },
             {
+                "command": "appcelerator-titanium.explorer.refresh",
+                "title": "Refresh Explorer",
+                "category": "Appcelerator"
+            },
+            {
                 "command": "appcelerator-titanium.run",
                 "title": "Run",
                 "category": "Appcelerator"
@@ -211,6 +216,81 @@
                     "description": "Keystore alias"
                 }
             }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "device-explorer",
+                    "title": "Device Explorer",
+                    "icon": "images/appc.svg"
+                }
+            ]
+        },
+        "views": {
+            "device-explorer": [
+                {
+                    "id": "deviceExplorer",
+                    "name": "Devices",
+                    "when": "appcelerator-titanium:enabled"
+                }
+            ]
+        },
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "appcelerator-titanium.explorer.refresh",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.run",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.dist",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.stop",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.set-log-level",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.open-related-view",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.open-related-style",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.open-related-controller",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.toggle-related-files",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.generate-autocomplete-suggestions",
+                    "when": "appcelerator-titanium:enabled"
+                }
+            ],
+            "view/title": [
+                {
+                  "command": "appcelerator-titanium.explorer.refresh",
+                  "when": "view == deviceExplorer",
+                  "group": "navigation"
+                }
+              ],
+              "view/item/context": [
+                {
+                    "command": "appcelerator-titanium.run",
+                    "when": "view == deviceExplorer"
+                }
+              ]
         }
     },
     "scripts": {

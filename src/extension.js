@@ -1,9 +1,12 @@
-const vscode = require('vscode');
 const Appc = require('./appc');
+const DeviceExplorer = require('./explorer/tiExplorer');
 const project = require('./project');
-const utils = require('./utils');
 const related = require('./related');
 const Terminal = require('./terminal');
+const utils = require('./utils');
+const vscode = require('vscode');
+
+// Providers
 const viewCompletionItemProvider = require('./providers/viewCompletionItemProvider');
 const styleCompletionItemProvider = require('./providers/styleCompletionItemProvider');
 const controllerCompletionItemProvider = require('./providers/controllerCompletionItemProvider');
@@ -30,9 +33,16 @@ function activate(context) {
 	project.onModified(setStatusBar);
 	definitionProviderHelper.activate(context.subscriptions);
 
+	if (!project.isTitaniumProject()) {
+		vscode.commands.executeCommand('setContext', 'appcelerator-titanium:enabled', false);
+	} else {
+		vscode.commands.executeCommand('setContext', 'appcelerator-titanium:enabled', true);
+	}
+
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
 	const styleFilePattern = '**/*.tss';
 	const controllerFilePattern = '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}';
+	const deviceExplorer = new DeviceExplorer();
 	context.subscriptions.push(
 		// register completion providers
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider),
@@ -270,7 +280,11 @@ function activate(context) {
 
 		vscode.commands.registerCommand(openDashboardCommandId, () => {
 			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()));
-		})
+		}),
+
+		vscode.window.registerTreeDataProvider('deviceExplorer', deviceExplorer),
+
+		vscode.commands.registerCommand('appcelerator-titanium.explorer.refresh', () => deviceExplorer.refresh())
 	);
 
 	init();
