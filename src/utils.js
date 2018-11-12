@@ -41,6 +41,29 @@ module.exports = {
 	},
 
 	/**
+	 * Returns the pretty name for a target, used for displaying in the UI.
+	 * @param {String} target - target to get pretty name for.
+	 * @returns {String}
+	 */
+	nameForTarget (target) {
+		target = target.toLowerCase();
+		switch (target) {
+			case 'device':
+			case 'emulator':
+			case 'simulator':
+				return this.capitalizeFirstLetter(target);
+			case 'dist-adhoc':
+				return 'Ad-Hoc';
+			case 'dist-appstore':
+				return 'App Store';
+			case 'dist-playstore':
+				return 'Play Store';
+			default:
+				return target;
+		}
+	},
+
+	/**
 	 * Returns normalised name for platform
 	 *
 	 * @param {String} platform 	target platform
