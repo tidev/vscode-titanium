@@ -2,6 +2,7 @@ const vscode = require('vscode');
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const semver = require('semver');
 const utils = require('./utils');
 const { homedir } = require('os');
 
@@ -168,6 +169,15 @@ const Appc = {
 			return Appc.info.ios.simulators.ios;
 		}
 		return {};
+	},
+
+	iOSSimulatorVersions() {
+		const sims = this.iOSSimulators();
+		return Object.keys(sims).sort((a, b) => {
+			a = semver.coerce(a);
+			b = semver.coerce(b);
+			return semver.compare(a, b);
+		}).reverse();
 	},
 
 	/**

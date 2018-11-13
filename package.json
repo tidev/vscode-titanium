@@ -280,17 +280,21 @@
             ],
             "view/title": [
                 {
-                  "command": "appcelerator-titanium.explorer.refresh",
-                  "when": "view == deviceExplorer",
-                  "group": "navigation"
+                    "command": "appcelerator-titanium.explorer.refresh",
+                    "when": "view == deviceExplorer",
+                    "group": "navigation"
                 }
-              ],
-              "view/item/context": [
+            ],
+            "view/item/context": [
                 {
                     "command": "appcelerator-titanium.run",
                     "when": "view == deviceExplorer"
+                },
+                {
+                    "command": "appcelerator-titanium.dist",
+                    "when": "view == deviceExplorer && viewItem == platformNode"
                 }
-              ]
+            ]
         }
     },
     "scripts": {
@@ -312,6 +316,7 @@
         "fs-extra": "^7.0.0",
         "mkdirp": "^0.5.1",
         "path": "^0.12.7",
+        "semver": "^5.6.0",
         "underscore": "^1.8.3"
     }
 }

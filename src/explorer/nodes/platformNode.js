@@ -7,6 +7,7 @@ module.exports = class PlatformNode extends BaseNode {
 		super(label, collapsibleState);
 		this.label = utils.nameForPlatform(label);
 		this.platform = label;
+		this.contextValue = 'platformNode';
 	}
 
 	getChildren() {
@@ -24,6 +25,15 @@ module.exports = class PlatformNode extends BaseNode {
 			default:
 				break;
 		}
+	}
+
+	getTreeItem() {
+		return {
+			contextValue: this.contextValue,
+			collapsibleState: vscode.TreeItemCollapsibleState.Expanded,
+			label: this.label,
+			platform: this.platform,
+		};
 	}
 
 	get tooltip() {

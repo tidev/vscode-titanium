@@ -64,6 +64,27 @@ module.exports = {
 	},
 
 	/**
+	 * Returns the target name based off a pretty name in the UI.
+	 * @param {String} name - name to get target for.
+	 */
+	targetForName(name) {
+		name = name.toLowerCase();
+		switch (name) {
+			case 'Ad-Hoc':
+				return 'dist-adhoc';
+			case 'App Store':
+				return 'dist-appstore';
+			case 'Play Store':
+				return 'dist-playstore';
+			case 'device':
+			case 'emulator':
+			case 'simulator':
+			default:
+				return name;
+		}
+	},
+
+	/**
 	 * Returns normalised name for platform
 	 *
 	 * @param {String} platform 	target platform

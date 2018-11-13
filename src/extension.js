@@ -67,8 +67,7 @@ function activate(context) {
 		}),
 
 		// register run command
-		vscode.commands.registerCommand('appcelerator-titanium.run', async () => {
-
+		vscode.commands.registerCommand('appcelerator-titanium.run', async (runOpts = {}) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -79,7 +78,11 @@ function activate(context) {
 			}
 
 			const runOptions = {
-				buildType: 'run'
+				buildType: 'run',
+				platform: runOpts.platform,
+				target: runOpts.targetId,
+				deviceId: runOpts.deviceId,
+				deviceLabel: runOpts.label
 			};
 
 			let last;
@@ -92,54 +95,61 @@ function activate(context) {
 				};
 			}
 
-			const platform = await selectPlatform(last);
+			if (!runOptions.platform) {
+				const platform = await selectPlatform(last);
 
-			if (!platform) {
-				return;
+				if (!platform) {
+					return;
+				}
+	
+				if (platform.id === 'last') {
+					run(lastOptions);
+					return;
+				}
+	
+				runOptions.platform = platform.id;
 			}
-
-			if (platform.id === 'last') {
-				run(lastOptions);
-				return;
-			}
-
-			runOptions.platform = platform.id;
 
 			if (project.isTitaniumModule) {
 				run(runOptions);
 				return;
 			}
 
-			const target = await selectTarget(platform.id);
+			if (!runOptions.target) {
+				const target = await selectTarget(runOptions.platform);
 
-			if (!target) {
-				return;
-			}
-
-			runOptions.target = target.id;
-
-			let deviceId;
-			if (platform.id === 'ios') {
-				if (target.id === 'simulator') {
-					deviceId = await selectiOSSimulator();
-				} else if (target.id === 'device') {
-					deviceId = await selectiOSDevice();
+				if (!target) {
+					return;
 				}
-			} else if (runOptions.platform === 'android') {
-				if (target.id === 'emulator') {
-					deviceId = await selectAndroidEmulator();
-				} else if (target.id === 'device') {
-					deviceId = await selectAndroidDevice();
+	
+				runOptions.target = target.id;
+			}
+		
+			if (!runOptions.deviceId) {
+				let deviceId;
+				if (runOptions.platform === 'ios') {
+					if (runOptions.target === 'simulator') {
+						deviceId = await selectiOSSimulator();
+					} else if (runOptions.target === 'device') {
+						deviceId = await selectiOSDevice();
+					}
+				} else if (runOptions.platform === 'android') {
+					if (runOptions.target === 'emulator') {
+						deviceId = await selectAndroidEmulator();
+					} else if (runOptions.target === 'device') {
+						deviceId = await selectAndroidDevice();
+					}
 				}
+	
+				if (!deviceId) {
+					return;
+				}
+	
+				runOptions.deviceId = deviceId.udid;
+				runOptions.deviceLabel = deviceId.label;
 			}
 
-			if (!deviceId) {
-				return;
-			}
-
-			runOptions.deviceId = deviceId.udid;
-			runOptions.deviceLabel = deviceId.label;
-			if (platform.id === 'ios' && target.id === 'device') {
+			if (runOptions.platform === 'ios' && runOptions.target === 'device') {
 				const { certificate, provisioning } = await selectiOSCodeSigning(runOptions);
 				if (!certificate || !provisioning) {
 					return;
@@ -153,7 +163,7 @@ function activate(context) {
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand('appcelerator-titanium.dist', async () => {
+		vscode.commands.registerCommand('appcelerator-titanium.dist', async (runOpts) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -167,9 +177,10 @@ function activate(context) {
 				vscode.window.showErrorMessage('Use run command to build native module');
 				return;
 			}
-
+			console.log(runOpts);
 			const runOptions = {
-				buildType: 'dist'
+				buildType: 'dist',
+				platform: runOpts.platform
 			};
 
 			let last;
@@ -438,7 +449,7 @@ function selectiOSSimulator() {
 		vscode.workspace.showErrorMessage('Error fetching iOS simulators. Check your environment and run `Appcelerator: init`.');
 		return;
 	}
-	return vscode.window.showQuickPick(Object.keys(Appc.iOSSimulators()), { placeHolder: 'Select iOS version' }).then(version => {
+	return vscode.window.showQuickPick(Appc.iOSSimulatorVersions(), { placeHolder: 'Select iOS version' }).then(version => {
 		const simulators = Appc.iOSSimulators()[version].map(simulator => {
 			return {
 				udid: simulator.udid,

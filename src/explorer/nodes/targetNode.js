@@ -2,11 +2,13 @@ const appc = require('../../appc');
 const BaseNode = require('./baseNode');
 const OSVerNode = require('./osVerNode');
 const DeviceNode = require('./deviceNode');
+const utils = require('../../utils');
 const vscode = require('vscode');
 module.exports = class DeviceTypeNode extends BaseNode {
 	constructor(label, collapsibleState, platform) {
 		super(label, collapsibleState);
 		this.platform = platform;
+		this.targetId = utils.targetForName(this.label);
 	}
 
 	getChildren() {
@@ -14,7 +16,7 @@ module.exports = class DeviceTypeNode extends BaseNode {
 		if (this.platform === 'ios') {
 			switch (this.label) {
 				case 'Simulator':
-					for (const simVer of Object.keys(appc.iOSSimulators())) {
+					for (const simVer of appc.iOSSimulatorVersions()) {
 						devices.push(new OSVerNode(simVer, vscode.TreeItemCollapsibleState.Collapsed, this.platform, this.label));
 					}
 					break;
