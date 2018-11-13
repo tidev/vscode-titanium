@@ -13,10 +13,12 @@ class Terminal {
 	}
 
 	runCommand({ args }) {
-		// TODO: Once the October update for vscode ships update this to only
-		// toggle if we arent the active terminal
+		const activeTerminal = vscode.window.activeTerminal;
+		// Only call show if we arent the active terminal
+		if (activeTerminal.name !== this.terminal.name) {
+			this.terminal.show();
+		}
 		this.clear();
-		this.terminal.show();
 		this.terminal.sendText(`${this.commandPath} ${args.join(' ')}`);
 	}
 
