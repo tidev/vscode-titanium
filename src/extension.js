@@ -163,7 +163,7 @@ function activate(context) {
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand('appcelerator-titanium.dist', async (runOpts) => {
+		vscode.commands.registerCommand('appcelerator-titanium.dist', async (runOpts = {}) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -177,7 +177,7 @@ function activate(context) {
 				vscode.window.showErrorMessage('Use run command to build native module');
 				return;
 			}
-			console.log(runOpts);
+
 			const runOptions = {
 				buildType: 'dist',
 				platform: runOpts.platform
@@ -191,18 +191,19 @@ function activate(context) {
 					description: lastDistDescription(lastOptions)
 				};
 			}
-
-			const platform = await selectPlatform(last);
-			if (!platform) {
-				return;
+			if (!runOptions.platform) {
+				const platform = await selectPlatform(last);
+				if (!platform) {
+					return;
+				}
+				if (platform.id === 'last') {
+					run(lastOptions);
+					return;
+				}
+				runOptions.platform = platform.id;
 			}
-			if (platform.id === 'last') {
-				run(lastOptions);
-				return;
-			}
-			runOptions.platform = platform.id;
 
-			if (platform.id === 'ios') {
+			if (runOptions.platform === 'ios') {
 				const target = await selectiOSDistribution();
 				if (!target) {
 					return;
@@ -213,7 +214,8 @@ function activate(context) {
 					return;
 				}
 				runOptions.provisioningProfile = profile;
-			} else if (platform.id === 'android') {
+			} else if (runOptions.platform === 'android') {
+				runOptions.target = 'dist-playstore';
 				runOptions.keystore = {};
 				const lastKeystorePath = extensionContext.workspaceState.get('lastKeystorePath');
 				const keyStorePath = await selectAndroidKeystore(lastKeystorePath);
@@ -705,12 +707,12 @@ function run(opts) {
 			'--target', opts.target,
 			'--output-dir', utils.distributionOutputDirectory()
 		);
-		if (opts.platform.id === 'ios') {
+		if (opts.platform === 'ios') {
 			args.push(
 				'--distribution-name', opts.certificate.name,
 				'--pp-uuid', opts.provisioningProfile.uuid
 			);
-		} else if (opts.platform.id === 'android') {
+		} else if (opts.platform === 'android') {
 			extensionContext.workspaceState.update('lastKeystorePath', opts.keystore.path);
 			args.push(
 				'--keystore', opts.keystore.path,
