@@ -21,7 +21,7 @@
         "url": "git+https://github.com/appcelerator-developer-relations/vscode-appcelerator-titanium.git"
     },
     "engines": {
-        "vscode": "^1.21.0"
+        "vscode": "^1.29.0"
     },
     "activationEvents": [
         "workspaceContains:tiapp.xml",
