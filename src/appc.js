@@ -42,9 +42,8 @@ const Appc = {
 	 */
 	getInfo(callback) {
 		let result = '';
-		const proc = spawn('appc', [ 'info', '-o', 'json' ]);
+		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
-		// proc.stderr.on('data', data => console.log(data));
 		proc.on('close', () => {
 			if (result && result.length) {
 				Appc.info = JSON.parse(result);

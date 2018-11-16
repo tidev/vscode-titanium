@@ -128,7 +128,7 @@ function activate(context) {
 				runOptions.target = target.id;
 			}
 
-			if (!runOptions.deviceId) {
+			if (!runOptions.deviceId && runOptions.target !== 'ws-local') {
 				let deviceId;
 				if (runOptions.platform === 'ios') {
 					if (runOptions.target === 'simulator') {
@@ -808,10 +808,11 @@ function run(opts) {
 
 	if (opts.buildType === 'run' && project.isTitaniumApp) {
 
-		args.push(
-			'--target', opts.target,
-			'--device-id', opts.deviceId
-		);
+		args.push('--target', opts.target);
+
+		if (opts.target !== 'ws-local') {
+			args.push('--device-id', opts.deviceId);
+		}
 
 		if (opts.target === 'device' && opts.platform === 'ios') {
 			args.push(
