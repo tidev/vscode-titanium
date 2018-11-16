@@ -48,7 +48,7 @@ const ControllerCompletionItemProvider = {
 			// return this.getRequireCompletions(linePrefix, prefix);
 			return this.getFileCompletions('lib');
 		// Alloy.createController('')
-		} else if (/Alloy\.(createController|Controllers\.instance)\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
+		} else if (/Alloy\.(createController|Controllers\.instance)\(["']([-a-zA-Z0-9-_/]*["']?\)?)$/.test(linePrefix)) {
 			// return this.getControllerCompletions(linePrefix, prefix);
 			return this.getFileCompletions('controllers');
 		// Alloy.createModel('')

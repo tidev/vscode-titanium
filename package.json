@@ -21,7 +21,7 @@
         "url": "git+https://github.com/appcelerator-developer-relations/vscode-appcelerator-titanium.git"
     },
     "engines": {
-        "vscode": "^1.21.0"
+        "vscode": "^1.29.0"
     },
     "activationEvents": [
         "workspaceContains:tiapp.xml",
@@ -53,6 +53,15 @@
                 "command": "appcelerator-titanium.init",
                 "title": "Init",
                 "category": "Appcelerator"
+            },
+            {
+                "command": "appcelerator-titanium.explorer.refresh",
+                "title": "Refresh Devices",
+                "category": "Appcelerator",
+                "icon": {
+                    "light": "images/light/refresh.svg",
+                    "dark": "images/dark/refresh.svg"
+                  }
             },
             {
                 "command": "appcelerator-titanium.run",
@@ -211,6 +220,85 @@
                     "description": "Keystore alias"
                 }
             }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "device-explorer",
+                    "title": "Titanium",
+                    "icon": "images/appc.svg"
+                }
+            ]
+        },
+        "views": {
+            "device-explorer": [
+                {
+                    "id": "deviceExplorer",
+                    "name": "Devices",
+                    "when": "appcelerator-titanium:enabled"
+                }
+            ]
+        },
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "appcelerator-titanium.explorer.refresh",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.run",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.dist",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.stop",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.set-log-level",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.open-related-view",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.open-related-style",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.open-related-controller",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.toggle-related-files",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.generate-autocomplete-suggestions",
+                    "when": "appcelerator-titanium:enabled"
+                }
+            ],
+            "view/title": [
+                {
+                    "command": "appcelerator-titanium.explorer.refresh",
+                    "when": "view == deviceExplorer",
+                    "group": "navigation"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "appcelerator-titanium.run",
+                    "when": "view == deviceExplorer"
+                },
+                {
+                    "command": "appcelerator-titanium.dist",
+                    "when": "view == deviceExplorer && viewItem == platformNode"
+                }
+            ]
         }
     },
     "scripts": {
@@ -232,6 +320,7 @@
         "fs-extra": "^7.0.0",
         "mkdirp": "^0.5.1",
         "path": "^0.12.7",
+        "semver": "^5.6.0",
         "underscore": "^1.8.3"
     }
 }
