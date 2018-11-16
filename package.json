@@ -56,8 +56,12 @@
             },
             {
                 "command": "appcelerator-titanium.explorer.refresh",
-                "title": "Refresh Explorer",
-                "category": "Appcelerator"
+                "title": "Refresh Devices",
+                "category": "Appcelerator",
+                "icon": {
+                    "light": "images/light/refresh.svg",
+                    "dark": "images/dark/refresh.svg"
+                  }
             },
             {
                 "command": "appcelerator-titanium.run",
@@ -221,7 +225,7 @@
             "activitybar": [
                 {
                     "id": "device-explorer",
-                    "title": "Device Explorer",
+                    "title": "Titanium",
                     "icon": "images/appc.svg"
                 }
             ]

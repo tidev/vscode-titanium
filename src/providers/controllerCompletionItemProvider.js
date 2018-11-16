@@ -30,7 +30,7 @@ const ControllerCompletionItemProvider = {
 		if (!this.completions) {
 			this.completions = completionItemProviderHelper.loadCompletions();
 		}
-		console.log(linePrefix);
+
 		// Alloy XML ID - $._
 		if (/\$\.([-a-zA-Z0-9-_]*)$/.test(linePrefix)) {
 			return this.getIdCompletions(linePrefix, prefix);
