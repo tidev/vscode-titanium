@@ -66,6 +66,7 @@ module.exports = {
 	/**
 	 * Returns the target name based off a pretty name in the UI.
 	 * @param {String} name - name to get target for.
+	 * @returns {String}
 	 */
 	targetForName(name) {
 		name = name.toLowerCase();

@@ -47,7 +47,7 @@ function activate(context) {
 		// register completion providers
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, styleCompletionItemProvider),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerCompletionItemProvider, '.'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerCompletionItemProvider, '.', '\'', '"', '/'),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
 
 		// register hover providers
@@ -101,12 +101,12 @@ function activate(context) {
 				if (!platform) {
 					return;
 				}
-	
+
 				if (platform.id === 'last') {
 					run(lastOptions);
 					return;
 				}
-	
+
 				runOptions.platform = platform.id;
 			}
 
@@ -121,10 +121,10 @@ function activate(context) {
 				if (!target) {
 					return;
 				}
-	
+
 				runOptions.target = target.id;
 			}
-		
+
 			if (!runOptions.deviceId) {
 				let deviceId;
 				if (runOptions.platform === 'ios') {
@@ -140,11 +140,11 @@ function activate(context) {
 						deviceId = await selectAndroidDevice();
 					}
 				}
-	
+
 				if (!deviceId) {
 					return;
 				}
-	
+
 				runOptions.deviceId = deviceId.udid;
 				runOptions.deviceLabel = deviceId.label;
 			}
