@@ -2,7 +2,7 @@ const vscode = require('vscode');
 const SnippetString = vscode.SnippetString;
 const Range = vscode.Range;
 const _ = require('underscore');
-const related = require('../related');
+const related = require('../../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
 const completionItemProviderHelper = require('./completionItemProviderHelper');
 

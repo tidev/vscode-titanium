@@ -4,8 +4,8 @@ const Range = vscode.Range;
 const _ = require('underscore');
 const path = require('path');
 const find = require('find');
-const utils = require('../utils');
-const related = require('../related');
+const utils = require('../../utils');
+const related = require('../../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
 const completionItemProviderHelper = require('./completionItemProviderHelper');
 

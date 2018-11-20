@@ -1,7 +1,7 @@
 const vscode = require('vscode');
 const fs = require('fs');
 const path = require('path');
-const Appc = require('../appc');
+const Appc = require('../../appc');
 const { homedir } = require('os');
 const _ = require('underscore');
 
@@ -13,7 +13,7 @@ const completionItemProviderHelper = {
 	 * @returns {Object}
 	*/
 	loadCompletions() {
-		let completions = require('./completions');
+		let completions = require('../completions');
 		_.extend(completions.properties, {
 			id: {
 				description: 'TSS id'

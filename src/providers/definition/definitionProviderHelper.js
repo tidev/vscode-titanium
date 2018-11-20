@@ -2,7 +2,7 @@ const vscode = require('vscode');
 const fs = require('fs-extra');
 const path = require('path');
 const find = require('find');
-const utils = require('../utils');
+const utils = require('../../utils');
 const mkdirp = require('mkdirp');
 
 /**

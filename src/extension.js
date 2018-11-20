@@ -6,16 +6,18 @@ const Terminal = require('./terminal');
 const utils = require('./utils');
 const vscode = require('vscode');
 
-// Providers
-const viewCompletionItemProvider = require('./providers/viewCompletionItemProvider');
-const styleCompletionItemProvider = require('./providers/styleCompletionItemProvider');
-const controllerCompletionItemProvider = require('./providers/controllerCompletionItemProvider');
-const tiappCompletionItemProvider = require('./providers/tiappCompletionItemProvider');
-const viewDefinitionProvider = require('./providers/viewDefinitionProvider');
-const styleDefinitionProvider = require('./providers/styleDefinitionProvider');
-const controllerDefinitionProvider = require('./providers/controllerDefinitionProvider');
-const definitionProviderHelper = require('./providers/definitionProviderHelper');
-const completionItemProviderHelper = require('./providers/completionItemProviderHelper');
+// Completion provider
+const completionItemProviderHelper = require('./providers/completion/completionItemProviderHelper');
+const viewCompletionItemProvider = require('./providers/completion/viewCompletionItemProvider');
+const styleCompletionItemProvider = require('./providers/completion/styleCompletionItemProvider');
+const controllerCompletionItemProvider = require('./providers/completion/controllerCompletionItemProvider');
+const tiappCompletionItemProvider = require('./providers/completion/tiappCompletionItemProvider');
+
+// Definition provider
+const viewDefinitionProvider = require('./providers/definition/viewDefinitionProvider');
+const styleDefinitionProvider = require('./providers/definition/styleDefinitionProvider');
+const controllerDefinitionProvider = require('./providers/definition/controllerDefinitionProvider');
+const definitionProviderHelper = require('./providers/definition/definitionProviderHelper');
 const openDashboardCommandId = 'appcelerator-titanium.openDashboard';
 
 let extensionContext = {};

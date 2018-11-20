@@ -1,4 +1,4 @@
-const related = require('../related');
+const related = require('../../related');
 const definitionProviderHelper = require('./definitionProviderHelper');
 
 /**

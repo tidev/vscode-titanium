@@ -1,5 +1,5 @@
 const path = require('path');
-const utils = require('../utils');
+const utils = require('../../utils');
 const definitionProviderHelper = require('./definitionProviderHelper');
 
 /**

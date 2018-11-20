@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const path = require('path');
-const related = require('../related');
+const related = require('../../related');
 const definitionProviderHelper = require('./definitionProviderHelper');
 
 /**

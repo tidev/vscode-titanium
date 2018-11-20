@@ -3,8 +3,8 @@ const Range = vscode.Range;
 const _ = require('underscore');
 const fs = require('fs');
 const path = require('path');
-const utils = require('../utils');
-const Appc = require('../appc');
+const utils = require('../../utils');
+const Appc = require('../../appc');
 
 /**
  * Tiapp.xml completion provider

@@ -1,5 +1,5 @@
 const vscode = require('vscode');
-const utils = require('../utils');
+const utils = require('../../utils');
 const _ = require('underscore');
 const find = require('find');
 const path = require('path');

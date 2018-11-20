@@ -1,4 +1,4 @@
-src/providers/completions.js
+completions.js
 node_modules
 .vscode-test/
 .vsix
