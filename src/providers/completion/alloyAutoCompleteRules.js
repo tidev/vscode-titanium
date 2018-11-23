@@ -8,65 +8,62 @@ const parseString = require('xml2js').parseString;
 module.exports = {
 	cfg: {
 		regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)$/,
-		getCompletions(linePrefix) {
-			if (this.regExp.test(linePrefix)) {
-				return new Promise((resolve) => {
-					const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
-					let completions = [];
-					if (utils.fileExists(cfgPath)) {
-						vscode.workspace.openTextDocument(cfgPath).then(document => {
-							let cfgObj = JSON.parse(document.getText());
-							cfgObj = _.reduce(cfgObj, function (memo, value, key) {
-								if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
-									return _.extend(memo, value);
-								} else {
-									return memo;
-								}
-							}, {});
+		async getCompletions(linePrefix) {
+			if (!this.regExp.test(linePrefix)) {
+				return;
+			}
 
-							const allKeys = utils.getAllKeys(cfgObj);
-							for (const key of allKeys) {
-								completions.push({
-									label: key,
-									kind: vscode.CompletionItemKind.Value
-								});
-							}
-							resolve(completions);
-						});
+			const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
+			const completions = [];
+			if (utils.fileExists(cfgPath)) {
+				const document = await vscode.workspace.openTextDocument(cfgPath);
+				let cfgObj = JSON.parse(document.getText());
+				cfgObj = _.reduce(cfgObj, function (memo, value, key) {
+					if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
+						return _.extend(memo, value);
+					} else {
+						return memo;
 					}
-				});
+				}, {});
+
+				const allKeys = utils.getAllKeys(cfgObj);
+				for (const key of allKeys) {
+					completions.push({
+						label: key,
+						kind: vscode.CompletionItemKind.Value
+					});
+				}
+				return completions;
 			}
 		}
 	},
 
 	i18n: {
 		regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
-		getCompletions(linePrefix) {
-			if (this.regExp.test(linePrefix)) {
-				return new Promise((resolve) => {
-					const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
-					const i18nPath = utils.getI18nPath();
-					if (utils.directoryExists(i18nPath)) {
-						const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
-						let completions = [];
-						if (utils.fileExists(i18nStringPath)) {
-							vscode.workspace.openTextDocument(i18nStringPath).then(document => {
-								parseString(document.getText(), (error, result) => {
-									if (result && result.resources && result.resources.string) {
-										for (let value of result.resources.string) {
-											completions.push({
-												label: value.$.name,
-												kind: vscode.CompletionItemKind.Reference,
-												detail: value._
-											});
-										}
-										resolve(completions);
-									}
+		async getCompletions(linePrefix) {
+			if (!this.regExp.test(linePrefix)) {
+				return;
+			}
+			const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
+			const i18nPath = utils.getI18nPath();
+			if (utils.directoryExists(i18nPath)) {
+				const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
+				let completions = [];
+				if (utils.fileExists(i18nStringPath)) {
+					const document = await vscode.workspace.openTextDocument(i18nStringPath);
+					parseString(document.getText(), (error, result) => {
+						if (result && result.resources && result.resources.string) {
+							for (let value of result.resources.string) {
+								completions.push({
+									label: value.$.name,
+									kind: vscode.CompletionItemKind.Reference,
+									detail: value._
 								});
-							});
+							}
+							return completions;
 						}
-					}
-				});
+					});
+				}
 			}
 		}
 	},

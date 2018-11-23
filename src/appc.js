@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 const { spawn } = require('child_process');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const semver = require('semver');
 const utils = require('./utils');
@@ -156,6 +156,12 @@ const Appc = {
 				}
 			}
 			return sdk;
+		}
+	},
+
+	sdkInfo(version) {
+		if (Appc.info.titanium) {
+			return Appc.info.titanium[version];
 		}
 	},
 
@@ -460,6 +466,14 @@ const Appc = {
 		// 		}
 		// 	}
 		// });
+	},
+
+	async getAlloyVersion() {
+		const appcPath = path.join(homedir(), '.appcelerator', 'install');
+		const appcVersion = await fs.readFile(path.join(appcPath, '.version'), 'utf8');
+		const alloyPath = path.join(appcPath, appcVersion, 'package', 'node_modules', 'alloy');
+		const { version: alloyVersion } = await fs.readJSON(path.join(alloyPath, 'package.json'));
+		return alloyVersion;
 	}
 };
 

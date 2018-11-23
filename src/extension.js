@@ -47,7 +47,7 @@ function activate(context) {
 	const deviceExplorer = new DeviceExplorer();
 	context.subscriptions.push(
 		// register completion providers
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider, '.', '\'', '"'),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, styleCompletionItemProvider),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerCompletionItemProvider, '.', '\'', '"', '/'),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
@@ -279,18 +279,8 @@ function activate(context) {
 		}),
 
 		// register generate autocomplete suggestions command
-		vscode.commands.registerCommand('appcelerator-titanium.generate-autocomplete-suggestions', () => {
-			vscode.workspace.getConfiguration('appcelerator-titanium.general').update('generateAutoCompleteSuggestions', true, true).then(() => {
-				completionItemProviderHelper.generateCompletions(null, (success) => {
-					if (success) {
-						delete require.cache[require.resolve('./providers/completions')];
-						viewCompletionItemProvider.loadCompletions();
-						styleCompletionItemProvider.loadCompletions();
-						controllerCompletionItemProvider.loadCompletions();
-					}
-				});
-
-			});
+		vscode.commands.registerCommand('appcelerator-titanium.generate-autocomplete-suggestions', async () => {
+			await generateCompletions({ force: true });
 		}),
 
 		vscode.commands.registerCommand(openDashboardCommandId, () => {
@@ -318,18 +308,11 @@ exports.deactivate = deactivate;  // eslint-disable-line no-undef
  * Initialise extension - fetch appc info
 */
 function init() {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, p => {
+	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, progress => {
 		return new Promise((resolve, reject) => {
-			Appc.getInfo((info) => {
+			Appc.getInfo(async (info) => {
 				if (info) {
-					completionItemProviderHelper.generateCompletions(p, (success) => {
-						if (success) {
-							resolve();
-						} else {
-							vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-							reject();
-						}
-					});
+					await generateCompletions({ progress });
 				} else {
 					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
 					reject();
@@ -749,5 +732,43 @@ function run(opts) {
 				});
 			});
 		});
+	}
+}
+
+/**
+ * Generate Alloy and Titanium SDK Completion files
+ *
+ * @param {Object} opts - Options
+ * @param {Object} progress - Progress reporter.
+ */
+async function generateCompletions({ force, progress } = {}) {
+	try {
+		const sdkVersion = project.sdk()[0];
+		if (!sdkVersion) {
+			// handle?
+		}
+		// Generate the completions
+		let [ alloy, sdk ] = await Promise.all([
+			completionItemProviderHelper.generateAlloyCompletions({ force, progress }),
+			completionItemProviderHelper.generateSDKCompletions({ force, progress, sdkVersion })
+		]);
+		// Load the completion data
+		await Promise.all([
+			viewCompletionItemProvider.loadCompletions(),
+			styleCompletionItemProvider.loadCompletions(),
+			controllerCompletionItemProvider.loadCompletions()
+		]);
+		if (sdk || alloy) {
+			let message = 'Autocomplete suggestions generated for';
+			if (sdk) {
+				message = `${message} Titanium ${sdk}`;
+			}
+			if (alloy) {
+				message = `${message} Alloy ${alloy}`;
+			}
+			vscode.window.showInformationMessage(message);
+		}
+	} catch (error) {
+		vscode.window.showErrorMessage('Error generating autocomplete suggestions');
 	}
 }

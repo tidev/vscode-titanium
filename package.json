@@ -170,11 +170,6 @@
                     "default": true,
                     "description": "Build command will be run using the integrated terminal."
                 },
-                "appcelerator-titanium.general.generateAutoCompleteSuggestions": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Generate auto-complete suggestions for currently selected Titanium SDK. NOTE: Requires relaunch."
-                },
                 "appcelerator-titanium.project.defaultI18nLanguage": {
                     "type": "string",
                     "default": "en"

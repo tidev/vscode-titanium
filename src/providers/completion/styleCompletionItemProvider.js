@@ -19,13 +19,13 @@ const StyleCompletionItemProvider = {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	provideCompletionItems(document, position) {
+	async provideCompletionItems(document, position) {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
 		if (!this.completions) {
-			this.completions = completionItemProviderHelper.loadCompletions();
+			await this.loadCompletions();
 		}
 
 		// property value - foo: _ or foo: ba_
@@ -97,7 +97,7 @@ const StyleCompletionItemProvider = {
      */
 	getTagCompletions(linePrefix, prefix) {
 		const completions = [];
-		_.each(this.completions.tags, function (value, key) {
+		_.each(this.completions.alloy.tags, function (value, key) {
 			if (!prefix || completionItemProviderHelper.matches(key, prefix)) {
 				completions.push({
 					label: key,
@@ -123,24 +123,35 @@ const StyleCompletionItemProvider = {
      */
 	getPropertyNameCompletions(linePrefix, prefix, position, document) {
 		const parentObjName = this.getParentObjectName(position, document);
-
+		const { properties, types } = this.completions.titanium;
 		const innerProperties = {};
-		const type = this.completions.types[this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined];
-		if ((this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined) && type.properties && type.properties.length) {
-			const completionProperty = this.completions.properties[parentObjName] ? this.completions.properties[parentObjName].type : undefined;
-			_.each(this.completions.types[completionProperty].properties, innerKey => innerProperties[innerKey] = {});
+		const completions = [];
+
+		// Lookup the property data
+		const propertyData = properties[parentObjName];
+		if (!propertyData) {
+			return completions;
 		}
 
-		const completions = [];
-		const candidateProperties = _.isEmpty(innerProperties) ? this.completions.properties : innerProperties;
-		for (let property in candidateProperties) {
+		const propertyType = properties[parentObjName].type;
+		const typeData = types[propertyType];
+		if (typeData && typeData.properties && typeData.properties.length) {
+			let completionProperty;
+			if (properties[parentObjName]) {
+				completionProperty = properties[parentObjName].type;
+			}
+			_.each(types[completionProperty].properties, innerKey => innerProperties[innerKey] = {});
+		}
+
+		const candidateProperties = _.isEmpty(innerProperties) ? properties : innerProperties;
+		for (const property in candidateProperties) {
 			if (!prefix || completionItemProviderHelper.matches(property, prefix)) {
 
 				//
 				// Object types
 				//
 				const jsObjectTypes = [ 'Font' ];
-				if (jsObjectTypes.indexOf(this.completions.properties[property].type) > -1) {
+				if (jsObjectTypes.indexOf(properties[property].type) > -1) {
 					completions.push({
 						label: property,
 						kind: vscode.CompletionItemKind.Property,
@@ -172,17 +183,18 @@ const StyleCompletionItemProvider = {
 	 * @returns {Array}
 	 */
 	getPropertyValueCompletions(linePrefix, prefix) {
+		const { properties } = this.completions.titanium;
 		let property;
 		const matches = /^\s*(\S+)\s*:/.exec(linePrefix);
 		if (matches && matches.length >= 2) {
 			property = matches[1];
 		}
 
-		if (!this.completions.properties[property]) {
+		if (properties[property]) {
 			return null;
 		}
 
-		const { values } = this.completions.properties[property];
+		const { values } = properties[property];
 		if (!values) {
 			return null;
 		}
@@ -225,6 +237,10 @@ const StyleCompletionItemProvider = {
 			lineNumber--;
 		}
 	},
+
+	async loadCompletions() {
+		this.completions = await completionItemProviderHelper.loadCompletions();
+	}
 };
 
 module.exports = StyleCompletionItemProvider;

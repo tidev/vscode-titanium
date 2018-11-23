@@ -22,14 +22,14 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	provideCompletionItems(document, position) {
+	async provideCompletionItems(document, position) {
 		const line = document.lineAt(position).text;
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
 		if (!this.completions) {
-			this.completions = completionItemProviderHelper.loadCompletions();
+			await this.loadCompletions();
 		}
 
 		// opening tag <_ or <Vie_
@@ -42,15 +42,15 @@ const ViewCompletionItemProvider = {
 		} else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('.]*$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult;
-			_.find(alloyAutoCompleteRules, rule => ruleResult = rule.getCompletions(linePrefix, position, prefix));
+			_.find(alloyAutoCompleteRules, async rule => ruleResult = await rule.getCompletions(linePrefix, position, prefix));
 			if (ruleResult) {
 				return ruleResult;
 			} else {
-				return this.getAttributeValueCompletions(linePrefix, position, prefix, document);
+				return await this.getAttributeValueCompletions(linePrefix, position, prefix, document);
 			}
 		}
 		// outside tag, test localised string function
-		return alloyAutoCompleteRules.i18n.getCompletions(linePrefix, position, prefix);
+		return await alloyAutoCompleteRules.i18n.getCompletions(linePrefix, position, prefix);
 	},
 
 	/**
@@ -69,16 +69,17 @@ const ViewCompletionItemProvider = {
 		if (!/^[a-zA-Z]+$/.test(prefix)) {
 			return [];
 		}
+		const { tags } = this.completions.alloy;
 		const completions = [];
 		const isClosing = new RegExp(`</${prefix || ''}$`).test(linePrefix);
 		const useSnippet = new RegExp(`^\\s*</?${prefix || ''}\\s*>?\\s*$`).test(line);
 		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) : new Range(position.line, position.character, position.line, line.length);
-		for (let tag in this.completions.tags) {
+		for (const tag in tags) {
 			if (!prefix || completionItemProviderHelper.matches(tag, prefix)) {
 				let completion = {
 					label: tag,
 					kind: vscode.CompletionItemKind.Class,
-					detail: this.completions.tags[tag].apiName
+					detail: tags[tag].apiName
 				};
 				if (useSnippet) {
 					completion.insertText = isClosing ? new SnippetString(`${tag}>`) : new SnippetString(`${tag}$1>$2</${tag}>`);
@@ -100,6 +101,8 @@ const ViewCompletionItemProvider = {
 	 * @returns {Array}
 	 */
 	getAttributeNameCompletions(linePrefix, position, prefix) {
+		const { tags } = this.completions.alloy;
+		const { types } = this.completions.titanium;
 		let completions = [];
 		let tagName;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
@@ -108,12 +111,12 @@ const ViewCompletionItemProvider = {
 		}
 		let tagAttributes = this.getTagAttributes(tagName).concat([ 'id', 'class', 'platform', 'bindId' ]);
 		let apiName = tagName;
-		if (this.completions.tags[tagName] && this.completions.tags[tagName].apiName) {
-			apiName = this.completions.tags[tagName].apiName;
+		if (tags[tagName] && tags[tagName].apiName) {
+			apiName = tags[tagName].apiName;
 		}
 		let events = [];
-		if (this.completions.types[apiName]) {
-			events = this.completions.types[apiName].events;
+		if (types[apiName]) {
+			events = types[apiName].events;
 		}
 
 		//
@@ -156,7 +159,7 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	getAttributeValueCompletions(linePrefix, position, prefix, document) {
+	async getAttributeValueCompletions(linePrefix, position, prefix, document) {
 		let values;
 		let tag;
 		let matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
@@ -164,95 +167,84 @@ const ViewCompletionItemProvider = {
 			tag = matches[1];
 		}
 		let attribute = this.getPreviousAttribute(linePrefix, position);
-		let completions = [];
+		const completions = [];
 
 		//
-		// realted and global TSS
+		// Related and global TSS
 		//
-		if (utils.getAlloyRootPath()) {
+		if (attribute === 'id' || attribute === 'class') {
+			const relatedFile = related.getTargetPath('tss', document.fileName);
+			const appTss = path.join(vscode.workspace.rootPath, 'app', 'styles', 'app.tss');
 
-			return new Promise((resolve) => {
-				if ((attribute === 'id') || (attribute === 'class')) {
-					const relatedFile = related.getTargetPath('tss', document.fileName);
-					const appTss = path.join(vscode.workspace.rootPath, 'app', 'styles', 'app.tss');
-
-					const files = [];
-					[ relatedFile, appTss ].forEach(file => {
-						files.push(new Promise((resolve) => {
-							vscode.workspace.openTextDocument(file).then(document => {
-								if (document.getText().length > 0) {
-									let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
-									if (attribute === 'class') {
-										regex = /["'](\.)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
-									}
-									values = [];
-									while ((matches = regex.exec(document.getText())) !== null) {
-										values.push(matches[2]);
-									}
-									const fileName = path.parse(file).name;
-									for (const value of values) {
-										if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
-											completions.push({
-												label: value,
-												kind: vscode.CodeActionKind.Reference,
-												detail: fileName
-											});
-										}
-									}
-								}
-								resolve();
+			const files = [];
+			async function getCompletions(file) {
+				const document = await vscode.workspace.openTextDocument(file);
+				if (document.getText().length) {
+					let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
+					if (attribute === 'class') {
+						regex = /["'](\.)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
+					}
+					values = [];
+					while ((matches = regex.exec(document.getText())) !== null) {
+						values.push(matches[2]);
+					}
+					const fileName = path.parse(file).name;
+					for (const value of values) {
+						if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
+							completions.push({
+								label: value,
+								kind: vscode.CodeActionKind.Reference,
+								detail: fileName
 							});
-						}));
-					});
-
-					Promise.all(files).then(() => {
-						resolve(completions);
-					});
-
-				} else if (attribute === 'src') {
-
-					//
-					// Require src attribute
-					//
-					if (tag === 'Require') {
-						let controllerPath = path.join(utils.getAlloyRootPath(), 'controllers');
-						if (utils.directoryExists(controllerPath)) {
-							let files = find.fileSync(/\.js$/, controllerPath);
-							const relatedControllerFile = related.getTargetPath('js', document.fileName);
-							for (const file of files) {
-								if (relatedControllerFile === file) {
-									continue;
-								}
-								let value = utils.toUnixPath(file.replace(controllerPath, '').split('.')[0]);
-								completions.push({
-									label: value,
-									kind: vscode.CompletionItemKind.Reference
-								});
-							}
 						}
+					}
+				}
+			}
 
-						resolve(completions);
+			for (const file of [ relatedFile, appTss ]) {
+				files.push(getCompletions(file));
+			}
 
-					//
-					// Widget src attribute
-					//
-					} else if (tag === 'Widget') {
-						let alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
-						vscode.workspace.openTextDocument(alloyConfigPath).then(document => {
-							let configObj = JSON.parse(document.getText());
-							for (let widgetName in (configObj ? configObj.dependencies : undefined)) {
-								completions.push({
-									label: widgetName,
-									kind: vscode.CompletionItemKind.Reference
-								});
-							}
-							resolve(completions);
+			await Promise.all(files);
+			return completions;
+
+		} else if (attribute === 'src') {
+
+			//
+			// Require src attribute
+			//
+			if (tag === 'Require') {
+				let controllerPath = path.join(utils.getAlloyRootPath(), 'controllers');
+				if (utils.directoryExists(controllerPath)) {
+					const files = find.fileSync(/\.js$/, controllerPath);
+					const relatedControllerFile = related.getTargetPath('js', document.fileName);
+					for (const file of files) {
+						if (relatedControllerFile === file) {
+							continue;
+						}
+						let value = utils.toUnixPath(file.replace(controllerPath, '').split('.')[0]);
+						completions.push({
+							label: value,
+							kind: vscode.CompletionItemKind.Reference
 						});
 					}
-				} else {
-					resolve([]);
 				}
-			});
+				return completions;
+			//
+			// Widget src attribute
+			//
+			} else if (tag === 'Widget') {
+				let alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
+				const document = await vscode.workspace.openTextDocument(alloyConfigPath);
+				const configObj = JSON.parse(document.getText());
+				for (const widgetName in (configObj ? configObj.dependencies : undefined)) {
+					completions.push({
+						label: widgetName,
+						kind: vscode.CompletionItemKind.Reference
+					});
+				}
+				return completions;
+			}
 		}
 
 		//
@@ -282,7 +274,9 @@ const ViewCompletionItemProvider = {
 	 * @returns {Array}
 	 */
 	getTagAttributes(tag) {
-		const type = this.completions.types[this.completions.tags[tag] ? this.completions.tags[tag].apiName : undefined];
+		const { tags } = this.completions.alloy;
+		const { types } = this.completions.titanium;
+		const type = types[tags[tag] ? tags[tag].apiName : undefined];
 		if (type) {
 			return type.properties;
 		}
@@ -292,13 +286,17 @@ const ViewCompletionItemProvider = {
 	/**
 	 * Get attribute values
 	 *
-	 * @param {String} attribute attribute name
+	 * @param {String} attributeName attribute name
 	 *
 	 * @returns {Array}
 	 */
-	getAttributeValues(attribute) {
-		attribute = this.completions.properties[attribute];
-		return (attribute ? attribute.values : undefined) ? (attribute ? attribute.values : undefined) : [];
+	getAttributeValues(attributeName) {
+		const { properties } = this.completions.titanium;
+		const attribute = properties[attributeName];
+		if (attribute) {
+			return attribute.values;
+		}
+		return [];
 	},
 
 	/**
@@ -321,6 +319,10 @@ const ViewCompletionItemProvider = {
 			return matches[1];
 		}
 	},
+
+	async loadCompletions() {
+		this.completions = await completionItemProviderHelper.loadCompletions();
+	}
 };
 
 module.exports = ViewCompletionItemProvider;

@@ -1,7 +1,7 @@
-const vscode = require('vscode');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const Appc = require('../../appc');
+const project = require('../../project');
 const { homedir } = require('os');
 const _ = require('underscore');
 
@@ -12,27 +12,45 @@ const completionItemProviderHelper = {
 	 *
 	 * @returns {Object}
 	*/
-	loadCompletions() {
-		let completions = require('../completions');
-		_.extend(completions.properties, {
-			id: {
-				description: 'TSS id'
-			},
-			class: {
-				description: 'TSS class'
-			},
-			platform: {
-				type: 'String',
-				description: 'Platform condition',
-				values: [
-					'android',
-					'ios',
-					'mobileweb',
-					'windows'
-				]
-			}
-		});
-		return completions;
+	async loadCompletions() {
+		try {
+			const sdk = project.sdk()[0];
+			const alloyVersion = await Appc.getAlloyVersion();
+			let sdkCompletions = await fs.readJSON(this.getSDKCompletionsFileName(sdk));
+			let alloyCompletions = await fs.readJSON(this.getAlloyCompletionsFileName(alloyVersion));
+			_.extend(sdkCompletions.properties, {
+				id: {
+					description: 'TSS id'
+				},
+				class: {
+					description: 'TSS class'
+				},
+				platform: {
+					type: 'String',
+					description: 'Platform condition',
+					values: [
+						'android',
+						'ios',
+						'mobileweb',
+						'windows'
+					]
+				}
+			});
+			return {
+				alloy: alloyCompletions,
+				titanium: sdkCompletions
+			};
+		} catch (error) {
+			throw error;
+		}
+	},
+
+	getSDKCompletionsFileName(version) {
+		return path.join(homedir(), '.titanium', 'completions', 'titanium', version, 'completions.json');
+	},
+
+	getAlloyCompletionsFileName(version) {
+		return path.join(homedir(), '.titanium', 'completions', 'alloy', version, 'completions.json');
 	},
 
 	/**
@@ -48,46 +66,43 @@ const completionItemProviderHelper = {
 	},
 
 	/**
+	 * Generate completions for an Alloy version.
 	 *
-	 * generate completions
-	 *
-	 * @param {Progress} progress activity progress object
-	 * @param {Function} callback callback function
+	 * @param {Object} opts - Options
+	 * @param {Boolean} opts.force - Force generation of completion file.
+	 * @param {Object} [opts.progress] - Progress output.
 	 */
-	generateCompletions(progress, callback) {
-		const completionsFilename = path.join(__dirname, 'completions.js');
-		if (!vscode.workspace.getConfiguration('appcelerator-titanium.general').get('generateAutoCompleteSuggestions')
-			&& fs.existsSync(completionsFilename)) {
-			callback && callback(true);
+	async generateAlloyCompletions({ force = false, progress } = {}) {
+		const appcPath = path.join(homedir(), '.appcelerator', 'install');
+		const version = await fs.readFile(path.join(appcPath, '.version'), 'utf8');
+		const alloyPath = path.join(appcPath, version, 'package', 'node_modules', 'alloy');
+		const alloyVersion = await Appc.getAlloyVersion();
+
+		const alloyCompletionsFilename = this.getAlloyCompletionsFileName(alloyVersion);
+
+		if (!force && fs.existsSync(alloyCompletionsFilename)) {
 			return;
 		}
-		vscode.workspace.getConfiguration('appcelerator-titanium.general').update('generateAutoCompleteSuggestions', false, true);
-		progress && progress.report({ message: 'Generating autocomplete suggestions ...' });
 
-		const appcPath = path.join(homedir(), '.appcelerator/install');
-		const version = fs.readFileSync(path.join(appcPath, '.version'), 'utf8');
-		const alloyPath = path.join(appcPath, version, 'package/node_modules/alloy');
-		// const alloyApi = JSON.parse(fs.readFileSync(path.join(alloyPath, 'docs/api.jsca'), 'utf8'));
-		const sdk = Appc.selectedSdk();
-		const titaniumAPIPath = path.join(sdk.path, 'api.jsca');
-		const api = JSON.parse(fs.readFileSync(titaniumAPIPath, 'utf8'));
+		// TODO: Generate completions from this?
+		// const alloyApi = await fs.readJSON(path.join(alloyPath, 'docs', 'api.jsca'));
 
 		// generate tag list
-		const fns = fs.readdirSync(path.join(alloyPath, '/Alloy/commands/compile/parsers'));
+		const alloyTags = await fs.readdir(path.join(alloyPath, 'Alloy', 'commands', 'compile', 'parsers'));
 		let tagDic = {};
-		for (const fn of fns) {
-			if (!fn.endsWith('.js')) {
+		for (const tag of alloyTags) {
+			if (!tag.endsWith('.js')) {
 				continue;
 			}
-			const ar = fn.split('.');
+			const ar = tag.split('.');
 			const tagName = ar[ar.length - 2];
 			if (tagName.indexOf('_') !== 0 && tagName[0] === tagName[0].toUpperCase()) {
 				tagDic[tagName] = {
-					apiName: fn.replace('.js', '')
+					apiName: tag.replace('.js', '')
 				};
-			} else if (tagName === '_ProxyProperty' && fn.indexOf('Ti.UI') === 0) {
+			} else if (tagName === '_ProxyProperty' && tag.indexOf('Ti.UI') === 0) {
 				tagDic[ar[ar.length - 3]] = { // Ti.UI.Window._ProxyProperty
-					apiName: fn.replace('.js', '').replace('._ProxyProperty', '')
+					apiName: tag.replace('.js', '').replace('._ProxyProperty', '')
 				};
 			}
 		}
@@ -118,16 +133,85 @@ const completionItemProviderHelper = {
 			}
 		});
 
+		// // missing types
+		// Object.assign(types, {
+		// 	'Alloy.Abstract.ItemTemplate': {
+		// 		description: 'Template that represents the basic appearance of a list item.',
+		// 		functions: [
+		// 		],
+		// 		properties: [
+		// 			'name',
+		// 			'height'
+		// 		],
+		// 		events: []
+		// 	},
+		// 	'Alloy.Widget': {
+		// 		description: 'Widgets are self-contained components that can be easily dropped into an Alloy project.',
+		// 		functions: [],
+		// 		properties: [
+		// 			'src'
+		// 		],
+		// 		events: []
+		// 	},
+		// 	'Alloy.Require': {
+		// 		description: 'Require alloy controller',
+		// 		functions: [],
+		// 		properties: [
+		// 			'src'
+		// 		],
+		// 		events: []
+		// 	}
+		// });
+
+		let sortedTagDic = {};
+		Object.keys(tagDic)
+			.sort()
+			.forEach(k => sortedTagDic[k] = tagDic[k]);
+		try {
+			await fs.ensureDir(path.dirname(alloyCompletionsFilename));
+			await fs.writeFile(alloyCompletionsFilename, JSON.stringify({
+				version: 1,
+				alloyVersion,
+				tags: sortedTagDic
+			}, null, 4));
+			return alloyVersion;
+		} catch (error) {
+			throw error;
+		}
+	},
+
+	/**
+	 *
+	 * Generate completions file for a Titanium SDK.
+	 *
+	 * @param {Object} opts - Options.
+	 * @param {Boolean} [opts.force=false] - Force generation of the completion file.
+	 * @param {Progress} [progress] activity progress object.
+	 * @param {String} sdkVersion - SDK Version to generate completions for.
+	 */
+	async generateSDKCompletions({ force = false, progress, sdkVersion }) {
+		// Make sdkVersion optional and load for selected SDK?
+		const sdkCompletionsFilename = this.getSDKCompletionsFileName(sdkVersion);
+
+		if (!force && fs.existsSync(sdkCompletionsFilename)) {
+			return;
+		}
+
+		progress && progress.report({ message: 'Generating autocomplete suggestions ...' });
+
+		const sdk = Appc.sdkInfo(sdkVersion);
+		const titaniumAPIPath = path.join(sdk.path, 'api.jsca');
+		const api = await fs.readJSON(titaniumAPIPath, 'utf8');
 		// property list
 		const types = {};
 		const props = {};
-		api.types.forEach((type) => {
+		for (const type of api.types) {
 			if (type.deprecated) {
-				return;
+				continue;
 			}
 
 			let propertyNamesOfType = [];
-			type.properties.forEach((prop) => {
+			for (const prop of type.properties) {
 				if (prop.permission !== 'read-only' && prop.name.indexOf('Modules.') !== 0) {
 
 					propertyNamesOfType.push(prop.name);
@@ -141,7 +225,6 @@ const completionItemProviderHelper = {
 							const values = props[prop.name].values ? props[prop.name].values.concat(prop.constants) : prop.constants;
 							props[prop.name].values = [ ...new Set(values) ];
 						}
-
 					} else {
 						props[prop.name] = {
 							description: prop.description.replace(/<p>|<\/p>/g, ''),
@@ -152,7 +235,7 @@ const completionItemProviderHelper = {
 						}
 					}
 				}
-			});
+			}
 
 			types[type.name.replace(/Titanium\./g, 'Ti.')] = {
 				description: type.description.replace(/<p>|<\/p>/g, ''),
@@ -164,7 +247,7 @@ const completionItemProviderHelper = {
 					return (e.deprecated) ? e.name + '|deprecated' : e.name;
 				})
 			};
-		});
+		}
 
 		// Alias
 		for (const key in props) {
@@ -196,65 +279,31 @@ const completionItemProviderHelper = {
 			}
 		}
 
-		// missing types
-		Object.assign(types, {
-			'Alloy.Abstract.ItemTemplate': {
-				description: 'Template that represents the basic appearance of a list item.',
-				functions: [
-				],
-				properties: [
-					'name',
-					'height'
-				],
-				events: []
-			},
-			'Alloy.Widget': {
-				description: 'Widgets are self-contained components that can be easily dropped into an Alloy project.',
-				functions: [],
-				properties: [
-					'src'
-				],
-				events: []
-			},
-			'Alloy.Require': {
-				description: 'Require alloy controller',
-				functions: [],
-				properties: [
-					'src'
-				],
-				events: []
-			}
-		});
-
 		// missing values
 		props.layout.values = [ '\'vertical\'', '\'horizontal\'', '\'composite\'' ];
-
-		let sortedTagDic = {};
-		Object.keys(tagDic)
-			.sort()
-			.forEach(k => sortedTagDic[k] = tagDic[k]);
 
 		const sortedProps = {};
 		Object.keys(props)
 			.sort()
 			.forEach(k => sortedProps[k] = props[k]);
 
-		fs.writeFile(completionsFilename,
-			'module.exports = ' + JSON.stringify({
-				version: 1,
-				sdkVersion: `${sdk.fullversion}`,
-				properties: sortedProps,
-				tags: sortedTagDic,
-				types: types
-			}, null, 4),
-			function (err) {
-				if (err) {
-					// console.error(err);
-				} else {
-					vscode.window.showInformationMessage(`Appcelerator Titanium: Autocomplete suggestions generated for Titanium SDK ${sdk.fullversion}`);
-					callback && callback(true);
-				}
-			});
+		try {
+			await fs.ensureDir(path.dirname(sdkCompletionsFilename));
+			await fs.writeJSON(
+				sdkCompletionsFilename,
+				{
+					version: 1,
+					sdkVersion: `${sdk.fullversion}`,
+					properties: sortedProps,
+					types: types
+				},
+				{
+					spaces: 4
+				});
+			return sdkVersion;
+		} catch (error) {
+			throw error;
+		}
 	}
 };
 
