@@ -40,9 +40,11 @@ module.exports = class DeviceTypeNode extends BaseNode {
 				case 'Emulator':
 					for (const [ type, emulators ] of Object.entries(appc.androidEmulators())) {
 						for (const emulator of emulators) {
-							const label = `${emulator.name} (${type})`;
+							let label = `${emulator.name}`;
+							if (type === 'Genymotion') {
+								label = `${label} (Genymotion)`;
+							}
 							devices.push(new DeviceNode(label, vscode.TreeItemCollapsibleState.None, this.platform, this.label, emulator.id));
-
 						}
 					}
 					break;

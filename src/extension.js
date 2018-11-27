@@ -64,9 +64,7 @@ function activate(context) {
 		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, viewDefinitionProvider),
 
 		// register init command
-		vscode.commands.registerCommand('appcelerator-titanium.init', () => {
-			init();
-		}),
+		vscode.commands.registerCommand('appcelerator-titanium.init', init),
 
 		// register run command
 		vscode.commands.registerCommand('appcelerator-titanium.run', async (runOpts = {}) => {
@@ -78,13 +76,13 @@ function activate(context) {
 				vscode.window.showErrorMessage('Build in progress');
 				return;
 			}
-
+			const iOSSimVersion = runOpts.version;
 			const runOptions = {
 				buildType: 'run',
 				platform: runOpts.platform,
 				target: runOpts.targetId,
 				deviceId: runOpts.deviceId,
-				deviceLabel: runOpts.label
+				deviceLabel: runOpts.platform === 'ios' ? `${runOpts.label} (${runOpts.version})` : runOpts.label
 			};
 
 			let last;
@@ -131,7 +129,7 @@ function activate(context) {
 				let deviceId;
 				if (runOptions.platform === 'ios') {
 					if (runOptions.target === 'simulator') {
-						deviceId = await selectiOSSimulator();
+						deviceId = await selectiOSSimulator(iOSSimVersion);
 					} else if (runOptions.target === 'device') {
 						deviceId = await selectiOSDevice();
 					}
@@ -215,7 +213,8 @@ function activate(context) {
 				if (!profile) {
 					return;
 				}
-				runOptions.provisioningProfile = profile;
+				runOptions.provisioningProfile = profile.provisioning;
+				runOptions.certificate = profile.certificate;
 			} else if (runOptions.platform === 'android') {
 				runOptions.target = 'dist-playstore';
 				runOptions.keystore = {};
@@ -289,7 +288,9 @@ function activate(context) {
 
 		vscode.window.registerTreeDataProvider('deviceExplorer', deviceExplorer),
 
-		vscode.commands.registerCommand('appcelerator-titanium.explorer.refresh', () => deviceExplorer.refresh())
+		vscode.commands.registerCommand('appcelerator-titanium.explorer.refresh', () => {
+			deviceExplorer.refresh();
+		})
 	);
 
 	init();
@@ -313,6 +314,7 @@ function init() {
 			Appc.getInfo(async (info) => {
 				if (info) {
 					await generateCompletions({ progress });
+					resolve();
 				} else {
 					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
 					reject();
@@ -429,23 +431,26 @@ function selectTarget(platform) {
 /**
  * Select iOS simulator
  *
+ * @param {String} version - The version of the iOS simulator to show.
  * @returns {Thenable}
 */
-function selectiOSSimulator() {
+async function selectiOSSimulator(version) {
 	if (!Appc.iOSSimulators() || Appc.iOSSimulators() === {}) {
 		vscode.workspace.showErrorMessage('Error fetching iOS simulators. Check your environment and run `Appcelerator: init`.');
 		return;
 	}
-	return vscode.window.showQuickPick(Appc.iOSSimulatorVersions(), { placeHolder: 'Select iOS version' }).then(version => {
-		const simulators = Appc.iOSSimulators()[version].map(simulator => {
-			return {
-				udid: simulator.udid,
-				label: `${simulator.name} (${version})`,
-				version: version
-			};
-		});
-		return vscode.window.showQuickPick(simulators, { placeHolder: 'Select simulator' });
+	if (!version) {
+		version = await vscode.window.showQuickPick(Appc.iOSSimulatorVersions(), { placeHolder: 'Select iOS version' });
+	}
+
+	const simulators = Appc.iOSSimulators()[version].map(simulator => {
+		return {
+			udid: simulator.udid,
+			label: `${simulator.name} (${version})`,
+			version: version
+		};
 	});
+	return vscode.window.showQuickPick(simulators, { placeHolder: 'Select simulator' });
 }
 
 /**
@@ -539,25 +544,23 @@ function selectiOSProvisioningProfile({ certificate, target }) {
 */
 function selectAndroidEmulator() {
 	const emulators = Appc.androidEmulators();
-	let options = [];
-	if (emulators.AVDs.length > 0) {
-		emulators.AVDs.forEach(emulator => {
-			options.push({
-				udid: emulator.id,
-				label: emulator.name
-			});
-		});
-	}
-	if (emulators.Genymotion.length > 0) {
-		emulators.Genymotion.forEach(emulator => {
-			options.push({
-				udid: emulator.id,
-				label: emulator.name
-			});
+	const options = [];
+
+	for (const emulator of emulators.AVDs) {
+		options.push({
+			udid: emulator.id,
+			label: emulator.name
 		});
 	}
 
-	if (!emulators.length) {
+	for (const emulator of emulators.Genymotion) {
+		options.push({
+			udid: emulator.id,
+			label: emulator.name
+		});
+	}
+
+	if (!options.length) {
 		vscode.window.showErrorMessage('No Android emulators detected');
 		return;
 	}
@@ -682,7 +685,7 @@ function run(opts) {
 
 		if (opts.target === 'device' && opts.platform === 'ios') {
 			args.push(
-				'--developer-name', opts.certificate.name,
+				'--developer-name', `"${opts.certificate.name}"`,
 				'--pp-uuid', opts.provisioningProfile.uuid
 			);
 		}
@@ -694,7 +697,7 @@ function run(opts) {
 		);
 		if (opts.platform === 'ios') {
 			args.push(
-				'--distribution-name', opts.certificate.name,
+				'--distribution-name', `"${opts.certificate.name}"`,
 				'--pp-uuid', opts.provisioningProfile.uuid
 			);
 		} else if (opts.platform === 'android') {

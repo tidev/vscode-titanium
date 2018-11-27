@@ -3,12 +3,13 @@ const utils = require('../../utils');
 const vscode = require('vscode');
 
 module.exports = class OsVerNode extends BaseNode {
-	constructor(label, collapsibleState, platform, target, deviceId) {
+	constructor(label, collapsibleState, platform, target, deviceId, version) {
 		super(label, collapsibleState);
 		this.platform = platform;
 		this.deviceId = deviceId;
 		this.target = target;
 		this.targetId = utils.targetForName(this.target);
+		this.version = version;
 	}
 
 	getTreeItem() {

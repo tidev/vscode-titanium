@@ -1,5 +1,4 @@
 const appc = require('../appc');
-const project = require('../project');
 const utils = require('../utils');
 const vscode = require('vscode');
 
@@ -35,10 +34,6 @@ class DeviceExplorer {
 	}
 
 	getChildren(element) {
-		if (!project.isTitaniumApp) {
-			vscode.window.showInformationMessage('Not a titanium app');
-		}
-
 		if (element) {
 			return element.getChildren(element);
 		}
