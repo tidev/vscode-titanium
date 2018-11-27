@@ -219,17 +219,17 @@
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "device-explorer",
+                    "id": "titanium-explorer",
                     "title": "Titanium",
                     "icon": "images/appc.svg"
                 }
             ]
         },
         "views": {
-            "device-explorer": [
+            "titanium-explorer": [
                 {
-                    "id": "deviceExplorer",
-                    "name": "Devices",
+                    "id": "titaniumExplorer",
+                    "name": "Explorer",
                     "when": "appcelerator-titanium:enabled"
                 }
             ]
@@ -280,18 +280,18 @@
             "view/title": [
                 {
                     "command": "appcelerator-titanium.explorer.refresh",
-                    "when": "view == deviceExplorer",
+                    "when": "view == titaniumExplorer",
                     "group": "navigation"
                 }
             ],
             "view/item/context": [
                 {
                     "command": "appcelerator-titanium.run",
-                    "when": "view == deviceExplorer"
+                    "when": "view == titaniumExplorer"
                 },
                 {
                     "command": "appcelerator-titanium.dist",
-                    "when": "view == deviceExplorer && viewItem == platformNode"
+                    "when": "view == titaniumExplorer && viewItem == platformNode"
                 }
             ]
         }

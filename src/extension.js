@@ -286,7 +286,7 @@ function activate(context) {
 			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()));
 		}),
 
-		vscode.window.registerTreeDataProvider('deviceExplorer', deviceExplorer),
+		vscode.window.registerTreeDataProvider('titaniumExplorer', deviceExplorer),
 
 		vscode.commands.registerCommand('appcelerator-titanium.explorer.refresh', () => {
 			deviceExplorer.refresh();
@@ -314,6 +314,8 @@ function init() {
 			Appc.getInfo(async (info) => {
 				if (info) {
 					await generateCompletions({ progress });
+					// Call refresh incase the Titanium Explorer activity pane became active before info
+					await vscode.commands.executeCommand('appcelerator-titanium.explorer.refresh');
 					resolve();
 				} else {
 					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
