@@ -5,7 +5,7 @@ timestamps {
   def nodeVersion = '8.11.4'
   def npmVersion = 'latest'
 
-  node('osx || linux') {
+  node('osx') {
     stage('Checkout') {
       checkout([
         $class: 'GitSCM',
