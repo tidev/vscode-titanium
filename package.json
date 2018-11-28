@@ -61,7 +61,7 @@
                 "icon": {
                     "light": "images/light/refresh.svg",
                     "dark": "images/dark/refresh.svg"
-                  }
+                }
             },
             {
                 "command": "appcelerator-titanium.run",
@@ -307,15 +307,14 @@
         "eslint": "^5.6.1",
         "eslint-config-axway": "^4.0.0",
         "typescript": "^3.1.1",
-        "vscode": "^1.1.21",
-        "xml2js": "^0.4.19"
+        "vscode": "^1.1.21"
     },
     "dependencies": {
         "find": "^0.2.9",
         "fs-extra": "^7.0.0",
-        "mkdirp": "^0.5.1",
-        "path": "^0.12.7",
+        "klaw-sync": "^6.0.0",
         "semver": "^5.6.0",
-        "underscore": "^1.8.3"
+        "underscore": "^1.8.3",
+        "xml2js": "^0.4.19"
     }
 }

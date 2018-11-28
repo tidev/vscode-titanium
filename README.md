@@ -12,11 +12,14 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 * Open project in VS Code (e.g. `code .`)
 * `Debug > Run` (or `F5`). This will open the debug mode with the extension loaded
 
-### Testing
+### Usage
 
-* Create symlink to ``~/.vscode/extensions/``
+The plugin is not publish on the Extension marketplace yet, you can do the below to use the plugin without debugging:
+
 * ``cd /path/to/extension`` and run ``npm install``
-* Restart VS Code
+* Create symlink to ``~/.vscode/extensions/``
+   * `ln -s /path/to/extension ~/.vscode/titanium`
+* Open Titanium project.
 
 ## Roadmap
 
@@ -45,8 +48,9 @@ Snippets							| ✅		   |
 
 Feature                             | Status    | Notes
 ---                                 | ---      	| ---
-**Build**                           | 🔜        | VS Code does not allow a custom toolbar, interaction through command palette
+**Build**                           | 🔜        | Interaction is through the command palette or the activity pane
 Distribution (Android)              | 🔜        | Initial attempt at keystore credentials
+Windows support                     | 🔜        | WIP branch at windows_support
 
 ### Planned
 
