@@ -195,6 +195,7 @@ Prefix          | Description
 `ticamera`      | Open camera
 `alglo`         | Alloy Globals object
 `alcfg`         | Alloy CFG object
+`alargs`				| Arguments available in an Alloy controller
 `alcon`         | Alloy create controller function
 `alcol`         | Alloy create collection function
 `almod`         | Alloy create model function
