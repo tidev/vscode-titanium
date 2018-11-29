@@ -32,7 +32,11 @@ const StyleCompletionItemProvider = {
 		if (/\s*\w+\s*:\s*[\w"'.]*$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult;
-			_.find(alloyAutoCompleteRules, rule => ruleResult = rule.getCompletions(linePrefix, position, prefix));
+			for (const rule of Object.values(alloyAutoCompleteRules)) {
+				if (rule.regExp.test(linePrefix)) {
+					ruleResult = await rule.getCompletions(linePrefix, position, prefix);
+				}
+			}
 			if (ruleResult) {
 				return ruleResult;
 			} else {

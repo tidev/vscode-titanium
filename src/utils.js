@@ -3,7 +3,7 @@ const path = require('path');
 const _ = require('underscore');
 const fs = require('fs');
 const { platform } = require('os');
-
+const walkSync = require('klaw-sync');
 module.exports = {
 
 	/**
@@ -244,4 +244,18 @@ module.exports = {
 		});
 		return result;
 	},
+
+	/**
+	 * Search a directory recursively for all JS files, filtering out directories
+	 * from the results.
+	 * @param {String} directory - Directory to search for files in.
+	 * @returns {Array<Object>} Array of objects of the structure { path, stats}, where path is the full path,
+	 * and stats is an fs.stats object.
+	 */
+	filterJSFiles(directory) {
+		return walkSync(directory, {
+			nodir: true,
+			filter: (item) => item.stats.isDirectory() || path.extname(item.path) === '.js'
+		});
+	}
 };

@@ -1,9 +1,8 @@
 const vscode = require('vscode');
 const fs = require('fs-extra');
 const path = require('path');
-const find = require('find');
 const utils = require('../../utils');
-const mkdirp = require('mkdirp');
+const walkSync = require('klaw-sync');
 
 /**
  * Definition provider helper
@@ -79,13 +78,17 @@ const DefinitionProviderHelper = {
 
 		if (/image\s*=\s*["'][\s0-9a-zA-Z-_^./]*$/.test(linePrefix)) {
 			const relativePath = path.parse(value);
-			const dir = path.join(utils.getAlloyRootPath(), 'assets');// , path.dirname(value));
-			const files = find.fileSync(new RegExp(`${relativePath.name}.*${relativePath.ext}$`), dir);
+			const dir = path.join(utils.getAlloyRootPath(), 'assets');
+			const regExp = new RegExp(`${relativePath.name}.*${relativePath.ext}$`);
+			const files = walkSync(dir, {
+				nodir: true,
+				filter: (item) => item.stats.isDirectory() || regExp.test(item.path)
+			});
 			let imageFile;
 			let string = 'Image not found';
 			if (files.length > 0) {
 				imageFile = files[0];
-				string = `![${imageFile}](${imageFile}|height=100)`;
+				string = `![${imageFile.path}](${imageFile.path}|height=100)`;
 			}
 			const hover = new vscode.Hover(new vscode.MarkdownString(string), new vscode.Range(position.line, startIndex + 1, position.line, endIndex));
 			return hover;
@@ -265,7 +268,7 @@ const DefinitionProviderHelper = {
 		const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
 		const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
 		if (!utils.fileExists(i18nStringPath)) {
-			mkdirp.sync(path.join(utils.getI18nPath(), defaultLang));
+			fs.ensureDirSync(path.join(utils.getI18nPath(), defaultLang));
 			fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
 		}
 		vscode.workspace.openTextDocument(i18nStringPath).then(document => {

@@ -3,7 +3,6 @@ const SnippetString = vscode.SnippetString;
 const Range = vscode.Range;
 const _ = require('underscore');
 const path = require('path');
-const find = require('find');
 const utils = require('../../utils');
 const related = require('../../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
@@ -44,9 +43,11 @@ const ControllerCompletionItemProvider = {
 		} else if (/\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
 			return this.getEventNameCompletions(linePrefix, prefix);
 		// require('')
-		} else if (/require\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
+		} else if (/require\(["']?([^'");]*)["']?\)?$/.test(linePrefix)) {
+			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/);
+			const requestedModule = matches[1];
 			// return this.getRequireCompletions(linePrefix, prefix);
-			return this.getFileCompletions('lib');
+			return this.getFileCompletions('lib', requestedModule);
 		// Alloy.createController('')
 		} else if (/Alloy\.(createController|Controllers\.instance)\(["']([-a-zA-Z0-9-_/]*["']?\)?)$/.test(linePrefix)) {
 			// return this.getControllerCompletions(linePrefix, prefix);
@@ -60,7 +61,11 @@ const ControllerCompletionItemProvider = {
 			return this.getWidgetCompletions(linePrefix, prefix);
 		} else {
 			let ruleResult;
-			_.find(alloyAutoCompleteRules, async rule => ruleResult = await rule.getCompletions(linePrefix, position, prefix));
+			for (const rule of Object.values(alloyAutoCompleteRules)) {
+				if (rule.regExp.test(linePrefix)) {
+					ruleResult = await rule.getCompletions(linePrefix, position, prefix);
+				}
+			}
 			if (ruleResult) {
 				return ruleResult;
 			}
@@ -254,26 +259,29 @@ const ControllerCompletionItemProvider = {
      * Get js file completions. Used to return controller, model and require references.
      *
      * @param {String} directory alloy directory
+	 * @param {String} moduleName name of the module
      *
      * @returns {Thenable}
      */
-	getFileCompletions(directory) {
-		return new Promise((resolve) => {
-			let completions = [];
-			let filesPath = path.join(utils.getAlloyRootPath(), directory);
-			if (utils.directoryExists(filesPath)) {
-				find.file(/\.js$/, filesPath, (files) => {
-					for (const file of files) {
-						let value = '/' + file.replace(filesPath + path.sep, '').split('.')[0];
-						completions.push({
-							label: value,
-							kind: vscode.CompletionItemKind.Reference
-						});
-					}
-					resolve(completions);
+	getFileCompletions(directory, moduleName) {
+		const completions = [];
+		const filesPath = path.join(utils.getAlloyRootPath(), directory);
+		if (moduleName.startsWith('/')) {
+			moduleName = moduleName.substring(0);
+		}
+		if (utils.directoryExists(filesPath)) {
+			const files = utils.filterJSFiles(filesPath);
+
+			for (const file of files) {
+				const value = `/${path.posix.relative(filesPath, file.path).replace('.js', '')}`;
+				completions.push({
+					label: value,
+					kind: vscode.CompletionItemKind.Reference
 				});
 			}
-		});
+			console.log(completions);
+			return completions;
+		}
 	},
 
 	/**

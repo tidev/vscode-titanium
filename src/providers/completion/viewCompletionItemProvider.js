@@ -1,9 +1,7 @@
 const vscode = require('vscode');
 const SnippetString = vscode.SnippetString;
 const Range = vscode.Range;
-const _ = require('underscore');
 const path = require('path');
-const find = require('find');
 const utils = require('../../utils');
 const related = require('../../related');
 const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
@@ -42,7 +40,11 @@ const ViewCompletionItemProvider = {
 		} else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('.]*$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult;
-			_.find(alloyAutoCompleteRules, async rule => ruleResult = await rule.getCompletions(linePrefix, position, prefix));
+			for (const rule of Object.values(alloyAutoCompleteRules)) {
+				if (rule.regExp.test(linePrefix)) {
+					ruleResult = await rule.getCompletions(linePrefix, position, prefix);
+				}
+			}
 			if (ruleResult) {
 				return ruleResult;
 			} else {
@@ -214,15 +216,15 @@ const ViewCompletionItemProvider = {
 			// Require src attribute
 			//
 			if (tag === 'Require') {
-				let controllerPath = path.join(utils.getAlloyRootPath(), 'controllers');
+				const controllerPath = path.join(utils.getAlloyRootPath(), 'controllers');
 				if (utils.directoryExists(controllerPath)) {
-					const files = find.fileSync(/\.js$/, controllerPath);
+					const files = utils.filterJSFiles(controllerPath);
 					const relatedControllerFile = related.getTargetPath('js', document.fileName);
 					for (const file of files) {
-						if (relatedControllerFile === file) {
+						if (relatedControllerFile === file.path) {
 							continue;
 						}
-						let value = utils.toUnixPath(file.replace(controllerPath, '').split('.')[0]);
+						const value = utils.toUnixPath(file.path.replace(controllerPath, '').split('.')[0]);
 						completions.push({
 							label: value,
 							kind: vscode.CompletionItemKind.Reference
