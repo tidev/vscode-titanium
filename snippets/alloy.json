@@ -12,7 +12,7 @@
 	"args": {
         "prefix": "alargs",
         "body": "$.args.$1",
-        "description": "Arguments available in a controller "
+        "description": "Arguments available in an Alloy controller "
     },
     "createController": {
         "prefix": "alcon",
