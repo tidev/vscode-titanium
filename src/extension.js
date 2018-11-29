@@ -82,7 +82,8 @@ function activate(context) {
 				platform: runOpts.platform,
 				target: runOpts.targetId,
 				deviceId: runOpts.deviceId,
-				deviceLabel: runOpts.platform === 'ios' ? `${runOpts.label} (${runOpts.version})` : runOpts.label
+				deviceLabel: runOpts.platform === 'ios' ? `${runOpts.label} (${runOpts.version})` : runOpts.label,
+				liveview: extensionContext.globalState.get('liveview')
 			};
 
 			let last;
@@ -290,6 +291,18 @@ function activate(context) {
 
 		vscode.commands.registerCommand('appcelerator-titanium.explorer.refresh', () => {
 			deviceExplorer.refresh();
+		}),
+
+		vscode.commands.registerCommand('appcelerator-titanium.explorer.setLiveViewEnabled', async () => {
+			await extensionContext.globalState.update('liveview', true);
+			await vscode.commands.executeCommand('setContext', 'appcelerator-titanium:liveview', true);
+			vscode.window.showInformationMessage('Enabled LiveView');
+		}),
+
+		vscode.commands.registerCommand('appcelerator-titanium.explorer.setLiveViewDisabled', async () => {
+			await extensionContext.globalState.update('liveview', false);
+			await vscode.commands.executeCommand('setContext', 'appcelerator-titanium:liveview', false);
+			vscode.window.showInformationMessage('Disabled LiveView');
 		})
 	);
 
@@ -690,6 +703,10 @@ function run(opts) {
 				'--developer-name', `"${opts.certificate.name}"`,
 				'--pp-uuid', opts.provisioningProfile.uuid
 			);
+		}
+
+		if (opts.liveview) {
+			args.push('--liveview');
 		}
 
 	} else if (opts.buildType === 'dist') {

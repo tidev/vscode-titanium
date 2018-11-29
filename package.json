@@ -64,6 +64,24 @@
                 }
             },
             {
+                "command": "appcelerator-titanium.explorer.setLiveViewEnabled",
+                "title": "Enable LiveView",
+                "category": "Appcelerator",
+                "icon": {
+                    "light": "images/light/eye-closed.svg",
+                    "dark": "images/dark/eye-closed.svg"
+                }
+            },
+            {
+                "command": "appcelerator-titanium.explorer.setLiveViewDisabled",
+                "title": "Disable LiveView",
+                "category": "Appcelerator",
+                "icon": {
+                    "light": "images/light/eye.svg",
+                    "dark": "images/dark/eye.svg"
+                }
+            },
+            {
                 "command": "appcelerator-titanium.run",
                 "title": "Run",
                 "category": "Appcelerator"
@@ -213,6 +231,12 @@
                     "type": "string",
                     "default": "",
                     "description": "Keystore alias"
+                },
+                "appcelerator-titanium.liveview": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Whether to use LiveView when building",
+                    "scope": "window"
                 }
             }
         },
@@ -238,6 +262,14 @@
             "commandPalette": [
                 {
                     "command": "appcelerator-titanium.explorer.refresh",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.explorer.setLiveViewEnabled",
+                    "when": "appcelerator-titanium:enabled"
+                },
+                {
+                    "command": "appcelerator-titanium.explorer.setLiveViewDisabled",
                     "when": "appcelerator-titanium:enabled"
                 },
                 {
@@ -278,6 +310,16 @@
                 }
             ],
             "view/title": [
+                {
+                    "command": "appcelerator-titanium.explorer.setLiveViewEnabled",
+                    "when": "view == titaniumExplorer && config.appcelerator-titanium.liveview && !appcelerator-titanium:liveview",
+                    "group": "navigation"
+                },
+                {
+                    "command": "appcelerator-titanium.explorer.setLiveViewDisabled",
+                    "when": "view == titaniumExplorer && config.appcelerator-titanium.liveview && appcelerator-titanium:liveview",
+                    "group": "navigation"
+                },
                 {
                     "command": "appcelerator-titanium.explorer.refresh",
                     "when": "view == titaniumExplorer",

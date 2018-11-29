@@ -16,3 +16,6 @@ trim_trailing_whitespace = false
 
 [Jenkinsfile]
 indent_style = 2
+
+[*.json]
+indent_style = 4
