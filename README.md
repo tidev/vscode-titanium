@@ -18,7 +18,7 @@ The plugin is not publish on the Extension marketplace yet, you can do the below
 
 * ``cd /path/to/extension`` and run ``npm install``
 * Create symlink to ``~/.vscode/extensions/``
-   * `ln -s /path/to/extension ~/.vscode/titanium`
+   * `ln -s /path/to/extension ~/.vscode/extensions/`
 * Open Titanium project.
 
 ## Roadmap
