@@ -9,6 +9,11 @@
         "body": "Alloy.CFG.$1",
         "description": "Alloy CFG object"
     },
+    "args": {
+        "prefix": "alargs",
+        "body": "$.args.$1",
+        "description": "Arguments available in an Alloy controller "
+    },
     "createController": {
         "prefix": "alcon",
         "body": "Alloy.createController('${1:name}', ${2:args});$3",
@@ -57,4 +62,3 @@
         "description": "Alloy Windows conditional statement"
     }
 }
-    
