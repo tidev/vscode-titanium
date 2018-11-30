@@ -9,7 +9,7 @@
         "body": "Alloy.CFG.$1",
         "description": "Alloy CFG object"
     },
-	"args": {
+    "args": {
         "prefix": "alargs",
         "body": "$.args.$1",
         "description": "Arguments available in an Alloy controller "
@@ -62,4 +62,3 @@
         "description": "Alloy Windows conditional statement"
     }
 }
-    

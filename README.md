@@ -36,13 +36,13 @@ Console output                      | ✅        | Using built-in console
 Local development (iOS)             | ✅        |
 Local development (Android)         | ✅        |
 Distribution (iOS)                  | ✅        |
-**Editor tools**					| ✅		   |
-Code highlighting					| ✅		   | Built-in support for JS and XML, added launguage support for TSS
-Code completion	                    | ✅        | Functionally complete but needs some refactoring
-Generate code completions list      | ✅️		|
-Jump to definition  	            | ✅		   | Path values are not highlighted correctly; images are previewed on hover
-Open related files                  | ✅		   |
-Snippets							| ✅		   |
+**Editor tools**                    | ✅        |
+Code highlighting                   | ✅        | Built-in support for JS and XML, added launguage support for TSS
+Code completion	                  | ✅        | Functionally complete but needs some refactoring
+Generate code completions list      | ✅️        |
+Jump to definition  	               | ✅        | Path values are not highlighted correctly; images are previewed on hover
+Open related files                  | ✅        |
+Snippets                            | ✅        |
 
 ### In Progress
 
@@ -55,9 +55,9 @@ Windows support                     | 🔜        | WIP branch at windows_suppor
 ### Planned
 
 Feature                             | Status    | Notes
----                                 | ---      	| ---
+---                                 | ---       | ---
 **Project creation**                | ⛔️        | 
-**Alloy component generation**      | ⛔️        |
+**Alloy component generation**      | ⛔️        | 
 
 ## Open a Titanium project
 
@@ -195,7 +195,7 @@ Prefix          | Description
 `ticamera`      | Open camera
 `alglo`         | Alloy Globals object
 `alcfg`         | Alloy CFG object
-`alargs`				| Arguments available in an Alloy controller
+`alargs`        | Arguments available in an Alloy controller
 `alcon`         | Alloy create controller function
 `alcol`         | Alloy create collection function
 `almod`         | Alloy create model function
