@@ -37,7 +37,7 @@ module.exports = {
 	i18n: {
 		regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
 		async getCompletions() {
-			const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
+			const defaultLang = vscode.workspace.getConfiguration('titanium.project').get('defaultI18nLanguage');
 			const i18nPath = utils.getI18nPath();
 			if (utils.directoryExists(i18nPath)) {
 				const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');

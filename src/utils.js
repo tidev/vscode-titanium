@@ -134,7 +134,7 @@ module.exports = {
 	 * @returns {String}
 	 */
 	distributionOutputDirectory() {
-		const directory = workspace.getConfiguration('appcelerator-titanium.build').get('distributionOutputDirectory');
+		const directory = workspace.getConfiguration('titanium.build').get('distributionOutputDirectory');
 		if (!path.isAbsolute(directory)) {
 			return path.join(workspace.rootPath, directory);
 		}

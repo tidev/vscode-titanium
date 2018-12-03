@@ -11,8 +11,8 @@ const walkSync = require('klaw-sync');
 */
 const DefinitionProviderHelper = {
 
-	insertCommandId: 'appcelerator-titanium.insertCodeAction',
-	insertI18nStringCommandId: 'appcelerator-titanium.insertI18nStringCodeAction',
+	insertCommandId: 'titanium.insertCodeAction',
+	insertI18nStringCommandId: 'titanium.insertI18nStringCodeAction',
 
 	suggestions: [
 		{ // i18n
@@ -21,7 +21,7 @@ const DefinitionProviderHelper = {
 				return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
 			},
 			files: function () {
-				return [ path.join(utils.getI18nPath(), vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage'), 'strings.xml') ];
+				return [ path.join(utils.getI18nPath(), vscode.workspace.getConfiguration('titanium.project').get('defaultI18nLanguage'), 'strings.xml') ];
 			},
 			i18nString: true
 		}
@@ -265,7 +265,7 @@ const DefinitionProviderHelper = {
 	 * @param {String} text text to insert
 	 */
 	insertI18nString(text) {
-		const defaultLang = vscode.workspace.getConfiguration('appcelerator-titanium.project').get('defaultI18nLanguage');
+		const defaultLang = vscode.workspace.getConfiguration('titanium.project').get('defaultI18nLanguage');
 		const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
 		if (!utils.fileExists(i18nStringPath)) {
 			fs.ensureDirSync(path.join(utils.getI18nPath(), defaultLang));

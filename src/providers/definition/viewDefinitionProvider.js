@@ -24,7 +24,7 @@ const ViewDefinitionProvider = {
 				return `Generate style (${fileName})`;
 			},
 			insertText: function (text) {
-				let insertText = vscode.workspace.getConfiguration('appcelerator-titanium.codeTemplates').get('tssClass');
+				let insertText = vscode.workspace.getConfiguration('titanium.codeTemplates').get('tssClass');
 				insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 				return insertText;
 			}
@@ -44,7 +44,7 @@ const ViewDefinitionProvider = {
 				return `Generate style (${fileName})`;
 			},
 			insertText: function (text) {
-				let insertText = vscode.workspace.getConfiguration('appcelerator-titanium.codeTemplates').get('tssId');
+				let insertText = vscode.workspace.getConfiguration('titanium.codeTemplates').get('tssId');
 				insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 				return insertText;
 			}
@@ -68,7 +68,7 @@ const ViewDefinitionProvider = {
 					|| text.startsWith('/')) {
 					return;
 				}
-				let insertText = vscode.workspace.getConfiguration('appcelerator-titanium.codeTemplates').get('tssTag');
+				let insertText = vscode.workspace.getConfiguration('titanium.codeTemplates').get('tssTag');
 				insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 				return insertText;
 			}
@@ -85,7 +85,7 @@ const ViewDefinitionProvider = {
 				return `Generate function (${fileName})`;
 			},
 			insertText: function (text) {
-				let insertText = vscode.workspace.getConfiguration('appcelerator-titanium.codeTemplates').get('jsFunction');
+				let insertText = vscode.workspace.getConfiguration('titanium.codeTemplates').get('jsFunction');
 				insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 				return insertText;
 			}

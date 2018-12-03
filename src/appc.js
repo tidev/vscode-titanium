@@ -366,8 +366,8 @@ const Appc = {
 			return;
 		}
 		let channel = vscode.window.createOutputChannel('Appcelerator');
-		const cmd = vscode.workspace.getConfiguration('appcelerator-titanium.general').get('appcCommandPath');
-		if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('displayBuildCommandInConsole')) {
+		const cmd = vscode.workspace.getConfiguration('titanium.general').get('appcCommandPath');
+		if (vscode.workspace.getConfiguration('titanium.general').get('displayBuildCommandInConsole')) {
 			channel.append(`${cmd} run ${opts.args.join(' ')}\n\n`);
 		}
 		this.killed = false;

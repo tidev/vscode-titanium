@@ -18,7 +18,7 @@ const viewDefinitionProvider = require('./providers/definition/viewDefinitionPro
 const styleDefinitionProvider = require('./providers/definition/styleDefinitionProvider');
 const controllerDefinitionProvider = require('./providers/definition/controllerDefinitionProvider');
 const definitionProviderHelper = require('./providers/definition/definitionProviderHelper');
-const openDashboardCommandId = 'appcelerator-titanium.openDashboard';
+const openDashboardCommandId = 'titanium.openDashboard';
 
 let extensionContext = {};
 let projectStatusBarItem;
@@ -36,9 +36,9 @@ function activate(context) {
 	definitionProviderHelper.activate(context.subscriptions);
 
 	if (!project.isTitaniumProject()) {
-		vscode.commands.executeCommand('setContext', 'appcelerator-titanium:enabled', false);
+		vscode.commands.executeCommand('setContext', 'titanium:enabled', false);
 	} else {
-		vscode.commands.executeCommand('setContext', 'appcelerator-titanium:enabled', true);
+		vscode.commands.executeCommand('setContext', 'titanium:enabled', true);
 	}
 
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
@@ -64,10 +64,10 @@ function activate(context) {
 		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, viewDefinitionProvider),
 
 		// register init command
-		vscode.commands.registerCommand('appcelerator-titanium.init', init),
+		vscode.commands.registerCommand('titanium.init', init),
 
 		// register run command
-		vscode.commands.registerCommand('appcelerator-titanium.run', async (runOpts = {}) => {
+		vscode.commands.registerCommand('titanium.run', async (runOpts = {}) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -164,7 +164,7 @@ function activate(context) {
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand('appcelerator-titanium.dist', async (runOpts = {}) => {
+		vscode.commands.registerCommand('titanium.dist', async (runOpts = {}) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -245,8 +245,8 @@ function activate(context) {
 		}),
 
 		// register stop command
-		vscode.commands.registerCommand('appcelerator-titanium.stop', () => {
-			if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
+		vscode.commands.registerCommand('titanium.stop', () => {
+			if (vscode.workspace.getConfiguration('titanium.general').get('useTerminalForBuild')) {
 				if (terminal) {
 					terminal.clear();
 				}
@@ -256,7 +256,7 @@ function activate(context) {
 		}),
 
 		// register set log level command
-		vscode.commands.registerCommand('appcelerator-titanium.set-log-level', () => {
+		vscode.commands.registerCommand('titanium.set-log-level', () => {
 			vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' }).then(level => {
 				if (level) {
 					extensionContext.globalState.update('logLevel', level.toLowerCase());
@@ -265,21 +265,21 @@ function activate(context) {
 		}),
 
 		// register related view commands
-		vscode.commands.registerCommand('appcelerator-titanium.open-related-view', () => {
+		vscode.commands.registerCommand('titanium.open-related-view', () => {
 			related.openRelatedFile('xml');
 		}),
-		vscode.commands.registerCommand('appcelerator-titanium.open-related-style', () => {
+		vscode.commands.registerCommand('titanium.open-related-style', () => {
 			related.openRelatedFile('tss');
 		}),
-		vscode.commands.registerCommand('appcelerator-titanium.open-related-controller', () => {
+		vscode.commands.registerCommand('titanium.open-related-controller', () => {
 			related.openRelatedFile('js');
 		}),
-		vscode.commands.registerCommand('appcelerator-titanium.toggle-related-files', () => {
+		vscode.commands.registerCommand('titanium.toggle-related-files', () => {
 			related.openAllFiles();
 		}),
 
 		// register generate autocomplete suggestions command
-		vscode.commands.registerCommand('appcelerator-titanium.generate-autocomplete-suggestions', async () => {
+		vscode.commands.registerCommand('titanium.generate-autocomplete-suggestions', async () => {
 			await generateCompletions({ force: true });
 		}),
 
@@ -289,19 +289,19 @@ function activate(context) {
 
 		vscode.window.registerTreeDataProvider('titaniumExplorer', deviceExplorer),
 
-		vscode.commands.registerCommand('appcelerator-titanium.explorer.refresh', () => {
+		vscode.commands.registerCommand('titanium.explorer.refresh', () => {
 			deviceExplorer.refresh();
 		}),
 
-		vscode.commands.registerCommand('appcelerator-titanium.explorer.setLiveViewEnabled', async () => {
+		vscode.commands.registerCommand('titanium.explorer.setLiveViewEnabled', async () => {
 			await extensionContext.globalState.update('liveview', true);
-			await vscode.commands.executeCommand('setContext', 'appcelerator-titanium:liveview', true);
+			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 			vscode.window.showInformationMessage('Enabled LiveView');
 		}),
 
-		vscode.commands.registerCommand('appcelerator-titanium.explorer.setLiveViewDisabled', async () => {
+		vscode.commands.registerCommand('titanium.explorer.setLiveViewDisabled', async () => {
 			await extensionContext.globalState.update('liveview', false);
-			await vscode.commands.executeCommand('setContext', 'appcelerator-titanium:liveview', false);
+			await vscode.commands.executeCommand('setContext', 'titanium:liveview', false);
 			vscode.window.showInformationMessage('Disabled LiveView');
 		})
 	);
@@ -328,7 +328,7 @@ function init() {
 				if (info) {
 					await generateCompletions({ progress });
 					// Call refresh incase the Titanium Explorer activity pane became active before info
-					await vscode.commands.executeCommand('appcelerator-titanium.explorer.refresh');
+					await vscode.commands.executeCommand('titanium.explorer.refresh');
 					resolve();
 				} else {
 					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
@@ -543,7 +543,7 @@ function selectiOSProvisioningProfile({ certificate, target }) {
 				description: profile.uuid,
 				uuid: profile.uuid
 			};
-			if (vscode.workspace.getConfiguration('appcelerator-titanium.iOS').get('showProvisioningProfileDetail')) {
+			if (vscode.workspace.getConfiguration('titanium.iOS').get('showProvisioningProfileDetail')) {
 				item.detail = `expires ${new Date(profile.expirationDate).toLocaleString('en-US')} | ${profile.appId}`;
 			}
 			profiles.push(item);
@@ -732,7 +732,7 @@ function run(opts) {
 		}
 	}
 
-	if (vscode.workspace.getConfiguration('appcelerator-titanium.general').get('useTerminalForBuild')) {
+	if (vscode.workspace.getConfiguration('titanium.general').get('useTerminalForBuild')) {
 		runTerminalCommand([ 'run', ...args ]);
 	} else {
 		let message = `Building for ${utils.nameForPlatform(opts.platform)}`;
