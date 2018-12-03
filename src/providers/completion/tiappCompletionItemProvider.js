@@ -57,8 +57,8 @@ const TiappCompletionItemProvider = {
 					}
 					const curModule = modules[moduleName];
 					curModule.platform = (curModule.platform || []).concat(platform);
-				};
-			};
+				}
+			}
 			for (let key in modules) {
 				completions.push({
 					label: key,
