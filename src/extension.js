@@ -83,7 +83,7 @@ function activate(context) {
 				target: runOpts.targetId,
 				deviceId: runOpts.deviceId,
 				deviceLabel: runOpts.platform === 'ios' ? `${runOpts.label} (${runOpts.version})` : runOpts.label,
-				liveview: extensionContext.globalState.get('liveview')
+				liveview: extensionContext.globalState.get('titanium:liveview')
 			};
 
 			let last;
@@ -294,13 +294,13 @@ function activate(context) {
 		}),
 
 		vscode.commands.registerCommand('titanium.explorer.setLiveViewEnabled', async () => {
-			await extensionContext.globalState.update('liveview', true);
+			await extensionContext.globalState.update('titanium:liveview', true);
 			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 			vscode.window.showInformationMessage('Enabled LiveView');
 		}),
 
 		vscode.commands.registerCommand('titanium.explorer.setLiveViewDisabled', async () => {
-			await extensionContext.globalState.update('liveview', false);
+			await extensionContext.globalState.update('titanium:liveview', false);
 			await vscode.commands.executeCommand('setContext', 'titanium:liveview', false);
 			vscode.window.showInformationMessage('Disabled LiveView');
 		})
@@ -322,19 +322,18 @@ exports.deactivate = deactivate;  // eslint-disable-line no-undef
  * Initialise extension - fetch appc info
 */
 function init() {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, progress => {
-		return new Promise((resolve, reject) => {
-			Appc.getInfo(async (info) => {
-				if (info) {
-					await generateCompletions({ progress });
-					// Call refresh incase the Titanium Explorer activity pane became active before info
-					await vscode.commands.executeCommand('titanium.explorer.refresh');
-					resolve();
-				} else {
-					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-					reject();
-				}
-			});
+	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, async progress => {
+		if (await extensionContext.globalState.get('titanium:liveview')) {
+			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
+		}
+		Appc.getInfo(async (info) => {
+			if (info) {
+				await generateCompletions({ progress });
+				// Call refresh incase the Titanium Explorer activity pane became active before info
+				await vscode.commands.executeCommand('titanium.explorer.refresh');
+			} else {
+				vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+			}
 		});
 	});
 }
