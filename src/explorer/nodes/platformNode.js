@@ -7,7 +7,7 @@ module.exports = class PlatformNode extends BaseNode {
 		super(label, collapsibleState);
 		this.label = utils.nameForPlatform(label);
 		this.platform = label;
-		this.contextValue = 'platformNode';
+		this.contextValue = 'PlatformNode';
 	}
 
 	getChildren() {

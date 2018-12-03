@@ -52,12 +52,12 @@
             {
                 "command": "titanium.init",
                 "title": "Init",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.explorer.refresh",
                 "title": "Refresh Devices",
-                "category": "Appcelerator",
+                "category": "Titanium",
                 "icon": {
                     "light": "images/light/refresh.svg",
                     "dark": "images/dark/refresh.svg"
@@ -66,7 +66,7 @@
             {
                 "command": "titanium.explorer.setLiveViewEnabled",
                 "title": "Enable LiveView",
-                "category": "Appcelerator",
+                "category": "Titanium",
                 "icon": {
                     "light": "images/light/eye-closed.svg",
                     "dark": "images/dark/eye-closed.svg"
@@ -75,7 +75,7 @@
             {
                 "command": "titanium.explorer.setLiveViewDisabled",
                 "title": "Disable LiveView",
-                "category": "Appcelerator",
+                "category": "Titanium",
                 "icon": {
                     "light": "images/light/eye.svg",
                     "dark": "images/dark/eye.svg"
@@ -84,47 +84,51 @@
             {
                 "command": "titanium.run",
                 "title": "Run",
-                "category": "Appcelerator"
+                "category": "Titanium",
+                "icon": {
+                    "light": "images/light/run.svg",
+                    "dark": "images/dark/run.svg"
+                }
             },
             {
                 "command": "titanium.dist",
                 "title": "Distribute",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.stop",
                 "title": "Stop",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.set-log-level",
                 "title": "Set log level",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.open-related-view",
                 "title": "Open related view",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.open-related-style",
                 "title": "Open related style",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.open-related-controller",
                 "title": "Open related controller",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.toggle-related-files",
                 "title": "Toggle related files",
-                "category": "Appcelerator"
+                "category": "Titanium"
             },
             {
                 "command": "titanium.generate-autocomplete-suggestions",
                 "title": "Generate autocomplete list",
-                "category": "Appcelerator"
+                "category": "Titanium"
             }
         ],
         "keybindings": [
@@ -333,7 +337,12 @@
                 },
                 {
                     "command": "titanium.dist",
-                    "when": "view == titaniumExplorer && viewItem == platformNode"
+                    "when": "view == titaniumExplorer && viewItem == PlatformNode"
+                },
+                {
+                    "command": "titanium.run",
+                    "when": "view == titaniumExplorer && viewItem == DeviceNode",
+                    "group": "inline"
                 }
             ]
         }

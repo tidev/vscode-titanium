@@ -2,7 +2,7 @@ const BaseNode = require('./baseNode');
 const utils = require('../../utils');
 const vscode = require('vscode');
 
-module.exports = class OsVerNode extends BaseNode {
+module.exports = class DeviceNode extends BaseNode {
 	constructor(label, collapsibleState, platform, target, deviceId, version) {
 		super(label, collapsibleState);
 		this.platform = platform;
@@ -10,6 +10,7 @@ module.exports = class OsVerNode extends BaseNode {
 		this.target = target;
 		this.targetId = utils.targetForName(this.target);
 		this.version = version;
+		this.contextValue = 'DeviceNode';
 	}
 
 	getTreeItem() {
@@ -19,7 +20,8 @@ module.exports = class OsVerNode extends BaseNode {
 			deviceId: this.deviceId,
 			target: this.target,
 			targetId: this.targetId,
-			platform: this.platform
+			platform: this.platform,
+			contextValue: this.contextValue
 		};
 	}
 
