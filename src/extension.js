@@ -50,7 +50,7 @@ function activate(context) {
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider, '.', '\'', '"'),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, styleCompletionItemProvider),
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerCompletionItemProvider, '.', '\'', '"', '/'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, tiappCompletionItemProvider),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, tiappCompletionItemProvider, '.'),
 
 		// register hover providers
 		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),

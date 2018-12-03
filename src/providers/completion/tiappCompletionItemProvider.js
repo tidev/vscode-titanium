@@ -1,6 +1,5 @@
 const vscode = require('vscode');
 const Range = vscode.Range;
-const _ = require('underscore');
 const fs = require('fs');
 const path = require('path');
 const utils = require('../../utils');
@@ -20,19 +19,27 @@ const TiappCompletionItemProvider = {
 	 * @returns {Thenable|Array}
 	 */
 	provideCompletionItems(document, position) {
-		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
+		const linePrefix = document.lgetText(new Range(position.line, 0, position.line, position.character));
 		const completions = [];
 		let tag;
-		const matches = /<([a-zA-Z][-a-zA-Z]*)(.*?)>(?:\s*|$)/.exec(linePrefix);
+		const matches = /<([a-zA-Z][-a-zA-Z]*)(.*?)>(.*|$)/.exec(linePrefix);
 		if (matches && matches.length >= 2) {
 			tag = matches[1];
 		}
 
 		if (tag === 'sdk-version') {
+			const sdkVer = /<sdk-version>([^<]*)<?/.exec(linePrefix);
+			let sdkVersion;
+			if (sdkVer) {
+				sdkVersion = sdkVer[1];
+			}
 			const sdks = Appc.sdks();
-			for (let idx in sdks) {
+			for (const sdk of sdks) {
+				if (sdkVersion && !sdk.fullversion.includes(sdkVersion)) {
+					continue;
+				}
 				completions.push({
-					label: sdks[idx].fullversion,
+					label: sdk.fullversion,
 					kind: vscode.CompletionItemKind.Value
 				});
 			}
@@ -42,16 +49,16 @@ const TiappCompletionItemProvider = {
 				return;
 			}
 			const modules = {};
-			_.each(TiappCompletionItemProvider.getDirectories(modulePath), platform => {
+			for (const platform of TiappCompletionItemProvider.getDirectories(modulePath)) {
 				const platformModulePath = path.join(vscode.workspace.rootPath, 'modules', platform);
-				return _.each(TiappCompletionItemProvider.getDirectories(platformModulePath), moduleName => {
+				for (const moduleName of TiappCompletionItemProvider.getDirectories(platformModulePath)) {
 					if (!modules[moduleName]) {
 						modules[moduleName] = {};
 					}
 					const curModule = modules[moduleName];
-					return curModule.platform = (curModule.platform || []).concat(platform);
-				});
-			});
+					curModule.platform = (curModule.platform || []).concat(platform);
+				};
+			};
 			for (let key in modules) {
 				completions.push({
 					label: key,
