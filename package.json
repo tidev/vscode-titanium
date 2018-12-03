@@ -328,6 +328,10 @@
                     "command": "titanium.explorer.refresh",
                     "when": "view == titaniumExplorer",
                     "group": "navigation"
+                },
+                {
+                    "command": "titanium.set-log-level",
+                    "group": "2_workspace"
                 }
             ],
             "view/item/context": [
