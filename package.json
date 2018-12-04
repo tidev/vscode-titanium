@@ -93,7 +93,11 @@
             {
                 "command": "titanium.dist",
                 "title": "Distribute",
-                "category": "Titanium"
+                "category": "Titanium",
+                "icon": {
+                    "light": "images/light/package.svg",
+                    "dark": "images/dark/package.svg"
+                }
             },
             {
                 "command": "titanium.stop",
@@ -336,17 +340,22 @@
             ],
             "view/item/context": [
                 {
-                    "command": "titanium.run",
-                    "when": "view == titaniumExplorer"
+                    "command": "titanium.dist",
+                    "when": "view == titaniumExplorer && viewItem == PlatformNode"
                 },
                 {
                     "command": "titanium.dist",
-                    "when": "view == titaniumExplorer && viewItem == PlatformNode"
+                    "when": "view == titaniumExplorer && viewItem == PlatformNode",
+                    "group": "inline"
                 },
                 {
                     "command": "titanium.run",
                     "when": "view == titaniumExplorer && viewItem == DeviceNode",
                     "group": "inline"
+                },
+                {
+                    "command": "titanium.run",
+                    "when": "view == titaniumExplorer"
                 }
             ]
         }
