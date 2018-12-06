@@ -50,7 +50,7 @@ module.exports = class DeviceTypeNode extends BaseNode {
 					break;
 			}
 		} else if (this.platform === 'windows') {
-			switch(this.label) {
+			switch (this.label) {
 				case 'Device':
 					for (const device of appc.windowsDevices()) {
 						console.log(device);

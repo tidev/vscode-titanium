@@ -326,7 +326,7 @@ function activate(context) {
 					name,
 					force: true
 				});
-				const shouldOpen = await vscode.window.showInformationMessage(`Controller ${name} created succesfully`, { title: 'Open'});
+				const shouldOpen = await vscode.window.showInformationMessage(`Controller ${name} created succesfully`, { title: 'Open' });
 				if (shouldOpen) {
 					const document = await vscode.workspace.openTextDocument(filePath);
 					await vscode.window.showTextDocument(document);
