@@ -1,10 +1,10 @@
 {
-    "name": "titanium",
+    "name": "vscode-titanium",
     "version": "0.0.1",
-    "displayName": "Appcelerator Titanium",
+    "displayName": "Titanium",
     "description": "Appcelerator Titanium build tools for Visual Studio Code",
     "icon": "images/icon.png",
-    "publisher": "Axway Appcelerator",
+    "publisher": "Axway",
     "categories": [
         "Extension Packs",
         "Languages",
@@ -64,7 +64,7 @@
                 }
             },
             {
-                "command": "titanium.explorer.setLiveViewEnabled",
+                "command": "titanium.build.setLiveViewEnabled",
                 "title": "Enable LiveView",
                 "category": "Titanium",
                 "icon": {
@@ -73,7 +73,7 @@
                 }
             },
             {
-                "command": "titanium.explorer.setLiveViewDisabled",
+                "command": "titanium.build.setLiveViewDisabled",
                 "title": "Disable LiveView",
                 "category": "Titanium",
                 "icon": {
@@ -82,7 +82,7 @@
                 }
             },
             {
-                "command": "titanium.run",
+                "command": "titanium.build.run",
                 "title": "Run",
                 "category": "Titanium",
                 "icon": {
@@ -91,7 +91,7 @@
                 }
             },
             {
-                "command": "titanium.dist",
+                "command": "titanium.package.run",
                 "title": "Distribute",
                 "category": "Titanium",
                 "icon": {
@@ -100,69 +100,99 @@
                 }
             },
             {
-                "command": "titanium.stop",
+                "command": "titanium.build.stop",
                 "title": "Stop",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.set-log-level",
+                "command": "titanium.build.setLogLevel",
                 "title": "Set log level",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.open-related-view",
+                "command": "titanium.alloy.generate.controller",
+                "title": "Generate Alloy controller",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.alloy.generate.migration",
+                "title": "Generate Alloy migration",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.alloy.generate.model",
+                "title": "Generate Alloy model",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.alloy.generate.style",
+                "title": "Generate Alloy style",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.alloy.generate.view",
+                "title": "Generate Alloy view",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.alloy.generate.widget",
+                "title": "Generate Alloy widget",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.alloy.openRelatedView",
                 "title": "Open related view",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.open-related-style",
+                "command": "titanium.alloy.openRelatedStyle",
                 "title": "Open related style",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.open-related-controller",
+                "command": "titanium.alloy.openRelatedController",
                 "title": "Open related controller",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.toggle-related-files",
-                "title": "Toggle related files",
+                "command": "titanium.alloy.openRelatedFiles",
+                "title": "Open related files",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.generate-autocomplete-suggestions",
+                "command": "titanium.generate.autocompleteSuggestions",
                 "title": "Generate autocomplete list",
                 "category": "Titanium"
             }
         ],
         "keybindings": [
             {
-                "command": "titanium.run",
+                "command": "titanium.build.run",
                 "key": "ctrl+alt+enter",
                 "mac": "cmd+alt+enter"
             },
             {
-                "command": "titanium.stop",
+                "command": "titanium.build.stop",
                 "key": "ctrl+alt+.",
                 "mac": "cmd+alt+."
             },
             {
-                "command": "titanium.open-related-view",
+                "command": "titanium.alloy.openRelatedView",
                 "key": "ctrl+alt+v",
                 "mac": "cmd+alt+v"
             },
             {
-                "command": "titanium.open-related-style",
+                "command": "titanium.alloy.openRelatedStyle",
                 "key": "ctrl+alt+s",
                 "mac": "cmd+alt+s"
             },
             {
-                "command": "titanium.open-related-controller",
+                "command": "titanium.alloy.openRelatedController",
                 "key": "ctrl+alt+x",
                 "mac": "cmd+alt+x"
             },
             {
-                "command": "titanium.toggle-related-files",
+                "command": "titanium.alloy.openRelatedFiles",
                 "key": "ctrl+alt+a",
                 "mac": "cmd+alt+a"
             }
@@ -200,7 +230,7 @@
                     "type": "string",
                     "default": "en"
                 },
-                "titanium.build.distributionOutputDirectory": {
+                "titanium.package.distributionOutputDirectory": {
                     "type": "string",
                     "default": "dist",
                     "description": "For iOS ad-hoc and App Store and Google Play builds. Ensure this location has write permission."
@@ -273,58 +303,98 @@
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.explorer.setLiveViewEnabled",
+                    "command": "titanium.build.setLiveViewEnabled",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.explorer.setLiveViewDisabled",
+                    "command": "titanium.build.setLiveViewDisabled",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.run",
+                    "command": "titanium.build.run",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.dist",
+                    "command": "titanium.package.run",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.stop",
+                    "command": "titanium.build.stop",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.set-log-level",
+                    "command": "titanium.build.setLogLevel",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.open-related-view",
+                    "command": "titanium.alloy.openRelatedView",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.open-related-style",
+                    "command": "titanium.alloy.openRelatedStyle",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.open-related-controller",
+                    "command": "titanium.alloy.openRelatedController",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.toggle-related-files",
+                    "command": "titanium.alloy.openRelatedFiles",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.generate-autocomplete-suggestions",
+                    "command": "titanium.generate.autocompleteSuggestions",
+                    "when": "titanium:enabled"
+                }
+            ],
+            "editor/context": [
+                {
+                    "command": "titanium.alloy.openRelatedController",
+                    "when": "editorLangId =~ /(xml|alloy-tss)/"
+                },
+                {
+                    "command": "titanium.alloy.openRelatedStyle",
+                    "when": "editorLangId =~ /(javascript|xml)/"
+                },
+                {
+                    "command": "titanium.alloy.openRelatedView",
+                    "when": "editorLangId =~ /(alloy-tss|javascript)/"
+                },
+                {
+                    "command": "titanium.alloy.openRelatedFiles",
+                    "when": "editorLangId =~ /(alloy-tss|javascript|xml)/"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "titanium.alloy.generate.controller",
+                    "group": "2_workspace",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.model",
+                    "group": "2_workspace",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.style",
+                    "group": "2_workspace",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.view",
+                    "group": "2_workspace",
                     "when": "titanium:enabled"
                 }
             ],
             "view/title": [
                 {
-                    "command": "titanium.explorer.setLiveViewEnabled",
+                    "command": "titanium.build.setLiveViewEnabled",
                     "when": "view == titaniumExplorer && config.titanium.liveview && !titanium:liveview",
                     "group": "navigation"
                 },
                 {
-                    "command": "titanium.explorer.setLiveViewDisabled",
+                    "command": "titanium.build.setLiveViewDisabled",
                     "when": "view == titaniumExplorer && config.titanium.liveview && titanium:liveview",
                     "group": "navigation"
                 },
@@ -334,27 +404,27 @@
                     "group": "navigation"
                 },
                 {
-                    "command": "titanium.set-log-level",
+                    "command": "titanium.build.setLogLevel",
                     "group": "2_workspace"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "titanium.dist",
+                    "command": "titanium.package.run",
                     "when": "view == titaniumExplorer && viewItem == PlatformNode"
                 },
                 {
-                    "command": "titanium.dist",
+                    "command": "titanium.package.run",
                     "when": "view == titaniumExplorer && viewItem == PlatformNode",
                     "group": "inline"
                 },
                 {
-                    "command": "titanium.run",
+                    "command": "titanium.build.run",
                     "when": "view == titaniumExplorer && viewItem == DeviceNode",
                     "group": "inline"
                 },
                 {
-                    "command": "titanium.run",
+                    "command": "titanium.build.run",
                     "when": "view == titaniumExplorer"
                 }
             ]

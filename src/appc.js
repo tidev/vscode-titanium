@@ -410,62 +410,33 @@ const Appc = {
 	/**
 	 * Run `appc alloy generate` command
 	 *
-	 * @param {Object} opts				arguments
-	 * @param {String} opts.type        what to generate (controller)
-	 * @param {Array} opts.args         arguments to pass to alloy generate command
-	 * @param {Function} opts.error		error callback function
+	 * @param {Object} opts - arguments.
+	 * @param {String} [opts.adapterType] - Adapter to use for Alloy model
+	 * @param {String} opts.cwd - Directory of the app.
+	 * @param {Boolean} opts.force - Force creation of the component, will overwrite existing component.
+	 * @param {String} opts.name -  Name of the component.
+	 * @param {String} opts.type - Type to generate.
+	 * @returns {Promise}
 	 */
-	generate(opts) { // eslint-disable-line no-unused-vars
-		// var args = [ 'alloy', 'generate', opts.type ];
-		// if (opts.args && opts.args.length) {
-		// 	args = args.concat(opts.args);
-		// }
-		// new BufferedProcess({
-		// 	command: 'appc',
-		// 	args,
-		// 	options: {
-		// 		cwd: atom.project.getPaths()[0]
-		// 	},
-		// 	stderr: output => {
-		// 		output = output.replace(/\[[0-9]+m/g, '');
-		// 		output = output.replace(/\[ERROR]/g, '');
-		// 		output = output.replace(/^\W+/g, '');
-		// 		output = output.charAt(0).toUpperCase() + output.slice(1);
-		// 		opts.error && opts.error({
-		// 			message: `Error generating ${opts.type} '${opts.name}'`,
-		// 			detail: output
-		// 		});
-		// 	},
-		// 	exit: code => {
-		// 		if (code !== 0) {
-		// 			return;
-		// 		}
-		// 		const name = opts.args[0];
-		// 		let files = [];
-		// 		switch (opts.type) {
-		// 			case 'controller':
-		// 				files = [ `views/${name}.xml`, `styles/${name}.tss`, `controllers/${name}.js` ];
-		// 				break;
-		// 			case 'view':
-		// 				files = [ `views/${name}.xml` ];
-		// 				break;
-		// 			case 'style':
-		// 				files = [ `styles/${name}.tss` ];
-		// 				break;
-		// 			case 'model':
-		// 				files = [ `models/${name}.js` ];
-		// 				break;
-		// 			case 'widget':
-		// 				files = [ `widgets/${name}/views/widget.xml`, `widgets/${name}/styles/widget.tss`, `widgets/${name}/controllers/widget.js` ];
-		// 				break;
-		// 			case 'jmk':
-		// 				files = [ 'alloy.jmk' ];
-		// 		}
-		// 		for (const file of files) {
-		// 			atom.workspace.open(path.join(atom.project.getPaths()[0], 'app', file));
-		// 		}
-		// 	}
-		// });
+	generate({ adapterType, cwd, force, name, type }) {
+		return new Promise((resolve, reject) => {
+			const args = [ 'alloy', 'generate', type, name ];
+			if (type === 'model') {
+				args.push(adapterType);
+			}
+			if (force) {
+				args.push('--force');
+			}
+			const proc = spawn('appc', args, { cwd, shell: true });
+
+			proc.on('close', (code) => {
+				if (code) {
+					// handle error
+					return reject();
+				}
+				return resolve();
+			});
+		});
 	},
 
 	async getAlloyVersion() {

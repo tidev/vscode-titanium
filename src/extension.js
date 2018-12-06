@@ -5,6 +5,8 @@ const related = require('./related');
 const Terminal = require('./terminal');
 const utils = require('./utils');
 const vscode = require('vscode');
+const fs = require('fs-extra');
+const path = require('path');
 
 // Completion provider
 const completionItemProviderHelper = require('./providers/completion/completionItemProviderHelper');
@@ -67,7 +69,7 @@ function activate(context) {
 		vscode.commands.registerCommand('titanium.init', init),
 
 		// register run command
-		vscode.commands.registerCommand('titanium.run', async (runOpts = {}) => {
+		vscode.commands.registerCommand('titanium.build.run', async (runOpts = {}) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -164,7 +166,7 @@ function activate(context) {
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand('titanium.dist', async (runOpts = {}) => {
+		vscode.commands.registerCommand('titanium.package.run', async (runOpts = {}) => {
 			if (checkLoginAndPrompt()) {
 				return;
 			}
@@ -245,7 +247,7 @@ function activate(context) {
 		}),
 
 		// register stop command
-		vscode.commands.registerCommand('titanium.stop', () => {
+		vscode.commands.registerCommand('titanium.build.stop', () => {
 			if (vscode.workspace.getConfiguration('titanium.general').get('useTerminalForBuild')) {
 				if (terminal) {
 					terminal.clear();
@@ -256,30 +258,29 @@ function activate(context) {
 		}),
 
 		// register set log level command
-		vscode.commands.registerCommand('titanium.set-log-level', () => {
-			vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' }).then(level => {
-				if (level) {
-					extensionContext.globalState.update('logLevel', level.toLowerCase());
-				}
-			});
+		vscode.commands.registerCommand('titanium.build.setLogLevel', async () => {
+			const level = await vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' });
+			if (level) {
+				extensionContext.globalState.update('logLevel', level.toLowerCase());
+			}
 		}),
 
 		// register related view commands
-		vscode.commands.registerCommand('titanium.open-related-view', () => {
+		vscode.commands.registerCommand('titanium.alloy.openRelatedView', () => {
 			related.openRelatedFile('xml');
 		}),
-		vscode.commands.registerCommand('titanium.open-related-style', () => {
+		vscode.commands.registerCommand('titanium.alloy.openRelatedStyle', () => {
 			related.openRelatedFile('tss');
 		}),
-		vscode.commands.registerCommand('titanium.open-related-controller', () => {
+		vscode.commands.registerCommand('titanium.alloy.openRelatedController', () => {
 			related.openRelatedFile('js');
 		}),
-		vscode.commands.registerCommand('titanium.toggle-related-files', () => {
+		vscode.commands.registerCommand('titanium.alloy.openRelatedFiles', () => {
 			related.openAllFiles();
 		}),
 
 		// register generate autocomplete suggestions command
-		vscode.commands.registerCommand('titanium.generate-autocomplete-suggestions', async () => {
+		vscode.commands.registerCommand('titanium.generate.autocompletEsuggestions', async () => {
 			await generateCompletions({ force: true });
 		}),
 
@@ -293,16 +294,131 @@ function activate(context) {
 			deviceExplorer.refresh();
 		}),
 
-		vscode.commands.registerCommand('titanium.explorer.setLiveViewEnabled', async () => {
+		vscode.commands.registerCommand('titanium.build.setLiveViewEnabled', async () => {
 			await extensionContext.globalState.update('titanium:liveview', true);
 			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 			vscode.window.showInformationMessage('Enabled LiveView');
 		}),
 
-		vscode.commands.registerCommand('titanium.explorer.setLiveViewDisabled', async () => {
+		vscode.commands.registerCommand('titanium.build.setLiveViewDisabled', async () => {
 			await extensionContext.globalState.update('titanium:liveview', false);
 			await vscode.commands.executeCommand('setContext', 'titanium:liveview', false);
 			vscode.window.showInformationMessage('Disabled LiveView');
+		}),
+
+		vscode.commands.registerCommand('titanium.alloy.generate.controller', async () => {
+			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your controller' });
+			if (!name) {
+				return;
+			}
+			const cwd = vscode.workspace.rootPath;
+			const filePath = path.join(cwd, 'app', 'controllers', `${name}.js`);
+			if (await fs.exists(filePath)) {
+				const shouldDelete = await vscode.window.showQuickPick([ 'Yes', 'No' ], { placeHolder: `Controller ${name} already exists. Overwrite it?` });
+				if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
+					return;
+				}
+			}
+			try {
+				await Appc.generate({
+					cwd,
+					type: 'controller',
+					name,
+					force: true
+				});
+				const shouldOpen = await vscode.window.showInformationMessage(`Controller ${name} created succesfully`, { title: 'Open'});
+				if (shouldOpen) {
+					const document = await vscode.workspace.openTextDocument(filePath);
+					await vscode.window.showTextDocument(document);
+				}
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to create Alloy controller ${name}`);
+			}
+		}),
+
+		vscode.commands.registerCommand('titanium.alloy.generate.migration', async () => {
+			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your migration' });
+			if (!name) {
+				return;
+			}
+			try {
+				await Appc.generate({
+					cwd: vscode.workspace.rootPath,
+					type: 'migration',
+					name
+				});
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to create Alloy migration ${name}`);
+			}
+		}),
+
+		vscode.commands.registerCommand('titanium.alloy.generate.model', async () => {
+			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your model' });
+			if (!name) {
+				return;
+			}
+			const adapterType = await vscode.window.showQuickPick([ 'sql', 'properties' ], { placeHolder: 'Select the adapter type' });
+			if (!adapterType) {
+				return;
+			}
+			try {
+				await Appc.generate({
+					cwd: vscode.workspace.rootPath,
+					type: 'model',
+					name,
+					adapterType
+				});
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to create Alloy controller ${name}`);
+			}
+		}),
+
+		vscode.commands.registerCommand('titanium.alloy.generate.style', async () => {
+			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your style' });
+			if (!name) {
+				return;
+			}
+			try {
+				await Appc.generate({
+					cwd: vscode.workspace.rootPath,
+					type: 'style',
+					name
+				});
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to create Alloy style ${name}`);
+			}
+		}),
+
+		vscode.commands.registerCommand('titanium.alloy.generate.view', async () => {
+			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your view' });
+			if (!name) {
+				return;
+			}
+			try {
+				await Appc.generate({
+					cwd: vscode.workspace.rootPath,
+					type: 'view',
+					name
+				});
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to create Alloy view ${name}`);
+			}
+		}),
+
+		vscode.commands.registerCommand('titanium.alloy.generate.widget', async () => {
+			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your widget' });
+			if (!name) {
+				return;
+			}
+			try {
+				await Appc.generate({
+					cwd: vscode.workspace.rootPath,
+					type: 'widget',
+					name
+				});
+			} catch (error) {
+				vscode.window.showErrorMessage(`Failed to create Alloy widget ${name}`);
+			}
 		})
 	);
 
