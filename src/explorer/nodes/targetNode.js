@@ -49,6 +49,21 @@ module.exports = class DeviceTypeNode extends BaseNode {
 					}
 					break;
 			}
+		} else if (this.platform === 'windows') {
+			switch (this.label) {
+				case 'Device':
+					for (const device of appc.windowsDevices()) {
+						console.log(device);
+					}
+					devices.push(new DeviceNode('ws-local', vscode.TreeItemCollapsibleState.None, this.platform, 'ws-local', null));
+					break;
+				case 'Emulator':
+					for (const emulator of appc.windowsEmulators()['10.0']) {
+						const label = emulator.name.replace('Mobile Emulator ', '');
+						devices.push(new DeviceNode(label, vscode.TreeItemCollapsibleState.None, this.platform, 'wp-emulator', emulator.udid));
+					}
+					break;
+			}
 		}
 		return devices;
 	}

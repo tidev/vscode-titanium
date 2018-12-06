@@ -22,6 +22,11 @@ module.exports = class PlatformNode extends BaseNode {
 					new TargetNode('Device', vscode.TreeItemCollapsibleState.Collapsed, this.platform),
 					new TargetNode('Simulator', vscode.TreeItemCollapsibleState.Collapsed, this.platform)
 				]);
+			case 'windows':
+				return Promise.resolve([
+					new TargetNode('Device', vscode.TreeItemCollapsibleState.Collapsed, this.platform),
+					new TargetNode('Emulator', vscode.TreeItemCollapsibleState.Collapsed, this.platform)
+				]);
 			default:
 				break;
 		}
