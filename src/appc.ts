@@ -1,73 +1,56 @@
-const vscode = require('vscode');
-const { spawn } = require('child_process');
-const fs = require('fs-extra');
-const path = require('path');
-const semver = require('semver');
-const utils = require('./utils');
-const { homedir } = require('os');
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import * as semver from 'semver';
+import { iOSProvisioinngProfileMatchesAppId } from './utils';
 
-const Appc = {
+import { spawn } from 'child_process';
+import { homedir } from 'os';
+import { window, workspace } from 'vscode';
 
-	info: {},
-	proc: null,
+export interface AlloyGenerateOptions {
+	adapterType?: string;
+	cwd: string;
+	force?: boolean;
+	type: string;
+	name: string;
+}
 
-	/**
-	 * Returns appc CLI session for current user
-	 *
-	 * @returns {Object}
-	 */
-	session() {
-		const sessionPath = path.join(homedir(), '.appcelerator/appc-cli.json');
-		if (fs.existsSync(sessionPath)) {
-			return JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
-		}
-	},
+export class Appc {
+
+	private info: any;
+	private proc: any;
+	private killed: boolean;
 
 	/**
 	 * Returns true if user has active session
 	 *
 	 * @returns {Boolean}
 	 */
-	isUserLoggedIn() {
+	public isUserLoggedIn () {
 		const session = this.session();
 		if (session && session.hasOwnProperty('session') && session.hasOwnProperty('expiry')) {
 			return (session.expiry - +new Date() > 0);
 		}
-	},
+	}
 
 	/**
 	 * Get info
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	getInfo(callback) {
+	public getInfo (callback) {
 		let result = '';
 		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
 		proc.on('close', () => {
 			if (result && result.length) {
-				Appc.info = JSON.parse(result);
-				callback && callback(Appc.info);
+				this.info = JSON.parse(result);
+				callback(this.info);
 			} else {
-				callback && callback({});
+				callback({});
 			}
 		});
-	},
-
-	/**
-	 * Returns OS name for current platform
-	 *
-	 * @returns {String}
-	*/
-	os () {
-		const name = Appc.info.os.name;
-		if (/mac/i.test(name)) {
-			return 'darwin';
-		} else if (/win/i.test(name)) {
-			return 'win32';
-		}
-		return 'linux';
-	},
+	}
 
 	/**
 	 * SDKs
@@ -75,11 +58,11 @@ const Appc = {
 	 * @param {Boolean} isGA    limit to only GA releases, default false
 	 * @returns {Array}
 	 */
-	sdks(isGA = false) {
-		if (Appc.info.titanium) {
-			let keys = Object.keys(Appc.info.titanium);
+	public sdks (isGA = false) {
+		if (this.info.titanium) {
+			let keys = Object.keys(this.info.titanium);
 			for (const key of keys) {
-				Appc.info.titanium[key].fullversion = key;
+				this.info.titanium[key].fullversion = key;
 			}
 
 			keys.sort((a, b) => {
@@ -116,10 +99,10 @@ const Appc = {
 				keys = keys.filter(key => key.indexOf('GA') > 0);
 			}
 
-			return keys.map(key => Appc.info.titanium[key]);
+			return keys.map(key => this.info.titanium[key]);
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * Latest SDKs
@@ -128,24 +111,24 @@ const Appc = {
 	 * @param {Object} SDK      latest SDK based on version number
 	 * @returns {Object}
 	 */
-	latestSdk(isGA = true) {
-		const sdks = Appc.sdks(isGA);
+	public latestSdk (isGA = true) {
+		const sdks = this.sdks(isGA);
 		if (sdks.length > 0) {
 			return sdks[0];
 		}
-	},
+	}
 
 	/**
 	 * Selected SDK
 	 *
 	 * @returns {Object}
 	 */
-	selectedSdk() {
-		if (Appc.info.titaniumCLI) {
-			const selectedVersion = Appc.info.titaniumCLI.selectedSDK;
+	public selectedSdk () {
+		if (this.info.titaniumCLI) {
+			const selectedVersion = this.info.titaniumCLI.selectedSDK;
 			let sdk;
 			if (selectedVersion) {
-				sdk = Appc.info.titanium[selectedVersion];
+				sdk = this.info.titanium[selectedVersion];
 				sdk.fullversion = selectedVersion;
 			}
 			if (!sdk) {
@@ -156,71 +139,71 @@ const Appc = {
 			}
 			return sdk;
 		}
-	},
+	}
 
-	sdkInfo(version) {
-		if (Appc.info.titanium) {
-			return Appc.info.titanium[version];
+	public sdkInfo (version) {
+		if (this.info.titanium) {
+			return this.info.titanium[version];
 		}
-	},
+	}
 
 	/**
 	 * iOS simulators
 	 *
 	 * @returns {Object}
 	 */
-	iOSSimulators() {
-		if (Appc.info.ios && Appc.info.ios.simulators) {
-			return Appc.info.ios.simulators.ios;
+	public iOSSimulators () {
+		if (this.info.ios && this.info.ios.simulators) {
+			return this.info.ios.simulators.ios;
 		}
 		return {};
-	},
+	}
 
-	iOSSimulatorVersions() {
+	public iOSSimulatorVersions () {
 		const sims = this.iOSSimulators();
 		return Object.keys(sims).sort((a, b) => {
 			a = semver.coerce(a);
 			b = semver.coerce(b);
 			return semver.compare(a, b);
 		}).reverse();
-	},
+	}
 
 	/**
 	 * iOS devices
 	 *
 	 * @returns {Array}
 	 */
-	iOSDevices() {
-		if (Appc.info.ios && Appc.info.ios.devices) {
-			return Appc.info.ios.devices;
+	public iOSDevices () {
+		if (this.info.ios && this.info.ios.devices) {
+			return this.info.ios.devices;
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * iOS targets
 	 *
 	 * @returns {Object}
 	 */
-	iOSTargets() {
+	public iOSTargets () {
 		return {
 			devices: this.iOSDevices(),
 			simulators: this.iOSSimulators()
 		};
-	},
+	}
 
 	/**
 	 * Android emulators
 	 *
 	 * @returns {Object}
 	 */
-	androidEmulators() {
-		if (Appc.info.android && Appc.info.android.emulators.length) {
-			var emulators = {
+	public androidEmulators () {
+		if (this.info.android && this.info.android.emulators.length) {
+			const emulators = {
 				AVDs: [],
 				Genymotion: []
 			};
-			for (const emulator of Appc.info.android.emulators) {
+			for (const emulator of this.info.android.emulators) {
 				if (emulator.type === 'avd') {
 					emulators.AVDs.push(emulator);
 				} else if (emulator.type === 'genymotion') {
@@ -230,67 +213,67 @@ const Appc = {
 			return emulators;
 		}
 		return {};
-	},
+	}
 
 	/**
 	 * Android devices
 	 *
 	 * @returns {Array}
 	 */
-	androidDevices() {
-		if (Appc.info.android && Appc.info.android.devices) {
-			return Appc.info.android.devices;
+	public androidDevices () {
+		if (this.info.android && this.info.android.devices) {
+			return this.info.android.devices;
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * Android targets
 	 *
 	 * @returns {Object}
 	 */
-	androidTargets() {
+	public androidTargets () {
 		return {
 			devices: this.androidDevices(),
 			emulators: this.androidEmulators()
 		};
-	},
+	}
 
 	/**
 	 * Windows devices
 	 *
 	 * @returns {Array}
 	 */
-	windowsDevices() {
-		if (Appc.info.windows && Appc.info.windows.devices) {
-			return Appc.info.windows.devices;
+	public windowsDevices () {
+		if (this.info.windows && this.info.windows.devices) {
+			return this.info.windows.devices;
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * Windows emulators
 	 *
 	 * @returns {Array}
 	 */
-	windowsEmulators() {
-		if (Appc.info.windows && Appc.info.windows.emulators) {
-			return Appc.info.windows.emulators;
+	public windowsEmulators () {
+		if (this.info.windows && this.info.windows.emulators) {
+			return this.info.windows.emulators;
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * Windows targets
 	 *
 	 * @returns {Object}
 	 */
-	windowsTargets() {
+	public windowsTargets () {
 		return {
 			devices: this.windowsDevices(),
 			emulators: this.windowsEmulators()
 		};
-	},
+	}
 
 	/**
 	 * iOS certificates
@@ -298,15 +281,15 @@ const Appc = {
 	 * @param {String} type     developer (default), distribution
 	 * @returns {Array}
 	 */
-	iOSCertificates(type = 'developer') {
-		var certificates = [];
-		if (Appc.info.ios && Appc.info.ios.certs) {
-			for (let keychain in Appc.info.ios.certs.keychains) {
-				certificates = certificates.concat(Appc.info.ios.certs.keychains[keychain][type]);
+	public iOSCertificates (type = 'developer') {
+		const certificates = [];
+		if (this.info.ios && this.info.ios.certs) {
+			for (const keychain of Object.values(this.info.ios.certs.keychains)) {
+				certificates.push(...keychain[type]);
 			}
 		}
 		return certificates;
-	},
+	}
 
 	/**
 	 * iOS provisioning profiles
@@ -316,24 +299,24 @@ const Appc = {
 	 * @param {String} appId        enable by matching app ID
 	 * @returns {Array}
 	 */
-	iOSProvisioningProfiles(deployment = 'development', certificate = {}, appId) {
-		var pem;
+	public iOSProvisioningProfiles (deployment = 'development', certificate: any = {}, appId) {
+		let pem: any;
 		if (certificate.pem) {
 			pem = certificate.pem.replace('-----BEGIN CERTIFICATE-----', '');
 			pem = pem.replace('-----END CERTIFICATE-----', '');
 			pem = pem.replace(/[\n\r]/g, '');
 		}
-		var profiles = [];
-		if (Appc.info.ios && Appc.info.ios.provisioning) {
+		const profiles = [];
+		if (this.info.ios && this.info.ios.provisioning) {
 
-			var deploymentProfiles = [];
+			let deploymentProfiles = [];
 			if (deployment === 'development') {
-				deploymentProfiles = Appc.info.ios.provisioning.development;
+				deploymentProfiles = this.info.ios.provisioning.development;
 			} else if (deployment === 'distribution') {
-				deploymentProfiles = Appc.info.ios.provisioning.adhoc;
-				deploymentProfiles = deploymentProfiles.concat(Appc.info.ios.provisioning.enterprise);
+				deploymentProfiles = this.info.ios.provisioning.adhoc;
+				deploymentProfiles = deploymentProfiles.concat(this.info.ios.provisioning.enterprise);
 			} else if (deployment === 'appstore') {
-				deploymentProfiles = Appc.info.ios.provisioning.distribution;
+				deploymentProfiles = this.info.ios.provisioning.distribution;
 			}
 
 			for (const profile of deploymentProfiles) {
@@ -342,69 +325,69 @@ const Appc = {
 					profile.disabled = true;
 				} else if (pem && profile.certs.indexOf(pem) === -1) {
 					profile.disabled = true;
-				} else if (appId && !utils.iOSProvisioinngProfileMatchesAppId(profile.appId, appId)) {
+				} else if (appId && !iOSProvisioinngProfileMatchesAppId(profile.appId, appId)) {
 					profile.disabled = true;
 				}
 				profiles.push(profile);
 			}
 		}
 		return profiles;
-	},
+	}
 
-	buildInProgress() {
-		return (this.proc !== null);
-	},
+	public buildInProgress () {
+		return this.proc;
+	}
 
 	/**
 	 * Run `appc run` command
 	 *
 	 * @param {Object} opts arguments
 	 */
-	run(opts) {
+	public run (opts) {
 		if (this.proc) {
 			return;
 		}
-		let channel = vscode.window.createOutputChannel('Appcelerator');
-		const cmd = vscode.workspace.getConfiguration('titanium.general').get('appcCommandPath');
-		if (vscode.workspace.getConfiguration('titanium.general').get('displayBuildCommandInConsole')) {
+		const channel = window.createOutputChannel('Appcelerator');
+		const cmd: string = workspace.getConfiguration('titanium.general').get('appcCommandPath');
+		if (workspace.getConfiguration('titanium.general').get('displayBuildCommandInConsole')) {
 			channel.append(`${cmd} run ${opts.args.join(' ')}\n\n`);
 		}
 		this.killed = false;
 		this.proc = spawn(cmd, [ 'run' ].concat(opts.args));
 		this.proc.stdout.on('data', data => {
 			if (!this.killed) {
-				let message = data.toString();
+				const message = data.toString();
 				channel.append(message);
 			}
 		});
 		this.proc.stderr.on('data', data => {
 			if (this.killed) {
-				let message = data.toString();
+				const message = data.toString();
 				channel.append(message);
-				opts.error && opts.error(message);
+				opts.error(message);
 			}
 		});
-		this.proc.on('close', (code) => {
+		this.proc.on('close', code => {
 			// console.log(`Exited with code ${code}`);
-			opts.exit && opts.exit(code);
+			opts.exit(code);
 			this.proc = null;
 		});
-		this.proc.on('exit', (code) => {
+		this.proc.on('exit', code => {
 			// console.log(`Exited with code ${code}`);
-			opts.exit && opts.exit(code);
+			opts.exit(code);
 			this.proc = null;
 		});
 
 		channel.show();
-	},
+	}
 
-	stop() {
+	public stop () {
 		if (this.proc) {
 			this.proc.kill('SIGKILL');
 			this.proc = null;
 			this.killed = true;
 		}
-	},
+	}
 
 	/**
 	 * Run `appc alloy generate` command
@@ -417,7 +400,7 @@ const Appc = {
 	 * @param {String} opts.type - Type to generate.
 	 * @returns {Promise}
 	 */
-	generate({ adapterType, cwd, force, name, type }) {
+	public generate ({ adapterType, cwd, force, name, type }: AlloyGenerateOptions) {
 		return new Promise((resolve, reject) => {
 			const args = [ 'alloy', 'generate', type, name ];
 			if (type === 'model') {
@@ -428,7 +411,7 @@ const Appc = {
 			}
 			const proc = spawn('appc', args, { cwd, shell: true });
 
-			proc.on('close', (code) => {
+			proc.on('close', code => {
 				if (code) {
 					// handle error
 					return reject();
@@ -436,15 +419,27 @@ const Appc = {
 				return resolve();
 			});
 		});
-	},
+	}
 
-	async getAlloyVersion() {
+	public async getAlloyVersion () {
 		const appcPath = path.join(homedir(), '.appcelerator', 'install');
 		const appcVersion = await fs.readFile(path.join(appcPath, '.version'), 'utf8');
 		const alloyPath = path.join(appcPath, appcVersion, 'package', 'node_modules', 'alloy');
 		const { version: alloyVersion } = await fs.readJSON(path.join(alloyPath, 'package.json'));
 		return alloyVersion;
 	}
-};
 
-module.exports = Appc;
+	/**
+	 * Returns appc CLI session for current user
+	 *
+	 * @returns {Object}
+	 */
+	private session () {
+		const sessionPath = path.join(homedir(), '.appcelerator/appc-cli.json');
+		if (fs.existsSync(sessionPath)) {
+			return JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
+		}
+	}
+}
+
+export default new Appc();

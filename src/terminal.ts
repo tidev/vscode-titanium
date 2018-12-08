@@ -1,12 +1,16 @@
-const { window } = require('vscode');
+import { Terminal as VSTerminal, window, } from 'vscode';
 
-class Terminal {
+export default class Terminal {
 
-	constructor({ name, commandPath = 'appc' }) {
+	private name: string;
+	private terminal: VSTerminal;
+	private commandPath: string;
+
+	constructor ({ name, commandPath = 'appc' }) {
 
 		this.name = name;
 		this.terminal = window.createTerminal({ name });
-		window.onDidCloseTerminal((e) => {
+		window.onDidCloseTerminal(e => {
 			if (e.name === this.name) {
 				this.terminal = undefined;
 			}
@@ -14,11 +18,11 @@ class Terminal {
 		this.commandPath = commandPath;
 	}
 
-	setCommandPath(commandPath) {
+	public setCommandPath (commandPath) {
 		this.commandPath = commandPath;
 	}
 
-	runCommand({ args }) {
+	public runCommand ({ args }) {
 		if (!this.terminal) {
 			this.terminal = window.createTerminal({ name: this.name });
 		}
@@ -32,10 +36,8 @@ class Terminal {
 		this.terminal.sendText(`${this.commandPath} ${args.join(' ')}`);
 	}
 
-	clear() {
+	public clear () {
 		this.terminal.sendText('clear');
 	}
 
 }
-
-module.exports = Terminal;

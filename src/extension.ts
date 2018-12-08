@@ -1,28 +1,29 @@
-const Appc = require('./appc');
-const DeviceExplorer = require('./explorer/tiExplorer');
-const project = require('./project');
-const related = require('./related');
-const Terminal = require('./terminal');
-const utils = require('./utils');
-const vscode = require('vscode');
-const fs = require('fs-extra');
-const path = require('path');
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import * as vscode from 'vscode';
 
-// Completion provider
-const completionItemProviderHelper = require('./providers/completion/completionItemProviderHelper');
-const viewCompletionItemProvider = require('./providers/completion/viewCompletionItemProvider');
-const styleCompletionItemProvider = require('./providers/completion/styleCompletionItemProvider');
-const controllerCompletionItemProvider = require('./providers/completion/controllerCompletionItemProvider');
-const tiappCompletionItemProvider = require('./providers/completion/tiappCompletionItemProvider');
+import appc from './appc';
+import DeviceExplorer from './explorer/tiExplorer';
+import project from './project';
+import * as related from './related';
+import Terminal from './terminal';
+import * as utils from './utils';
 
-// Definition provider
-const viewDefinitionProvider = require('./providers/definition/viewDefinitionProvider');
-const styleDefinitionProvider = require('./providers/definition/styleDefinitionProvider');
-const controllerDefinitionProvider = require('./providers/definition/controllerDefinitionProvider');
-const definitionProviderHelper = require('./providers/definition/definitionProviderHelper');
+import * as completionItemProviderHelper from './providers/completion/completionItemProviderHelper';
+import { ControllerCompletionItemProvider } from './providers/completion/controllerCompletionItemProvider';
+import { StyleCompletionItemProvider } from './providers/completion/styleCompletionItemProvider';
+import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
+import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
+
+import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
+import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
+import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
+import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
+import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
+
 const openDashboardCommandId = 'titanium.openDashboard';
 
-let extensionContext = {};
+let extensionContext: vscode.ExtensionContext;
 let projectStatusBarItem;
 let terminal;
 /**
@@ -30,12 +31,12 @@ let terminal;
  *
  * @param {Object} context 	extension context
  */
-function activate(context) {
+function activate (context) {
 	extensionContext = context;
 	project.load();
 	setStatusBar();
 	project.onModified(setStatusBar);
-	definitionProviderHelper.activate(context.subscriptions);
+	// definitionProviderHelper.activate(context.subscriptions);
 
 	if (!project.isTitaniumProject()) {
 		vscode.commands.executeCommand('setContext', 'titanium:enabled', false);
@@ -49,21 +50,21 @@ function activate(context) {
 	const deviceExplorer = new DeviceExplorer();
 	context.subscriptions.push(
 		// register completion providers
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, viewCompletionItemProvider, '.', '\'', '"'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, styleCompletionItemProvider),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerCompletionItemProvider, '.', '\'', '"', '/'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, tiappCompletionItemProvider, '.'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCompletionItemProvider(), '.', '\'', '"'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleCompletionItemProvider()),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerCompletionItemProvider(), '.', '\'', '"', '/'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, new TiappCompletionItemProvider(), '.'),
 
 		// register hover providers
-		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
+		// vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
 
 		// register definition providers
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, viewDefinitionProvider),
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: styleFilePattern }, styleDefinitionProvider),
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, controllerDefinitionProvider),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewDefinitionProvider()),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleDefinitionProvider()),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerDefinitionProvider()),
 
 		// register code action providers
-		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, viewDefinitionProvider),
+		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider()),
 
 		// register init command
 		vscode.commands.registerCommand('titanium.init', init),
@@ -74,12 +75,12 @@ function activate(context) {
 				return;
 			}
 
-			if (Appc.buildInProgress()) {
+			if (appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
 				return;
 			}
 			const iOSSimVersion = runOpts.version;
-			const runOptions = {
+			const runOptions: any = {
 				buildType: 'run',
 				platform: runOpts.platform,
 				target: runOpts.targetId,
@@ -99,7 +100,7 @@ function activate(context) {
 			}
 
 			if (!runOptions.platform) {
-				const platform = await selectPlatform(last);
+				const platform: any = await selectPlatform(last);
 
 				if (!platform) {
 					return;
@@ -171,7 +172,7 @@ function activate(context) {
 				return;
 			}
 
-			if (Appc.buildInProgress()) {
+			if (appc.buildInProgress()) {
 				vscode.window.showErrorMessage('Build in progress');
 				return;
 			}
@@ -181,7 +182,7 @@ function activate(context) {
 				return;
 			}
 
-			const runOptions = {
+			const runOptions: any = {
 				buildType: 'dist',
 				platform: runOpts.platform
 			};
@@ -195,7 +196,7 @@ function activate(context) {
 				};
 			}
 			if (!runOptions.platform) {
-				const platform = await selectPlatform(last);
+				const platform: any = await selectPlatform(last);
 				if (!platform) {
 					return;
 				}
@@ -253,7 +254,7 @@ function activate(context) {
 					terminal.clear();
 				}
 			} else {
-				Appc.stop();
+				appc.stop();
 			}
 		}),
 
@@ -320,7 +321,7 @@ function activate(context) {
 				}
 			}
 			try {
-				await Appc.generate({
+				await appc.generate({
 					cwd,
 					type: 'controller',
 					name,
@@ -342,7 +343,7 @@ function activate(context) {
 				return;
 			}
 			try {
-				await Appc.generate({
+				await appc.generate({
 					cwd: vscode.workspace.rootPath,
 					type: 'migration',
 					name
@@ -362,7 +363,7 @@ function activate(context) {
 				return;
 			}
 			try {
-				await Appc.generate({
+				await appc.generate({
 					cwd: vscode.workspace.rootPath,
 					type: 'model',
 					name,
@@ -379,7 +380,7 @@ function activate(context) {
 				return;
 			}
 			try {
-				await Appc.generate({
+				await appc.generate({
 					cwd: vscode.workspace.rootPath,
 					type: 'style',
 					name
@@ -395,7 +396,7 @@ function activate(context) {
 				return;
 			}
 			try {
-				await Appc.generate({
+				await appc.generate({
 					cwd: vscode.workspace.rootPath,
 					type: 'view',
 					name
@@ -411,7 +412,7 @@ function activate(context) {
 				return;
 			}
 			try {
-				await Appc.generate({
+				await appc.generate({
 					cwd: vscode.workspace.rootPath,
 					type: 'widget',
 					name
@@ -428,21 +429,21 @@ exports.activate = activate; // eslint-disable-line no-undef
 
 /**
  * Deactivate
-*/
-function deactivate() {
+ */
+function deactivate () {
 	project.dispose();
 }
 exports.deactivate = deactivate;  // eslint-disable-line no-undef
 
 /**
  * Initialise extension - fetch appc info
-*/
-function init() {
+ */
+function init () {
 	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, async progress => {
 		if (await extensionContext.globalState.get('titanium:liveview')) {
 			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 		}
-		Appc.getInfo(async (info) => {
+		appc.getInfo(async info => {
 			if (info) {
 				await generateCompletions({ progress });
 				// Call refresh incase the Titanium Explorer activity pane became active before info
@@ -457,7 +458,7 @@ function init() {
 /**
  * Set project name and link to dashboard in status bar
  */
-function setStatusBar() {
+function setStatusBar () {
 	if (!projectStatusBarItem) {
 		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
 	}
@@ -484,15 +485,10 @@ function setStatusBar() {
  * @param {Object} last last build destination
  *
  * @returns {Thenable}
-*/
-function selectPlatform(platforms, last) {
-	if (platforms && !Array.isArray(platforms)) {
-		last = platforms;
-		platforms = null;
-	}
-	if (!platforms) {
-		platforms = utils.platforms();
-	}
+ */
+function selectPlatform (last: any) {
+	const platforms = utils.platforms();
+
 	const items = platforms.map(platform => {
 		return { label: utils.nameForPlatform(platform), id: platform };
 	});
@@ -508,7 +504,7 @@ function selectPlatform(platforms, last) {
 	if (last) {
 		items.splice(0, 0, {
 			label: last.label,
-			description: last.description,
+			// description: last.description, FIXME!
 			id: 'last'
 		});
 		opts.placeHolder = 'Select platform or last destination';
@@ -523,7 +519,7 @@ function selectPlatform(platforms, last) {
  * @param {Object} opts run options
  * @returns {String} The description for the last run
  */
-function lastRunDescription(opts) {
+function lastRunDescription (opts) {
 	return `${utils.nameForPlatform(opts.platform)} ${utils.nameForTarget(opts.target)} ${opts.deviceLabel}`;
 }
 
@@ -533,7 +529,7 @@ function lastRunDescription(opts) {
  * @param {Object} opts run options
  * @returns {String} The description for the last distribution build
  */
-function lastDistDescription(opts) {
+function lastDistDescription (opts) {
 	if (opts.platform.id === 'ios') {
 		return `iOS (${opts.certificate.name} | ${opts.provisioningProfile.label})`;
 	} else {
@@ -546,8 +542,8 @@ function lastDistDescription(opts) {
  *
  * @param {String} platform - Platform that is being built to.
  * @returns {Thenable}
-*/
-function selectTarget(platform) {
+ */
+function selectTarget (platform) {
 	return vscode.window.showQuickPick([ {
 		label: (platform === 'android') ? 'Emulator' : 'Simulator',
 		id: (platform === 'android') ? 'emulator' : 'simulator'
@@ -563,21 +559,21 @@ function selectTarget(platform) {
  *
  * @param {String} version - The version of the iOS simulator to show.
  * @returns {Thenable}
-*/
-async function selectiOSSimulator(version) {
-	if (!Appc.iOSSimulators() || Appc.iOSSimulators() === {}) {
-		vscode.workspace.showErrorMessage('Error fetching iOS simulators. Check your environment and run `Appcelerator: init`.');
+ */
+async function selectiOSSimulator (version) {
+	if (!appc.iOSSimulators() || appc.iOSSimulators() === {}) {
+		vscode.window.showErrorMessage('Error fetching iOS simulators. Check your environment and run `Appcelerator: init`.');
 		return;
 	}
 	if (!version) {
-		version = await vscode.window.showQuickPick(Appc.iOSSimulatorVersions(), { placeHolder: 'Select iOS version' });
+		version = await vscode.window.showQuickPick(appc.iOSSimulatorVersions(), { placeHolder: 'Select iOS version' });
 	}
 
-	const simulators = Appc.iOSSimulators()[version].map(simulator => {
+	const simulators = appc.iOSSimulators()[version].map(simulator => {
 		return {
 			udid: simulator.udid,
 			label: `${simulator.name} (${version})`,
-			version: version
+			version
 		};
 	});
 	return vscode.window.showQuickPick(simulators, { placeHolder: 'Select simulator' });
@@ -587,9 +583,9 @@ async function selectiOSSimulator(version) {
  * Select iOS device
  *
  * @returns {Thenable}
-*/
-function selectiOSDevice() {
-	const devices = Appc.iOSDevices().map(device => {
+ */
+function selectiOSDevice () {
+	const devices = appc.iOSDevices().map(device => {
 		return {
 			udid: device.udid,
 			label: device.name
@@ -602,14 +598,14 @@ function selectiOSDevice() {
  * Select iOS code signing: certificate and provisioning profile
  *
  * @returns {Thenable}
-*/
-async function selectiOSCodeSigning({ buildType, target }) {
+ */
+async function selectiOSCodeSigning ({ buildType, target }) {
 	const selectedCertificate = await selectiOSCertificate(buildType);
 	if (!selectedCertificate) {
 		return;
 	}
 
-	const certificate = Appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
+	const certificate = appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
 
 	const provisioning = await selectiOSProvisioningProfile({ certificate, target });
 	if (!provisioning) {
@@ -627,8 +623,8 @@ async function selectiOSCodeSigning({ buildType, target }) {
  * @param {String} buildType - Type of build being performed, either run or dist.
  * @returns {Thenable}
  */
-function selectiOSCertificate(buildType) {
-	const certificates = Appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').map(certificate => {
+function selectiOSCertificate (buildType) {
+	const certificates = appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').map(certificate => {
 		return {
 			label: `${certificate.name}`,
 			description: `expires ${new Date(certificate.after).toLocaleString('en-US')}`,
@@ -642,8 +638,8 @@ function selectiOSCertificate(buildType) {
  * Select iOS provisioning profile
  *
  * @returns {Thenable}
-*/
-function selectiOSProvisioningProfile({ certificate, target }) {
+ */
+function selectiOSProvisioningProfile ({ certificate, target }) {
 	const profiles = [];
 	let deployment = 'development';
 	if (target === 'dist-adhoc') {
@@ -651,9 +647,9 @@ function selectiOSProvisioningProfile({ certificate, target }) {
 	} else if (target === 'dist-appstore') {
 		deployment = 'appstore';
 	}
-	Appc.iOSProvisioningProfiles(deployment, certificate, project.appId()).forEach(profile => {
+	appc.iOSProvisioningProfiles(deployment, certificate, project.appId()).forEach(profile => {
 		if (!profile.disabled) {
-			const item = {
+			const item: any = {
 				label: profile.name,
 				description: profile.uuid,
 				uuid: profile.uuid
@@ -671,9 +667,9 @@ function selectiOSProvisioningProfile({ certificate, target }) {
  * Select Android emulator
  *
  * @returns {Thenable}
-*/
-function selectAndroidEmulator() {
-	const emulators = Appc.androidEmulators();
+ */
+function selectAndroidEmulator () {
+	const emulators: any = appc.androidEmulators();
 	const options = [];
 
 	for (const emulator of emulators.AVDs) {
@@ -702,9 +698,9 @@ function selectAndroidEmulator() {
  * Select Android device
  *
  * @returns {Thenable}
-*/
-function selectAndroidDevice() {
-	const devices = Appc.androidDevices().map(device => {
+ */
+function selectAndroidDevice () {
+	const devices = appc.androidDevices().map(device => {
 		return {
 			udid: device.id,
 			label: device.name
@@ -723,8 +719,8 @@ function selectAndroidDevice() {
  * Select iOS distribution
  *
  * @returns {Thenable}
-*/
-function selectiOSDistribution() {
+ */
+function selectiOSDistribution () {
 	return vscode.window.showQuickPick([ {
 		label: 'App Store',
 		id: 'dist-appstore'
@@ -735,7 +731,7 @@ function selectiOSDistribution() {
 	} ]);
 }
 
-async function selectAndroidKeystore(last) {
+async function selectAndroidKeystore (last) {
 	const items = [ {
 		label: 'Browse ...',
 		id: 'browse'
@@ -744,7 +740,7 @@ async function selectAndroidKeystore(last) {
 	if (last) {
 		items.splice(0, 0, {
 			label: 'Last used',
-			description: last,
+			// description: last, FIXME
 			id: 'last'
 		});
 	}
@@ -765,8 +761,8 @@ async function selectAndroidKeystore(last) {
  * Check Appcelerator login and prompt if necessary.
  * @returns {Boolean} Whether or not the login prompt should be shown.
  */
-function checkLoginAndPrompt() {
-	if (!Appc.isUserLoggedIn()) {
+function checkLoginAndPrompt () {
+	if (!appc.isUserLoggedIn()) {
 		vscode.window.showInformationMessage('Please log in to the Appcelerator platform');
 		runTerminalCommand([ 'login' ]);
 		return true;
@@ -780,7 +776,7 @@ function checkLoginAndPrompt() {
  *
  * @param {Array} args Array of arguments to be ran.
  */
-function runTerminalCommand(args) {
+function runTerminalCommand (args) {
 	if (!terminal) {
 		terminal = new Terminal({ name: 'Appcelerator' });
 	}
@@ -792,7 +788,7 @@ function runTerminalCommand(args) {
  *
  * @param {Object} opts run options
  */
-function run(opts) {
+function run (opts) {
 
 	const args = [
 		'--platform', opts.platform,
@@ -856,10 +852,13 @@ function run(opts) {
 			message = `${message} ${utils.nameForTarget(opts.target)}`;
 		}
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: message }, progress => {
-			progress && progress.report(message);
 
-			return new Promise((resolve) => {
-				Appc.run({
+			if (progress) {
+				progress.report({ message });
+			}
+
+			return new Promise(resolve => {
+				appc.run({
 					args,
 					error: () => {
 						resolve();
@@ -879,22 +878,16 @@ function run(opts) {
  * @param {Object} opts - Options
  * @param {Object} progress - Progress reporter.
  */
-async function generateCompletions({ force, progress } = {}) {
+async function generateCompletions ({ force = false, progress = null } = {}) {
 	try {
 		const sdkVersion = project.sdk()[0];
 		if (!sdkVersion) {
 			// handle?
 		}
 		// Generate the completions
-		let [ alloy, sdk ] = await Promise.all([
+		const [ alloy, sdk ] = await Promise.all([
 			completionItemProviderHelper.generateAlloyCompletions({ force, progress }),
 			completionItemProviderHelper.generateSDKCompletions({ force, progress, sdkVersion })
-		]);
-		// Load the completion data
-		await Promise.all([
-			viewCompletionItemProvider.loadCompletions(),
-			styleCompletionItemProvider.loadCompletions(),
-			controllerCompletionItemProvider.loadCompletions()
 		]);
 		if (sdk || alloy) {
 			let message = 'Autocomplete suggestions generated for';

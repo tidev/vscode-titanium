@@ -1,0 +1,33 @@
+{
+    "defaultSeverity": "error",
+    "extends": ["tslint:recommended"],
+    "rules": {
+        "arrow-parens": [true, "ban-single-arg-parens"],
+        "curly": true,
+        "class-name": true,
+        "interface-name": [true, "never-prefix"],
+        "indent": [true, "tab"],
+        "max-line-length": false,
+        "member-ordering": [true, { "order": "fields-first" }],
+        "no-string-throw": true,
+        "no-trailing-whitespace": [true, "ignore-comments"],
+        "no-unused-expression": true,
+        "no-duplicate-variable": true,
+        "object-literal-sort-keys": false,
+        "quotemark": [true, "single"],
+        "semicolon": [
+            true,
+            "always"
+        ],
+        "space-before-function-paren": true,
+        "triple-equals": true,
+        "trailing-comma": false,
+        "variable-name": [
+            true,
+            "ban-keywords",
+            "check-format",
+            "allow-pascal-case",
+            "allow-leading-underscore"
+        ]
+    }
+}

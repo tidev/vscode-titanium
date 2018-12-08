@@ -18,7 +18,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/appcelerator-developer-relations/vscode-appcelerator-titanium.git"
+        "url": "git+https://github.com/appcelerator/vscode-appcelerator-titanium.git"
     },
     "engines": {
         "vscode": "^1.29.0"
@@ -28,7 +28,7 @@
         "workspaceContains:**/timodule.xml"
     ],
     "license": "Apache 2.0",
-    "main": "./src/extension",
+    "main": "./out/extension",
     "contributes": {
         "languages": [
             {
@@ -431,20 +431,23 @@
         }
     },
     "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "test": "node ./node_modules/vscode/bin/test",
-        "lint": "eslint src"
+        "lint": "tslint -p tsconfig.json --format stylish"
     },
     "devDependencies": {
         "@types/mocha": "^5.2.5",
-        "@types/node": "^10.11.3",
-        "eslint": "^5.6.1",
-        "eslint-config-axway": "^4.0.0",
-        "typescript": "^3.1.1",
-        "vscode": "^1.1.21"
+        "@types/node": "^8.10.25",
+        "tslint": "^5.11.0",
+        "tslint-eslint-rules": "^5.4.0",
+        "typescript": "^3.2.2",
+        "vscode": "^1.1.26"
     },
     "dependencies": {
-        "fs-extra": "^7.0.0",
+        "fs-extra": "^7.0.1",
         "klaw-sync": "^6.0.0",
         "semver": "^5.6.0",
         "underscore": "^1.8.3",

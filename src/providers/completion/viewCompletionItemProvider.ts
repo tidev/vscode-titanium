@@ -1,17 +1,18 @@
-const vscode = require('vscode');
-const SnippetString = vscode.SnippetString;
-const Range = vscode.Range;
-const path = require('path');
-const utils = require('../../utils');
-const related = require('../../related');
-const alloyAutoCompleteRules = require('./alloyAutoCompleteRules');
-const completionItemProviderHelper = require('./completionItemProviderHelper');
 
+import * as path from 'path';
+import * as _ from 'underscore';
+import * as related from '../../related';
+import * as utils from '../../utils';
+import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
+import * as completionItemProviderHelper from './completionItemProviderHelper';
+
+import { CompletionItem, CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
 /**
  * Alloy View completion provider
-*/
-const ViewCompletionItemProvider = {
+ */
+export class ViewCompletionItemProvider implements CompletionItemProvider {
 
+	private completions: any;
 	/**
 	 * Provide completion items
 	 *
@@ -20,7 +21,7 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	async provideCompletionItems(document, position) {
+	public async provideCompletionItems (document, position) {
 		const line = document.lineAt(position).text;
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);
@@ -42,7 +43,7 @@ const ViewCompletionItemProvider = {
 			let ruleResult;
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
-					ruleResult = await rule.getCompletions(linePrefix, position, prefix);
+					ruleResult = await rule.getCompletions();
 				}
 			}
 			if (ruleResult) {
@@ -52,8 +53,8 @@ const ViewCompletionItemProvider = {
 			}
 		}
 		// outside tag, test localised string function
-		return await alloyAutoCompleteRules.i18n.getCompletions(linePrefix, position, prefix);
-	},
+		return await alloyAutoCompleteRules.i18nAutoComplete.getCompletions();
+	}
 
 	/**
 	 * Get tag name completions
@@ -66,7 +67,7 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Array}
 	 */
-	getTagNameCompletions(line, linePrefix, prefix, position, prefixRange) {
+	public getTagNameCompletions (line, linePrefix, prefix, position, prefixRange) {
 		// ensure prefix contains valid characters
 		if (!/^[a-zA-Z]+$/.test(prefix)) {
 			return [];
@@ -78,9 +79,9 @@ const ViewCompletionItemProvider = {
 		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) : new Range(position.line, position.character, position.line, line.length);
 		for (const tag in tags) {
 			if (!prefix || completionItemProviderHelper.matches(tag, prefix)) {
-				let completion = {
+				const completion: CompletionItem = {
 					label: tag,
-					kind: vscode.CompletionItemKind.Class,
+					kind: CompletionItemKind.Class,
 					detail: tags[tag].apiName
 				};
 				if (useSnippet) {
@@ -91,7 +92,7 @@ const ViewCompletionItemProvider = {
 			}
 		}
 		return completions;
-	},
+	}
 
 	/**
 	 * Get attribute name completions
@@ -102,16 +103,16 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Array}
 	 */
-	getAttributeNameCompletions(linePrefix, position, prefix) {
+	public getAttributeNameCompletions (linePrefix, position, prefix) {
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
-		let completions = [];
+		const completions = [];
 		let tagName;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
 		if (matches) {
 			tagName = matches[1];
 		}
-		let tagAttributes = this.getTagAttributes(tagName).concat([ 'id', 'class', 'platform', 'bindId' ]);
+		const tagAttributes = this.getTagAttributes(tagName).concat([ 'id', 'class', 'platform', 'bindId' ]);
 		let apiName = tagName;
 		if (tags[tagName] && tags[tagName].apiName) {
 			apiName = tags[tagName].apiName;
@@ -129,7 +130,7 @@ const ViewCompletionItemProvider = {
 				completions.push({
 					label: attribute,
 					insertText: new SnippetString(`${attribute}="$1"$0`),
-					kind: vscode.CompletionItemKind.Property
+					kind: CompletionItemKind.Property
 				});
 			}
 		}
@@ -142,14 +143,14 @@ const ViewCompletionItemProvider = {
 			if (!prefix || completionItemProviderHelper.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
-					kind: vscode.CompletionItemKind.Event,
+					kind: CompletionItemKind.Event,
 					insertText: new SnippetString(`${attribute}="$1"$0`)
 				});
 			}
 		}
 
 		return completions;
-	},
+	}
 
 	/**
 	 * Get attribute value completions
@@ -161,14 +162,14 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	async getAttributeValueCompletions(linePrefix, position, prefix, document) {
+	public async getAttributeValueCompletions (linePrefix, position, prefix, document) {
 		let values;
 		let tag;
-		let matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
+		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
 		if (matches) {
 			tag = matches[1];
 		}
-		let attribute = this.getPreviousAttribute(linePrefix, position);
+		const attribute = this.getPreviousAttribute(linePrefix, position);
 		const completions = [];
 
 		//
@@ -176,26 +177,26 @@ const ViewCompletionItemProvider = {
 		//
 		if (attribute === 'id' || attribute === 'class') {
 			const relatedFile = related.getTargetPath('tss', document.fileName);
-			const appTss = path.join(vscode.workspace.rootPath, 'app', 'styles', 'app.tss');
+			const appTss = path.join(workspace.rootPath, 'app', 'styles', 'app.tss');
 
 			const files = [];
-			async function getCompletions(file) {
-				const document = await vscode.workspace.openTextDocument(file);
-				if (document.getText().length) {
+			async function getCompletions (file) {
+				const doc = await workspace.openTextDocument(file);
+				if (doc.getText().length) {
 					let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
 					if (attribute === 'class') {
 						regex = /["'](\.)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
 					}
 					values = [];
-					while ((matches = regex.exec(document.getText())) !== null) {
-						values.push(matches[2]);
+					for (let mtchs = regex.exec(doc.getText()); mtchs !== null; mtchs = regex.exec(doc.getText())) {
+						values.push(mtchs[2]);
 					}
 					const fileName = path.parse(file).name;
 					for (const value of values) {
 						if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
 							completions.push({
 								label: value,
-								kind: vscode.CodeActionKind.Reference,
+								kind: CompletionItemKind.Reference,
 								detail: fileName
 							});
 						}
@@ -227,7 +228,7 @@ const ViewCompletionItemProvider = {
 						const value = utils.toUnixPath(file.path.replace(controllerPath, '').split('.')[0]);
 						completions.push({
 							label: value,
-							kind: vscode.CompletionItemKind.Reference
+							kind: CompletionItemKind.Reference
 						});
 					}
 				}
@@ -236,13 +237,13 @@ const ViewCompletionItemProvider = {
 			// Widget src attribute
 			//
 			} else if (tag === 'Widget') {
-				let alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
-				const document = await vscode.workspace.openTextDocument(alloyConfigPath);
-				const configObj = JSON.parse(document.getText());
-				for (const widgetName in (configObj ? configObj.dependencies : undefined)) {
+				const alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
+				const doc = await workspace.openTextDocument(alloyConfigPath);
+				const configObj = JSON.parse(doc.getText());
+				for (const widgetName of Object.keys(configObj.dependencies)) {
 					completions.push({
 						label: widgetName,
-						kind: vscode.CompletionItemKind.Reference
+						kind: CompletionItemKind.Reference
 					});
 				}
 				return completions;
@@ -259,14 +260,14 @@ const ViewCompletionItemProvider = {
 				if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
 					completions.push({
 						label: value,
-						kind: vscode.CompletionItemKind.Value
+						kind: CompletionItemKind.Value
 					});
 				}
 			}
 		}
 
 		return completions;
-	},
+	}
 
 	/**
 	 * Get tag attributes
@@ -275,7 +276,7 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Array}
 	 */
-	getTagAttributes(tag) {
+	public getTagAttributes (tag) {
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 		const type = types[tags[tag] ? tags[tag].apiName : undefined];
@@ -283,7 +284,7 @@ const ViewCompletionItemProvider = {
 			return type.properties;
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * Get attribute values
@@ -292,14 +293,14 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {Array}
 	 */
-	getAttributeValues(attributeName) {
+	public getAttributeValues (attributeName) {
 		const { properties } = this.completions.titanium;
 		const attribute = properties[attributeName];
 		if (attribute) {
 			return attribute.values;
 		}
 		return [];
-	},
+	}
 
 	/**
 	 * Get previous attribute
@@ -309,7 +310,7 @@ const ViewCompletionItemProvider = {
 	 *
 	 * @returns {String}
 	 */
-	getPreviousAttribute(linePrefix, position) {
+	public getPreviousAttribute (linePrefix, position) {
 		// Remove everything until the opening quote
 		let quoteIndex = position.character - 1;
 		while (linePrefix[quoteIndex] && !([ '"', '\'' ].includes(linePrefix[quoteIndex]))) {
@@ -320,11 +321,9 @@ const ViewCompletionItemProvider = {
 		if (matches && matches.length >= 2) {
 			return matches[1];
 		}
-	},
+	}
 
-	async loadCompletions() {
+	private async loadCompletions () {
 		this.completions = await completionItemProviderHelper.loadCompletions();
 	}
-};
-
-module.exports = ViewCompletionItemProvider;
+}
