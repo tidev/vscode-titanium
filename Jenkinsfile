@@ -30,6 +30,14 @@ timestamps {
           // This is pointless right now, for shame! :D
           sh 'npm run test'
         } // stage lint and test
+
+        stage('Build vsix') {
+          // Create the vsix package
+          sh 'npx vsce package'
+          // Archive it
+          archiveArtifacts '*.vsix'
+          // TODO: Can we add this to GitHub in the releases section automatically?
+        }
       } // ansiColor
     } // nodejs
   } // node
