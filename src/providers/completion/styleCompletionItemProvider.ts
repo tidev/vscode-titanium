@@ -133,19 +133,18 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 
 		// Lookup the property data
 		const propertyData = properties[parentObjName];
-		if (!propertyData) {
-			return completions;
-		}
+		if (propertyData) {
 
-		const propertyType = properties[parentObjName].type;
-		const typeData = types[propertyType];
-		if (typeData && typeData.properties && typeData.properties.length) {
-			let completionProperty;
-			if (properties[parentObjName]) {
-				completionProperty = properties[parentObjName].type;
-			}
-			for (const property of types[completionProperty].properties) {
-				innerProperties[property] = {};
+			const propertyType = properties[parentObjName].type;
+			const typeData = types[propertyType];
+			if (typeData && typeData.properties && typeData.properties.length) {
+				let completionProperty;
+				if (properties[parentObjName]) {
+					completionProperty = properties[parentObjName].type;
+				}
+				for (const property of types[completionProperty].properties) {
+					innerProperties[property] = {};
+				}
 			}
 		}
 
