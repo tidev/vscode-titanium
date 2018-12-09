@@ -7,6 +7,8 @@ import { spawn } from 'child_process';
 import { homedir } from 'os';
 import { window, workspace } from 'vscode';
 
+import { IosCert } from './types/common';
+
 export interface AlloyGenerateOptions {
 	adapterType?: string;
 	cwd: string;
@@ -161,11 +163,7 @@ export class Appc {
 
 	public iOSSimulatorVersions () {
 		const sims = this.iOSSimulators();
-		return Object.keys(sims).sort((a, b) => {
-			a = semver.coerce(a);
-			b = semver.coerce(b);
-			return semver.compare(a, b);
-		}).reverse();
+		return Object.keys(sims).sort((a, b) => semver.compare(semver.coerce(a), semver.coerce(b))).reverse();
 	}
 
 	/**
@@ -299,8 +297,8 @@ export class Appc {
 	 * @param {String} appId        enable by matching app ID
 	 * @returns {Array}
 	 */
-	public iOSProvisioningProfiles (deployment = 'development', certificate: any = {}, appId) {
-		let pem: any;
+	public iOSProvisioningProfiles (deployment = 'development', certificate: IosCert, appId) {
+		let pem: string;
 		if (certificate.pem) {
 			pem = certificate.pem.replace('-----BEGIN CERTIFICATE-----', '');
 			pem = pem.replace('-----END CERTIFICATE-----', '');

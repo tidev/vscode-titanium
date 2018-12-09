@@ -21,6 +21,8 @@ import { StyleDefinitionProvider } from './providers/definition/styleDefinitionP
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 
+import { IosCert, ProvisioningProfile, RunOptions } from './types/common';
+
 const openDashboardCommandId = 'titanium.openDashboard';
 
 let extensionContext: vscode.ExtensionContext;
@@ -80,7 +82,8 @@ function activate (context) {
 				return;
 			}
 			const iOSSimVersion = runOpts.version;
-			const runOptions: any = {
+
+			const runOptions: RunOptions = {
 				buildType: 'run',
 				platform: runOpts.platform,
 				target: runOpts.targetId,
@@ -154,7 +157,7 @@ function activate (context) {
 			}
 
 			if (runOptions.platform === 'ios' && runOptions.target === 'device') {
-				const { certificate, provisioning } = await selectiOSCodeSigning(runOptions);
+				const { certificate, provisioning } = await selectiOSCodeSigning(runOptions.buildType, runOptions.target);
 				if (!certificate || !provisioning) {
 					return;
 				}
@@ -182,7 +185,7 @@ function activate (context) {
 				return;
 			}
 
-			const runOptions: any = {
+			const runOptions: RunOptions = {
 				buildType: 'dist',
 				platform: runOpts.platform
 			};
@@ -213,7 +216,7 @@ function activate (context) {
 					return;
 				}
 				runOptions.target = target.id;
-				const profile = await selectiOSCodeSigning(runOptions);
+				const profile = await selectiOSCodeSigning(runOptions.buildType, runOptions.target);
 				if (!profile) {
 					return;
 				}
@@ -221,7 +224,11 @@ function activate (context) {
 				runOptions.certificate = profile.certificate;
 			} else if (runOptions.platform === 'android') {
 				runOptions.target = 'dist-playstore';
-				runOptions.keystore = {};
+				runOptions.keystore = {
+					alias: null,
+					path: null,
+					password: null
+				};
 				const lastKeystorePath = extensionContext.workspaceState.get('lastKeystorePath');
 				const keyStorePath = await selectAndroidKeystore(lastKeystorePath);
 				if (keyStorePath) {
@@ -314,7 +321,7 @@ function activate (context) {
 			}
 			const cwd = vscode.workspace.rootPath;
 			const filePath = path.join(cwd, 'app', 'controllers', `${name}.js`);
-			if (await fs.exists(filePath)) {
+			if (await fs.pathExists(filePath)) {
 				const shouldDelete = await vscode.window.showQuickPick([ 'Yes', 'No' ], { placeHolder: `Controller ${name} already exists. Overwrite it?` });
 				if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
 					return;
@@ -599,15 +606,15 @@ function selectiOSDevice () {
  *
  * @returns {Thenable}
  */
-async function selectiOSCodeSigning ({ buildType, target }) {
+async function selectiOSCodeSigning (buildType: string, target: string) {
 	const selectedCertificate = await selectiOSCertificate(buildType);
 	if (!selectedCertificate) {
 		return;
 	}
 
-	const certificate = appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
+	const certificate: IosCert = appc.iOSCertificates(buildType === 'run' ? 'developer' : 'distribution').find(cert => cert.pem === selectedCertificate.pem);
 
-	const provisioning = await selectiOSProvisioningProfile({ certificate, target });
+	const provisioning: ProvisioningProfile = await selectiOSProvisioningProfile({ certificate, target });
 	if (!provisioning) {
 		return;
 	}
@@ -788,7 +795,7 @@ function runTerminalCommand (args) {
  *
  * @param {Object} opts run options
  */
-function run (opts) {
+function run (opts: RunOptions) {
 
 	const args = [
 		'--platform', opts.platform,

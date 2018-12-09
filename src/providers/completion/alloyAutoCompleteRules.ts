@@ -1,6 +1,5 @@
-import walkSync from 'klaw-sync';
+import * as walkSync from 'klaw-sync';
 import * as path from 'path';
-import * as _ from 'underscore';
 import * as utils from '../../utils';
 
 import { CompletionItemKind, workspace } from 'vscode';
@@ -13,16 +12,17 @@ export const cfgAutoComplete = {
 		const completions = [];
 		if (utils.fileExists(cfgPath)) {
 			const document = await workspace.openTextDocument(cfgPath);
-			let cfgObj = JSON.parse(document.getText());
-			cfgObj = _.reduce(cfgObj, (memo, value, key) => {
-				if ((key === 'global') || key.startsWith('env:') || key.startsWith('os:')) {
-					return _.extend(memo, value);
-				} else {
-					return memo;
-				}
-			}, {});
+			const cfgObj = JSON.parse(document.getText());
+			const deconstructedConfig = {};
 
-			const allKeys = utils.getAllKeys(cfgObj);
+			for (const [ key, value ] of Object.entries(cfgObj)) {
+				if (key === 'global' || key.startsWith('os:') || key.startsWith('env:')) {
+					// Ignore and traverse
+					Object.assign(deconstructedConfig, value);
+				}
+			}
+
+			const allKeys = utils.getAllKeys(deconstructedConfig);
 			for (const key of allKeys) {
 				completions.push({
 					label: key,

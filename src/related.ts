@@ -1,5 +1,5 @@
 import * as path from 'path';
-import _ from 'underscore';
+import * as _ from 'underscore';
 import { getAlloyRootPath, isAlloyProject } from './utils';
 
 import { Uri, window } from 'vscode';

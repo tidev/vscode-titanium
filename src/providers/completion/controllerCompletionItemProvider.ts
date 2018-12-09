@@ -1,6 +1,5 @@
 
 import * as path from 'path';
-import * as _ from 'underscore';
 import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
@@ -179,7 +178,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		const completions = [];
 		// suggest class completion
 		if (!attribute || attribute.length === 0) {
-			_.each(types, (value, key) => {
+			for (const key of Object.keys(types)) {
 				if (key.indexOf(apiName) === 0 && key.indexOf('_') === -1) {
 					const replaceSections = key.split('.');
 					completions.push({
@@ -188,7 +187,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 						insertText: replaceSections[replaceSections.length - 1]
 					});
 				}
-			});
+			}
 		}
 
 		// if type exists suggest function and properties

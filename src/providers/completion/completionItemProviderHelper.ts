@@ -201,7 +201,7 @@ export async function generateSDKCompletions ({ force = false, progress, sdkVers
 
 	const sdk = appc.sdkInfo(sdkVersion);
 	const titaniumAPIPath = path.join(sdk.path, 'api.jsca');
-	const api = await fs.readJSON(titaniumAPIPath, 'utf8');
+	const api = await fs.readJSON(titaniumAPIPath);
 	// property list
 	const types: any = {};
 	const props: any = {};

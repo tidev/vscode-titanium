@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
-import walkSync from 'klaw-sync';
+import * as walkSync from 'klaw-sync';
 import * as path from 'path';
-import _ from 'underscore';
+import * as _ from 'underscore';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
@@ -236,12 +236,12 @@ export function getAllKeys (obj: object) {
 		return [];
 	}
 	const result = [];
-	_.each(obj, (value, key) => {
+	for (const [ key, value ] of Object.entries(obj)) {
 		result.push(key);
-		_.each(module.exports.getAllKeys(value), val => {
+		for (const val of getAllKeys(value)) {
 			result.push(key + '.' + val);
-		});
-	});
+		}
+	}
 	return result;
 }
 
@@ -255,6 +255,6 @@ export function getAllKeys (obj: object) {
 export function filterJSFiles (directory: string) {
 	return walkSync(directory, {
 		nodir: true,
-		filter: item => item.stats.isDirectory() || path.extname(item.path) === '.js'
+		filter: (item: walkSync.Item) => item.stats.isDirectory() || path.extname(item.path) === '.js'
 	});
 }

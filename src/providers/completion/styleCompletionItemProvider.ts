@@ -101,7 +101,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 */
 	public getTagCompletions (linePrefix, prefix) {
 		const completions = [];
-		_.each(this.completions.alloy.tags, (value, key) => {
+		for (const [ key, value ] of Object.entries(this.completions.alloy.tags) as any[]) {
 			if (!prefix || completionItemProviderHelper.matches(key, prefix)) {
 				completions.push({
 					label: key,
@@ -110,7 +110,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 					insertText: new SnippetString(`${key}": {\n\t\${1}\t\n}`)
 				});
 			}
-		});
+		}
 
 		return completions;
 	}
@@ -144,7 +144,9 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 			if (properties[parentObjName]) {
 				completionProperty = properties[parentObjName].type;
 			}
-			_.each(types[completionProperty].properties, innerKey => innerProperties[innerKey] = {});
+			for (const property of types[completionProperty].properties) {
+				innerProperties[property] = {};
+			}
 		}
 
 		const candidateProperties = _.isEmpty(innerProperties) ? properties : innerProperties;
@@ -236,7 +238,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 				return;
 			}
 			if (propertyName) {
-				return propertyName;
+				return propertyName.replace(/["#.]/g, '');
 			}
 			lineNumber--;
 		}
