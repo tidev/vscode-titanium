@@ -2,6 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
+import { AlloyComponentExtension, AlloyComponentFolder, AlloyComponentType, generateComponent, generateModel } from './commands/alloyGenerate';
+
 import appc from './appc';
 import DeviceExplorer from './explorer/tiExplorer';
 import project from './project';
@@ -314,120 +316,17 @@ function activate (context) {
 			vscode.window.showInformationMessage('Disabled LiveView');
 		}),
 
-		vscode.commands.registerCommand('titanium.alloy.generate.controller', async () => {
-			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your controller' });
-			if (!name) {
-				return;
-			}
-			const cwd = vscode.workspace.rootPath;
-			const filePath = path.join(cwd, 'app', 'controllers', `${name}.js`);
-			if (await fs.pathExists(filePath)) {
-				const shouldDelete = await vscode.window.showQuickPick([ 'Yes', 'No' ], { placeHolder: `Controller ${name} already exists. Overwrite it?` });
-				if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
-					return;
-				}
-			}
-			try {
-				await appc.generate({
-					cwd,
-					type: 'controller',
-					name,
-					force: true
-				});
-				const shouldOpen = await vscode.window.showInformationMessage(`Controller ${name} created succesfully`, { title: 'Open' });
-				if (shouldOpen) {
-					const document = await vscode.workspace.openTextDocument(filePath);
-					await vscode.window.showTextDocument(document);
-				}
-			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to create Alloy controller ${name}`);
-			}
-		}),
+		vscode.commands.registerCommand('titanium.alloy.generate.controller', () => generateComponent(AlloyComponentType.Controller, AlloyComponentFolder.Controller, AlloyComponentExtension.Controller)),
 
-		vscode.commands.registerCommand('titanium.alloy.generate.migration', async () => {
-			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your migration' });
-			if (!name) {
-				return;
-			}
-			try {
-				await appc.generate({
-					cwd: vscode.workspace.rootPath,
-					type: 'migration',
-					name
-				});
-			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to create Alloy migration ${name}`);
-			}
-		}),
+		vscode.commands.registerCommand('titanium.alloy.generate.migration', () => generateComponent(AlloyComponentType.Migration, AlloyComponentFolder.Migration, AlloyComponentExtension.Migration)),
 
-		vscode.commands.registerCommand('titanium.alloy.generate.model', async () => {
-			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your model' });
-			if (!name) {
-				return;
-			}
-			const adapterType = await vscode.window.showQuickPick([ 'sql', 'properties' ], { placeHolder: 'Select the adapter type' });
-			if (!adapterType) {
-				return;
-			}
-			try {
-				await appc.generate({
-					cwd: vscode.workspace.rootPath,
-					type: 'model',
-					name,
-					adapterType
-				});
-			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to create Alloy controller ${name}`);
-			}
-		}),
+		vscode.commands.registerCommand('titanium.alloy.generate.model', generateModel),
 
-		vscode.commands.registerCommand('titanium.alloy.generate.style', async () => {
-			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your style' });
-			if (!name) {
-				return;
-			}
-			try {
-				await appc.generate({
-					cwd: vscode.workspace.rootPath,
-					type: 'style',
-					name
-				});
-			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to create Alloy style ${name}`);
-			}
-		}),
+		vscode.commands.registerCommand('titanium.alloy.generate.style', () => generateComponent(AlloyComponentType.Style, AlloyComponentFolder.Style, AlloyComponentExtension.Style)),
 
-		vscode.commands.registerCommand('titanium.alloy.generate.view', async () => {
-			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your view' });
-			if (!name) {
-				return;
-			}
-			try {
-				await appc.generate({
-					cwd: vscode.workspace.rootPath,
-					type: 'view',
-					name
-				});
-			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to create Alloy view ${name}`);
-			}
-		}),
+		vscode.commands.registerCommand('titanium.alloy.generate.view', () => generateComponent(AlloyComponentType.View, AlloyComponentFolder.View, AlloyComponentExtension.View)),
 
-		vscode.commands.registerCommand('titanium.alloy.generate.widget', async () => {
-			const name = await vscode.window.showInputBox({ prompt: 'Enter the name for your widget' });
-			if (!name) {
-				return;
-			}
-			try {
-				await appc.generate({
-					cwd: vscode.workspace.rootPath,
-					type: 'widget',
-					name
-				});
-			} catch (error) {
-				vscode.window.showErrorMessage(`Failed to create Alloy widget ${name}`);
-			}
-		})
+		vscode.commands.registerCommand('titanium.alloy.generate.widget', () => generateComponent(AlloyComponentType.Widget, AlloyComponentFolder.Widget, AlloyComponentExtension.Widget)),
 	);
 
 	init();

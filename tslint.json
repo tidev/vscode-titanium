@@ -7,6 +7,7 @@
         "class-name": true,
         "interface-name": [true, "never-prefix"],
         "indent": [true, "tab"],
+        "max-classes-per-file": false,
         "max-line-length": false,
         "member-ordering": [true, { "order": "fields-first" }],
         "no-string-throw": true,

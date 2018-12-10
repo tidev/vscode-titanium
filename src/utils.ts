@@ -29,7 +29,7 @@ export function platforms () {
  * @returns {String}
  */
 export function nameForPlatform (targetPlatform: string) {
-	targetPlatform =  this.normalisedPlatform(targetPlatform);
+	targetPlatform =  normalisedPlatform(targetPlatform);
 	switch (targetPlatform) {
 		case 'android':
 			return 'Android';
@@ -51,7 +51,7 @@ export function nameForTarget (target: string) {
 		case 'device':
 		case 'emulator':
 		case 'simulator':
-			return this.capitalizeFirstLetter(target);
+			return capitalizeFirstLetter(target);
 		case 'dist-adhoc':
 			return 'Ad-Hoc';
 		case 'dist-appstore':
@@ -166,7 +166,7 @@ export function getAlloyRootPath () {
  * @returns {Boolean}
  */
 export function isAlloyProject () {
-	return this.directoryExists(this.getAlloyRootPath());
+	return directoryExists(getAlloyRootPath());
 }
 
 /**
@@ -175,8 +175,8 @@ export function isAlloyProject () {
  * @returns {String}
  */
 export function getI18nPath () {
-	if (this.isAlloyProject()) {
-		return path.join(this.getAlloyRootPath(), 'i18n');
+	if (isAlloyProject()) {
+		return path.join(getAlloyRootPath(), 'i18n');
 	}
 }
 
