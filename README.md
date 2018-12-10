@@ -16,7 +16,7 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 
 The plugin is not publish on the Extension marketplace yet, you can do the below to use the plugin without debugging:
 
-* ``cd /path/to/extension`` and run ``npm install``
+* ``cd /path/to/extension`` and run ``npm install`` then ``npm run compile``
 * Create symlink to ``~/.vscode/extensions/``
    * `ln -s /path/to/extension ~/.vscode/extensions/`
 * Open Titanium project.
