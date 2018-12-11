@@ -1,27 +1,31 @@
-import { commands, Disposable, TextEditor, Uri } from 'vscode';
-import { CommandContext } from '../constants';
-import { BaseNode } from '../explorer/nodes';
+import { MessageOptions, window } from 'vscode';
+import { ExtensionContainer } from '../container';
+
+export interface InteractionChoice {
+	title: string;
+	run (): void;
+}
 
 export enum Commands {
-	GenerateAlloyController = 'titanium.alloy.generate.controller',
-
 	BuildApp = 'titanium.build.run',
-}
-
-export interface CommandContextParsingOptions {
-	editor: boolean;
-	uri: boolean;
-}
-
-function isTextEditor (editor: any): editor is TextEditor {
-	if (editor === null)  {
-		return false;
-	}
-
-	return (
-		editor.id !== undefined &&
-		((editor as TextEditor).edit !== undefined || (editor as TextEditor).document !== undefined)
-	);
+	DisableLiveView = 'titanium.build.setLiveViewDisabled',
+	EnableLiveView = 'titanium.build.setLiveViewEnabled',
+	GenerateAlloyController = 'titanium.alloy.generate.controller',
+	GenerateAlloyMigration = 'titanium.alloy.generate.migration',
+	GenerateAlloyModel = 'titanium.alloy.generate.model',
+	GenerateAlloyStyle = 'titanium.alloy.generate.style',
+	GenerateAlloyView = 'titanium.alloy.generate.view',
+	GenerateAlloyWidget = 'titanium.alloy.generate.widget',
+	GenerateAutocomplete = 'titanium.generate.autocompleteSuggestions',
+	OpenAppOnDashboard = 'titanium.openDashboard',
+	OpenAllRelatedFiles = 'titanium.alloy.open.allRelatedFiles',
+	OpenRelatedController = 'titanium.alloy.open.relatedController',
+	OpenRelatedStyle = 'titanium.alloy.open.relatedStyle',
+	OpenRelatedView = 'titanium.alloy.open.relatedView',
+	PackageApp = 'titanium.package.run',
+	RefreshExplorer = 'titanium.explorer.refresh',
+	SetLogLevel = 'titanium.build.setLogLevel',
+	StopBuild = 'titanium.build.stop'
 }
 
 export class UserCancellation extends Error {
@@ -30,66 +34,28 @@ export class UserCancellation extends Error {
 	}
 }
 
-export abstract class Command implements Disposable {
+export class InteractionError extends Error {
+	public messageOptions: MessageOptions;
+	public interactionChoices: InteractionChoice[] = [];
+}
 
-	protected readonly contextParsingOptions: CommandContextParsingOptions = { editor: false, uri: false };
-	private _disposable: Disposable;
-
-	constructor (command: Commands | Commands[]) {
-		if (typeof command === 'string') {
-			this._disposable = commands.registerCommand(
-				command,
-				(...args: any[]) => this._execute(command, ...args),
-				this
-			);
-			return;
-		}
-	}
-
-	private static parseCommandContext (command: string, options: any, ...args: any[]) {
-		let editor: TextEditor | undefined;
-
-		let firstArg = args[0];
-		if (options.editor && (firstArg === null || isTextEditor(firstArg))) {
-			editor = firstArg;
-			args = args.slice(1);
-			firstArg = args[0];
-		}
-
-		if (options.uri && (firstArg === null || firstArg instanceof Uri)) {
-			const [uri, ...rest] = args as [Uri, any];
-			if (uri !== undefined) {
-				return [{ command, type: 'uri', editor, uri }, ...rest];
-			} else {
-				args = args.slice(1);
+/**
+ * Check Appcelerator login and prompt if necessary.
+ * @returns {Boolean} Whether or not the login prompt should be shown.
+ */
+export function checkLogin () {
+	if (!ExtensionContainer.appc.isUserLoggedIn()) {
+		window.showInformationMessage('Please log in to the Appcelerator platform');
+		const error = new InteractionError('You are not logged in. Please log in to continue');
+		error.messageOptions = {
+			modal: true
+		};
+		error.interactionChoices.push({
+			title: 'Login',
+			run: () => {
+				ExtensionContainer.terminal.runCommand([ 'login' ]);
 			}
-		}
-
-		if (firstArg instanceof BaseNode) {
-			const [node, ...rest] = args as [BaseNode, any];
-			return [{ command, type: 'viewItem', node }, rest];
-		}
-
-		return [{ command, type: 'unknown', editor }, args];
+		});
+		throw error;
 	}
-
-	public dispose () {
-		if (this._disposable) {
-			this._disposable.dispose();
-		}
-	}
-
-	public abstract execute (...args: any[]): any;
-
-	protected async preExecute (context: any, ...args: any[]): Promise<any> {
-		return this.execute(...args);
-	}
-
-	protected _execute (command: string, ...args: any[]): any {
-		// Telemetry.trackEvent(command);
-
-		const [context, rest] = Command.parseCommandContext(command, { ...this.contextParsingOptions }, ...args);
-		return this.preExecute(context, ...rest);
-	}
-
 }

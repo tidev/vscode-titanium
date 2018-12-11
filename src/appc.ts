@@ -326,7 +326,9 @@ export class Appc {
 				} else if (appId && !iOSProvisioinngProfileMatchesAppId(profile.appId, appId)) {
 					profile.disabled = true;
 				}
-				profiles.push(profile);
+				if (!profile.disabled) {
+					profiles.push(profile);
+				}
 			}
 		}
 		return profiles;

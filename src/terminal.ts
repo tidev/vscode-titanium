@@ -4,9 +4,9 @@ export default class Terminal {
 
 	private name: string;
 	private terminal: VSTerminal;
-	private commandPath: string;
+	private command: string;
 
-	constructor ({ name, commandPath = 'appc' }) {
+	constructor (name: string, command: string = 'appc' ) {
 
 		this.name = name;
 		this.terminal = window.createTerminal({ name });
@@ -15,14 +15,14 @@ export default class Terminal {
 				this.terminal = undefined;
 			}
 		});
-		this.commandPath = commandPath;
+		this.command = command;
 	}
 
 	public setCommandPath (commandPath) {
-		this.commandPath = commandPath;
+		this.command = commandPath;
 	}
 
-	public runCommand ({ args }) {
+	public runCommand (args: string[]) {
 		if (!this.terminal) {
 			this.terminal = window.createTerminal({ name: this.name });
 		}
@@ -33,7 +33,7 @@ export default class Terminal {
 			this.terminal.show();
 		}
 		this.clear();
-		this.terminal.sendText(`${this.commandPath} ${args.join(' ')}`);
+		this.terminal.sendText(`${this.command} ${args.join(' ')}`);
 	}
 
 	public clear () {

@@ -140,22 +140,22 @@
                 "category": "Titanium"
             },
             {
-                "command": "titanium.alloy.openRelatedView",
+                "command": "titanium.alloy.open.relatedView",
                 "title": "Open related view",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.alloy.openRelatedStyle",
+                "command": "titanium.alloy.open.relatedStyle",
                 "title": "Open related style",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.alloy.openRelatedController",
+                "command": "titanium.alloy.open.relatedController",
                 "title": "Open related controller",
                 "category": "Titanium"
             },
             {
-                "command": "titanium.alloy.openRelatedFiles",
+                "command": "titanium.alloy.open.allRelatedFiles",
                 "title": "Open related files",
                 "category": "Titanium"
             },
@@ -177,22 +177,22 @@
                 "mac": "cmd+alt+."
             },
             {
-                "command": "titanium.alloy.openRelatedView",
+                "command": "titanium.alloy.open.relatedView",
                 "key": "ctrl+alt+v",
                 "mac": "cmd+alt+v"
             },
             {
-                "command": "titanium.alloy.openRelatedStyle",
+                "command": "titanium.alloy.open.relatedStyle",
                 "key": "ctrl+alt+s",
                 "mac": "cmd+alt+s"
             },
             {
-                "command": "titanium.alloy.openRelatedController",
+                "command": "titanium.alloy.open.relatedController",
                 "key": "ctrl+alt+x",
                 "mac": "cmd+alt+x"
             },
             {
-                "command": "titanium.alloy.openRelatedFiles",
+                "command": "titanium.alloy.open.allRelatedFiles",
                 "key": "ctrl+alt+a",
                 "mac": "cmd+alt+a"
             }
@@ -327,19 +327,19 @@
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedView",
+                    "command": "titanium.alloy.open.relatedView",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedStyle",
+                    "command": "titanium.alloy.open.relatedStyle",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedController",
+                    "command": "titanium.alloy.open.relatedController",
                     "when": "titanium:enabled"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedFiles",
+                    "command": "titanium.alloy.open.allRelatedFiles",
                     "when": "titanium:enabled"
                 },
                 {
@@ -349,19 +349,19 @@
             ],
             "editor/context": [
                 {
-                    "command": "titanium.alloy.openRelatedController",
+                    "command": "titanium.alloy.open.relatedController",
                     "when": "editorLangId =~ /(xml|alloy-tss)/"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedStyle",
+                    "command": "titanium.alloy.open.relatedStyle",
                     "when": "editorLangId =~ /(javascript|xml)/"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedView",
+                    "command": "titanium.alloy.open.relatedView",
                     "when": "editorLangId =~ /(alloy-tss|javascript)/"
                 },
                 {
-                    "command": "titanium.alloy.openRelatedFiles",
+                    "command": "titanium.alloy.open.allRelatedFiles",
                     "when": "editorLangId =~ /(alloy-tss|javascript|xml)/"
                 }
             ],

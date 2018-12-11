@@ -1,11 +1,13 @@
-import BaseNode from './baseNode';
-import TargetNode from './targetNode';
+import { BaseNode } from './baseNode';
+import { TargetNode } from './targetNode';
 
-import { TreeItemCollapsibleState } from 'vscode';
+import { TreeItem, TreeItemCollapsibleState } from 'vscode';
+import { Commands } from '../../commands/common';
 import { nameForPlatform } from '../../utils';
 
-export default class PlatformNode extends BaseNode {
+export class PlatformNode extends BaseNode {
 
+	public readonly collapsibleState = TreeItemCollapsibleState.Expanded;
 	public readonly contextValue: string = 'PlatformNode';
 	public readonly platform: string;
 
@@ -38,15 +40,6 @@ export default class PlatformNode extends BaseNode {
 			default:
 				break;
 		}
-	}
-
-	public getTreeItem () {
-		return {
-			contextValue: this.contextValue,
-			collapsibleState: TreeItemCollapsibleState.Expanded,
-			label: this.label,
-			platform: this.platform,
-		};
 	}
 
 	get tooltip () {

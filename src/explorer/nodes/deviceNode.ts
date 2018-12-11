@@ -1,10 +1,11 @@
-import BaseNode from './baseNode';
+import { BaseNode } from './baseNode';
 
 import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 import { targetForName } from '../../utils';
 
-export default class DeviceNode extends BaseNode {
+export class DeviceNode extends BaseNode {
 
+	public readonly collapsibleState = TreeItemCollapsibleState.None;
 	public readonly contextValue: string = 'DeviceNode';
 
 	constructor (
@@ -16,19 +17,6 @@ export default class DeviceNode extends BaseNode {
 		public readonly version?: string
 	) {
 		super(label);
-	}
-
-	public getTreeItem (): TreeItem {
-		return {
-			label: this.label,
-			collapsibleState: TreeItemCollapsibleState.None,
-			contextValue: this.contextValue
-		};
-			// TODO: Do these get passed through?
-			// deviceId: this.deviceId,
-			// target: this.target,
-			// targetId: this.targetId,
-			// platform: this.platform,
 	}
 
 	get tooltip () {

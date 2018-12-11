@@ -1,13 +1,15 @@
-import BaseNode from './baseNode';
-import DeviceNode from './deviceNode';
-import OSVerNode from './osVerNode';
+import { TreeItemCollapsibleState } from 'vscode';
+import { BaseNode } from './baseNode';
+import { DeviceNode } from './deviceNode';
+import { OSVerNode } from './osVerNode';
 
 import appc from '../../appc';
 import { targetForName } from '../../utils';
 
-export default class DeviceTypeNode extends BaseNode {
+export class TargetNode extends BaseNode {
 
-	public readonly contextValue: string = 'DeviceTypeNode';
+	public readonly collapsibleState = TreeItemCollapsibleState.Collapsed;
+	public readonly contextValue: string = 'TargetNode';
 	public readonly targetId: string;
 
 	constructor (

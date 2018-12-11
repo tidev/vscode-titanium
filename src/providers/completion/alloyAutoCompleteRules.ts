@@ -118,7 +118,7 @@ export const imageAutoComplete = {
 				if (!(image.scales.length === 1 && image.scales[0] === '@1x')) {
 					scales = image.scales.join(', ');
 				}
-				// TODO: Is it possible to preview the image like the atom plugin?
+				// TODO: Is it possible to preview the image like the atom plugin? We do this elsewhere right now
 				completions.push({
 					label: utils.toUnixPath(`${image.prefix}${image.suffix}`.replace(assetPath, '')).replace(/^\/(iphone|android|windows)/, ''),
 					kind: CompletionItemKind.File,

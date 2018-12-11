@@ -85,6 +85,17 @@ export function targetForName (name: string) {
 	}
 }
 
+export function targetsForPlatform (platformName: string) {
+	platformName = normalisedPlatform(platformName);
+	switch (platformName) {
+		case 'android':
+			return [ 'emulator', 'device', 'dist-playstore' ];
+		case 'ios':
+			return [ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ];
+		case 'windows':
+			return [ 'dist-phonestore', 'dist-winstore', 'wp-emulator', 'wp-device', 'ws-local' ];
+	}
+}
 /**
  * Returns normalised name for platform
  *
@@ -257,4 +268,56 @@ export function filterJSFiles (directory: string) {
 		nodir: true,
 		filter: (item: walkSync.Item) => item.stats.isDirectory() || path.extname(item.path) === '.js'
 	});
+}
+
+export function buildArguments (options: any, projectType: string) {
+	const args = [
+		'run',
+		'--platform', options.platform
+	];
+
+	if (projectType === 'app') {
+		args.push('--target', options.target);
+
+		if (options.target !== 'ws-local') {
+			args.push('--device-id', options.deviceId);
+		}
+
+		if (options.target === 'device' && options.platform === 'ios') {
+			args.push(
+				'--developer-name', `"${options.certificate}"`,
+				'--pp-uuid', options.provisioningProfile
+			);
+		}
+
+		if (options.liveview) {
+			args.push('--liveview');
+		}
+	}
+
+	return args;
+}
+
+export function packageArguments (options: any) {
+	const args = [
+		'run',
+		'--platform', options.platform,
+		'--target', options.target,
+		'--output-dir', options.outputDirectory
+	];
+
+	if (options.platform === 'android') {
+		args.push(
+			'--keystore', options.keystoreInfo.location,
+			'--store-password', options.keystoreInfo.password,
+			'--alias', options.keystoreInfo.alias
+		);
+	} else if (options.platform === 'ios') {
+		args.push(
+			'--distribution-name', `"${options.iOSCertificate}"`,
+			'--pp-uuid', options.iOSProvisioningProfile
+		);
+	}
+
+	return args;
 }

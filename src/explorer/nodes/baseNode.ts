@@ -1,19 +1,18 @@
 import { TreeItem, TreeItemCollapsibleState } from 'vscode';
-export default abstract class BaseNode {
+export abstract class BaseNode {
 
-	public readonly label: string;
+	public abstract readonly collapsibleState;
 	public abstract readonly contextValue: string;
-
+	public readonly deviceId: string | undefined;
+	public readonly label: string;
+	public readonly targetId: string | undefined;
+	public readonly osVersion: string | undefined;
 	constructor (label) {
 		this.label = label;
 	}
 
-	public getTreeItem (): TreeItem {
-		return {
-			label: this.label,
-			collapsibleState: TreeItemCollapsibleState.Collapsed,
-			contextValue: this.contextValue
-		};
+	public getTreeItem (element: BaseNode): TreeItem {
+		return element;
 	}
 
 	public getChildren (element: BaseNode): BaseNode[] | Promise<BaseNode[]>  {

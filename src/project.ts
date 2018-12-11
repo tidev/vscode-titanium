@@ -16,7 +16,7 @@ export class Project {
 	public isTitaniumModule: boolean = false;
 
 	private tiapp: any;
-	private modules: any[];
+	private modules: any[] = [];
 	private emitter: EventEmitter<void>;
 
 	/**
