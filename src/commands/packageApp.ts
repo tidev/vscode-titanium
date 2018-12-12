@@ -1,12 +1,12 @@
 import * as path from 'path';
 import project from '../project';
 
-import { window, workspace } from 'vscode';
+import { workspace } from 'vscode';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
 import { nameForPlatform, packageArguments, } from '../utils';
-import { checkLogin, InteractionError } from './common';
+import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { enterAndroidKeystoreInfo, enterPassword, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
 
@@ -98,10 +98,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		ExtensionContainer.terminal.runCommand(args);
 	} catch (error) {
 		if (error instanceof InteractionError) {
-			const actionToTake = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
-			if (actionToTake) {
-				actionToTake.run();
-			}
+			await handleInteractionError(error);
 		}
 	}
 }

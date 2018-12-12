@@ -61,3 +61,10 @@ export function checkLogin () {
 		throw error;
 	}
 }
+
+export async function handleInteractionError (error) {
+	const actionToTake: any = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
+	if (actionToTake) {
+		actionToTake.run();
+	}
+}

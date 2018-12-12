@@ -1,11 +1,10 @@
 import project from '../project';
 
-import { window } from 'vscode';
-import { GlobalState, WorkspaceState } from '../constants';
+import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
-import { buildArguments, nameForPlatform, nameForTarget, } from '../utils';
-import { checkLogin, InteractionError } from './common';
+import { buildArguments } from '../utils';
+import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
 
@@ -35,7 +34,7 @@ export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode |
 		ExtensionContainer.terminal.runCommand(args);
 	} catch (error) {
 		if (error instanceof InteractionError) {
-			window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
+			await handleInteractionError(error);
 		}
 	}
 }

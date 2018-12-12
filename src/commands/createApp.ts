@@ -6,7 +6,7 @@ import { VSCodeCommands } from '../constants';
 import { ExtensionContainer } from '../container';
 import { inputBox, selectFromFileSystem, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createAppArguments, validateAppId } from '../utils';
-import { checkLogin, UserCancellation } from './common';
+import { checkLogin, handleInteractionError,  InteractionError } from './common';
 
 export async function createApplication () {
 	try {
@@ -47,8 +47,8 @@ export async function createApplication () {
 			await commands.executeCommand(VSCodeCommands.OpenFolder, projectDir, true);
 		}
 	} catch (error) {
-		if (error instanceof UserCancellation) {
-			//
+		if (error instanceof InteractionError) {
+			await handleInteractionError(error);
 		}
 	}
 }

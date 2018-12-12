@@ -1,11 +1,10 @@
 import project from '../project';
 
-import { window } from 'vscode';
 import { GlobalState, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
 import { buildArguments, nameForPlatform, nameForTarget, } from '../utils';
-import { checkLogin, InteractionError } from './common';
+import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import {
 	selectAndroidDevice,
@@ -122,7 +121,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 		ExtensionContainer.terminal.runCommand(args);
 	} catch (error) {
 		if (error instanceof InteractionError) {
-			window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
+			await handleInteractionError(error);
 		}
 	}
 }
