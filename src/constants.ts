@@ -1,3 +1,7 @@
+export enum VSCodeCommands {
+	OpenFolder = 'vscode.openFolder'
+}
+
 export enum CommandContext {
 
 }

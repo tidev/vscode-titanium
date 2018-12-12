@@ -1,4 +1,5 @@
-import { Terminal as VSTerminal, window, } from 'vscode';
+import { spawn, SpawnOptions } from 'child_process';
+import { ProgressLocation, ProgressOptions, Terminal as VSTerminal, window } from 'vscode';
 
 export default class Terminal {
 
@@ -34,6 +35,22 @@ export default class Terminal {
 		}
 		this.clear();
 		this.terminal.sendText(`${this.command} ${args.join(' ')}`);
+	}
+
+	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }) {
+		return window.withProgress(progressOptions, () => {
+			return new Promise((resolve, reject) => {
+				const proc = spawn(this.command, args, spawnOptions);
+
+				proc.on('close', code => {
+					if (code) {
+						return reject();
+					}
+					return resolve();
+				});
+			});
+		});
+
 	}
 
 	public clear () {

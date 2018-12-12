@@ -8,6 +8,8 @@ import {
 	buildApplication,
 	buildModule,
 	Commands,
+	createApplication,
+	createModule,
 	generateComponent,
 	generateModel,
 	packageApplication
@@ -156,6 +158,11 @@ function activate (context) {
 		vscode.commands.registerCommand(Commands.GenerateAlloyView, () => generateComponent(AlloyComponentType.View, AlloyComponentFolder.View, AlloyComponentExtension.View)),
 
 		vscode.commands.registerCommand(Commands.GenerateAlloyWidget, () => generateComponent(AlloyComponentType.Widget, AlloyComponentFolder.Widget, AlloyComponentExtension.Widget)),
+
+		vscode.commands.registerCommand(Commands.CreateApp, createApplication),
+
+		vscode.commands.registerCommand(Commands.CreateModule, createModule)
+
 	);
 
 	init();

@@ -55,6 +55,16 @@
                 "category": "Titanium"
             },
             {
+                "command": "titanium.create.application",
+                "title": "Create Titanium application",
+                "category": "Titanium"
+            },
+            {
+                "command": "titanium.create.module",
+                "title": "Create Titanium module",
+                "category": "Titanium"
+            },
+            {
                 "command": "titanium.explorer.refresh",
                 "title": "Refresh Devices",
                 "category": "Titanium",
@@ -298,6 +308,12 @@
         },
         "menus": {
             "commandPalette": [
+                {
+                    "command": "titanium.create.application"
+                },
+                {
+                    "command": "titanium.create.module"
+                },
                 {
                     "command": "titanium.explorer.refresh",
                     "when": "titanium:enabled"

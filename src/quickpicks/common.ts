@@ -1,8 +1,19 @@
 import appc from '../appc';
 import * as utils from '../utils';
 
-import { InputBoxOptions, QuickPickOptions, window } from 'vscode';
+import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, window } from 'vscode';
 import { UserCancellation } from '../commands/common';
+
+export async function selectFromFileSystem (options: OpenDialogOptions) {
+	if (!options.canSelectMany) {
+		options.canSelectMany = false;
+	}
+	const filePath = await window.showOpenDialog(options);
+	if (!filePath) {
+		throw new UserCancellation();
+	}
+	return filePath;
+}
 
 export async function enterPassword (options: InputBoxOptions) {
 	if (!options.password) {
@@ -13,6 +24,19 @@ export async function enterPassword (options: InputBoxOptions) {
 		options.placeHolder = 'Enter your password';
 	}
 	return inputBox(options);
+}
+
+export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false) {
+	const shouldDelete = await window.showQuickPick([ 'Yes', 'No' ], options);
+	if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
+		if (shouldThrow) {
+			throw new UserCancellation();
+		} else {
+			return false;
+		}
+	} else {
+		return true;
+	}
 }
 
 export async function inputBox (options: InputBoxOptions) {
@@ -94,7 +118,7 @@ export async function selectAndroidKeystore (lastUsed) {
 	}];
 	if (lastUsed) {
 		items.push({
-			label: 'Last used',
+			label: `Last used ${lastUsed}`,
 			id: 'last'
 		});
 	}

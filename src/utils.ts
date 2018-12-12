@@ -321,3 +321,52 @@ export function packageArguments (options: any) {
 
 	return args;
 }
+
+export function createAppArguments (options: any) {
+	const args = [
+		'new',
+		'--type', 'titanium',
+		'--name', options.name,
+		'--id', options.appId,
+		'--project-dir', path.join(options.workspaceDir, options.name),
+		'--platforms', options.platforms.join(','),
+		'--no-prompt',
+		'--log-level', 'trace'
+	];
+
+	if (options.force) {
+		args.push('--force');
+	}
+	if (!options.enableServices) {
+		args.push('--no-services');
+	} else {
+		args.push('--no-enable-services');
+	}
+	return args;
+}
+
+export function createModuleArguments (options: any) {
+	const args = [
+		'new',
+		'--type', 'timodule',
+		'--name', options.name,
+		'--id', options.appId,
+		'--project-dir', path.join(options.workspaceDir, options.name),
+		'--platforms', options.platforms.join(','),
+		'--no-prompt',
+		'--log-level', 'trace'
+	];
+
+	if (options.force) {
+		args.push('--force');
+	}
+	return args;
+}
+
+export function validateAppId (appId: string) {
+	// TODO: Document this, add Java keyword detection, return what's wrong rather than true/false?
+	if (!/^([a-zA-Z_]{1}[a-zA-Z0-9]*(\.[a-zA-Z0-9]+)+)$/.test(appId)) {
+		return false;
+	}
+	return true;
+}

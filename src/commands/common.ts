@@ -8,6 +8,8 @@ export interface InteractionChoice {
 
 export enum Commands {
 	BuildApp = 'titanium.build.run',
+	CreateApp = 'titanium.create.application',
+	CreateModule = 'titanium.create.module',
 	DisableLiveView = 'titanium.build.setLiveViewDisabled',
 	EnableLiveView = 'titanium.build.setLiveViewEnabled',
 	GenerateAlloyController = 'titanium.alloy.generate.controller',
