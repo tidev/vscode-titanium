@@ -1,13 +1,19 @@
 {
     "name": "vscode-titanium",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "displayName": "Titanium",
-    "description": "Appcelerator Titanium build tools for Visual Studio Code",
+    "description": "Intellisense, snippets, and integrated build tools for Titanium",
     "icon": "images/icon.png",
     "publisher": "Axway",
+    "keywords": [
+        "axway",
+        "titanium",
+        "appcelerator",
+        "alloy"
+    ],
     "categories": [
         "Extension Packs",
-        "Languages",
+        "Programming Languages",
         "Snippets",
         "Other"
     ],
