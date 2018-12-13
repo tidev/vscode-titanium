@@ -259,7 +259,7 @@ export async function generateSDKCompletions ({ force = false, progress, sdkVers
 				const splitedName = val.split('.');
 				const typeName = splitedName.slice(0, -1).join('.');
 				const tiUIProps = api.types.find(type => type.name === typeName).properties;
-				const curPropInfo = tiUIProps.find(property => prop.name === splitedName[splitedName.length - 1]);
+				const curPropInfo = tiUIProps.find(property => property.name === splitedName[splitedName.length - 1]);
 
 				let shortName = val.replace(/Titanium\./g, 'Ti.');
 				if (curPropInfo.deprecated) {
