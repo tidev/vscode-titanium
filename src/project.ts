@@ -131,8 +131,14 @@ export class Project {
 	 *
 	 */
 	private loadTiappFile () {
-		const filePath = path.join(workspace.rootPath, TIAPP_FILENAME);
 		this.isTitaniumApp = false;
+		// tslint:disable-next-line:no-console
+		const rootPath = workspace.rootPath;
+		if (!rootPath) {
+			// tslint:disable-next-line:no-console
+			return;
+		}
+		const filePath = path.join(rootPath, TIAPP_FILENAME);
 		if (utils.fileExists(filePath)) {
 			const fileData = fs.readFileSync(filePath, 'utf-8');
 			const parser = new xml2js.Parser();
@@ -164,12 +170,16 @@ export class Project {
 	 * Attempt to find module projects by loading timodule.xml and manifest files
 	 */
 	private loadModules () {
+		const rootPath = workspace.rootPath;
+		if (!rootPath) {
+			return;
+		}
 		const paths = [
-			path.join(workspace.rootPath),
-			path.join(workspace.rootPath, 'android'),
-			path.join(workspace.rootPath, 'ios'),
-			path.join(workspace.rootPath, 'iphone'),
-			path.join(workspace.rootPath, 'windows'),
+			path.join(rootPath),
+			path.join(rootPath, 'android'),
+			path.join(rootPath, 'ios'),
+			path.join(rootPath, 'iphone'),
+			path.join(rootPath, 'windows'),
 		];
 		for (let i = 0, numPaths = paths.length; i < numPaths; i++) {
 			this.loadModuleAt(paths[i]);

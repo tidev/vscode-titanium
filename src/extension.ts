@@ -1,5 +1,9 @@
+
 import * as vscode from 'vscode';
-import { ExtensionContainer } from './container';
+import appc from './appc';
+import DeviceExplorer from './explorer/tiExplorer';
+import project from './project';
+import * as related from './related';
 
 import {
 	AlloyComponentExtension,
@@ -14,11 +18,8 @@ import {
 	generateModel,
 	packageApplication
 } from './commands';
-
-import appc from './appc';
-import DeviceExplorer from './explorer/tiExplorer';
-import project from './project';
-import * as related from './related';
+import { GlobalState, VSCodeCommands } from './constants';
+import { ExtensionContainer } from './container';
 
 import * as completionItemProviderHelper from './providers/completion/completionItemProviderHelper';
 import { ControllerCompletionItemProvider } from './providers/completion/controllerCompletionItemProvider';
@@ -41,14 +42,16 @@ let projectStatusBarItem;
 function activate (context) {
 	ExtensionContainer.inititalize(context);
 	project.load();
-	setStatusBar();
-	project.onModified(setStatusBar);
 	// definitionProviderHelper.activate(context.subscriptions);
 
 	if (!project.isTitaniumProject()) {
-		vscode.commands.executeCommand('setContext', 'titanium:enabled', false);
+		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, false);
+		ExtensionContainer.context.globalState.update(GlobalState.Enabled, false);
 	} else {
-		vscode.commands.executeCommand('setContext', 'titanium:enabled', true);
+		setStatusBar();
+		project.onModified(setStatusBar);
+		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, true);
+		ExtensionContainer.context.globalState.update(GlobalState.Enabled, true);
 	}
 
 	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
@@ -165,7 +168,7 @@ function activate (context) {
 
 	);
 
-	init();
+	return init();
 }
 exports.activate = activate; // eslint-disable-line no-undef
 
@@ -180,21 +183,25 @@ exports.deactivate = deactivate;  // eslint-disable-line no-undef
 /**
  * Initialise extension - fetch appc info
  */
-function init () {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, async progress => {
-		if (await ExtensionContainer.context.globalState.get('titanium:liveview')) {
-			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
-		}
-		appc.getInfo(async info => {
-			if (info) {
-				await generateCompletions({ progress });
-				// Call refresh incase the Titanium Explorer activity pane became active before info
-				await vscode.commands.executeCommand(Commands.RefreshExplorer);
-			} else {
-				vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+async function init () {
+	const isEnabled = await ExtensionContainer.context.globalState.get<boolean>(GlobalState.Enabled);
+	if (isEnabled) {
+		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, async progress => {
+			if (await ExtensionContainer.context.globalState.get('titanium:liveview')) {
+				await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 			}
+			appc.getInfo(async info => {
+				if (info) {
+					await generateCompletions({ progress });
+					// Call refresh incase the Titanium Explorer activity pane became active before info
+					await vscode.commands.executeCommand(Commands.RefreshExplorer);
+				} else {
+					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+				}
+			});
 		});
-	});
+	}
+
 }
 
 /**

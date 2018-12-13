@@ -33,6 +33,8 @@
         "vscode": "^1.29.0"
     },
     "activationEvents": [
+        "onCommand:titanium.create.application",
+        "onCommand:titanium.create.module",
         "workspaceContains:tiapp.xml",
         "workspaceContains:**/timodule.xml"
     ],
@@ -369,6 +371,30 @@
                 },
                 {
                     "command": "titanium.generate.autocompleteSuggestions",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.controller",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.migration",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.model",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.style",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.view",
+                    "when": "titanium:enabled"
+                },
+                {
+                    "command": "titanium.alloy.generate.widget",
                     "when": "titanium:enabled"
                 }
             ],
