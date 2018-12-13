@@ -5,6 +5,9 @@
     "description": "Intellisense, snippets, and integrated build tools for Titanium",
     "icon": "images/logo-titanium.png",
     "publisher": "Axway",
+    "bugs": {
+        "url": "https://github.com/appcelerator/vscode-appcelerator-titanium/issues"
+    },
     "keywords": [
         "axway",
         "titanium",
@@ -17,7 +20,7 @@
         "Snippets",
         "Other"
     ],
-    "homepage": "https://www.appcelerator.com",
+    "homepage": "https://github.com/appcelerator/vscode-appcelerator-titanium",
     "galleryBanner": {
         "color": "#d22630",
         "theme": "dark"
