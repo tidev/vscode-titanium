@@ -42,10 +42,17 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 				}
 				completions.push({
 					label: sdk.fullversion,
-					kind: CompletionItemKind.Value
+					kind: CompletionItemKind.Value,
+					insertText: sdk.fullversion.replace(sdkVersion, '')
 				});
 			}
 		} else if (tag === 'module') {
+			/**
+			 * TODOs
+			 * - Add support for filtering based off the platform property
+			 * - Add support for adding to the platform property
+			 * - Add support for the deploy type tag
+			 */
 			const modulePath = path.join(workspace.rootPath, 'modules');
 			if (!utils.directoryExists(modulePath)) {
 				return;
@@ -55,15 +62,18 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 				const platformModulePath = path.join(workspace.rootPath, 'modules', platform);
 				for (const moduleName of this.getDirectories(platformModulePath)) {
 					if (!modules[moduleName]) {
-						modules[moduleName] = {};
+						modules[moduleName] = {
+							platforms: []
+						};
 					}
-					modules[moduleName] = (modules[moduleName].platform || []).concat(platform);
+					modules[moduleName].platforms.push(platform);
 				}
 			}
-			for (const [ key, value ] of Object.entries(modules)) {
+			for (const [ key, value ] of Object.entries(modules) as any[]) {
 				completions.push({
 					label: key,
-					// detail: value.platform.join(',')
+					kind: CompletionItemKind.Module,
+					detail: value.platforms.join(',')
 				});
 			}
 		}
