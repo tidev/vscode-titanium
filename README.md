@@ -8,7 +8,7 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 
 ### Via the browser
 
-1. Browse to https://marketplace.visualstudio.com/items?itemName=axway.vscode-titaniun
+1. [Open the extension on the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
 2. Click "Install"
 
 ### In VS Code
