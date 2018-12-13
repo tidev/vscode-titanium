@@ -1,5 +1,5 @@
 ---
-name: Propose a Feature
+name: 💡 Propose a Feature
 about: Suggest a new feature or improvement for vscode-titanium
 labels: enhancement
 ---

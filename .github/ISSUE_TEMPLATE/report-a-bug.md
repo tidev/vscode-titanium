@@ -1,5 +1,5 @@
 ---
-name: Report a Bug
+name: 🐛 Report a Bug
 about: Create a report to help us improve vscode-titanium
 labels: bug
 ---

@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "displayName": "Titanium",
     "description": "Intellisense, snippets, and integrated build tools for Titanium",
-    "icon": "images/icon.png",
+    "icon": "images/logo-titanium.png",
     "publisher": "Axway",
     "keywords": [
         "axway",

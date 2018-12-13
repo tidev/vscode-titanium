@@ -1,5 +1,5 @@
 ---
-name: Ask a question
+name: 🙋 Ask a question
 about: Please direct questions to the titanium_editors channel on TiSlack
 ---
 
