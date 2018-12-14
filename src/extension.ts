@@ -49,7 +49,12 @@ function activate (context) {
 		ExtensionContainer.context.globalState.update(GlobalState.Enabled, false);
 	} else {
 		setStatusBar();
-		project.onModified(setStatusBar);
+		project.onModified(async () => {
+			await Promise.all([
+				setStatusBar(),
+				generateCompletions()
+			]);
+		});
 		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, true);
 		ExtensionContainer.context.globalState.update(GlobalState.Enabled, true);
 	}
@@ -255,6 +260,6 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 			vscode.window.showInformationMessage(message);
 		}
 	} catch (error) {
-		vscode.window.showErrorMessage('Error generating autocomplete suggestions');
+		vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`);
 	}
 }

@@ -200,6 +200,11 @@ export async function generateSDKCompletions ({ force = false, progress, sdkVers
 	}
 
 	const sdk = appc.sdkInfo(sdkVersion);
+
+	if (!sdk) {
+		throw new Error(`The current projects SDK version ${sdkVersion}, is not installed. Please update the SDK version in the tiapp to generate autocomplete suggestions.`);
+	}
+
 	const titaniumAPIPath = path.join(sdk.path, 'api.jsca');
 	const api = await fs.readJSON(titaniumAPIPath);
 	// property list
