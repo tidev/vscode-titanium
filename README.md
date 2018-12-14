@@ -162,4 +162,4 @@ Various icons used throughout the extension are sourced from the awesome [octico
 
 ## License 
 
-(Apache License. Version 2.0)[LICENSE.md]
+[Apache License. Version 2.0](LICENSE.md)

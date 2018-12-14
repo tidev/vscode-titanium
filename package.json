@@ -502,7 +502,7 @@
     "compile": "tsc -p ./",
     "lint": "tslint -p tsconfig.json --format stylish",
     "postinstall": "node ./node_modules/vscode/bin/install",
-    "release": "standard-version",
+    "release": "standard-version && npx vsce package",
     "test": "node ./node_modules/vscode/bin/test",
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
