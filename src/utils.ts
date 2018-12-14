@@ -302,9 +302,12 @@ export function packageArguments (options: any) {
 	const args = [
 		'run',
 		'--platform', options.platform,
-		'--target', options.target,
-		'--output-dir', options.outputDirectory
+		'--target', options.target
 	];
+
+	if (options.target !== 'dist-appstore') {
+		args.push('--output-dir', options.outputDirectory);
+	}
 
 	if (options.platform === 'android') {
 		args.push(
