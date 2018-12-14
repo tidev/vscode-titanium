@@ -182,7 +182,7 @@ export async function selectiOSSimulator (iOSVersion) {
 	if (!iOSVersion) {
 		iOSVersion = await selectiOSSimulatorVersion();
 	}
-	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name}(${iOSVersion})`, udid, version: iOSVersion }));
+	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, udid, version: iOSVersion }));
 	return quickPick(simulators, { placeHolder: 'Select simulator'});
 }
 
