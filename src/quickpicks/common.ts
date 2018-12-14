@@ -145,7 +145,7 @@ export async function enterAndroidKeystoreInfo (lastUsed) {
 export function selectiOSCertificate (buildType: string) {
 	const certificateType = buildType === 'run' ? 'developer' : 'distribution';
 	const certificates = appc.iOSCertificates(certificateType).map(cert => ({
-		description: `expires ${new Date(cert.after).toLocaleString('en-US')}`,
+		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
 		label: cert.name,
 		pem: cert.pem
 	}));
@@ -159,7 +159,12 @@ export function selectiOSProvisioningProfile (certificate: any, target: string, 
 	} else if (target === 'dist-appstore') {
 		deployment = 'appstore';
 	}
-	const profiles = appc.iOSProvisioningProfiles(deployment, certificate, appId).map(({ expirationDate, name, uuid }) => ({ description: uuid, detail: expirationDate, label: name, uuid }));
+	const profiles = appc.iOSProvisioningProfiles(deployment, certificate, appId).map(({ expirationDate, name, uuid }) => ({
+		description: uuid,
+		detail: `Expires: ${new Date(expirationDate).toLocaleString('en-US')}`,
+		label: name,
+		uuid
+	}));
 	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
 

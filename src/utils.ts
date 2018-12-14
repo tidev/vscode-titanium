@@ -285,8 +285,8 @@ export function buildArguments (options: any, projectType: string) {
 
 		if (options.target === 'device' && options.platform === 'ios') {
 			args.push(
-				'--developer-name', `"${options.certificate}"`,
-				'--pp-uuid', options.provisioningProfile
+				'--developer-name', `"${options.iOSCertificate}"`,
+				'--pp-uuid', options.iOSProvisioningProfile
 			);
 		}
 

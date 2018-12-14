@@ -87,9 +87,6 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 					const deviceInfo = await selectiOSDevice();
 					deviceId = deviceInfo.udid;
 					deviceLabel = deviceId.label;
-					const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId());
-					iOSCertificate = codeSigning.certificate.label;
-					iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
 				} else if (target === 'simulator') {
 					const simulatorInfo = await selectiOSSimulator(osVersion);
 					deviceId = simulatorInfo.udid;
@@ -104,6 +101,12 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 					const emulatorInfo = await selectWindowsEmulator();
 				}
 			}
+		}
+
+		if (!iOSCertificate || iOSProvisioningProfile) {
+			const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId());
+			iOSCertificate = codeSigning.certificate.label;
+			iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
 		}
 
 		const buildInfo = {
