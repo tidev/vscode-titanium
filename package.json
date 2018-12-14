@@ -498,13 +498,14 @@
         }
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
+        "commit": "git-cz",
         "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test",
         "lint": "tslint -p tsconfig.json --format stylish",
-        "commit": "git-cz"
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "release": "standard-version",
+        "test": "node ./node_modules/vscode/bin/test",
+        "vscode:prepublish": "npm run compile",
+        "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
         "@commitlint/cli": "^7.2.1",
@@ -520,6 +521,7 @@
         "cz-conventional-changelog": "^2.1.0",
         "husky": "^1.2.0",
         "lint-staged": "^8.1.0",
+        "standard-version": "^4.4.0",
         "tslint": "^5.11.0",
         "tslint-eslint-rules": "^5.4.0",
         "typescript": "^3.2.2",
