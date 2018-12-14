@@ -32,6 +32,7 @@ import * as definitionProviderHelper from './providers/definition/definitionProv
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
+import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
 
 let projectStatusBarItem;
 /**
@@ -71,7 +72,7 @@ function activate (context) {
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, new TiappCompletionItemProvider(), '.'),
 
 		// register hover providers
-		// vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, definitionProviderHelper),
+		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, new ViewHoverProvider()),
 
 		// register definition providers
 		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewDefinitionProvider()),

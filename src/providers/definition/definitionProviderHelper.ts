@@ -72,11 +72,7 @@ export function provideHover (document, position) {
 		return;
 	}
 
-	// console.log(`line: ${line}`);
-	// console.log(`word: ${word}`);
-	// console.log(`value: ${value}`);
-
-	if (/image\s*=\s*["'][\s0-9a-zA-Z-_^./]*$/.test(linePrefix)) {
+	if (/image\s*[=:]\s*["'][\s0-9a-zA-Z-_^./]*$/.test(linePrefix)) {
 		const relativePath = path.parse(value);
 		const dir = path.join(utils.getAlloyRootPath(), 'assets');
 		const fileNameRegExp = new RegExp(`${relativePath.name}.*${relativePath.ext}$`);
@@ -104,7 +100,7 @@ export function provideHover (document, position) {
  *
  * @returns {Thenable}
  */
-export function provideDefinition (document, position, suggestions) {
+export async function provideDefinition (document, position, suggestions) {
 	const line = document.lineAt(position).text;
 	const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 	const wordRange = document.getWordRangeAtPosition(position);
@@ -125,16 +121,12 @@ export function provideDefinition (document, position, suggestions) {
 
 	const value = (startIndex && endIndex) ? line.substring(startIndex + 1, endIndex) : '';
 
-	// console.log(`line: ${line}`);
-	// console.log(`word: ${word}`);
-	// console.log(`value: ${value}`);
-
 	suggestions = suggestions.concat(this.suggestions);
 
 	for (const suggestion of suggestions) {
 		if (suggestion.regExp.test(linePrefix)) {
 			if (suggestion.definitionRegExp) {
-				return this.getReferences(suggestion.files(document, word, value), suggestion.definitionRegExp(word, value), (file, range) => {
+				return await getReferences(suggestion.files(document, word, value), suggestion.definitionRegExp(word, value), (file, range) => {
 					return new Location(Uri.file(file), range);
 				});
 			} else {
@@ -153,7 +145,7 @@ export function provideDefinition (document, position, suggestions) {
  *
  * @returns {Thenable}
  */
-export function provideCodeActions (document, range, suggestions) {
+export async function provideCodeActions (document, range, suggestions) {
 	const linePrefix = document.getText(new Range(range.end.line, 0, range.end.line, range.end.character));
 	const wordRange = document.getWordRangeAtPosition(range.end);
 	const word = wordRange ? document.getText(wordRange) : null;
@@ -165,42 +157,34 @@ export function provideCodeActions (document, range, suggestions) {
 	}
 
 	suggestions = suggestions.concat(this.suggestions);
-
-	return new Promise(resolve => {
-		for (const suggestion of suggestions) {
-			if (suggestion.regExp.test(linePrefix)) {
-				const suggestionsRegex = suggestion.definitionRegExp(word);
-				this.getReferences(suggestion.files(document, word), suggestionsRegex, () => {
-					return {};
-				})
-					.then(definitions => {
-						const codeActions = [];
-						if ((!definitions || definitions.length === 0) && suggestion.insertText) {
-							const insertText = suggestion.insertText(word);
-							if (insertText) {
-								suggestion.files(document, word).forEach(file => {
-									codeActions.push({
-										title: suggestion.title(path.parse(file).name),
-										command: insertCommandId,
-										arguments: [ insertText, file ]
-									});
-								});
-							}
-							resolve(codeActions);
-						} else if ((!definitions || definitions.length === 0) && suggestion.i18nString) {
-							codeActions.push({
-								title: 'Generate i18n string',
-								command: insertI18nStringCommandId,
-								arguments: [ word ]
-							});
-							resolve(codeActions);
-						} else {
-							resolve([]);
-						}
+	const codeActions = [];
+	for (const suggestion of suggestions) {
+		if (suggestion.regExp.test(linePrefix)) {
+			const suggestionsRegex = suggestion.definitionRegExp(word);
+			const definitions = await getReferences(suggestion.files(document, word), suggestionsRegex, () => {
+				return {};
+			});
+			if ((!definitions || definitions.length === 0) && suggestion.insertText) {
+				const insertText = suggestion.insertText(word);
+				if (insertText) {
+					suggestion.files(document, word).forEach(file => {
+						codeActions.push({
+							title: suggestion.title(path.parse(file).name),
+							command: insertCommandId,
+							arguments: [ insertText, file ]
+						});
 					});
+				}
+			} else if ((!definitions || definitions.length === 0) && suggestion.i18nString) {
+				codeActions.push({
+					title: 'Generate i18n string',
+					command: insertI18nStringCommandId,
+					arguments: [ word ]
+				});
 			}
 		}
-	});
+	}
+	return codeActions;
 }
 
 /**
@@ -212,32 +196,25 @@ export function provideCodeActions (document, range, suggestions) {
  *
  * @returns {Array}
  */
-export function getReferences (files, regExp?: RegExp, callback?: any) {
-	return new Promise(resolve => {
-		const definitions = [];
-		const searches = [];
-		files.forEach(file => {
-			searches.push(new Promise((res, reject) => {
-				workspace.openTextDocument(file).then(document => {
-					if (document.getText().length > 0) {
-						for (let matches = regExp.exec(document.getText()); matches !== null; matches = regExp.exec(document.getText())) {
-							const position = document.positionAt(matches.index);
-							definitions.push(callback(file, new Range(position.line, position.character, position.line, 0)));
-						}
-					}
-					res();
-				}, () => {
-					reject();
-				});
-			}));
-		});
-
-		Promise.all(searches).then(() => {
-			resolve(definitions);
-		}, () => {
-			resolve([]);
-		});
-	});
+export async function getReferences (files, regExp?: RegExp, callback?: any) {
+	const definitions = [];
+	const searches = [];
+	for (const file of files ) {
+		let document;
+		try {
+			document = await workspace.openTextDocument(file);
+		} catch (error) {
+			// ignore the error, it's most likelty the file doesn't exist
+			continue;
+		}
+		if (document.getText().length > 0) {
+			for (let matches = regExp.exec(document.getText()); matches !== null; matches = regExp.exec(document.getText())) {
+				const position = document.positionAt(matches.index);
+				definitions.push(callback(file, new Range(position.line, position.character, position.line, 0)));
+			}
+		}
+	}
+	return definitions;
 }
 
 /**
