@@ -61,6 +61,5 @@ const suggestions = [
 export class ControllerDefinitionProvider implements vscode.DefinitionProvider {
 	public provideDefinition (document: vscode.TextDocument, position: vscode.Position) {
 		return provideDefinition(document, position, suggestions);
-
 	}
 }
