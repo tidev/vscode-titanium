@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.2...v0.1.3) (2018-12-18)
+
+
+### Bug Fixes
+
+* **build:** only prompt for cert and provisioning profile when building to ios device ([721609d](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/721609d)), closes [#34](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/34)
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.1...v0.1.2) (2018-12-14)
 
