@@ -1,5 +1,7 @@
 # Appcelerator Titanium Package for Visual Studio Code
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/appcelerator/vscode-appcelerator-titanium.svg)](https://greenkeeper.io/)
+
 Appcelerator Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
 
 <img width="900" alt="Appcelerator Titanium extension for VS Ccode" src="https://user-images.githubusercontent.com/2697821/37837371-f0fc7bd6-2eac-11e8-822d-049cce038d15.png">
