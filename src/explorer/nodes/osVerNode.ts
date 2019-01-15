@@ -19,7 +19,7 @@ export class OSVerNode extends BaseNode {
 	) {
 		super(label);
 		this.version = label;
-		this.targetId = targetForName(this.target);
+		this.targetId = targetForName(this.target, this.platform);
 	}
 
 	public getChildren (): DeviceNode[] {
