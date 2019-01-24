@@ -79,7 +79,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 					deviceLabel = deviceId.label;
 				} else if (target === 'emulator') {
 					const emulatorInfo = await selectAndroidEmulator();
-					deviceId = emulatorInfo.udid;
+					deviceId = '"'+emulatorInfo.udid+'"';
 					deviceLabel = emulatorInfo.label;
 				}
 			} else if (platform === 'ios') {
