@@ -71,18 +71,6 @@ export function nameForTarget (target: string) {
  */
 export function targetForName (name: string, targetPlatform: string) {
 	name = name.toLowerCase();
-	if (targetPlatform === 'windows') {
-		switch (name) {
-			case 'Phone Store':
-				return 'dist-phonestore';
-			case 'device':
-				return 'wp-device';
-			case 'emulator':
-				return 'wp-emulator';
-			default:
-				return name;
-		}
-	}
 	switch (name) {
 		case 'Ad-Hoc':
 			return 'dist-adhoc';
@@ -91,7 +79,9 @@ export function targetForName (name: string, targetPlatform: string) {
 		case 'Play Store':
 			return 'dist-playstore';
 		case 'device':
+			return targetPlatform === 'windows' ? 'wp-device' : name;
 		case 'emulator':
+			return targetPlatform === 'windows' ? 'wp-emulator' : name;
 		case 'simulator':
 		default:
 			return name;
