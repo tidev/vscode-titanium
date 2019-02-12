@@ -64,7 +64,7 @@ export class TargetNode extends BaseNode {
 					for (const device of appc.windowsDevices()) {
 						devices.push(new DeviceNode(device.name, this.platform, this.label, device.udid, this.targetId));
 					}
-					devices.push(new DeviceNode('ws-local', this.platform, 'ws-local', null, 'ws-local'));
+					devices.push(new DeviceNode('Local Machine', this.platform, 'ws-local', null, 'ws-local'));
 					break;
 				case 'Emulator':
 					for (const emulator of appc.windowsEmulators()['10.0']) {
