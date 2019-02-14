@@ -201,7 +201,9 @@ async function init () {
 					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
 					return;
 				}
-				await generateCompletions({ progress });
+				if (project.isTitaniumApp) {
+					await generateCompletions({ progress });
+				}
 				// Call refresh incase the Titanium Explorer activity pane became active before info
 				await vscode.commands.executeCommand(Commands.RefreshExplorer);
 
