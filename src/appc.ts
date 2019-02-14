@@ -46,8 +46,12 @@ export class Appc {
 		proc.stdout.on('data', data => result += data);
 		proc.on('close', () => {
 			if (result && result.length) {
-				this.info = JSON.parse(result);
-				callback(this.info);
+				try {
+					this.info = JSON.parse(result);
+					return callback(null, this.info);
+				} catch (error) {
+					return callback(error);
+				}
 			} else {
 				callback({});
 			}

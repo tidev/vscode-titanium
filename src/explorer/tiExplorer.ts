@@ -17,7 +17,7 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 	public refresh () {
 		vscode. window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, () => {
 			return new Promise((resolve, reject) => {
-				appc.getInfo(info => {
+				appc.getInfo((error, info) => {
 					if (info) {
 						this._onDidChangeTreeData.fire();
 						vscode.window.showInformationMessage('Updated device explorer');

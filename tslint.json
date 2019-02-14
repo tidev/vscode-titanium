@@ -6,7 +6,7 @@
         "curly": true,
         "class-name": true,
         "interface-name": [true, "never-prefix"],
-        "indent": [true, "tab"],
+        "indent": [true, "tabs"],
         "max-classes-per-file": false,
         "max-line-length": false,
         "member-ordering": [true, { "order": "fields-first" }],
