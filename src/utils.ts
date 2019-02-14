@@ -66,9 +66,10 @@ export function nameForTarget (target: string) {
 /**
  * Returns the target name based off a pretty name in the UI.
  * @param {String} name - name to get target for.
+ * @param {String} targetPlatform - platform to get target for.
  * @returns {String}
  */
-export function targetForName (name: string) {
+export function targetForName (name: string, targetPlatform: string) {
 	name = name.toLowerCase();
 	switch (name) {
 		case 'Ad-Hoc':
@@ -78,7 +79,9 @@ export function targetForName (name: string) {
 		case 'Play Store':
 			return 'dist-playstore';
 		case 'device':
+			return targetPlatform === 'windows' ? 'wp-device' : name;
 		case 'emulator':
+			return targetPlatform === 'windows' ? 'wp-emulator' : name;
 		case 'simulator':
 		default:
 			return name;

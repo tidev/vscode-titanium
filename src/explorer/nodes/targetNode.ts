@@ -17,7 +17,7 @@ export class TargetNode extends BaseNode {
 		public readonly platform: string
 	) {
 		super(label);
-		this.targetId = targetForName(this.label);
+		this.targetId = targetForName(this.label, this.platform);
 	}
 
 	public getChildren () {
@@ -62,9 +62,9 @@ export class TargetNode extends BaseNode {
 			switch (this.label) {
 				case 'Device':
 					for (const device of appc.windowsDevices()) {
-						// console.log(device);
+						devices.push(new DeviceNode(device.name, this.platform, this.label, device.udid, this.targetId));
 					}
-					devices.push(new DeviceNode('ws-local', this.platform, 'ws-local', null, this.targetId));
+					devices.push(new DeviceNode('Local Machine', this.platform, 'ws-local', null, 'ws-local'));
 					break;
 				case 'Emulator':
 					for (const emulator of appc.windowsEmulators()['10.0']) {
