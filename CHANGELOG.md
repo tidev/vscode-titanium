@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.3...v0.1.4) (2019-02-20)
+
+
+### Bug Fixes
+
+* do not attempt to generate completions for module projects ([70f34bd](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/70f34bd))
+* handle errors from parsing appc info response ([90cc125](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/90cc125))
+* **build:** quote all arguments when constructing the build and package args ([c20cb6a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c20cb6a)), closes [#41](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/41)
+* **Windows Targets:** correct windows target names ([#40](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/40)) ([737edf9](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/737edf9))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.2...v0.1.3) (2018-12-18)
 
