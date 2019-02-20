@@ -288,7 +288,7 @@ export function buildArguments (options: any, projectType: string) {
 
 		if (options.target === 'device' && options.platform === 'ios') {
 			args.push(
-				'--developer-name', `"${options.iOSCertificate}"`,
+				'--developer-name', options.iOSCertificate,
 				'--pp-uuid', options.iOSProvisioningProfile
 			);
 		}
@@ -297,8 +297,7 @@ export function buildArguments (options: any, projectType: string) {
 			args.push('--liveview');
 		}
 	}
-
-	return args;
+	return args.map(arg => quoteArgument(arg));
 }
 
 export function packageArguments (options: any) {
@@ -320,12 +319,11 @@ export function packageArguments (options: any) {
 		);
 	} else if (options.platform === 'ios') {
 		args.push(
-			'--distribution-name', `"${options.iOSCertificate}"`,
+			'--distribution-name', options.iOSCertificate,
 			'--pp-uuid', options.iOSProvisioningProfile
 		);
 	}
-
-	return args;
+	return args.map(arg => quoteArgument(arg));
 }
 
 export function createAppArguments (options: any) {
@@ -348,7 +346,7 @@ export function createAppArguments (options: any) {
 	} else {
 		args.push('--no-enable-services');
 	}
-	return args;
+	return args.map(arg => quoteArgument(arg));
 }
 
 export function createModuleArguments (options: any) {
@@ -366,7 +364,11 @@ export function createModuleArguments (options: any) {
 	if (options.force) {
 		args.push('--force');
 	}
-	return args;
+	return args.map(arg => quoteArgument(arg));
+}
+
+function quoteArgument (arg: string) {
+	return `"${arg}"`;
 }
 
 export function validateAppId (appId: string) {
