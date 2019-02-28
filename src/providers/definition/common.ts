@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as related from '../../related';
 
 import { workspace } from 'vscode';
+import { ExtensionContainer } from '../../container';
 
 export const viewSuggestions = [
 	{ // class
@@ -20,7 +21,7 @@ export const viewSuggestions = [
 			return `Generate style (${fileName})`;
 		},
 		insertText (text) {
-			let insertText: string = workspace.getConfiguration('titanium.codeTemplates').get('tssClass');
+			let insertText = ExtensionContainer.config.codeTemplates.tssClass;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -40,7 +41,7 @@ export const viewSuggestions = [
 			return `Generate style (${fileName})`;
 		},
 		insertText (text) {
-			let insertText: string = workspace.getConfiguration('titanium.codeTemplates').get('tssId');
+			let insertText = ExtensionContainer.config.codeTemplates.tssId;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -64,7 +65,7 @@ export const viewSuggestions = [
 				|| text.startsWith('/')) {
 				return;
 			}
-			let insertText: string = workspace.getConfiguration('titanium.codeTemplates').get('tssTag');
+			let insertText = ExtensionContainer.config.codeTemplates.tssTag;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -81,7 +82,7 @@ export const viewSuggestions = [
 			return `Generate function (${fileName})`;
 		},
 		insertText (text) {
-			let insertText: string = workspace.getConfiguration('titanium.codeTemplates').get('jsFunction');
+			let insertText = ExtensionContainer.config.codeTemplates.jsFunction;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}

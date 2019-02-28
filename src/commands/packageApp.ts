@@ -16,6 +16,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		// TODO: Handle a build in progress
 		const buildType = 'dist';
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastPackageState);
+		const logLevel = ExtensionContainer.config.general.logLevel;
 
 		let iOSCertificate;
 		let lastBuildDescription;
@@ -75,7 +76,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		}
 
 		if (!outputDirectory) {
-			const distDirectory = workspace.getConfiguration('titanium.package').get<string>('distributionOutputDirectory');
+			const distDirectory = ExtensionContainer.config.package.distributionOutputDirectory;
 			if (!path.isAbsolute(distDirectory)) {
 				outputDirectory = path.join(workspace.rootPath, distDirectory);
 			} else {
@@ -90,7 +91,8 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			keystoreInfo,
 			target,
 			iOSCertificate,
-			iOSProvisioningProfile
+			iOSProvisioningProfile,
+			logLevel
 		};
 		const storableInfo = Object.assign({}, buildInfo, { keystoreInfo: { password: null }});
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, storableInfo);

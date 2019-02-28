@@ -454,12 +454,12 @@
       "view/title": [
         {
           "command": "titanium.build.setLiveViewEnabled",
-          "when": "view == titaniumExplorer && config.titanium.liveview && !titanium:liveview",
+          "when": "view == titaniumExplorer && !config.titanium.build.liveview",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLiveViewDisabled",
-          "when": "view == titaniumExplorer && config.titanium.liveview && titanium:liveview",
+          "when": "view == titaniumExplorer && config.titanium.build.liveview",
           "group": "navigation"
         },
         {

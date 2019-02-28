@@ -143,19 +143,6 @@ export function iOSProvisioinngProfileMatchesAppId (profileAppId: string, appId:
 }
 
 /**
- * Distribution output directory. Builds absolute path.
- *
- * @returns {String}
- */
-export function  distributionOutputDirectory () {
-	const directory: string = workspace.getConfiguration('titanium.package').get('distributionOutputDirectory');
-	if (!path.isAbsolute(directory)) {
-		return path.join(workspace.rootPath, directory);
-	}
-	return directory;
-}
-
-/**
  * Returns string with capitalized first letter
  *
  * @param {String} s - string.
@@ -276,7 +263,8 @@ export function filterJSFiles (directory: string) {
 export function buildArguments (options: any, projectType: string) {
 	const args = [
 		'run',
-		'--platform', options.platform
+		'--platform', options.platform,
+		'--log-level', options.logLevel
 	];
 
 	if (projectType === 'app') {
@@ -297,6 +285,7 @@ export function buildArguments (options: any, projectType: string) {
 			args.push('--liveview');
 		}
 	}
+
 	return args.map(arg => quoteArgument(arg));
 }
 
@@ -304,7 +293,8 @@ export function packageArguments (options: any) {
 	const args = [
 		'run',
 		'--platform', options.platform,
-		'--target', options.target
+		'--target', options.target,
+		'--log-level', options.logLevel
 	];
 
 	if (options.target !== 'dist-appstore') {
@@ -335,7 +325,7 @@ export function createAppArguments (options: any) {
 		'--project-dir', path.join(options.workspaceDir, options.name),
 		'--platforms', options.platforms.join(','),
 		'--no-prompt',
-		'--log-level', 'trace'
+		'--log-level', options.logLevel
 	];
 
 	if (options.force) {
@@ -358,7 +348,7 @@ export function createModuleArguments (options: any) {
 		'--project-dir', path.join(options.workspaceDir, options.name),
 		'--platforms', options.platforms.join(','),
 		'--no-prompt',
-		'--log-level', 'trace'
+		'--log-level', options.logLevel
 	];
 
 	if (options.force) {

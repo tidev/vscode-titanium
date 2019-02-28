@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as utils from '../../utils';
 
 import { commands, Hover, Location, MarkdownString, Position, Range, Uri, workspace, WorkspaceEdit } from 'vscode';
+import { ExtensionContainer } from '../../container';
 
 /**
  * Definition provider helper
@@ -21,7 +22,7 @@ const i18nSuggestions = [
 			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
 		},
 		files () {
-			return [ path.join(utils.getI18nPath(), workspace.getConfiguration('titanium.project').get('defaultI18nLanguage'), 'strings.xml') ];
+			return [ path.join(utils.getI18nPath(), ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
 		},
 		i18nString: true
 	}
@@ -241,7 +242,7 @@ export function insert (text, filePath) {
  * @param {String} text text to insert
  */
 export function insertI18nString (text) {
-	const defaultLang: string = workspace.getConfiguration('titanium.project').get('defaultI18nLanguage');
+	const defaultLang =  ExtensionContainer.config.project.defaultI18nLanguage;
 	const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
 	if (!utils.fileExists(i18nStringPath)) {
 		fs.ensureDirSync(path.join(utils.getI18nPath(), defaultLang));

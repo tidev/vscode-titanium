@@ -1,13 +1,13 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
-import { iOSProvisioinngProfileMatchesAppId } from './utils';
 
 import { spawn } from 'child_process';
 import { homedir } from 'os';
-import { window, workspace } from 'vscode';
-
+import { window } from 'vscode';
+import { ExtensionContainer } from './container';
 import { IosCert } from './types/common';
+import { iOSProvisioinngProfileMatchesAppId } from './utils';
 
 export interface AlloyGenerateOptions {
 	adapterType?: string;
@@ -352,8 +352,8 @@ export class Appc {
 			return;
 		}
 		const channel = window.createOutputChannel('Appcelerator');
-		const cmd: string = workspace.getConfiguration('titanium.general').get('appcCommandPath');
-		if (workspace.getConfiguration('titanium.general').get('displayBuildCommandInConsole')) {
+		const cmd = ExtensionContainer.config.general.appcCommandPath;
+		if (ExtensionContainer.config.general.displayBuildCommandInConsole) {
 			channel.append(`${cmd} run ${opts.args.join(' ')}\n\n`);
 		}
 		this.killed = false;
