@@ -232,29 +232,26 @@
       "type": "object",
       "title": "Appcelerator Titanium",
       "properties": {
-        "titanium.general.appcCommandPath": {
+        "titanium.android.keystoreAlias": {
           "type": "string",
-          "default": "appc",
-          "description": "Set the full path to the `appc` command if VS Code is unable to locate it. Run init command."
+          "default": "",
+          "description": "Keystore alias"
         },
-        "titanium.general.displayBuildCommandInConsole": {
+        "titanium.android.keystorePath": {
+          "type": "string",
+          "default": "",
+          "description": "Keystore path"
+        },
+        "titanium.build.liveview": {
           "type": "boolean",
           "default": true,
-          "description": "The executed build command is written to the console to aid debugging. This will include password arguments."
+          "description": "Whether to use LiveView when building",
+          "scope": "window"
         },
-        "titanium.general.useTerminalForBuild": {
-          "type": "boolean",
-          "default": true,
-          "description": "Build command will be run using the integrated terminal."
-        },
-        "titanium.project.defaultI18nLanguage": {
+        "titanium.codeTemplates.jsFunction": {
           "type": "string",
-          "default": "en"
-        },
-        "titanium.package.distributionOutputDirectory": {
-          "type": "string",
-          "default": "dist",
-          "description": "For iOS ad-hoc and App Store and Google Play builds. Ensure this location has write permission."
+          "default": "\\nfunction ${text}(e){\\n}\\n",
+          "description": "Event handler function template"
         },
         "titanium.codeTemplates.tssClass": {
           "type": "string",
@@ -271,31 +268,47 @@
           "default": "\\n'${text}': {\\n}\\n",
           "description": "Style tag template"
         },
-        "titanium.codeTemplates.jsFunction": {
+        "titanium.general.appcCommandPath": {
           "type": "string",
-          "default": "\\nfunction ${text}(e){\\n}\\n",
-          "description": "Event handler function template"
+          "default": "appc",
+          "description": "Set the full path to the `appc` command if VS Code is unable to locate it. Run init command."
         },
-        "titanium.iOS.showProvisioningProfileDetail": {
+        "titanium.general.displayBuildCommandInConsole": {
+          "type": "boolean",
+          "default": true,
+          "description": "The executed build command is written to the console to aid debugging. This will include password arguments."
+        },
+        "titanium.general.logLevel": {
+          "type": "string",
+          "default": "info",
+          "description": "Logging level for commands being run",
+          "scope": "window",
+          "enum": [
+            "debug",
+            "error",
+            "info",
+            "trace",
+            "warn"
+          ]
+        },
+        "titanium.general.useTerminalForBuild": {
+          "type": "boolean",
+          "default": true,
+          "description": "Build command will be run using the integrated terminal."
+        },
+        "titanium.ios.showProvisioningProfileDetail": {
           "type": "boolean",
           "default": false,
           "description": "Show provisioning profile app ID and expiry information in picker"
         },
-        "titanium.android.keystorePath": {
+        "titanium.package.distributionOutputDirectory": {
           "type": "string",
-          "default": "",
-          "description": "Keystore path"
+          "default": "dist",
+          "description": "For iOS ad-hoc and App Store and Google Play builds. Ensure this location has write permission."
         },
-        "titanium.android.keystoreAlias": {
+        "titanium.project.defaultI18nLanguage": {
           "type": "string",
-          "default": "",
-          "description": "Keystore alias"
-        },
-        "titanium.liveview": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to use LiveView when building",
-          "scope": "window"
+          "default": "en"
         }
       }
     },
