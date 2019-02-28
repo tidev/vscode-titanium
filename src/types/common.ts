@@ -42,3 +42,11 @@ export interface ProvisioningProfile {
 	team: string[];
 	uuid: string;
 }
+
+export enum LogLevel {
+	Debug = 'debug',
+	Error = 'error',
+	Info = 'info',
+	Trace = 'trace',
+	Warn = 'warn'
+}

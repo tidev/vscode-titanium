@@ -27,6 +27,7 @@ import { StyleCompletionItemProvider } from './providers/completion/styleComplet
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
+import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
@@ -41,7 +42,12 @@ let projectStatusBarItem;
  * @param {Object} context 	extension context
  */
 function activate (context) {
-	ExtensionContainer.inititalize(context);
+
+	Configuration.configure(context);
+
+	const config = configuration.get<Config>();
+
+	ExtensionContainer.inititalize(context, config);
 	project.load();
 	// definitionProviderHelper.activate(context.subscriptions);
 

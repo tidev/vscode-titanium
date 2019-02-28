@@ -1,3 +1,5 @@
+export const ExtensionId = 'titanium';
+
 export enum VSCodeCommands {
 	OpenFolder = 'vscode.openFolder',
 	SetContext = 'setContext'
@@ -15,6 +17,5 @@ export enum GlobalState {
 export enum WorkspaceState {
 	LastBuildState = 'lastRunOptions',
 	LastPackageState = 'lastDistOptions',
-	LastKeystorePath = 'lastKeystorePath',
-
+	LastKeystorePath = 'lastKeystorePath'
 }
