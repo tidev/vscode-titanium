@@ -282,7 +282,6 @@
           "type": "string",
           "default": "info",
           "description": "Logging level for commands being run",
-          "scope": "window",
           "enum": [
             "debug",
             "error",
