@@ -295,11 +295,6 @@
           "default": true,
           "description": "Build command will be run using the integrated terminal."
         },
-        "titanium.ios.showProvisioningProfileDetail": {
-          "type": "boolean",
-          "default": false,
-          "description": "Show provisioning profile app ID and expiry information in picker"
-        },
         "titanium.package.distributionOutputDirectory": {
           "type": "string",
           "default": "dist",

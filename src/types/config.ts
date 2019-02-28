@@ -20,9 +20,6 @@ export interface Config {
 		logLevel: LogLevel,
 		useTerminalForBuild: boolean
 	};
-	ios: {
-		showProvisioningProfileDetail: boolean
-	};
 	package: {
 		distributionOutputDirectory: string
 	};
