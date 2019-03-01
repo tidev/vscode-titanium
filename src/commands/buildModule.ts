@@ -13,7 +13,7 @@ export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode |
 		checkLogin();
 		// TODO: Handle a build in progress, allow passing in emulators etc. here? And actually use package for dist modules?
 		const buildType = 'run';
-
+		const logLevel = ExtensionContainer.config.general.logLevel;
 		let platform;
 
 		if (node) {
@@ -27,7 +27,8 @@ export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode |
 
 		const buildInfo = {
 			buildType,
-			platform
+			platform,
+			logLevel
 		};
 		const args = buildArguments(buildInfo, 'module');
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, buildInfo);

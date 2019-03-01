@@ -4,6 +4,7 @@ import * as utils from '../../utils';
 
 import { CompletionItemKind, workspace } from 'vscode';
 import { parseString } from 'xml2js';
+import { ExtensionContainer } from '../../container';
 
 export const cfgAutoComplete = {
 	regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)$/,
@@ -37,7 +38,7 @@ export const cfgAutoComplete = {
 export const i18nAutoComplete = {
 	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
 	async getCompletions () {
-		const defaultLang: string = workspace.getConfiguration('titanium.project').get('defaultI18nLanguage');
+		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
 		const i18nPath = utils.getI18nPath();
 		if (utils.directoryExists(i18nPath)) {
 			const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');

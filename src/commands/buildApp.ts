@@ -23,9 +23,9 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 		checkLogin();
 		// TODO: Handle a build in progress
 		const buildType = 'run';
-		const liveview = ExtensionContainer.context.globalState.get<boolean>(GlobalState.Liveview);
+		const liveview = ExtensionContainer.config.build.liveview;
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastBuildState);
-
+		const logLevel = ExtensionContainer.config.general.logLevel;
 		let deviceId;
 		let deviceLabel;
 		let iOSCertificate;
@@ -118,6 +118,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			target,
 			iOSCertificate,
 			iOSProvisioningProfile,
+			logLevel
 		};
 		const args = buildArguments(buildInfo, 'app');
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, buildInfo);

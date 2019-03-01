@@ -27,12 +27,14 @@ import { StyleCompletionItemProvider } from './providers/completion/styleComplet
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
+import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
+import { LogLevel } from './types/common';
 
 let projectStatusBarItem;
 /**
@@ -41,7 +43,12 @@ let projectStatusBarItem;
  * @param {Object} context 	extension context
  */
 function activate (context) {
-	ExtensionContainer.inititalize(context);
+
+	Configuration.configure(context);
+
+	const config = configuration.get<Config>();
+
+	ExtensionContainer.inititalize(context, config);
 	project.load();
 	// definitionProviderHelper.activate(context.subscriptions);
 
@@ -100,7 +107,7 @@ function activate (context) {
 
 		// register stop command
 		vscode.commands.registerCommand(Commands.StopBuild, () => {
-			if (vscode.workspace.getConfiguration('titanium.general').get('useTerminalForBuild')) {
+			if (ExtensionContainer.config.general.useTerminalForBuild) {
 				ExtensionContainer.terminal.clear();
 			} else {
 				appc.stop();
@@ -110,8 +117,9 @@ function activate (context) {
 		// register set log level command
 		vscode.commands.registerCommand(Commands.SetLogLevel, async () => {
 			const level = await vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' });
-			if (level) {
-				ExtensionContainer.context.globalState.update('logLevel', level.toLowerCase());
+			const actualLevel = LogLevel[level];
+			if (actualLevel) {
+				await configuration.update('general.logLevel', actualLevel, vscode.ConfigurationTarget.Global);
 			}
 		}),
 
@@ -145,14 +153,12 @@ function activate (context) {
 		}),
 
 		vscode.commands.registerCommand(Commands.EnableLiveView, async () => {
-			await ExtensionContainer.context.globalState.update('titanium:liveview', true);
-			await vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
+			await configuration.update('build.liveview', true, vscode.ConfigurationTarget.Global);
 			vscode.window.showInformationMessage('Enabled LiveView');
 		}),
 
 		vscode.commands.registerCommand(Commands.DisableLiveView, async () => {
-			await ExtensionContainer.context.globalState.update('titanium:liveview', false);
-			await vscode.commands.executeCommand('setContext', 'titanium:liveview', false);
+			await configuration.update('build.liveview', false, vscode.ConfigurationTarget.Global);
 			vscode.window.showInformationMessage('Disabled LiveView');
 		}),
 
