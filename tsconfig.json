@@ -21,6 +21,7 @@
         "node_modules",
         ".vscode-test",
         "test",
-        "out"
+        "out",
+        "scripts"
     ]
 }
