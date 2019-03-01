@@ -30,5 +30,10 @@
             "allow-pascal-case",
             "allow-leading-underscore"
         ]
+    },
+    "linterOptions": {
+        "exclude": [
+            "scripts/*.js"
+        ]
     }
 }
