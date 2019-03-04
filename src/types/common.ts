@@ -12,7 +12,7 @@ export interface RunOptions {
 
 export interface KeystoreInfo {
 	alias: string;
-	path: string;
+	location: string;
 	password: string;
 	privateKeyPassword?: string;
 }
@@ -37,7 +37,7 @@ export interface ProvisioningProfile {
 	expirationDate: string;
 	file: string;
 	getTaskAllow: boolean;
-	managaged: boolean;
+	managed: boolean;
 	name: string;
 	team: string[];
 	uuid: string;

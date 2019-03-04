@@ -9,6 +9,7 @@ import { nameForPlatform, packageArguments, } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { enterAndroidKeystoreInfo, enterPassword, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
+import { KeystoreInfo } from '../types/common';
 
 export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -19,11 +20,11 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		const logLevel = ExtensionContainer.config.general.logLevel;
 
 		let iOSCertificate;
+		let iOSProvisioningProfile;
+		let keystoreInfo: KeystoreInfo;
 		let lastBuildDescription;
 		let outputDirectory;
-		let keystoreInfo;
 		let platform;
-		let iOSProvisioningProfile;
 		let target;
 
 		if (node) {
@@ -94,10 +95,11 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			iOSProvisioningProfile,
 			logLevel
 		};
-		const storableInfo = Object.assign({}, buildInfo, { keystoreInfo: { password: null }});
-		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, storableInfo);
 		const args = packageArguments(buildInfo);
 		ExtensionContainer.terminal.runCommand(args);
+		buildInfo.keystoreInfo.password = null;
+		buildInfo.keystoreInfo.privateKeyPassword = null;
+		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, buildInfo);
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
