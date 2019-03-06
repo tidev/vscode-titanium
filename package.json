@@ -234,12 +234,12 @@
       "properties": {
         "titanium.android.keystoreAlias": {
           "type": "string",
-          "default": "",
+          "default": null,
           "description": "Keystore alias used for packaging Android applications"
         },
         "titanium.android.keystorePath": {
           "type": "string",
-          "default": "",
+          "default": null,
           "description": "Path to keystore used for packaging Android applications"
         },
         "titanium.build.liveview": {

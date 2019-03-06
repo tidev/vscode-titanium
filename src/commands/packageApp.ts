@@ -65,8 +65,9 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 
 		if (platform === 'android' && !keystoreInfo) {
 			const lastKeystore = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastKeystorePath);
+			const savedKeystorePath = ExtensionContainer.config.android.keystorePath;
 			// TODO: Private key password?
-			keystoreInfo = await enterAndroidKeystoreInfo(lastKeystore);
+			keystoreInfo = await enterAndroidKeystoreInfo(lastKeystore, savedKeystorePath);
 			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastKeystorePath, keystoreInfo.location);
 		} else if (platform === 'ios' && !iOSCertificate) {
 			const codesigning = await selectiOSCodeSigning(buildType, target, project.appId());
