@@ -2,8 +2,8 @@ import { LogLevel } from './common';
 
 export interface Config {
 	android: {
-		keystoreAlias: string,
-		keystorePath: string
+		keystoreAlias: string | null,
+		keystorePath: string | null
 	};
 	build: {
 		liveview: boolean

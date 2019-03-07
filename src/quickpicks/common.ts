@@ -1,8 +1,11 @@
+import * as path from 'path';
 import appc from '../appc';
 import * as utils from '../utils';
 
-import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, window } from 'vscode';
-import { UserCancellation } from '../commands/common';
+import { pathExists } from 'fs-extra';
+import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, window, workspace } from 'vscode';
+import { InteractionError, UserCancellation } from '../commands/common';
+import { ExtensionContainer } from '../container';
 
 export async function selectFromFileSystem (options: OpenDialogOptions) {
 	if (!options.canSelectMany) {
@@ -111,7 +114,7 @@ export function selectAndroidEmulator () {
 	return quickPick(options, { placeHolder: 'Select emulator' });
 }
 
-export async function selectAndroidKeystore (lastUsed) {
+export async function selectAndroidKeystore (lastUsed, savedKeystorePath) {
 	const items = [{
 		label: 'Browse for keystore',
 		id: 'browse'
@@ -122,18 +125,33 @@ export async function selectAndroidKeystore (lastUsed) {
 			id: 'last'
 		});
 	}
+	if (savedKeystorePath) {
+		items.push({
+			label: `Saved ${savedKeystorePath}`,
+			id: 'saved'
+		});
+	}
 	const keystoreAction = await quickPick(items, { placeHolder: 'Browse for keystore or use last keystore' });
 	if (keystoreAction.id === 'browse') {
 		const uri = await window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
 		return uri[0].path;
+	} else if (keystoreAction.id === 'saved') {
+		if (!path.isAbsolute(savedKeystorePath)) {
+			savedKeystorePath = path.resolve(workspace.rootPath, savedKeystorePath);
+		}
+		return savedKeystorePath;
 	} else {
 		return lastUsed;
 	}
 }
 
-export async function enterAndroidKeystoreInfo (lastUsed) {
-	const location = await selectAndroidKeystore(lastUsed);
-	const alias = await inputBox({ placeHolder: 'Enter your keystore alias' });
+export async function enterAndroidKeystoreInfo (lastUsed, savedKeystorePath) {
+	const location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
+
+	if (!await pathExists(location)) {
+		throw new InteractionError(`The Keystore file ${location} does not exist`);
+	}
+	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias });
 	const password = await enterPassword({ placeHolder: 'Enter your keystore password' });
 	return {
 		alias,
