@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.4...v0.2.0) (2019-03-07)
+
+
+### Bug Fixes
+
+* remove scope from logLevel to add back to preferences menu ([491974c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/491974c))
+* **package:** correct last build state for android ([#52](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/52)) ([26357e0](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/26357e0)), closes [#47](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/47)
+
+
+### Features
+
+* **config:** add support for setting default keystore path ([#53](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/53)) ([a0832ac](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a0832ac)), closes [#51](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/51)
+
+
+
 <a name="0.1.4"></a>
 ## [0.1.4](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.3...v0.1.4) (2019-02-20)
 
