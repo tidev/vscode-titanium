@@ -1,6 +1,6 @@
 # Contributing
 
-Interested in contributing? You can follow the below to ensure your contribution goes smoothly and is a great experience.
+Interested in contributing? You can follow the information below to ensure your contribution goes smoothly and is a great experience.
 
 ## File an issue
 
