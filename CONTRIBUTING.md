@@ -1,3 +1,11 @@
+# Contributing
+
+Interested in contributing? You can follow the information below to ensure your contribution goes smoothly and is a great experience.
+
+## File an issue
+
+For any contribution we first ask that you [file an issue](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/new/choose), this helps us keep track of any necessary changes, as well as discuss and agree on a plan of action to ensure landing your changes goes as smoothly as possible.
+
 ## Getting set up for development
 
 1. Just to be safe, remove or move your existing installation at `~/.vscode/extensions/???`
@@ -12,7 +20,7 @@ You're now up and running with the extension running in another workspace. When 
 
 When sending in a PR please make sure you do the following:
 
-- Commit using `npm run commit`
+- Commit using `npm run commit`, making sure to reference your issue ID when the prompting asks.
 	- This ensure that the commit follows the [Conventional Commits](https://www.conventionalcommits.org/) standard used by the project. This is validated on a `git commit` using git hooks via husky.
 - `npm run lint` passes
 	- This is also validated on a `git commit` using git hooks via husky.
@@ -26,6 +34,7 @@ To release of the extension the following needs to be followed:
 
 1. Ensure that your local `master` branch is completely up to date with the main repo.
 2. Run `npm run release`, which performs the following
+	- Runs `scripts/generate-settings-table.js` to ensure the configuration settings documentation is up to date.
 	- Runs [standard-version](https://github.com/conventional-changelog/standard-version) to bump versions based on commit messages, updates the changelog, commits the files and tags a new release.
 	- Runs `npx vsce package` to generate a new `.vsix` file ready for upload to the marketplace.
 3. Push to the main repo.

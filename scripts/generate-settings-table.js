@@ -5,7 +5,7 @@ const { contributes: { configuration } } = require('../package.json');
 let tableString = '| Setting name | Description | Default Value |';
 tableString = `${tableString}\n| ------------- | ------------- | ----- |`
 for (const [ name, settingInfo ] of Object.entries(configuration.properties)) {
-	const defaultValue = settingInfo.default === undefined || settingInfo.default.length === 0 ? 'No Default' : settingInfo.default;
+	const defaultValue = settingInfo.default === null || settingInfo.default.length === 0 ? 'No Default' : settingInfo.default;
 	tableString = `${tableString}\n| \`${name}\` | ${settingInfo.description} | \`${defaultValue}\` |`
 }
 
