@@ -34,7 +34,7 @@ export enum AlloyComponentExtension {
 	Model = '.js',
 	Style = '.tss',
 	View = '.xml',
-	Widget = 'widgets' // ??
+	Widget = ''
 }
 
 async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension) {
@@ -43,29 +43,47 @@ async function promptForDetails (type: AlloyComponentType, folder: AlloyComponen
 		throw new UserCancellation();
 	}
 	const cwd = workspace.rootPath;
-	const filePath = path.join(cwd, 'app', folder, `${name}${extension}`);
-	if (await fs.pathExists(filePath)) {
+	const mainFile = path.join(cwd, 'app', folder, `${name}${extension}`);
+	const filePaths = [];
+	if (type === AlloyComponentType.Widget) {
+		filePaths.push(
+			path.join(mainFile, 'controllers', 'widget.js'),
+			path.join(mainFile, 'styles', 'widget.tss'),
+			path.join(mainFile, 'views', 'widget.xml')
+		);
+	} else {
+		filePaths.push(mainFile);
+	}
+	if (await fs.pathExists(mainFile)) {
 		const shouldDelete = await window.showQuickPick([ 'Yes', 'No' ], { placeHolder: ` ${name} already exists. Overwrite it?` });
 		if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
 			throw new UserCancellation();
 		}
 	}
-	return { cwd, filePath, name, type };
+	return { cwd, filePaths, name, type };
 }
 
 export async function generateComponent (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension) {
-	const { cwd, filePath, name } = await promptForDetails(type, folder, extension);
+	let name;
 	try {
+		const creationArgs = await promptForDetails(type, folder, extension);
+		const cwd = creationArgs.cwd;
+		const filePaths = creationArgs.filePaths;
+		name = creationArgs.name;
+
 		await appc.generate({
 			cwd,
 			type,
 			name,
 			force: true
 		});
-		const shouldOpen = await window.showInformationMessage(`${capitalizeFirstLetter(type)} ${name} created succesfully`, { title: 'Open' });
+		const shouldOpen = await window.showInformationMessage(`${capitalizeFirstLetter(type)} ${name} created successfully`, { title: 'Open' });
 		if (shouldOpen) {
-			const document = await workspace.openTextDocument(filePath);
-			await window.showTextDocument(document);
+			for (const file of filePaths) {
+				const document = await workspace.openTextDocument(file);
+				await window.showTextDocument(document, { preview: false });
+			}
+
 		}
 	} catch (error) {
 		if (error instanceof UserCancellation) {
@@ -76,18 +94,24 @@ export async function generateComponent (type: AlloyComponentType, folder: Alloy
 }
 
 export async function generateModel () {
-	const { cwd, filePath, name } = await promptForDetails(AlloyComponentType.Model, AlloyComponentFolder.Model, AlloyComponentExtension.Model);
+	let name;
 	try {
+		const creationArgs = await promptForDetails(AlloyComponentType.Model, AlloyComponentFolder.Model, AlloyComponentExtension.Model);
+		const cwd = creationArgs.cwd;
+		const filePaths = creationArgs.filePaths;
+		name = creationArgs.name;
 		await appc.generate({
 			cwd,
 			type: AlloyComponentType.Model,
 			name,
 			force: true
 		});
-		const shouldOpen = await window.showInformationMessage(`${capitalizeFirstLetter(AlloyComponentType.Model)} ${name} created succesfully`, { title: 'Open' });
+		const shouldOpen = await window.showInformationMessage(`${capitalizeFirstLetter(AlloyComponentType.Model)} ${name} created successfully`, { title: 'Open' });
 		if (shouldOpen) {
-			const document = await workspace.openTextDocument(filePath);
-			await window.showTextDocument(document);
+			for (const file of filePaths) {
+				const document = await workspace.openTextDocument(file);
+				await window.showTextDocument(document);
+			}
 		}
 	} catch (error) {
 		if (error instanceof UserCancellation) {
