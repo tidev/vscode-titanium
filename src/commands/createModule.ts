@@ -13,6 +13,8 @@ export async function createModule () {
 		checkLogin();
 		// ToDo: Store last dir created in and provide as default?
 		let force;
+		const logLevel = ExtensionContainer.config.general.logLevel;
+
 		const name = await inputBox({ prompt: 'Enter your module name' });
 		const appId = await inputBox({
 			prompt: 'Enter your module ID',
@@ -33,9 +35,10 @@ export async function createModule () {
 		const args = createModuleArguments({
 			appId,
 			force,
-			workspaceDir,
+			logLevel,
 			name,
-			platforms
+			platforms,
+			workspaceDir,
 		});
 		await ExtensionContainer.terminal.runCommandInBackground(args, { cancellable: false, location: ProgressLocation.Notification, title: 'Creating module' });
 		// TODO: Once workspace support is figured out, add an "add to workspace command"
