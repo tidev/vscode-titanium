@@ -11,7 +11,8 @@ export enum CommandContext {
 
 export enum GlobalState {
 	Enabled = 'titanium:enabled',
-	Liveview = 'titanium:liveview'
+	Liveview = 'titanium:liveview',
+	Running = 'build:running',
 }
 
 export enum WorkspaceState {

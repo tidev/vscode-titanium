@@ -55,7 +55,7 @@ export function checkLogin () {
 		error.interactionChoices.push({
 			title: 'Login',
 			run: () => {
-				ExtensionContainer.terminal.runCommand([ 'login' ]);
+				ExtensionContainer.terminal.runCommand(['login'], { forceTerminal: true });
 			}
 		});
 		throw error;

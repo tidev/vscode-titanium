@@ -123,7 +123,11 @@
       {
         "command": "titanium.build.stop",
         "title": "Stop",
-        "category": "Titanium"
+        "category": "Titanium",
+        "icon": {
+          "light": "images/light/square.svg",
+          "dark": "images/dark/square.svg"
+        }
       },
       {
         "command": "titanium.build.setLogLevel",
@@ -292,7 +296,7 @@
         },
         "titanium.general.useTerminalForBuild": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "When true build/package commands will be run using the integrated terminal as opposed to using an output channel."
         },
         "titanium.package.distributionOutputDirectory": {
@@ -447,6 +451,16 @@
         }
       ],
       "view/title": [
+        {
+          "command": "titanium.build.run",
+          "when": "view == titaniumExplorer && !build:running",
+          "group": "navigation"
+        },
+        {
+          "command": "titanium.build.stop",
+          "when": "view == titaniumExplorer && build:running",
+          "group": "navigation"
+        },
         {
           "command": "titanium.build.setLiveViewEnabled",
           "when": "view == titaniumExplorer && !config.titanium.build.liveview",
