@@ -110,7 +110,7 @@ function activate (context) {
 			if (ExtensionContainer.config.general.useTerminalForBuild) {
 				ExtensionContainer.terminal.clear();
 			} else {
-				appc.stop();
+				ExtensionContainer.terminal.stop();
 			}
 		}),
 

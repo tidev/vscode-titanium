@@ -123,7 +123,11 @@
       {
         "command": "titanium.build.stop",
         "title": "Stop",
-        "category": "Titanium"
+        "category": "Titanium",
+        "icon": {
+          "light": "images/light/square.svg",
+          "dark": "images/dark/square.svg"
+        }
       },
       {
         "command": "titanium.build.setLogLevel",
@@ -447,6 +451,16 @@
         }
       ],
       "view/title": [
+        {
+          "command": "titanium.build.run",
+          "when": "view == titaniumExplorer && !titanium:build:running",
+          "group": "navigation"
+        },
+        {
+          "command": "titanium.build.stop",
+          "when": "view == titaniumExplorer && titanium:build:running",
+          "group": "navigation"
+        },
         {
           "command": "titanium.build.setLiveViewEnabled",
           "when": "view == titaniumExplorer && !config.titanium.build.liveview",

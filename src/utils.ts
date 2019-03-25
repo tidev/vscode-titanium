@@ -261,10 +261,12 @@ export function filterJSFiles (directory: string) {
 }
 
 export function buildArguments (options: any, projectType: string) {
+
 	const args = [
 		'run',
 		'--platform', options.platform,
-		'--log-level', options.logLevel
+		'--log-level', options.logLevel,
+		'--project-dir', options.projectDir
 	];
 
 	if (projectType === 'app') {

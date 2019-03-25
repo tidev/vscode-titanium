@@ -1,5 +1,6 @@
 import project from '../project';
 
+import { workspace } from 'vscode';
 import { GlobalState, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
@@ -26,6 +27,8 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 		const liveview = ExtensionContainer.config.build.liveview;
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastBuildState);
 		const logLevel = ExtensionContainer.config.general.logLevel;
+		const projectDir = workspace.rootPath;
+
 		let deviceId;
 		let deviceLabel;
 		let iOSCertificate;
@@ -118,6 +121,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			target,
 			iOSCertificate,
 			iOSProvisioningProfile,
+			projectDir,
 			logLevel
 		};
 		const args = buildArguments(buildInfo, 'app');
