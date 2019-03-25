@@ -3,6 +3,7 @@ import * as path from 'path';
 import appc from '../appc';
 
 import { window, workspace } from 'vscode';
+import { inputBox, quickPick } from '../quickpicks';
 import { capitalizeFirstLetter } from '../utils';
 import { UserCancellation } from './common';
 
@@ -38,10 +39,8 @@ export enum AlloyComponentExtension {
 }
 
 async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension) {
-	const name = await window.showInputBox({ prompt: `Enter the name for your ${type}` });
-	if (!name) {
-		throw new UserCancellation();
-	}
+	const name = await inputBox({ prompt: `Enter the name for your ${type}` });
+
 	const cwd = workspace.rootPath;
 	const mainFile = path.join(cwd, 'app', folder, `${name}${extension}`);
 	const filePaths = [];
@@ -55,7 +54,7 @@ async function promptForDetails (type: AlloyComponentType, folder: AlloyComponen
 		filePaths.push(mainFile);
 	}
 	if (await fs.pathExists(mainFile)) {
-		const shouldDelete = await window.showQuickPick([ 'Yes', 'No' ], { placeHolder: ` ${name} already exists. Overwrite it?` });
+		const shouldDelete = await quickPick([ 'Yes', 'No' ], { placeHolder: ` ${name} already exists. Overwrite it?` });
 		if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
 			throw new UserCancellation();
 		}
@@ -97,10 +96,12 @@ export async function generateModel () {
 	let name;
 	try {
 		const creationArgs = await promptForDetails(AlloyComponentType.Model, AlloyComponentFolder.Model, AlloyComponentExtension.Model);
+		const adapterType = await quickPick([ 'properties', 'sql' ], { canPickMany: false, placeHolder: 'Which adapter type?' });
 		const cwd = creationArgs.cwd;
 		const filePaths = creationArgs.filePaths;
 		name = creationArgs.name;
 		await appc.generate({
+			adapterType,
 			cwd,
 			type: AlloyComponentType.Model,
 			name,
