@@ -1,4 +1,4 @@
-import { spawn, SpawnOptions } from 'child_process';
+import { ChildProcess, spawn, SpawnOptions } from 'child_process';
 import * as vscode from 'vscode';
 import { ProgressLocation, ProgressOptions, Terminal as VSTerminal, window } from 'vscode';
 import { GlobalState } from './constants';
@@ -9,8 +9,8 @@ export default class Terminal {
 	private name: string;
 	private terminal: VSTerminal;
 	private command: string;
-	private proc: any;
-	private channel: any;
+	private proc: ChildProcess;
+	private channel: vscode.OutputChannel;
 
 	constructor (name: string, command: string = 'appc' ) {
 
@@ -49,9 +49,9 @@ export default class Terminal {
 	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }) {
 		return window.withProgress(progressOptions, () => {
 			return new Promise((resolve, reject) => {
-				this.proc = spawn(this.command, args, spawnOptions);
+				const proc = spawn(this.command, args, spawnOptions);
 
-				this.proc.on('close', code => {
+				proc.on('close', code => {
 					if (code) {
 						return reject();
 					}
@@ -76,7 +76,7 @@ export default class Terminal {
 		this.proc = spawn(this.command, args, { shell: true });
 		this.proc.stdout.on('data', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
-			vscode.commands.executeCommand('setContext', 'build:running', true);
+			vscode.commands.executeCommand('setContext', GlobalState.Running, true);
 			const message = data.toString();
 			this.channel.append(message);
 		});
@@ -89,7 +89,7 @@ export default class Terminal {
 		});
 		this.proc.on('exit', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, false);
-			vscode.commands.executeCommand('setContext', 'build:running', false);
+			vscode.commands.executeCommand('setContext', GlobalState.Running, false);
 			this.proc = null;
 		});
 
