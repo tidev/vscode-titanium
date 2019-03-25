@@ -13,6 +13,8 @@ export async function createApplication () {
 		checkLogin();
 		// ToDo: Store last dir created in and provide as default?
 		let force;
+		const logLevel = ExtensionContainer.config.general.logLevel;
+
 		const name = await inputBox({ prompt: 'Enter your application name' });
 		const appId = await inputBox({
 			prompt: 'Enter your application ID',
@@ -35,9 +37,10 @@ export async function createApplication () {
 			appId,
 			enableServices,
 			force,
-			workspaceDir,
+			logLevel,
 			name,
-			platforms
+			platforms,
+			workspaceDir,
 		});
 		await ExtensionContainer.terminal.runCommandInBackground(args, { cancellable: false, location: ProgressLocation.Notification, title: 'Creating application' });
 		// TODO: Once workspace support is figured out, add an "add to workspace command"
