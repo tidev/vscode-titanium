@@ -40,6 +40,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 
 		if (node) {
 			deviceId = node.deviceId;
+			deviceLabel = node.label;
 			osVersion = node.osVersion;
 			platform = node.platform;
 			target = node.targetId;
