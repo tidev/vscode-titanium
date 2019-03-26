@@ -9,6 +9,7 @@ import { nameForPlatform, packageArguments, } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { enterAndroidKeystoreInfo, enterPassword, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
+import { PackageOptions } from '../types/cli';
 import { KeystoreInfo } from '../types/common';
 
 export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
@@ -86,8 +87,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			}
 		}
 
-		const buildInfo = {
-			buildType,
+		const buildInfo: PackageOptions = {
 			platform,
 			outputDirectory,
 			keystoreInfo,

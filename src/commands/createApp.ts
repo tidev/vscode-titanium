@@ -16,7 +16,7 @@ export async function createApplication () {
 		const logLevel = ExtensionContainer.config.general.logLevel;
 
 		const name = await inputBox({ prompt: 'Enter your application name' });
-		const appId = await inputBox({
+		const id = await inputBox({
 			prompt: 'Enter your application ID',
 			validateInput: currentAppId => {
 				const isValid = validateAppId(currentAppId);
@@ -34,7 +34,7 @@ export async function createApplication () {
 		}
 
 		const args = createAppArguments({
-			appId,
+			id,
 			enableServices,
 			force,
 			logLevel,

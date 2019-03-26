@@ -1,15 +1,3 @@
-export interface RunOptions {
-	buildType?: string;
-	certificate?: IosCert;
-	deviceId?: string;
-	deviceLabel?: string;
-	liveview?: boolean|null;
-	platform?: string;
-	provisioningProfile?: ProvisioningProfile;
-	target?: string;
-	keystore?: KeystoreInfo;
-}
-
 export interface KeystoreInfo {
 	alias: string;
 	location: string;

@@ -1,5 +1,5 @@
-import project from '../project';
-
+import * as path from 'path';
+import { workspace } from 'vscode';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
@@ -7,6 +7,7 @@ import { buildArguments } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
+import { BuildModuleOptions } from '../types/cli';
 
 export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -24,13 +25,16 @@ export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode |
 			const platformInfo = await selectPlatform();
 			platform = platformInfo.id;
 		}
-
-		const buildInfo = {
+		const projectDir = path.join(workspace.rootPath, platform);
+		const buildInfo: BuildModuleOptions = {
 			buildType,
 			platform,
-			logLevel
+			logLevel,
+			projectDir,
+			buildOnly: true,
+			projectType: 'module'
 		};
-		const args = buildArguments(buildInfo, 'module');
+		const args = buildArguments(buildInfo);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, buildInfo);
 		ExtensionContainer.terminal.runCommand(args);
 	} catch (error) {
