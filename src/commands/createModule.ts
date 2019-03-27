@@ -16,7 +16,7 @@ export async function createModule () {
 		const logLevel = ExtensionContainer.config.general.logLevel;
 
 		const name = await inputBox({ prompt: 'Enter your module name' });
-		const appId = await inputBox({
+		const id = await inputBox({
 			prompt: 'Enter your module ID',
 			validateInput: currentAppId => {
 				const isValid = validateAppId(currentAppId);
@@ -33,7 +33,7 @@ export async function createModule () {
 		}
 
 		const args = createModuleArguments({
-			appId,
+			id,
 			force,
 			logLevel,
 			name,

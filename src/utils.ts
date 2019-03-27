@@ -5,6 +5,7 @@ import * as _ from 'underscore';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
+import { BuildAppOptions, BuildModuleOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
 
 /**
  * Returns available target platforms
@@ -260,7 +261,7 @@ export function filterJSFiles (directory: string) {
 	});
 }
 
-export function buildArguments (options: any, projectType: string) {
+export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 
 	const args = [
 		'run',
@@ -269,7 +270,11 @@ export function buildArguments (options: any, projectType: string) {
 		'--project-dir', options.projectDir
 	];
 
-	if (projectType === 'app') {
+	if (options.buildOnly) {
+		args.push('--build-only');
+	}
+
+	if (isAppBuild(options)) {
 		args.push('--target', options.target);
 
 		if (options.target !== 'ws-local') {
@@ -291,7 +296,7 @@ export function buildArguments (options: any, projectType: string) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function packageArguments (options: any) {
+export function packageArguments (options: PackageOptions) {
 	const args = [
 		'run',
 		'--platform', options.platform,
@@ -318,12 +323,12 @@ export function packageArguments (options: any) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function createAppArguments (options: any) {
+export function createAppArguments (options: CreateAppOptions) {
 	const args = [
 		'new',
 		'--type', 'titanium',
 		'--name', options.name,
-		'--id', options.appId,
+		'--id', options.id,
 		'--project-dir', path.join(options.workspaceDir, options.name),
 		'--platforms', options.platforms.join(','),
 		'--no-prompt',
@@ -341,12 +346,12 @@ export function createAppArguments (options: any) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function createModuleArguments (options: any) {
+export function createModuleArguments (options: CreateModuleOptions) {
 	const args = [
 		'new',
 		'--type', 'timodule',
 		'--name', options.name,
-		'--id', options.appId,
+		'--id', options.id,
 		'--project-dir', path.join(options.workspaceDir, options.name),
 		'--platforms', options.platforms.join(','),
 		'--no-prompt',
@@ -369,4 +374,8 @@ export function validateAppId (appId: string) {
 		return false;
 	}
 	return true;
+}
+
+function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is BuildAppOptions {
+	return (options as BuildAppOptions).projectType === 'app';
 }

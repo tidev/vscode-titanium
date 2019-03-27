@@ -18,6 +18,7 @@ import {
 	selectWindowsDevice,
 	selectWindowsEmulator
 } from '../quickpicks/common';
+import { BuildAppOptions } from '../types/cli';
 
 export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -113,7 +114,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
 		}
 
-		const buildInfo = {
+		const buildInfo: BuildAppOptions = {
 			buildType,
 			deviceId,
 			deviceLabel,
@@ -123,9 +124,11 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			iOSCertificate,
 			iOSProvisioningProfile,
 			projectDir,
-			logLevel
+			logLevel,
+			projectType: 'app',
+			buildOnly: false
 		};
-		const args = buildArguments(buildInfo, 'app');
+		const args = buildArguments(buildInfo);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, buildInfo);
 		ExtensionContainer.terminal.runCommand(args);
 	} catch (error) {
