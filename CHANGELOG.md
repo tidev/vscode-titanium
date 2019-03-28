@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.2.0...v0.3.0) (2019-03-28)
+
+
+### Bug Fixes
+
+* **alloy/generate:** handle opening widget files ([#59](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/59)) ([fab426d](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/fab426d)), closes [#55](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/55)
+* **build:** last target undefined ([#65](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/65)) ([9471756](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/9471756)), closes [#57](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/57)
+* **build/module:** pass project dir and build only on module build ([#68](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/68)) ([4ed8907](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/4ed8907)), closes [#67](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/67)
+* **create:** pass in log level to create argument builder ([#61](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/61)) ([9f09ab9](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/9f09ab9)), closes [#60](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/60)
+* **create/model:** add adapter type to model creation ([#64](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/64)) ([95b7259](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/95b7259)), closes [#58](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/58)
+
+
+### Features
+
+* **build:** added the output channel option ([#63](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/63)) ([23e0677](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/23e0677)), closes [#33](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/33)
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.4...v0.2.0) (2019-03-07)
 
