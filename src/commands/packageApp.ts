@@ -19,6 +19,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		const buildType = 'dist';
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastPackageState);
 		const logLevel = ExtensionContainer.config.general.logLevel;
+		const projectDir = workspace.rootPath;
 
 		let iOSCertificate;
 		let iOSProvisioningProfile;
@@ -94,7 +95,8 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			target,
 			iOSCertificate,
 			iOSProvisioningProfile,
-			logLevel
+			logLevel,
+			projectDir
 		};
 		const args = packageArguments(buildInfo);
 		ExtensionContainer.terminal.runCommand(args);

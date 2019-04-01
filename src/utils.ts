@@ -301,7 +301,8 @@ export function packageArguments (options: PackageOptions) {
 		'run',
 		'--platform', options.platform,
 		'--target', options.target,
-		'--log-level', options.logLevel
+		'--log-level', options.logLevel,
+		'--project-dir', options.projectDir
 	];
 
 	if (options.target !== 'dist-appstore') {

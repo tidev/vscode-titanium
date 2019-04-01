@@ -32,6 +32,7 @@ export interface PackageOptions extends BaseCLIOptions {
 	keystoreInfo: KeystoreInfo;
 	outputDirectory: string;
 	platform: 'android' | 'ios' | 'windows';
+	projectDir: string;
 	target: string;
 }
 
