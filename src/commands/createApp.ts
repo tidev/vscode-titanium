@@ -13,7 +13,7 @@ export async function createApplication () {
 		checkLogin();
 		let force;
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		const LastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
+		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 
 		const name = await inputBox({ prompt: 'Enter your application name' });
 		const id = await inputBox({
@@ -27,7 +27,7 @@ export async function createApplication () {
 		});
 		const platforms = await selectPlatforms();
 		const enableServices = await yesNoQuestion({ placeHolder: 'Enable services?' });
-		const workspaceDir = await selectCreationLocation(LastCreationPath);
+		const workspaceDir = await selectCreationLocation(lastCreationPath);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir);
 		if (await fs.pathExists(path.join(workspaceDir, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That app already exists. Would you like to overwrite?' }, true);

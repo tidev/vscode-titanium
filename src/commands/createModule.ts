@@ -13,7 +13,7 @@ export async function createModule () {
 		checkLogin();
 		let force;
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		const LastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
+		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 
 		const name = await inputBox({ prompt: 'Enter your module name' });
 		const id = await inputBox({
@@ -26,7 +26,7 @@ export async function createModule () {
 			}
 		});
 		const platforms = await selectPlatforms();
-		const workspaceDir = await selectCreationLocation(LastCreationPath);
+		const workspaceDir = await selectCreationLocation(lastCreationPath);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir);
 		if (await fs.pathExists(path.join(workspaceDir, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That module already exists. Would you like to overwrite?' }, true);

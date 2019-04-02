@@ -19,5 +19,5 @@ export enum WorkspaceState {
 	LastBuildState = 'lastRunOptions',
 	LastPackageState = 'lastDistOptions',
 	LastKeystorePath = 'lastKeystorePath',
-	LastCreationPath = 'LastCreationPath'
+	LastCreationPath = 'lastCreationPath'
 }

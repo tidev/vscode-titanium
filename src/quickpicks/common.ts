@@ -52,8 +52,8 @@ export async function inputBox (options: InputBoxOptions) {
 	return input;
 }
 
-export async function quickPick (items: any[], quickPickOptions?: QuickPickOptions, options?: any) {
-	if (items.length === 1 && !options.forceShow) {
+export async function quickPick (items: any[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}) {
+	if (items.length === 1 && !forceShow) {
 		return items[0];
 	}
 	const result = await window.showQuickPick(items, quickPickOptions);
