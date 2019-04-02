@@ -52,11 +52,11 @@ export async function inputBox (options: InputBoxOptions) {
 	return input;
 }
 
-export async function quickPick (items: any[], options?: QuickPickOptions) {
-	if (items.length === 1) {
+export async function quickPick (items: any[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}) {
+	if (items.length === 1 && !forceShow) {
 		return items[0];
 	}
-	const result = await window.showQuickPick(items, options);
+	const result = await window.showQuickPick(items, quickPickOptions);
 	if (!result) {
 		throw new UserCancellation();
 	}
@@ -72,6 +72,29 @@ export function selectPlatform (lastBuildDescription?: any) {
 		});
 	}
 	return quickPick(platforms);
+}
+
+export async function selectCreationLocation (lastUsed?) {
+	const items = [{
+		label: 'Browse for directory',
+		id: 'browse'
+	}];
+	if (lastUsed) {
+		items.push({
+			label: `Last used ${lastUsed}`,
+			id: 'last'
+		});
+	}
+	const directory = await quickPick(items, { placeHolder: 'Browse for directory or use last directory' }, { forceShow: true });
+	if (directory.id === 'browse') {
+		const filePath = await window.showOpenDialog({ canSelectMany: false, canSelectFolders: true });
+		if (!filePath) {
+			throw new UserCancellation();
+		}
+		return filePath[0].path;
+	} else {
+		return lastUsed;
+	}
 }
 
 export function selectBuildTarget (platform: string) {

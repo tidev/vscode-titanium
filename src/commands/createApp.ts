@@ -2,18 +2,18 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { commands, ProgressLocation, Uri, window } from 'vscode';
-import { VSCodeCommands } from '../constants';
+import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
-import { inputBox, selectFromFileSystem, selectPlatforms, yesNoQuestion } from '../quickpicks';
+import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createAppArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError,  InteractionError } from './common';
 
 export async function createApplication () {
 	try {
 		checkLogin();
-		// ToDo: Store last dir created in and provide as default?
 		let force;
 		const logLevel = ExtensionContainer.config.general.logLevel;
+		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 
 		const name = await inputBox({ prompt: 'Enter your application name' });
 		const id = await inputBox({
@@ -27,8 +27,8 @@ export async function createApplication () {
 		});
 		const platforms = await selectPlatforms();
 		const enableServices = await yesNoQuestion({ placeHolder: 'Enable services?' });
-		const location: Uri[] = await selectFromFileSystem({ canSelectFolders: true });
-		const workspaceDir = location[0].path;
+		const workspaceDir = await selectCreationLocation(lastCreationPath);
+		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir);
 		if (await fs.pathExists(path.join(workspaceDir, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That app already exists. Would you like to overwrite?' }, true);
 		}

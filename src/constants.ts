@@ -18,5 +18,6 @@ export enum GlobalState {
 export enum WorkspaceState {
 	LastBuildState = 'lastRunOptions',
 	LastPackageState = 'lastDistOptions',
-	LastKeystorePath = 'lastKeystorePath'
+	LastKeystorePath = 'lastKeystorePath',
+	LastCreationPath = 'lastCreationPath'
 }
