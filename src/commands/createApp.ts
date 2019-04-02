@@ -11,7 +11,6 @@ import { checkLogin, handleInteractionError,  InteractionError } from './common'
 export async function createApplication () {
 	try {
 		checkLogin();
-		// ToDo: Store last dir created in and provide as default?
 		let force;
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const LastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
