@@ -522,7 +522,11 @@
   "greenkeeper": {
     "ignore": [
       "@types/node"
-    ]
+    ],
+    "commitMessages": {
+      "dependencyUpdate": "chore(deps): update ${dependency} to version ${version}",
+      "devDependencyUpdate": "chore(deps): update ${dependency} to version ${version}"
+    }
   },
   "scripts": {
     "commit": "git-cz",
