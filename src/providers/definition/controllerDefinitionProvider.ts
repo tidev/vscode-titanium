@@ -30,7 +30,7 @@ const suggestions = [
 		}
 	},
 	{ // widget name
-		regExp: /Alloy\.createWidget\(["']([-a-zA-Z0-9-_/]*)$/,
+		regExp: /Alloy\.createWidget\(["']([-a-zA-Z0-9-_/.]*)$/,
 		files (document, text, value) {
 			return [ document.fileName.replace(/app\/(.*)$/, `app/widgets/${value}/controllers/widget.js`) ];
 		}

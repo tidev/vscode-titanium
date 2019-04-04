@@ -3,7 +3,7 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 
-import { commands, Hover, Location, MarkdownString, Position, Range, Uri, workspace, WorkspaceEdit } from 'vscode';
+import { commands, DefinitionLink, Hover, Location, MarkdownString, Position, Range, Uri, workspace, WorkspaceEdit } from 'vscode';
 import { ExtensionContainer } from '../../container';
 
 /**
@@ -131,7 +131,17 @@ export async function provideDefinition (document, position, suggestions) {
 					return new Location(Uri.file(file), range);
 				});
 			} else {
-				return [ new Location(Uri.file(suggestion.files(document, word, value)[0]), new Range(0, 0, 0, 0)) ];
+				const results: DefinitionLink[] = [];
+				const files = suggestion.files(document, word, value);
+				for (const file of files) {
+					const link: DefinitionLink = {
+						originSelectionRange: new Range(position.line, startIndex, position.line, endIndex),
+						targetRange: new Range(0, 0, 0, 0),
+						targetUri: Uri.file(file)
+					};
+					results.push(link);
+				}
+				return results;
 			}
 		}
 	}
