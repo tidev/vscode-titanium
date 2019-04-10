@@ -21,7 +21,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 * @returns {Thenable|Array}
 	 */
 	public async provideCompletionItems (document, position) {
-		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
+		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character + 1));
 		const prefixRange = document.getWordRangeAtPosition(position);
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
@@ -50,7 +50,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 		} else if (/^['"][.#]\w*$/.test(linePrefix)) {
 			return this.getClassOrIdCompletions(linePrefix, prefix);
 			// tag - "Wind_ or "_
-		} else if (/^['"]\w*$/.test(linePrefix)) {
+		} else if (/^['"]\w['"]*$/.test(linePrefix)) {
 			return this.getTagCompletions(linePrefix, prefix);
 		}
 	}
@@ -107,7 +107,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 					label: key,
 					kind: CompletionItemKind.Class,
 					detail: value.apiName,
-					insertText: new SnippetString(`${key}": {\n\t\${1}\t\n}`)
+					insertText: key
 				});
 			}
 		}
