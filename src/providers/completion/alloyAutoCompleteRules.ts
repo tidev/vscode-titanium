@@ -7,7 +7,7 @@ import { parseString } from 'xml2js';
 import { ExtensionContainer } from '../../container';
 
 export const cfgAutoComplete = {
-	regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)$/,
+	regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)[,]?$/,
 	async getCompletions () {
 		const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
 		const completions = [];
@@ -36,33 +36,35 @@ export const cfgAutoComplete = {
 };
 
 export const i18nAutoComplete = {
-	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*)$/,
-	async getCompletions () {
-		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
-		const i18nPath = utils.getI18nPath();
-		if (utils.directoryExists(i18nPath)) {
-			const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
-			const completions = [];
-			if (utils.fileExists(i18nStringPath)) {
-				const document = await workspace.openTextDocument(i18nStringPath);
-				parseString(document.getText(), (error, result) => {
-					if (result && result.resources && result.resources.string) {
-						for (const value of result.resources.string) {
-							completions.push({
-								label: value.$.name,
-								kind: CompletionItemKind.Reference,
-								detail: value._
-							});
+	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*["']?)$/,
+	getCompletions () {
+		return new Promise(async (resolve, reject) => {
+			const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
+			const i18nPath = utils.getI18nPath();
+			if (utils.directoryExists(i18nPath)) {
+				const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
+				const completions = [];
+				if (utils.fileExists(i18nStringPath)) {
+					const document = await workspace.openTextDocument(i18nStringPath);
+					parseString(document.getText(), (error, result) => {
+						if (result && result.resources && result.resources.string) {
+							for (const value of result.resources.string) {
+								completions.push({
+									label: value.$.name,
+									kind: CompletionItemKind.Reference,
+									detail: value._
+								});
+							}
+							return resolve(completions);
 						}
-						return completions;
-					}
-				});
+					});
+				}
 			}
-		}
+		});
 	}
 };
 export const imageAutoComplete = {
-	regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)$/,
+	regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)['"]?$/,
 	getCompletions () {
 		const alloyRootPath = utils.getAlloyRootPath();
 		const assetPath = path.join(alloyRootPath, 'assets');
