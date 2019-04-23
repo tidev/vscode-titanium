@@ -47,11 +47,11 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 		} else if (/^\s*\w*$/.test(linePrefix)) {
 			return this.getPropertyNameCompletions(linePrefix, prefix, position, document);
 			// class or id - ".foo_ or "#foo
-		} else if (/^['"][.#]\w*$/.test(linePrefix)) {
-			return this.getClassOrIdCompletions(linePrefix, prefix);
+		} else if (/^\s*['"][.#]\w*["']?$/.test(linePrefix)) {
+			return this.getClassOrIdCompletions(linePrefix, prefix, position, document);
 			// tag - "Wind_ or "_
-		} else if (/^['"]\w['"]*$/.test(linePrefix)) {
-			return this.getTagCompletions(linePrefix, prefix);
+		} else if (/^\s*['"]\w*["']?$/.test(linePrefix)) {
+			return this.getTagCompletions(linePrefix, prefix, position, document);
 		}
 	}
 
@@ -63,24 +63,28 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Thenable}
 	 */
-	public getClassOrIdCompletions (linePrefix, prefix) {
+	public getClassOrIdCompletions (linePrefix, prefix, position, document) {
 		return new Promise(resolve => {
 			const relatedFile = related.getTargetPath('xml');
 			const fileName = relatedFile.split('/').pop();
-			workspace.openTextDocument(relatedFile).then(document => {
+			const quote = /'/.test(linePrefix) ? '\'' : '\"';
+			const range = document.getWordRangeAtPosition(position, /\w+["']/);
+			workspace.openTextDocument(relatedFile).then(file => {
 				const completions = [];
 				const values = [];
 				let regex = /class="(.*?)"/g;
-				if (/^['"]#\w*$/.test(linePrefix)) {
+				if (/^['"]#\w*["']?$/.test(linePrefix)) {
 					regex = /id="(.*?)"/g;
 				}
-				for (let matches = regex.exec(document.getText()); matches !== null; matches = regex.exec(document.getText())) {
+				for (let matches = regex.exec(file.getText()); matches !== null; matches = regex.exec(file.getText())) {
 					for (const value of matches[1].split(' ')) {
 						if (value && value.length > 0 && !values.includes(value) && (!prefix || completionItemProviderHelper.matches(value, prefix))) {
 							completions.push({
 								label: value,
 								kind: CompletionItemKind.Reference,
-								detail: `${fileName}`
+								detail: `${fileName}`,
+								range,
+								insertText: new SnippetString(`${value}${quote}: {\n\t\${1}\t\n}`)
 							});
 							values.push(value);
 						}
@@ -99,15 +103,18 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Array}
 	 */
-	public getTagCompletions (linePrefix, prefix) {
+	public getTagCompletions (linePrefix, prefix, position, document) {
 		const completions = [];
+		const range = document.getWordRangeAtPosition(position, /\w+["']/);
+		const quote = /'/.test(linePrefix) ? '\'' : '\"';
 		for (const [ key, value ] of Object.entries(this.completions.alloy.tags) as any[]) {
 			if (!prefix || completionItemProviderHelper.matches(key, prefix)) {
 				completions.push({
 					label: key,
 					kind: CompletionItemKind.Class,
 					detail: value.apiName,
-					insertText: key
+					range,
+					insertText: new SnippetString(`${key}${quote}: {\n\t\${1}\t\n}`)
 				});
 			}
 		}

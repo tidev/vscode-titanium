@@ -57,7 +57,7 @@
       {
         "language": "alloy-tss",
         "scopeName": "source.css.tss",
-        "path": "./grammars/tss.tmLanguage"
+        "path": "./grammars/tss.JSON-tmLanguage.json"
       }
     ],
     "commands": [
