@@ -196,26 +196,25 @@ exports.deactivate = deactivate;  // eslint-disable-line no-undef
  * Initialise extension - fetch appc info
  */
 async function init () {
-	const isEnabled = await ExtensionContainer.context.globalState.get<boolean>(GlobalState.Enabled);
+	const isEnabled = ExtensionContainer.context.globalState.get<boolean>(GlobalState.Enabled);
 	if (isEnabled) {
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Reading Appcelerator environment ...' }, async progress => {
 			return new Promise((resolve, reject) => {
-				if ( ExtensionContainer.context.globalState.get('titanium:liveview')) {
+				if (ExtensionContainer.context.globalState.get('titanium:liveview')) {
 					vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 				}
 				appc.getInfo(error => {
 					if (error) {
 						vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-						reject();
+						return reject();
 					}
 					if (project.isTitaniumApp) {
 						generateCompletions({ progress });
 						resolve();
-					} else {
-						// Call refresh incase the Titanium Explorer activity pane became active before info
-						vscode.commands.executeCommand(Commands.RefreshExplorer);
-						resolve();
 					}
+					// Call refresh incase the Titanium Explorer activity pane became active before info
+					vscode.commands.executeCommand(Commands.RefreshExplorer);
+					resolve();
 				});
 			});
 		});
