@@ -13,6 +13,8 @@ export enum GlobalState {
 	Enabled = 'titanium:enabled',
 	Liveview = 'titanium:liveview',
 	Running = 'titanium:build:running',
+	LastUpdateCheck = 'titanium:update:lastCheck',
+	HasUpdates = 'titanium:update:hasUpdates'
 }
 
 export enum WorkspaceState {

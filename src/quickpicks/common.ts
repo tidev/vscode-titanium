@@ -3,6 +3,7 @@ import appc from '../appc';
 import * as utils from '../utils';
 
 import { pathExists } from 'fs-extra';
+import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
@@ -242,4 +243,30 @@ export function selectWindowsDevice () {
 
 export function selectWindowsEmulator () {
 	// TODO
+}
+
+export async function selectUpdates (updates: UpdateInfo[]) {
+	const choices = updates
+		.map(update => ({
+			label: `${update.productName}: ${update.latestVersion}`,
+			action: update.action,
+			latestVersion: update.latestVersion,
+			priority: update.priority,
+			picked: true,
+			productName: update.productName
+		})
+	);
+
+	const selected = await quickPick(choices, {
+		canPickMany: true,
+		placeHolder: 'Which updates would you like to install?'
+	}, {
+		forceShow: true
+	});
+
+	if (!selected) {
+		throw new UserCancellation();
+	}
+
+	return selected;
 }

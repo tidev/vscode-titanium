@@ -8,6 +8,7 @@ export interface InteractionChoice {
 
 export enum Commands {
 	BuildApp = 'titanium.build.run',
+	CheckForUpdates = 'titanium.updates.checkAll',
 	CreateApp = 'titanium.create.application',
 	CreateModule = 'titanium.create.module',
 	DisableLiveView = 'titanium.build.setLiveViewDisabled',
@@ -19,15 +20,21 @@ export enum Commands {
 	GenerateAlloyView = 'titanium.alloy.generate.view',
 	GenerateAlloyWidget = 'titanium.alloy.generate.widget',
 	GenerateAutocomplete = 'titanium.generate.autocompleteSuggestions',
+	InstallAllUpdates = 'titanium.updates.installAll',
+	InstallUpdate = 'titanium.updates.install',
 	OpenAppOnDashboard = 'titanium.openDashboard',
 	OpenAllRelatedFiles = 'titanium.alloy.open.allRelatedFiles',
 	OpenRelatedController = 'titanium.alloy.open.relatedController',
 	OpenRelatedStyle = 'titanium.alloy.open.relatedStyle',
 	OpenRelatedView = 'titanium.alloy.open.relatedView',
+	OpenReleaseNotes = 'titanium.updates.openReleaseNotes',
 	PackageApp = 'titanium.package.run',
 	RefreshExplorer = 'titanium.explorer.refresh',
+	RefreshUpdates = 'titanium.updateExplorer.refresh',
+	SelectUpdates = 'titanium.updates.select',
 	SetLogLevel = 'titanium.build.setLogLevel',
-	StopBuild = 'titanium.build.stop'
+	StopBuild = 'titanium.build.stop',
+	ShowUpdatesView = 'titanium.view.updateExplorer.focus'
 }
 
 export class UserCancellation extends Error {
