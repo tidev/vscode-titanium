@@ -146,7 +146,7 @@ function activate (context) {
 			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()));
 		}),
 
-		vscode.window.registerTreeDataProvider('titaniumExplorer', deviceExplorer),
+		vscode.window.registerTreeDataProvider('titanium.view.deviceExplorer', deviceExplorer),
 
 		vscode.commands.registerCommand(Commands.RefreshExplorer, () => {
 			deviceExplorer.refresh();

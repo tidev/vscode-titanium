@@ -315,17 +315,17 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "titanium-explorer",
+          "id": "titanium",
           "title": "Titanium",
           "icon": "images/titanium.svg"
         }
       ]
     },
     "views": {
-      "titanium-explorer": [
+      "titanium": [
         {
-          "id": "titaniumExplorer",
-          "name": "Explorer",
+          "id": "titanium.view.deviceExplorer",
+          "name": "Device Explorer",
           "when": "titanium:enabled"
         }
       ]
@@ -454,52 +454,53 @@
       "view/title": [
         {
           "command": "titanium.build.run",
-          "when": "view == titaniumExplorer && !titanium:build:running",
+          "when": "view == titanium.view.deviceExplorer && !titanium:build:running",
           "group": "navigation"
         },
         {
           "command": "titanium.build.stop",
-          "when": "view == titaniumExplorer && titanium:build:running",
+          "when": "view == titanium.view.deviceExplorer && titanium:build:running",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLiveViewEnabled",
-          "when": "view == titaniumExplorer && !config.titanium.build.liveview",
+          "when": "view == titanium.view.deviceExplorer && !config.titanium.build.liveview",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLiveViewDisabled",
-          "when": "view == titaniumExplorer && config.titanium.build.liveview",
+          "when": "view == titanium.view.deviceExplorer && config.titanium.build.liveview",
           "group": "navigation"
         },
         {
           "command": "titanium.explorer.refresh",
-          "when": "view == titaniumExplorer",
+          "when": "view == titanium.view.deviceExplorer",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLogLevel",
-          "group": "2_workspace"
+          "group": "2_workspace",
+          "when": "view == titanium.view.deviceExplorer"
         }
       ],
       "view/item/context": [
         {
           "command": "titanium.package.run",
-          "when": "view == titaniumExplorer && viewItem == PlatformNode"
+          "when": "view == titanium && viewItem == PlatformNode"
         },
         {
           "command": "titanium.package.run",
-          "when": "view == titaniumExplorer && viewItem == PlatformNode",
+          "when": "view == titanium && viewItem == PlatformNode",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titaniumExplorer && viewItem == DeviceNode",
+          "when": "view == titanium && viewItem == DeviceNode",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titaniumExplorer"
+          "when": "view == titanium"
         }
       ]
     }
