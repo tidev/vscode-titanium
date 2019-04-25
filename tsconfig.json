@@ -7,15 +7,17 @@
         "lib": [
             "es2018"
         ],
+        "moduleResolution": "node",
         "sourceMap": true,
         "rootDir": "src",
-        /* Strict Type-Checking Option */
-        "strict": false,   /* enable all strict type-checking options */
-        /* Additional Checks */
-        "noUnusedLocals": false /* Report errors on unused locals. */
-        // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
-        // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
-        // "noUnusedParameters": true,  /* Report errors on unused parameters. */
+        "strict": false,
+        "noUnusedLocals": false,
+        "baseUrl": ".",
+        "paths": {
+            "titanium-editor-commons/*": [
+                "node_modules/titanium-editor-commons/out/*"
+            ]
+        }
     },
     "exclude": [
         "node_modules",
