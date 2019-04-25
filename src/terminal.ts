@@ -46,6 +46,20 @@ export default class Terminal {
 		}
 	}
 
+	public executeCommand (command: string) {
+		if (!this.terminal) {
+			this.terminal = window.createTerminal({ name: this.name });
+		}
+		const activeTerminal = window.activeTerminal;
+		// Only call show if we arent the active terminal
+		if (!activeTerminal || activeTerminal.name !== this.terminal.name) {
+			this.terminal.show();
+		}
+		this.clear();
+		this.terminal.sendText(command);
+
+	}
+
 	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }) {
 		return window.withProgress(progressOptions, () => {
 			return new Promise((resolve, reject) => {

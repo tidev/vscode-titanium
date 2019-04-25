@@ -18,7 +18,8 @@ export interface Config {
 		appcCommandPath: string,
 		displayBuildCommandInConsole: boolean,
 		logLevel: LogLevel,
-		useTerminalForBuild: boolean
+		useTerminalForBuild: boolean,
+		updateFrequency: string
 	};
 	package: {
 		distributionOutputDirectory: string

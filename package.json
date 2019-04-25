@@ -30,7 +30,7 @@
     "url": "git+https://github.com/appcelerator/vscode-appcelerator-titanium.git"
   },
   "engines": {
-    "vscode": "^1.29.0"
+    "vscode": "^1.31.0"
   },
   "activationEvents": [
     "onCommand:titanium.create.application",
@@ -189,6 +189,39 @@
         "command": "titanium.generate.autocompleteSuggestions",
         "title": "Generate autocomplete list",
         "category": "Titanium"
+      },
+      {
+        "command": "titanium.updates.openReleaseNotes",
+        "title": "Open release notes",
+        "category": "Titanium",
+        "icon": {
+          "light": "images/light/link-external.svg",
+          "dark": "images/dark/link-external.svg"
+        }
+      },
+      {
+        "command": "titanium.updates.checkAll",
+        "title": "Check For Updates",
+        "category": "Titanium",
+        "icon": {
+          "light": "images/light/refresh.svg",
+          "dark": "images/dark/refresh.svg"
+        }
+      },
+      {
+        "command": "titanium.updates.installAll",
+        "title": "Install All Updates",
+        "category": "Titanium"
+      },
+      {
+        "command": "titanium.updates.select",
+        "title": "Select Updates",
+        "category": "Titanium"
+      },
+      {
+        "command": "titanium.updates.install",
+        "title": "Install Update",
+        "category": "Titanium"
       }
     ],
     "keybindings": [
@@ -295,6 +328,11 @@
             "warn"
           ]
         },
+        "titanium.general.updateFrequency": {
+          "type": "string",
+          "default": "1 day",
+          "description": "Controls the frequency for how often to show an alert if there are updates available. Updates can always be viewed in the Titanium activity pane. Accepts values in time formats like 60 minutes, 12 hours, 7 days etc."
+        },
         "titanium.general.useTerminalForBuild": {
           "type": "boolean",
           "default": true,
@@ -326,6 +364,11 @@
         {
           "id": "titanium.view.deviceExplorer",
           "name": "Device Explorer",
+          "when": "titanium:enabled"
+        },
+        {
+          "id": "titanium.view.updateExplorer",
+          "name": "Update Explorer",
           "when": "titanium:enabled"
         }
       ]
@@ -409,6 +452,14 @@
         {
           "command": "titanium.alloy.generate.widget",
           "when": "titanium:enabled"
+        },
+        {
+          "command": "titanium.updates.openReleaseNotes",
+          "when": "false"
+        },
+        {
+          "command": "titanium.updates.install",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -481,26 +532,50 @@
           "command": "titanium.build.setLogLevel",
           "group": "2_workspace",
           "when": "view == titanium.view.deviceExplorer"
+        },
+        {
+          "command": "titanium.updates.installAll",
+          "group": "2_workspace",
+          "when": "view == titanium.view.updateExplorer && titanium:update:hasUpdates"
+        },
+        {
+          "command": "titanium.updates.select",
+          "group": "2_workspace",
+          "when": "view == titanium.view.updateExplorer && titanium:update:hasUpdates"
+        },
+        {
+          "command": "titanium.updates.checkAll",
+          "when": "view == titanium.view.updateExplorer",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
         {
           "command": "titanium.package.run",
-          "when": "view == titanium && viewItem == PlatformNode"
+          "when": "view == titanium.view.deviceExplorer && viewItem == PlatformNode"
         },
         {
           "command": "titanium.package.run",
-          "when": "view == titanium && viewItem == PlatformNode",
+          "when": "view == titanium.view.deviceExplorer && viewItem == PlatformNode",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium && viewItem == DeviceNode",
+          "when": "view == titanium.view.deviceExplorer && viewItem == DeviceNode",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium"
+          "when": "view == titanium.view.deviceExplorer"
+        },
+        {
+          "command": "titanium.updates.openReleaseNotes",
+          "when": "view == titanium.view.updateExplorer && viewItem == UpdateNode",
+          "group": "inline"
+        },
+        {
+          "command": "titanium.updates.install",
+          "when": "view == titanium.view.updateExplorer && viewItem == UpdateNode"
         }
       ]
     }
@@ -563,12 +638,14 @@
     "tslint": "^5.15.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.4.1",
-    "vscode": "^1.1.33"
+    "vscode": "^1.1.31"
   },
   "dependencies": {
     "fs-extra": "^7.0.1",
     "klaw-sync": "^6.0.0",
+    "ms": "^2.1.1",
     "semver": "^6.0.0",
+    "titanium-editor-commons": "^0.1.1",
     "underscore": "^1.8.3",
     "xml2js": "^0.4.19"
   }

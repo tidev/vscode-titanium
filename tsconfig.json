@@ -12,12 +12,7 @@
         "rootDir": "src",
         "strict": false,
         "noUnusedLocals": false,
-        "baseUrl": ".",
-        "paths": {
-            "titanium-editor-commons/*": [
-                "node_modules/titanium-editor-commons/out/*"
-            ]
-        }
+        "baseUrl": "."
     },
     "exclude": [
         "node_modules",

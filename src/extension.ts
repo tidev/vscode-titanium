@@ -29,12 +29,17 @@ import { ViewCompletionItemProvider } from './providers/completion/viewCompletio
 
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
-import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
 import { LogLevel } from './types/common';
+
+import * as ms from 'ms';
+import { updates } from 'titanium-editor-commons';
+import { UpdateNode } from './explorer/nodes';
+import UpdateExplorer from './explorer/updatesExplorer';
+import { selectUpdates } from './quickpicks/common';
 
 let projectStatusBarItem;
 /**
@@ -71,6 +76,7 @@ function activate (context) {
 	const styleFilePattern = '**/*.tss';
 	const controllerFilePattern = '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}';
 	const deviceExplorer = new DeviceExplorer();
+	const updateExplorer = new UpdateExplorer();
 	context.subscriptions.push(
 		// register completion providers
 		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCompletionItemProvider(), '.', '\'', '"'),
@@ -152,6 +158,12 @@ function activate (context) {
 			deviceExplorer.refresh();
 		}),
 
+		vscode.window.registerTreeDataProvider('titanium.view.updateExplorer', updateExplorer),
+
+		vscode.commands.registerCommand(Commands.RefreshUpdates, () => {
+			updateExplorer.refresh();
+		}),
+
 		vscode.commands.registerCommand(Commands.EnableLiveView, async () => {
 			await configuration.update('build.liveview', true, vscode.ConfigurationTarget.Global);
 			vscode.window.showInformationMessage('Enabled LiveView');
@@ -176,8 +188,74 @@ function activate (context) {
 
 		vscode.commands.registerCommand(Commands.CreateApp, createApplication),
 
-		vscode.commands.registerCommand(Commands.CreateModule, createModule)
+		vscode.commands.registerCommand(Commands.CreateModule, createModule),
 
+		vscode.commands.registerCommand(Commands.OpenReleaseNotes, ({ update }: UpdateNode) => {
+			vscode.env.openExternal(vscode.Uri.parse(update.releaseNotes));
+		}),
+
+		vscode.commands.registerCommand(Commands.CheckForUpdates, async () => {
+			vscode.commands.executeCommand(Commands.RefreshUpdates);
+			const updateInfo = await updates.checkAllUpdates();
+			const numberOfUpdates = updateInfo.length;
+			if (!numberOfUpdates) {
+				return;
+			}
+			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
+			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
+			const message = numberOfUpdates > 1 ? `There are ${numberOfUpdates} updates available` : `There is ${numberOfUpdates} update available`;
+			const choice = await vscode.window.showInformationMessage(message, { title: 'Install' }, { title: 'View' });
+			if (!choice) {
+				return;
+			}
+			if (choice.title === 'Install') {
+				vscode.commands.executeCommand(Commands.SelectUpdates);
+			} else if (choice.title === 'View') {
+				// Focus the update view
+				await vscode.commands.executeCommand(Commands.ShowUpdatesView);
+			}
+		}),
+
+		vscode.commands.registerCommand(Commands.SelectUpdates, async updateInfo => {
+			try {
+				if (!updateInfo) {
+					updateInfo = updateExplorer.updates;
+				}
+
+				const updatesToInstall = await selectUpdates(updateInfo);
+				await installUpdates(updatesToInstall);
+				if (updateInfo.length === updatesToInstall.length) {
+					ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+					vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+				}
+			} catch (error) {
+				// stuff
+			}
+		}),
+
+		vscode.commands.registerCommand(Commands.InstallAllUpdates, async updateInfo => {
+			try {
+				if (!updateInfo) {
+					updateInfo = updateExplorer.updates;
+				}
+
+				await installUpdates(updateInfo);
+				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+			} catch (error) {
+				// stuff
+			}
+		}),
+
+		vscode.commands.registerCommand(Commands.InstallUpdate, async updateInfo => {
+			try {
+				await installUpdates([ updateInfo.update ]);
+				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+			} catch (error) {
+				// stuff
+			}
+		}),
 	);
 
 	return init();
@@ -213,8 +291,27 @@ async function init () {
 					}
 					// Call refresh incase the Titanium Explorer activity pane became active before info
 					vscode.commands.executeCommand(Commands.RefreshExplorer);
+
+					// Perform the update check if we need to
+					const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck);
+					const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
+
+					// If there's no timestamp for when we last checked the updates then set to now
+					if (!lastUpdateCheck) {
+						ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+					}
+
+					const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
+					if (checkUpdates) {
+						ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+						vscode.commands.executeCommand(Commands.CheckForUpdates);
+					} else {
+						vscode.commands.executeCommand(Commands.RefreshUpdates);
+					}
+
 					resolve();
 				});
+
 			});
 		});
 	}
@@ -274,4 +371,58 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 	} catch (error) {
 		vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`);
 	}
+}
+
+async function installUpdates (updateInfo) {
+	vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
+		return new Promise(async resolve => {
+			const totalUpdates = updateInfo.length;
+			let counter = 1;
+
+			// sort prior to running
+			updateInfo.sort((curr, prev) => curr.priority - prev.priority);
+
+			for (const update of updateInfo) {
+				const label = update.label || `${update.productName}: ${update.latestVersion}`;
+				progress.report({
+					message: `Installing ${label} (${counter}/${totalUpdates})`
+				});
+				try {
+					await update.action(update.latestVersion);
+					progress.report({
+						increment: 100 / totalUpdates,
+						message: `Installed ${label} (${counter}/${totalUpdates})`
+					});
+				} catch (error) {
+					progress.report({
+						increment: 100 / totalUpdates,
+						message: `Failed to install ${label} (${counter}/${totalUpdates})`
+					});
+					if (error.metadata) {
+						const { metadata } = error;
+						if (update.productName === updates.ProductNames.AppcInstaller && metadata.errorCode === 'EACCES') {
+							const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${update.label} as it must be ran with sudo`, {
+								title: 'Install with Sudo',
+								run: () => {
+									ExtensionContainer.terminal.executeCommand(`sudo ${metadata.command}`);
+								}
+							});
+							if (runWithSudo) {
+								runWithSudo.run();
+							}
+						}
+					} else {
+						// TODO should we show the error that we got passed?
+						await vscode.window.showErrorMessage(`Failed to update to ${update.label}`);
+					}
+				}
+				counter++;
+			}
+			await vscode.commands.executeCommand(Commands.RefreshUpdates);
+			await vscode.commands.executeCommand(Commands.RefreshExplorer);
+			// resolve but don't return so that the progress reporting dialog is dismissed before we report the summary
+			resolve();
+			await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
+		});
+	});
 }
