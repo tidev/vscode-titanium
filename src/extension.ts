@@ -210,7 +210,6 @@ async function init () {
 					}
 					if (project.isTitaniumApp) {
 						generateCompletions({ progress });
-						resolve();
 					}
 					// Call refresh incase the Titanium Explorer activity pane became active before info
 					vscode.commands.executeCommand(Commands.RefreshExplorer);
