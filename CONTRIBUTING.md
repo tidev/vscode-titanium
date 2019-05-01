@@ -27,7 +27,6 @@ When sending in a PR please make sure you do the following:
 - When making the PR, please make sure to contain as much relevant info as possible in the PR body.
 - Make sure to sign the [Axway CLA](https://cla.axway.com/).
 
-
 ## Releasing
 
 To release of the extension the following needs to be followed:
@@ -37,7 +36,7 @@ To release of the extension the following needs to be followed:
 	- Runs `scripts/generate-settings-table.js` to ensure the configuration settings documentation is up to date.
 	- Runs [standard-version](https://github.com/conventional-changelog/standard-version) to bump versions based on commit messages, updates the changelog, commits the files and tags a new release.
 	- Runs `npx vsce package` to generate a new `.vsix` file ready for upload to the marketplace.
-3. Push to the main repo.
-4. Upload the `.vsix` file to the marketplace.
+3. Push to the main repo with `git push` and `git push <appc remote> <tag>`.
+4. Upload the `.vsix` file to the [marketplace](https://marketplace.visualstudio.com/manage).
 5. Draft a new release on the [releases page](https://github.com/appcelerator/vscode-appcelerator-titanium/releases).
 6. 🎉
