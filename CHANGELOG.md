@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.3.2"></a>
+## [0.3.2](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.3.1...v0.3.2) (2019-05-01)
+
+
+### Bug Fixes
+
+* **providers:** added auto close for quotes and brackets for tss ([#76](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/76)) ([bfedfe1](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bfedfe1))
+* **providers:** fix the link for the widget identifier ([#75](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/75)) ([fbd06c6](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/fbd06c6)), closes [#62](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/62)
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.3.0...v0.3.1) (2019-04-01)
 
