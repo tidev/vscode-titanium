@@ -30,19 +30,19 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 		}
 		// property value - foo: _ or foo: ba_
 		if (/\s*\w+\s*:\s*\w*[(]?["'.]?\w*["'.]?[,]?$/.test(linePrefix)) {
-		// first attempt Alloy rules (i18n, image etc.)
-		let ruleResult;
-		for (const rule of Object.values(alloyAutoCompleteRules)) {
-			if (rule.regExp.test(linePrefix)) {
-				ruleResult = await rule.getCompletions();
+			// first attempt Alloy rules (i18n, image etc.)
+			let ruleResult;
+			for (const rule of Object.values(alloyAutoCompleteRules)) {
+				if (rule.regExp.test(linePrefix)) {
+					ruleResult = await rule.getCompletions();
+				}
 			}
-		}
-		if (ruleResult) {
-			return ruleResult;
-		} else {
-			return this.getPropertyValueCompletions(linePrefix, prefix);
-		}
-			// property name - _ or fo_
+			if (ruleResult) {
+				return ruleResult;
+			} else {
+				return this.getPropertyValueCompletions(linePrefix, prefix);
+			}
+		// property name - _ or fo_
 		} else if (/^\s*\w*$/.test(linePrefix)) {
 			return this.getPropertyNameCompletions(linePrefix, prefix, position, document);
 			// class or id - ".foo_ or "#foo
