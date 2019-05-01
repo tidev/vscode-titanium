@@ -33,7 +33,8 @@
     },
     "linterOptions": {
         "exclude": [
-            "scripts/*.js"
+            "scripts/*.js",
+            "grammars/*.json"
         ]
     }
 }
