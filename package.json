@@ -169,13 +169,15 @@
       },
       {
         "command": "titanium.create.application",
-        "title": "Create Titanium application",
-        "category": "Titanium"
+        "title": "Create application",
+        "category": "Titanium",
+        "description": "Create a new Titanium application project"
       },
       {
         "command": "titanium.create.module",
-        "title": "Create Titanium module",
-        "category": "Titanium"
+        "title": "Create module",
+        "category": "Titanium",
+        "description": "Create a new Titanium module project"
       },
       {
         "command": "titanium.explorer.refresh",
@@ -197,27 +199,31 @@
       },
       {
         "command": "titanium.build.run",
-        "title": "Run",
+        "title": "Build",
         "category": "Titanium",
-        "icon": "$(play)"
+        "icon": "$(play)",
+        "description": "Build a Titanium project"
       },
       {
         "command": "titanium.build.debug",
         "title": "Debug",
         "category": "Titanium",
-        "icon": "$(debug)"
+        "icon": "$(debug)",
+        "description": "Debug a Titanium project"
       },
       {
         "command": "titanium.package.run",
-        "title": "Distribute",
+        "title": "Package",
         "category": "Titanium",
-        "icon": "$(package)"
+        "icon": "$(package)",
+        "description": "Package a Titanium project"
       },
       {
         "command": "titanium.build.stop",
         "title": "Stop",
         "category": "Titanium",
-        "icon": "$(debug-stop)"
+        "icon": "$(debug-stop)",
+        "description": "Stop a running build or package process"
       },
       {
         "command": "titanium.build.setLogLevel",
@@ -347,11 +353,13 @@
     "snippets": [
       {
         "language": "javascript",
-        "path": "./snippets/titanium.json"
+        "path": "./snippets/titanium.json",
+        "description": "Snippets for Titanium development"
       },
       {
         "language": "javascript",
-        "path": "./snippets/alloy.json"
+        "path": "./snippets/alloy.json",
+        "description": "Snippets for Alloy development"
       }
     ],
     "configuration": {
@@ -555,6 +563,14 @@
         },
         {
           "command": "titanium.build.debug",
+          "when": "false"
+        },
+        {
+          "command": "titanium.init",
+          "when": "false"
+        },
+        {
+          "command": "titanium.explorer.refresh",
           "when": "false"
         }
       ],
@@ -881,8 +897,9 @@
   "scripts": {
     "commit": "git-cz",
     "compile": "tsc -p ./",
+    "generate-readme": "node ./scripts/readme/generate.js",
     "lint": "eslint --ext .ts src/",
-    "release": "node ./scripts/generate-settings-table.js &&  standard-version && npx vsce package",
+    "release": "npm run generate-readme && standard-version && npx vsce package",
     "test": "COVERAGE=1 node ./out/test/unit/runTest.js",
     "test:integration": "node -e \"console.log('Hey there! You want to run the UI tests, but you cant do that via npm run. So you want to run ./runUITests.sh')\"",
     "vscode:prepublish": "npm run compile",
@@ -921,6 +938,7 @@
     "eslint-config-axway": "^4.7.0",
     "eslint-plugin-chai-friendly": "^0.6.0",
     "eslint-plugin-mocha": "^7.0.1",
+    "ejs": "^3.0.2",
     "glob": "^7.1.6",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
