@@ -362,13 +362,13 @@
     "views": {
       "titanium": [
         {
-          "id": "titanium.view.deviceExplorer",
-          "name": "Device Explorer",
+          "id": "titanium.view.buildExplorer",
+          "name": "Build",
           "when": "titanium:enabled"
         },
         {
           "id": "titanium.view.updateExplorer",
-          "name": "Update Explorer",
+          "name": "Updates",
           "when": "titanium:enabled"
         }
       ]
@@ -505,33 +505,33 @@
       "view/title": [
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.deviceExplorer && !titanium:build:running",
+          "when": "view == titanium.view.buildExplorer && !titanium:build:running",
           "group": "navigation"
         },
         {
           "command": "titanium.build.stop",
-          "when": "view == titanium.view.deviceExplorer && titanium:build:running",
+          "when": "view == titanium.view.buildExplorer && titanium:build:running",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLiveViewEnabled",
-          "when": "view == titanium.view.deviceExplorer && !config.titanium.build.liveview",
+          "when": "view == titanium.view.buildExplorer && !config.titanium.build.liveview",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLiveViewDisabled",
-          "when": "view == titanium.view.deviceExplorer && config.titanium.build.liveview",
+          "when": "view == titanium.view.buildExplorer && config.titanium.build.liveview",
           "group": "navigation"
         },
         {
           "command": "titanium.explorer.refresh",
-          "when": "view == titanium.view.deviceExplorer",
+          "when": "view == titanium.view.buildExplorer",
           "group": "navigation"
         },
         {
           "command": "titanium.build.setLogLevel",
           "group": "2_workspace",
-          "when": "view == titanium.view.deviceExplorer"
+          "when": "view == titanium.view.buildExplorer"
         },
         {
           "command": "titanium.updates.installAll",
@@ -552,21 +552,21 @@
       "view/item/context": [
         {
           "command": "titanium.package.run",
-          "when": "view == titanium.view.deviceExplorer && viewItem == PlatformNode"
+          "when": "view == titanium.view.buildExplorer && viewItem == PlatformNode"
         },
         {
           "command": "titanium.package.run",
-          "when": "view == titanium.view.deviceExplorer && viewItem == PlatformNode",
+          "when": "view == titanium.view.buildExplorer && viewItem == PlatformNode",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.deviceExplorer && viewItem == DeviceNode",
+          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.deviceExplorer"
+          "when": "view == titanium.view.buildExplorer"
         },
         {
           "command": "titanium.updates.openReleaseNotes",
