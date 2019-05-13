@@ -18,6 +18,7 @@
     "Extension Packs",
     "Programming Languages",
     "Snippets",
+    "Debuggers",
     "Other"
   ],
   "homepage": "https://github.com/appcelerator/vscode-appcelerator-titanium",
@@ -33,6 +34,7 @@
     "vscode": "^1.31.0"
   },
   "activationEvents": [
+    "onDebug",
     "onCommand:titanium.create.application",
     "onCommand:titanium.create.module",
     "workspaceContains:tiapp.xml",
@@ -41,6 +43,66 @@
   "license": "Apache 2.0",
   "main": "./out/extension",
   "contributes": {
+    "debuggers": [
+      {
+        "type": "titanium",
+        "label": "Titanium Debugger",
+        "languages": [
+          "javascript"
+        ],
+        "enableBreakpointsFor": {
+          "languageIds": [
+            "javascript",
+            "typescript"
+          ]
+        },
+        "program": "./out/debugger/titaniumDebugger.js",
+        "runtime": "node",
+        "initialConfigurations": [
+          {
+            "name": "Launch on Android",
+            "type": "titanium",
+            "request": "launch",
+            "platform": "android",
+            "appRoot": "${workspaceRoot}",
+            "sourceMaps": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Titanium: Launch on Android",
+            "description": "Configuration for launch app on Android emulator",
+            "body": {
+              "name": "Launch on Android",
+              "type": "titanium",
+              "request": "launch",
+              "platform": "android",
+              "appRoot": "^\"\\${workspaceRoot}\"",
+              "sourceMaps": true
+            }
+          }
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": ["platform", "appRoot"],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "description": "Platform to debug"
+              },
+              "appRoot": {
+                "type": "string",
+                "description": "Root for folder to debug"
+              },
+              "port": {
+                "type": "number",
+                "description": "Port number"
+              }
+            }
+          }
+        }
+      }
+    ],
     "languages": [
       {
         "id": "alloy-tss",
@@ -647,6 +709,8 @@
     "semver": "^6.2.0",
     "titanium-editor-commons": "^0.2.0",
     "underscore": "^1.8.3",
+    "vscode-chrome-debug-core": "^6.7.48",
+    "vscode-debugadapter": "^1.34.0",
     "xml2js": "^0.4.19"
   }
 }
