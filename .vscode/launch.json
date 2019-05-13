@@ -27,6 +27,25 @@
                 "${workspaceFolder}/out/test/**/*.js"
             ],
             "preLaunchTask": "npm: watch"
+        },
+        {
+            "name": "Server",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/src/debugger/titaniumDebugger.ts",
+            "args": [
+                "--server=4711"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Extension + Server",
+            "configurations": [ "Extension", "Server" ]
         }
     ]
 }
