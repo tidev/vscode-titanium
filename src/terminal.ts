@@ -76,7 +76,7 @@ export default class Terminal {
 
 	}
 
-	public runCommandInOutput (args: string[]) {
+	public runCommandInOutput (args: string[], cwd?: string) {
 		if (this.proc) {
 			window.showInformationMessage('A build is already in progress');
 			return;
@@ -87,7 +87,7 @@ export default class Terminal {
 		args.push('--no-prompt');
 		this.channel.clear();
 		this.channel.append(`${this.command} ${args.join(' ')}\n\n`);
-		this.proc = spawn(this.command, args, { shell: true });
+		this.proc = spawn(this.command, args, { shell: true, cwd  });
 		this.proc.stdout.on('data', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 			vscode.commands.executeCommand('setContext', GlobalState.Running, true);
@@ -108,6 +108,7 @@ export default class Terminal {
 		});
 
 		this.channel.show();
+		return this.proc;
 	}
 
 	public clear () {

@@ -1,6 +1,5 @@
-import { ChromeDebugAdapter, ChromeDebugSession, IAttachRequestArgs, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
-import { Event } from 'vscode-debugadapter';
-import { DebugProtocol } from 'vscode-debugprotocol';
+import { ChromeDebugAdapter, ChromeDebugSession, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
+import { DebugProtocol, Event } from 'vscode-debugadapter';
 import { MESSAGE_STRING, Request } from '../common/extensionProtocol';
 import { BuildAppOptions } from '../types/cli';
 import { LogLevel } from '../types/common';
@@ -14,7 +13,6 @@ export interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
 	cwd: string;
 	projectType: string;
 }
-
 export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 	private idCount = 0;
@@ -51,9 +49,6 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			target: launchArgs.target || 'emulator'
 		};
 		const info: any = await this.sendRequest('BUILD', args);
-		if (info.isError) {
-			throw new Error(info.message);
-		}
 		// TODO: Clean up to be more correct
 		launchArgs.port = args.debugPort;
 		launchArgs.cwd = args.projectDir;
@@ -84,4 +79,11 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		});
 	}
 
+	private extensionResponse (request) {
+		const resolver = this.activeRequests.get(request.id);
+		if (resolver) {
+			resolver(request.result);
+		}
+		this.activeRequests.delete(request.id);
+	}
 }
