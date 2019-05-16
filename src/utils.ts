@@ -291,6 +291,13 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 		if (options.liveview) {
 			args.push('--liveview');
 		}
+
+		if (options.debugPort && options.platform === 'android') {
+			args.push(
+				'--debug-host',
+				`/localhost:${options.debugPort}`
+			);
+		}
 	}
 
 	return args.map(arg => quoteArgument(arg));

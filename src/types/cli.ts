@@ -20,6 +20,7 @@ export interface BuildAppOptions extends BaseBuildOptions {
 	iOSProvisioningProfile?: string;
 	target?: string;
 	keystore?: string;
+	debugPort?: number;
 }
 
 export interface BuildModuleOptions extends BaseBuildOptions {

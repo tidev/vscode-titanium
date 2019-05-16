@@ -28,6 +28,9 @@ import { StyleCompletionItemProvider } from './providers/completion/styleComplet
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import { MESSAGE_STRING, Request, Response } from './common/extensionProtocol';
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
@@ -45,7 +48,6 @@ import { handleInteractionError, InteractionChoice, InteractionError,  } from '.
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { selectUpdates } from './quickpicks/common';
-
 let projectStatusBarItem;
 /**
  * Activate
@@ -332,6 +334,30 @@ function activate (context) {
 			}
 		}))
 	);
+
+	context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
+		if (event.event === MESSAGE_STRING) {
+			const request: Request = event.body;
+			if (request.code === 'BUILD') {
+				const providedArgs = request.args as BuildAppOptions;
+				const buildArgs = buildArguments(providedArgs);
+				const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
+				const response: Response = {
+					id: request.id,
+					result: {
+						port: providedArgs.debugPort,
+						alloyProject: await fs.pathExists(path.join(providedArgs.projectDir, 'app'))
+					}
+				};
+				build.stderr.on('data', data => {
+					data = data.toString();
+					if (/To connect Chrome DevTools/.test(data)) {
+						event.session.customRequest('extensionResponse', response);
+					}
+				});
+			}
+		}
+	}));
 
 	return init();
 }
