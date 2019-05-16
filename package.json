@@ -84,7 +84,10 @@
         ],
         "configurationAttributes": {
           "launch": {
-            "required": ["platform", "appRoot"],
+            "required": [
+              "platform",
+              "appRoot"
+            ],
             "properties": {
               "platform": {
                 "type": "string",
