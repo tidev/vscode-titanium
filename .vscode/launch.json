@@ -12,7 +12,10 @@
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "npm: watch"
+            "preLaunchTask": "npm: watch",
+            "skipFiles": [
+                "<node_internals>/**/*.js"
+            ]
         },
         {
             "name": "Extension Tests",
@@ -38,7 +41,10 @@
                 "--server=4711"
             ],
             "outFiles": [
-                "${workspaceFolder}/out/**/*.js"
+                "${workspaceFolder}/out/**/*.js",
+            ],
+            "skipFiles": [
+                "<node_internals>/**/*.js"
             ]
         }
     ],
