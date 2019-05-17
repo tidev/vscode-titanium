@@ -34,7 +34,10 @@ import { StyleDefinitionProvider } from './providers/definition/styleDefinitionP
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
+import { selectDevice } from './quickpicks/common';
+import { BuildAppOptions } from './types/cli';
 import { LogLevel } from './types/common';
+import { buildArguments } from './utils';
 
 import * as ms from 'ms';
 import { environment, updates } from 'titanium-editor-commons';
@@ -283,6 +286,28 @@ function activate (context) {
 				// stuff
 			}
 		}),
+
+		context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
+			if (event.event === MESSAGE_STRING) {
+				const request: Request = event.body;
+				if (request.code === 'BUILD') {
+					const providedArgs = request.args as BuildAppOptions;
+					const buildArgs = buildArguments(providedArgs);
+					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
+					const response: Response = {
+						id: request.id,
+						result: {
+							port: providedArgs.debugPort,
+							alloyProject: await fs.pathExists(path.join(providedArgs.projectDir, 'app'))
+						}
+					};
+					if (!providedArgs.deviceId) {
+						const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
+						providedArgs.deviceId = udid;
+					}
+				}
+			}
+		}))
 	);
 
 	return init();
