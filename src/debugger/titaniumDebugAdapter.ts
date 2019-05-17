@@ -5,18 +5,66 @@ import { MESSAGE_STRING, Request } from '../common/extensionProtocol';
 import { BuildAppOptions } from '../types/cli';
 import { LogLevel } from '../types/common';
 
-interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
+export interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
 	appRoot?: string;
+	platform: 'android' | 'ios';
+	deviceId?: string;
+	port: number;
+	target: string;
+	cwd: string;
+	projectType: string;
 }
 
 export class TitaniumDebugAdapter extends ChromeDebugAdapter {
-	public attach (args: IAttachRequestArgs): Promise<void> {
-		return;
+
+	private idCount = 0;
+	private activeRequests = new Map();
+	private session: ChromeDebugSession;
+
+	constructor (adapterOpts, session) {
+		super(adapterOpts, session);
+		this.session = session;
 	}
 
-	public launch (args: TitaniumLaunchRequestArgs): Promise<void> {
-		return;
+	public commonArgs (args: TitaniumLaunchRequestArgs) {
+		args.sourceMaps = typeof args.sourceMaps === 'undefined' || args.sourceMaps;
+		super.commonArgs(args);
 	}
+
+	public launch (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
+		const { platform } = launchArgs;
+		if (platform === 'android') {
+			return this.launchAndroid(launchArgs);
+		}
+	}
+
+	public async launchAndroid (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
+		const args: BuildAppOptions = {
+			platform: launchArgs.platform,
+			projectDir: launchArgs.appRoot,
+			buildOnly: false,
+			projectType: 'app',
+			logLevel: LogLevel.Trace,
+			buildType: 'run',
+			deviceId: launchArgs.deviceId,
+			debugPort: launchArgs.port || 51388,
+			target: launchArgs.target || 'emulator'
+		};
+		const info: any = await this.sendRequest('BUILD', args);
+		if (info.isError) {
+			throw new Error(info.message);
+		}
+		// TODO: Clean up to be more correct
+		launchArgs.port = args.debugPort;
+		launchArgs.cwd = args.projectDir;
+		// TODO: Improve the projectType interface
+		const projectType = info.alloyProject ? 'alloy' : 'classic';
+		(this.pathTransformer as any).configureTransformOptions(launchArgs, projectType);
+		(this.sourceMapTransformer as any).configureOptions(launchArgs, projectType);
+
+		return super.attach(launchArgs);
+	}
+
 	public disconnect (args: DebugProtocol.DisconnectArguments) {
 		this.sendRequest('END', args);
 		super.disconnect(args);
