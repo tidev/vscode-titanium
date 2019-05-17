@@ -313,6 +313,19 @@ function activate (context) {
 							event.session.customRequest('extensionResponse', response);
 						}
 					});
+
+					build.on('exit', code => {
+						if (code) {
+							const message = 'Failed to start debug sessions, please see the output for more information';
+							vscode.window.showErrorMessage(message);
+							ExtensionContainer.terminal.showOutput();
+							response.result = {
+								isError: true,
+								message
+							};
+							event.session.customRequest('extensionResponse', response);
+						}
+					});
 				} else if (request.code === 'END') {
 					ExtensionContainer.terminal.stop();
 				}

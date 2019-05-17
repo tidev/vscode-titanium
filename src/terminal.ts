@@ -120,4 +120,8 @@ export default class Terminal {
 			this.proc = null;
 		}
 	}
+
+	public showOutput () {
+		this.channel.show();
+	}
 }
