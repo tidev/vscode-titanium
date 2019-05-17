@@ -290,10 +290,9 @@ function activate (context) {
 		context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
 			if (event.event === MESSAGE_STRING) {
 				const request: Request = event.body;
+
 				if (request.code === 'BUILD') {
 					const providedArgs = request.args as BuildAppOptions;
-					const buildArgs = buildArguments(providedArgs);
-					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
 					const response: Response = {
 						id: request.id,
 						result: {
@@ -305,6 +304,17 @@ function activate (context) {
 						const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
 						providedArgs.deviceId = udid;
 					}
+
+					const buildArgs = buildArguments(providedArgs);
+					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
+					build.stderr.on('data', data => {
+						data = data.toString();
+						if (providedArgs.platform === 'android' && /To connect Chrome DevTools/.test(data)) {
+							event.session.customRequest('extensionResponse', response);
+						}
+					});
+				} else if (request.code === 'END') {
+					ExtensionContainer.terminal.stop();
 				}
 			}
 		}))
