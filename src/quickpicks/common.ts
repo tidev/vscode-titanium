@@ -276,5 +276,7 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 export function selectDevice (platform: string, target: string) {
 	if (platform === 'android' && target === 'emulator') {
 		return selectAndroidEmulator();
+	} else if (platform === 'android' && target === 'device') {
+		return selectAndroidDevice();
 	}
 }
