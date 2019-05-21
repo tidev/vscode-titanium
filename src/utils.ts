@@ -380,3 +380,12 @@ export function validateAppId (appId: string) {
 function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is BuildAppOptions {
 	return (options as BuildAppOptions).projectType === 'app';
 }
+
+export class CustomError extends Error {
+
+	public code: string;
+	constructor (message: string, code: string) {
+		super(message);
+		this.code = code;
+	}
+}

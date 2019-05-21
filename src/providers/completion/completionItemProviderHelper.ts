@@ -5,6 +5,7 @@ import appc from '../../appc';
 import project from '../../project';
 
 import { homedir } from 'os';
+import { CustomError } from '../../utils';
 /**
  * Load completions list
  *
@@ -202,7 +203,7 @@ export async function generateSDKCompletions ({ force = false, progress, sdkVers
 	const sdk = appc.sdkInfo(sdkVersion);
 
 	if (!sdk) {
-		throw new Error(`The current projects SDK version ${sdkVersion}, is not installed. Please update the SDK version in the tiapp to generate autocomplete suggestions.`);
+		throw new CustomError(`The current projects SDK version ${sdkVersion}, is not installed. Please update the SDK version in the tiapp to generate autocomplete suggestions.`, 'ESDKNOTINSTALLED');
 	}
 
 	const titaniumAPIPath = path.join(sdk.path, 'api.jsca');
