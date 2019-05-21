@@ -37,6 +37,7 @@ import { LogLevel } from './types/common';
 
 import * as ms from 'ms';
 import { updates } from 'titanium-editor-commons';
+import { InteractionChoice } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { selectUpdates } from './quickpicks/common';
@@ -348,8 +349,9 @@ function setStatusBar () {
  * @param {Object} progress - Progress reporter.
  */
 async function generateCompletions ({ force = false, progress = null } = {}) {
+	let sdkVersion;
 	try {
-		const sdkVersion = project.sdk()[0];
+		sdkVersion = project.sdk()[0];
 		if (!sdkVersion) {
 			// handle?
 		}
@@ -369,7 +371,31 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 			vscode.window.showInformationMessage(message);
 		}
 	} catch (error) {
-		vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`);
+		const actions: InteractionChoice[] = [];
+		if (error.code === 'ESDKNOTINSTALLED') {
+			actions.push({
+				title: 'Install',
+				run: () => {
+					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, () => {
+						return new Promise(async (resolve, reject) => {
+							try {
+								await updates.titanium.sdk.installUpdate(sdkVersion);
+								appc.getInfo(() => {
+									generateCompletions();
+									return resolve();
+								});
+							} catch (error) {
+								return reject(error);
+							}
+						});
+					});
+				}
+			});
+		}
+		const install = await vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`, ...actions);
+		if (install) {
+			await install.run();
+		}
 	}
 }
 
