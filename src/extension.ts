@@ -224,11 +224,16 @@ function activate (context) {
 				}
 
 				const updatesToInstall = await selectUpdates(updateInfo);
-				await installUpdates(updatesToInstall);
-				if (updateInfo.length === updatesToInstall.length) {
-					ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-					vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-				}
+				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
+					return new Promise(async resolve => {
+						await installUpdates(updatesToInstall, progress);
+						if (updateInfo.length === updatesToInstall.length) {
+							ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+							vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+						}
+						resolve();
+					});
+				});
 			} catch (error) {
 				// stuff
 			}
@@ -239,10 +244,18 @@ function activate (context) {
 				if (!updateInfo) {
 					updateInfo = updateExplorer.updates;
 				}
-
-				await installUpdates(updateInfo);
-				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
+					return new Promise(async resolve => {
+						const totalUpdates = updateInfo.length;
+						await installUpdates(updateInfo, progress);
+						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+						await vscode.commands.executeCommand(Commands.RefreshUpdates);
+						await vscode.commands.executeCommand(Commands.RefreshExplorer);
+						resolve();
+						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
+					});
+				});
 			} catch (error) {
 				// stuff
 			}
@@ -250,9 +263,18 @@ function activate (context) {
 
 		vscode.commands.registerCommand(Commands.InstallUpdate, async updateInfo => {
 			try {
-				await installUpdates([ updateInfo.update ]);
-				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
+					return new Promise(async resolve => {
+						const totalUpdates = updateInfo.length;
+						await installUpdates([ updateInfo.update ], progress);
+						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+						await vscode.commands.executeCommand(Commands.RefreshUpdates);
+						await vscode.commands.executeCommand(Commands.RefreshExplorer);
+						resolve();
+						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
+					});
+				});
 			} catch (error) {
 				// stuff
 			}
@@ -271,25 +293,132 @@ function deactivate () {
 }
 exports.deactivate = deactivate;  // eslint-disable-line no-undef
 
+async function validateEnvironment () {
+	const environmentInfo = {
+		installed: [],
+		missing: []
+	};
+	const [ coreVersion, installVersion, sdkVersion ] = await Promise.all([
+		await updates.appc.core.checkInstalledVersion(),
+		await updates.appc.install.checkInstalledVersion(),
+		await updates.titanium.sdk.checkInstalledVersion()
+	]);
+
+	if (coreVersion) {
+		environmentInfo.installed.push({
+			name: updates.ProductNames.AppcCore,
+			version: coreVersion
+		});
+	} else {
+		environmentInfo.missing.push({
+			name: updates.ProductNames.AppcCore,
+			getInstallInfo: () => {
+				return updates.appc.core.checkForUpdate();
+			}
+		});
+	}
+
+	if (installVersion) {
+		environmentInfo.installed.push({
+			name: updates.ProductNames.AppcInstaller,
+			version: installVersion
+		});
+	} else {
+		environmentInfo.missing.push({
+			name: updates.ProductNames.AppcInstaller,
+			getInstallInfo: () => {
+				return updates.appc.install.checkForUpdate();
+			}
+		});
+	}
+
+	if (sdkVersion) {
+		environmentInfo.installed.push({
+			name: updates.ProductNames.TitaniumSDK,
+			version: sdkVersion
+		});
+	} else {
+		environmentInfo.missing.push({
+			name: updates.ProductNames.TitaniumSDK,
+			getInstallInfo: () => {
+				return updates.titanium.sdk.checkForUpdate();
+			}
+		});
+	}
+
+	return environmentInfo;
+}
+
 /**
  * Initialise extension - fetch appc info
  */
 async function init () {
 	const isEnabled = ExtensionContainer.context.globalState.get<boolean>(GlobalState.Enabled);
 	if (isEnabled) {
-		vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Reading Appcelerator environment ...' }, async progress => {
-			return new Promise((resolve, reject) => {
+		vscode.window.withProgress({ cancellable: false, location: vscode.ProgressLocation.Notification, title: 'Titanium' }, async progress => {
+			return new Promise(async (resolve, reject) => {
+
+				progress.report({
+					message: 'Validating environment'
+				});
+
+				const { missing } = await validateEnvironment();
+
+				if (missing.length) {
+					let message = `You are missing the following required components for:`;
+					for (let i = 0; i < missing.length; i++) {
+						const product = missing[i];
+						if (i < missing.length - 1) {
+							message = `${message} ${product.name},`;
+						} else {
+							message = `${message} ${product.name}`;
+						}
+					}
+					message = `${message}. Without these components the extension will be unusable.`;
+					const choices: InteractionChoice[] = [
+						{
+							title: 'Install',
+							run: async () => {
+								const updateInfo = [];
+								for (const product of missing) {
+									updateInfo.push(await product.getInstallInfo());
+
+								}
+								await installUpdates(updateInfo, progress, false);
+							}
+						}
+					];
+					const installProducts = await vscode.window.showErrorMessage(message, ...choices);
+					if (installProducts) {
+						progress.report({
+							message: 'Installing missing components'
+						});
+
+						await installProducts.run();
+					} else {
+						vscode.window.showErrorMessage('Extension startup cancelled as required components are not installed');
+						return reject();
+					}
+				}
+
 				if (ExtensionContainer.context.globalState.get('titanium:liveview')) {
 					vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
 				}
+
+				progress.report({
+					message: 'Fetching environment information'
+				});
+
 				appc.getInfo(error => {
 					if (error) {
 						vscode.window.showErrorMessage('Error fetching Appcelerator environment');
 						return reject();
 					}
+
 					if (project.isTitaniumApp) {
 						generateCompletions({ progress });
 					}
+
 					// Call refresh incase the Titanium Explorer activity pane became active before info
 					vscode.commands.executeCommand(Commands.RefreshExplorer);
 
@@ -399,56 +528,47 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 	}
 }
 
-async function installUpdates (updateInfo) {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
-		return new Promise(async resolve => {
-			const totalUpdates = updateInfo.length;
-			let counter = 1;
+async function installUpdates (updateInfo, progress, incrementProgress = true) {
+	const totalUpdates = updateInfo.length;
+	let counter = 1;
 
-			// sort prior to running
-			updateInfo.sort((curr, prev) => curr.priority - prev.priority);
+	// sort prior to running
+	updateInfo.sort((curr, prev) => curr.priority - prev.priority);
 
-			for (const update of updateInfo) {
-				const label = update.label || `${update.productName}: ${update.latestVersion}`;
-				progress.report({
-					message: `Installing ${label} (${counter}/${totalUpdates})`
-				});
-				try {
-					await update.action(update.latestVersion);
-					progress.report({
-						increment: 100 / totalUpdates,
-						message: `Installed ${label} (${counter}/${totalUpdates})`
-					});
-				} catch (error) {
-					progress.report({
-						increment: 100 / totalUpdates,
-						message: `Failed to install ${label} (${counter}/${totalUpdates})`
-					});
-					if (error.metadata) {
-						const { metadata } = error;
-						if (update.productName === updates.ProductNames.AppcInstaller && metadata.errorCode === 'EACCES') {
-							const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${update.label} as it must be ran with sudo`, {
-								title: 'Install with Sudo',
-								run: () => {
-									ExtensionContainer.terminal.executeCommand(`sudo ${metadata.command}`);
-								}
-							});
-							if (runWithSudo) {
-								runWithSudo.run();
-							}
+	for (const update of updateInfo) {
+		const label = update.label || `${update.productName}: ${update.latestVersion}`;
+		progress.report({
+			message: `Installing ${label} (${counter}/${totalUpdates})`
+		});
+		try {
+			await update.action(update.latestVersion);
+			progress.report({
+				increment: incrementProgress ? 100 / totalUpdates : 0,
+				message: `Installed ${label} (${counter}/${totalUpdates})`
+			});
+		} catch (error) {
+			progress.report({
+				increment: incrementProgress ? 100 / totalUpdates : 0,
+				message: `Failed to install ${label} (${counter}/${totalUpdates})`
+			});
+			if (error.metadata) {
+				const { metadata } = error;
+				if (update.productName === updates.ProductNames.AppcInstaller && metadata.errorCode === 'EACCES') {
+					const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${update.label} as it must be ran with sudo`, {
+						title: 'Install with Sudo',
+						run: () => {
+							ExtensionContainer.terminal.executeCommand(`sudo ${metadata.command}`);
 						}
-					} else {
-						// TODO should we show the error that we got passed?
-						await vscode.window.showErrorMessage(`Failed to update to ${update.label}`);
+					});
+					if (runWithSudo) {
+						runWithSudo.run();
 					}
 				}
-				counter++;
+			} else {
+				// TODO should we show the error that we got passed?
+				await vscode.window.showErrorMessage(`Failed to update to ${update.label}`);
 			}
-			await vscode.commands.executeCommand(Commands.RefreshUpdates);
-			await vscode.commands.executeCommand(Commands.RefreshExplorer);
-			// resolve but don't return so that the progress reporting dialog is dismissed before we report the summary
-			resolve();
-			await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
-		});
-	});
+		}
+		counter++;
+	}
 }

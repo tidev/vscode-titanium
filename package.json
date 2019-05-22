@@ -645,7 +645,7 @@
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.1",
     "semver": "^6.0.0",
-    "titanium-editor-commons": "^0.1.1",
+    "titanium-editor-commons": "^0.1.2",
     "underscore": "^1.8.3",
     "xml2js": "^0.4.19"
   }
