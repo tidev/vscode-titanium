@@ -226,12 +226,16 @@ function activate (context) {
 				const updatesToInstall = await selectUpdates(updateInfo);
 				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
 					return new Promise(async resolve => {
+						const totalUpdates = updatesToInstall.length;
 						await installUpdates(updatesToInstall, progress);
-						if (updateInfo.length === updatesToInstall.length) {
+						if (updateInfo.length === totalUpdates) {
 							ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
 							vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
 						}
+						vscode.commands.executeCommand(Commands.RefreshUpdates);
+						vscode.commands.executeCommand(Commands.RefreshExplorer);
 						resolve();
+						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
 					});
 				});
 			} catch (error) {
@@ -250,8 +254,8 @@ function activate (context) {
 						await installUpdates(updateInfo, progress);
 						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
 						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-						await vscode.commands.executeCommand(Commands.RefreshUpdates);
-						await vscode.commands.executeCommand(Commands.RefreshExplorer);
+						vscode.commands.executeCommand(Commands.RefreshUpdates);
+						vscode.commands.executeCommand(Commands.RefreshExplorer);
 						resolve();
 						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
 					});
@@ -269,8 +273,8 @@ function activate (context) {
 						await installUpdates([ updateInfo.update ], progress);
 						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
 						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-						await vscode.commands.executeCommand(Commands.RefreshUpdates);
-						await vscode.commands.executeCommand(Commands.RefreshExplorer);
+						vscode.commands.executeCommand(Commands.RefreshUpdates);
+						vscode.commands.executeCommand(Commands.RefreshExplorer);
 						resolve();
 						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
 					});
