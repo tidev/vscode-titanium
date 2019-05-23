@@ -16,17 +16,21 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	private updateMap: Map<string, UpdateNode> = new Map();
 
+	private checkingForUpdates: boolean = false;
+
 	public async refresh () {
+		this.checkingForUpdates = true;
+		this._onDidChangeTreeData.fire();
 		try {
-			const availableUpdates = await updates.checkAllUpdates();
-			this.updates = availableUpdates;
-			this._onDidChangeTreeData.fire();
-			if (this.updates.length) {
-				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
-				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
-			}
+			this.updates = await updates.checkAllUpdates();
 		} catch (error) {
 			// squash
+		}
+		this.checkingForUpdates = false;
+		this._onDidChangeTreeData.fire();
+		if (this.updates.length) {
+			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
+			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
 		}
 	}
 
@@ -37,6 +41,12 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 	public getChildren () {
 
 		const elements = [];
+
+		if (this.checkingForUpdates) {
+			elements.push(new BlankNode('Checking for updates'));
+			return Promise.resolve(elements);
+		}
+
 		for (const update of this.updates) {
 			const { currentVersion, latestVersion, productName } = update;
 			const label = `${productName}: ${currentVersion || 'Not Installed'} -> ${latestVersion}`;
@@ -44,9 +54,11 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 			this.updateMap.set(productName, node);
 			elements.push(node);
 		}
+
 		if (!elements.length) {
 			elements.push(new BlankNode('There are no updates available'));
 		}
+
 		return Promise.resolve(elements);
 	}
 
