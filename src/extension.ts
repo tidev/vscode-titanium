@@ -384,6 +384,9 @@ async function init () {
 							title: 'Install',
 							run: async () => {
 								const updateInfo = [];
+								progress.report({
+									message: 'Fetching latest component versions'
+								});
 								for (const product of missing) {
 									updateInfo.push(await product.getInstallInfo());
 
@@ -547,14 +550,22 @@ async function installUpdates (updateInfo, progress, incrementProgress = true) {
 		try {
 			await update.action(update.latestVersion);
 			progress.report({
-				increment: incrementProgress ? 100 / totalUpdates : 0,
 				message: `Installed ${label} (${counter}/${totalUpdates})`
 			});
+			if (incrementProgress) {
+				progress.report({
+					increment: 100 / totalUpdates
+				});
+			}
 		} catch (error) {
 			progress.report({
-				increment: incrementProgress ? 100 / totalUpdates : 0,
 				message: `Failed to install ${label} (${counter}/${totalUpdates})`
 			});
+			if (incrementProgress) {
+				progress.report({
+					increment: 100 / totalUpdates
+				});
+			}
 			if (error.metadata) {
 				const { metadata } = error;
 				if (update.productName === updates.ProductNames.AppcInstaller && metadata.errorCode === 'EACCES') {
