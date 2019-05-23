@@ -269,14 +269,13 @@ function activate (context) {
 			try {
 				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
 					return new Promise(async resolve => {
-						const totalUpdates = updateInfo.length;
 						await installUpdates([ updateInfo.update ], progress);
 						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
 						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
 						vscode.commands.executeCommand(Commands.RefreshUpdates);
 						vscode.commands.executeCommand(Commands.RefreshExplorer);
 						resolve();
-						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
+						await vscode.window.showInformationMessage('Installed 1 update');
 					});
 				});
 			} catch (error) {
