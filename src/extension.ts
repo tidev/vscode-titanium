@@ -351,30 +351,6 @@ function activate (context) {
 		}))
 	);
 
-	context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
-		if (event.event === MESSAGE_STRING) {
-			const request: Request = event.body;
-			if (request.code === 'BUILD') {
-				const providedArgs = request.args as BuildAppOptions;
-				const buildArgs = buildArguments(providedArgs);
-				const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
-				const response: Response = {
-					id: request.id,
-					result: {
-						port: providedArgs.debugPort,
-						alloyProject: await fs.pathExists(path.join(providedArgs.projectDir, 'app'))
-					}
-				};
-				build.stderr.on('data', data => {
-					data = data.toString();
-					if (/To connect Chrome DevTools/.test(data)) {
-						event.session.customRequest('extensionResponse', response);
-					}
-				});
-			}
-		}
-	}));
-
 	return init();
 }
 exports.activate = activate; // eslint-disable-line no-undef

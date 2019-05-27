@@ -123,6 +123,8 @@ export default class Terminal {
 	}
 
 	public showOutput () {
-		this.channel.show();
+		if (this.channel) {
+			this.channel.show();
+		}
 	}
 }
