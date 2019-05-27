@@ -30,6 +30,7 @@ import { ViewCompletionItemProvider } from './providers/completion/viewCompletio
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { UserCancellation } from './commands/common';
 import { MESSAGE_STRING, Request, Response } from './common/extensionProtocol';
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
@@ -303,8 +304,23 @@ function activate (context) {
 						}
 					};
 					if (!providedArgs.deviceId) {
-						const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
-						providedArgs.deviceId = udid;
+						try {
+							const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
+							providedArgs.deviceId = udid;
+						} catch (error) {
+							let message = error.message;
+							if (error instanceof UserCancellation) {
+								message = 'Failed to start debug session as no target was selected';
+							}
+							vscode.window.showErrorMessage(message);
+							ExtensionContainer.terminal.showOutput();
+							response.result = {
+								isError: true,
+								message
+							};
+							event.session.customRequest('extensionResponse', response);
+							return;
+						}
 					}
 
 					const buildArgs = buildArguments(providedArgs);
