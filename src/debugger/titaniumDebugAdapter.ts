@@ -1,5 +1,6 @@
 import { ChromeDebugAdapter, ChromeDebugSession, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
-import { DebugProtocol, Event } from 'vscode-debugadapter';
+import { Event } from 'vscode-debugadapter';
+import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request } from '../common/extensionProtocol';
 import { BuildAppOptions } from '../types/cli';
 import { LogLevel } from '../types/common';
