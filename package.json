@@ -621,7 +621,7 @@
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@commitlint/cli": "^7.5.2",
+    "@commitlint/cli": "^8.0.0",
     "@commitlint/config-conventional": "^8.0.0",
     "@types/fs-extra": "^5.0.5",
     "@types/klaw-sync": "^6.0.0",
