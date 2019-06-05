@@ -21,6 +21,7 @@ export interface BuildAppOptions extends BaseBuildOptions {
 	target?: string;
 	keystore?: string;
 	debugPort?: number;
+	skipJsMinify?: boolean;
 }
 
 export interface BuildModuleOptions extends BaseBuildOptions {

@@ -47,7 +47,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			buildType: 'run',
 			deviceId: launchArgs.deviceId,
 			debugPort: launchArgs.port || 51388,
-			target: launchArgs.target || 'emulator'
+			target: launchArgs.target || 'emulator',
+			skipJsMinify: true
 		};
 		const info: any = await this.sendRequest('BUILD', args);
 		// TODO: Clean up to be more correct

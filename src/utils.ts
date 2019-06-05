@@ -298,6 +298,10 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 				`/localhost:${options.debugPort}`
 			);
 		}
+
+		if (options.skipJsMinify) {
+			args.push('--skip-js-minify');
+		}
 	}
 
 	return args.map(arg => quoteArgument(arg));
