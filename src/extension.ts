@@ -36,7 +36,7 @@ import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
 import { LogLevel } from './types/common';
 
 import * as ms from 'ms';
-import { updates } from 'titanium-editor-commons';
+import { environment, updates } from 'titanium-editor-commons';
 import { InteractionChoice } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
@@ -296,62 +296,6 @@ function deactivate () {
 }
 exports.deactivate = deactivate;  // eslint-disable-line no-undef
 
-async function validateEnvironment () {
-	const environmentInfo = {
-		installed: [],
-		missing: []
-	};
-	const [ coreVersion, installVersion, sdkVersion ] = await Promise.all([
-		await updates.appc.core.checkInstalledVersion(),
-		await updates.appc.install.checkInstalledVersion(),
-		await updates.titanium.sdk.checkInstalledVersion()
-	]);
-
-	if (coreVersion) {
-		environmentInfo.installed.push({
-			name: updates.ProductNames.AppcCore,
-			version: coreVersion
-		});
-	} else {
-		environmentInfo.missing.push({
-			name: updates.ProductNames.AppcCore,
-			getInstallInfo: () => {
-				return updates.appc.core.checkForUpdate();
-			}
-		});
-	}
-
-	if (installVersion) {
-		environmentInfo.installed.push({
-			name: updates.ProductNames.AppcInstaller,
-			version: installVersion
-		});
-	} else {
-		environmentInfo.missing.push({
-			name: updates.ProductNames.AppcInstaller,
-			getInstallInfo: () => {
-				return updates.appc.install.checkForUpdate();
-			}
-		});
-	}
-
-	if (sdkVersion) {
-		environmentInfo.installed.push({
-			name: updates.ProductNames.TitaniumSDK,
-			version: sdkVersion
-		});
-	} else {
-		environmentInfo.missing.push({
-			name: updates.ProductNames.TitaniumSDK,
-			getInstallInfo: () => {
-				return updates.titanium.sdk.checkForUpdate();
-			}
-		});
-	}
-
-	return environmentInfo;
-}
-
 /**
  * Initialise extension - fetch appc info
  */
@@ -365,7 +309,7 @@ async function init () {
 					message: 'Validating environment'
 				});
 
-				const { missing } = await validateEnvironment();
+				const { missing } = await environment.validateEnvironment();
 
 				if (missing.length) {
 					let message = `You are missing the following required components for:`;
