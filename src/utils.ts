@@ -312,9 +312,12 @@ export function packageArguments (options: PackageOptions) {
 	if (options.platform === 'android') {
 		args.push(
 			'--keystore', options.keystoreInfo.location,
-			'--store-password', options.keystoreInfo.password,
-			'--alias', options.keystoreInfo.alias
+			'--alias', options.keystoreInfo.alias,
+			'--store-password', options.keystoreInfo.password
 		);
+		if (options.keystoreInfo.privateKeyPassword) {
+			args.push('--key-password', options.keystoreInfo.privateKeyPassword);
+		}
 	} else if (options.platform === 'ios') {
 		args.push(
 			'--distribution-name', options.iOSCertificate,
