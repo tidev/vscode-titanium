@@ -1,4 +1,5 @@
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from './appc';
 import DeviceExplorer from './explorer/tiExplorer';
@@ -37,7 +38,7 @@ import { LogLevel } from './types/common';
 
 import * as ms from 'ms';
 import { environment, updates } from 'titanium-editor-commons';
-import { InteractionChoice } from './commands/common';
+import { handleInteractionError, InteractionChoice, InteractionError,  } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { selectUpdates } from './quickpicks/common';
@@ -430,9 +431,20 @@ function setStatusBar () {
 async function generateCompletions ({ force = false, progress = null } = {}) {
 	let sdkVersion;
 	try {
-		sdkVersion = project.sdk()[0];
-		if (!sdkVersion) {
-			// handle?
+		sdkVersion = project.sdk();
+		if (sdkVersion.length > 1) {
+			const error = new InteractionError('Errors found in tiapp.xml: multiple SDKs found.');
+			error.interactionChoices.push({
+				title: 'Open tiapp.xml',
+				run: async () => {
+					const file = path.join(vscode.workspace.rootPath, 'tiapp.xml');
+					const document = await vscode.workspace.openTextDocument(file);
+					await vscode.window.showTextDocument(document);
+				}
+			});
+			throw error;
+		} else {
+			sdkVersion = sdkVersion[0];
 		}
 		// Generate the completions
 		const [ alloy, sdk ] = await Promise.all([
@@ -450,30 +462,34 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 			vscode.window.showInformationMessage(message);
 		}
 	} catch (error) {
-		const actions: InteractionChoice[] = [];
-		if (error.code === 'ESDKNOTINSTALLED') {
-			actions.push({
-				title: 'Install',
-				run: () => {
-					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, () => {
-						return new Promise(async (resolve, reject) => {
-							try {
-								await updates.titanium.sdk.installUpdate(sdkVersion);
-								appc.getInfo(() => {
-									generateCompletions();
-									return resolve();
-								});
-							} catch (error) {
-								return reject(error);
-							}
+		if (error instanceof InteractionError) {
+			await handleInteractionError(error);
+		} else {
+			const actions: InteractionChoice[] = [];
+			if (error.code === 'ESDKNOTINSTALLED') {
+				actions.push({
+					title: 'Install',
+					run: () => {
+						vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, () => {
+							return new Promise(async (resolve, reject) => {
+								try {
+									await updates.titanium.sdk.installUpdate(sdkVersion);
+									appc.getInfo(() => {
+										generateCompletions();
+										return resolve();
+									});
+								} catch (error) {
+									return reject(error);
+								}
+							});
 						});
-					});
-				}
-			});
-		}
-		const install = await vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`, ...actions);
-		if (install) {
-			await install.run();
+					}
+				});
+			}
+			const install = await vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`, ...actions);
+			if (install) {
+				await install.run();
+			}
 		}
 	}
 }
