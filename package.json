@@ -623,7 +623,7 @@
   "devDependencies": {
     "@commitlint/cli": "^8.0.0",
     "@commitlint/config-conventional": "^8.0.0",
-    "@types/fs-extra": "^7.0.0",
+    "@types/fs-extra": "^8.0.0",
     "@types/klaw-sync": "^6.0.0",
     "@types/mocha": "^5.2.6",
     "@types/node": "8.10.25",
