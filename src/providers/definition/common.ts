@@ -71,12 +71,12 @@ export const viewSuggestions = [
 		}
 	},
 	{ // handler
-		regExp: /on(.*?)=["']$/,
+		regExp: /on(.*?)=["'][A-Za-z]*$/,
 		files () {
-			return [ related.getTargetPath('js') ];
+			return [ related.getTargetPath('js')];
 		},
 		definitionRegExp (text) {
-			return new RegExp(`function ${text}\\s*?\\(`);
+			return new RegExp(`function ${text}s*?\\(`);
 		},
 		title (fileName) {
 			return `Generate function (${fileName})`;

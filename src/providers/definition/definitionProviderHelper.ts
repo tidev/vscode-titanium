@@ -219,9 +219,14 @@ export async function getReferences (files, regExp?: RegExp, callback?: any) {
 			continue;
 		}
 		if (document.getText().length > 0) {
-			for (let matches = regExp.exec(document.getText()); matches !== null; matches = regExp.exec(document.getText())) {
+			const matches = regExp.exec(document.getText());
+			if (!matches) {
+				continue;
+			}
+			for (const match of matches) {
 				const position = document.positionAt(matches.index);
-				definitions.push(callback(file, new Range(position.line, position.character, position.line, 0)));
+				const location = callback(file, new Range(position.line, position.character, position.line, 0));
+				definitions.push(location);
 			}
 		}
 	}
