@@ -2,7 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { BasePathTransformer, chromeUtils, IPathMapping, ISetBreakpointsArgs, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
 import { DebugProtocol } from 'vscode-debugprotocol';
-import { TitaniumLaunchRequestArgs } from './titaniumDebugAdapter';
+import { determineProjectType, getAppName } from '../common/utils';
+import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from './titaniumDebugAdapter';
 
 export class TitaniumPathTransformer extends BasePathTransformer {
 
@@ -12,12 +13,24 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	private _localPathToTargetUrl = new Map<string, string>();
 	private _targetUrlToLocalPath = new Map<string, string>();
 	private projectType: string;
+	private appName: string;
 
-	public configureTransformOptions (args: TitaniumLaunchRequestArgs, projectType: string) {
+	public async attach (args: TitaniumAttachRequestArgs) {
+		await this.configureTransformOptions(args);
+		return super.attach(args);
+	}
+
+	public async launch (args: TitaniumLaunchRequestArgs) {
+		await this.configureTransformOptions(args);
+		return super.attach(args);
+	}
+
+	public async configureTransformOptions (args: TitaniumAttachRequestArgs|TitaniumLaunchRequestArgs) {
 		this._pathMapping = args.pathMapping;
 		this.appDirectory = args.appRoot;
-		this.platform = args.platform;
-		this.projectType = projectType;
+		this.platform = args.platform === 'ios' ? 'iphone' : args.platform;
+		this.projectType = await determineProjectType(this.appDirectory);
+		this.appName = await getAppName(this.appDirectory);
 	}
 
 	public setBreakpoints (args: ISetBreakpointsArgs): ISetBreakpointsArgs {
@@ -65,9 +78,20 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 	public async getLocalPath (sourceUrl: string): Promise<string> {
 		const appRoot = this.projectType === 'alloy' ? path.join(this.appDirectory, 'app') : path.join(this.appDirectory, 'Resources');
+		const platformAppRoot = path.join(this.appDirectory, 'Resources', this.platform);
 		const platformRoot = path.join(appRoot, this.platform);
 		let defaultPath = '';
 		const searchFolders = [ appRoot ];
+
+		if (this.platform === 'iphone') {
+			try {
+				const appName = `${this.appName}.app`;
+				sourceUrl = sourceUrl.split(appName)[1];
+			} catch (error) {
+				throw error;
+			}
+
+		}
 
 		if (this.projectType !== 'alloy') {
 			searchFolders.push(platformRoot);

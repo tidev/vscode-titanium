@@ -69,15 +69,29 @@
         ],
         "configurationSnippets": [
           {
-            "label": "Titanium: Launch on Android",
-            "description": "Configuration for launch app on Android emulator",
+            "label": "Titanium: Launch on Android Emulator",
+            "description": "Configuration for launch app on Android",
             "body": {
               "name": "Launch on Android",
               "type": "titanium",
               "request": "launch",
               "platform": "android",
               "appRoot": "^\"\\${workspaceRoot}\"",
-              "sourceMaps": true
+              "sourceMaps": true,
+              "target": "emulator"
+            }
+          },
+          {
+            "label": "Titanium: Launch on iOS",
+            "description": "Configuration for launch app on iOS simulator",
+            "body": {
+              "name": "Launch on iOS",
+              "type": "titanium",
+              "request": "launch",
+              "platform": "ios",
+              "appRoot": "^\"\\${workspaceRoot}\"",
+              "sourceMaps": true,
+              "target": "simulator"
             }
           }
         ],
@@ -103,6 +117,10 @@
               "deviceId": {
                 "type": "string",
                 "description": "Device ID"
+              },
+              "target": {
+                "type": "string",
+                "description": "Target"
               }
             }
           }
@@ -710,9 +728,11 @@
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
+    "got": "^9.6.0",
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.2",
     "semver": "^6.2.0",
+    "@awam/remotedebug-ios-webkit-adapter": "^0.4.0",
     "titanium-editor-commons": "^0.2.0",
     "underscore": "^1.8.3",
     "uuid": "^3.3.2",
