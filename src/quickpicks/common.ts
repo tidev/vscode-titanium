@@ -273,10 +273,15 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 	return selected;
 }
 
-export function selectDevice (platform: string, target: string) {
+export async function selectDevice (platform: string, target: string) {
 	if (platform === 'android' && target === 'emulator') {
 		return selectAndroidEmulator();
 	} else if (platform === 'android' && target === 'device') {
 		return selectAndroidDevice();
+	} else if (platform === 'ios' && target === 'device') {
+		return selectiOSDevice();
+	} else if (platform === 'ios' && target === 'simulator') {
+		const simVersion = await selectiOSSimulatorVersion();
+		return selectiOSSimulator(simVersion);
 	}
 }

@@ -38,7 +38,7 @@ import { StyleDefinitionProvider } from './providers/definition/styleDefinitionP
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
-import { selectDevice } from './quickpicks/common';
+import { selectBuildTarget, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from './quickpicks/common';
 import { BuildAppOptions } from './types/cli';
 import { LogLevel } from './types/common';
 import { buildArguments } from './utils';
@@ -300,31 +300,35 @@ function activate (context) {
 						id: request.id,
 						result: {
 							port: providedArgs.debugPort,
-							alloyProject: await fs.pathExists(path.join(providedArgs.projectDir, 'app'))
+							udid: providedArgs.deviceId,
+							name: project.appName()
 						}
 					};
-					if (!providedArgs.deviceId) {
-						try {
-							const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
-							providedArgs.deviceId = udid;
-						} catch (error) {
-							let message = error.message;
-							if (error instanceof UserCancellation) {
-								message = 'Failed to start debug session as no target was selected';
-							}
-							vscode.window.showErrorMessage(message);
-							ExtensionContainer.terminal.showOutput();
-							response.result = {
-								isError: true,
-								message
-							};
-							event.session.customRequest('extensionResponse', response);
-							return;
-						}
+					try {
+						const extraInfo = await getBuildInfo(providedArgs);
+						Object.assign(providedArgs, extraInfo);
+						Object.assign(response.result, providedArgs);
+					} catch (error) {
+						vscode.window.showErrorMessage(error.message);
+						ExtensionContainer.terminal.showOutput();
+						response.result = {
+							isError: true,
+							message: error.message
+						};
+						event.session.customRequest('extensionResponse', response);
+						return;
 					}
-
 					const buildArgs = buildArguments(providedArgs);
 					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
+
+					build.stdout.on('data', data => {
+						data = data.toString();
+
+						if (providedArgs.platform === 'ios' && /Start (application|simulator) log/.test(data)) {
+							event.session.customRequest('extensionResponse', response);
+						}
+					});
+
 					build.stderr.on('data', data => {
 						data = data.toString();
 						if (providedArgs.platform === 'android' && /To connect Chrome DevTools/.test(data)) {
@@ -344,6 +348,14 @@ function activate (context) {
 							event.session.customRequest('extensionResponse', response);
 						}
 					});
+				} else if (request.code === 'INFO') {
+					const providedArgs = request.args as BuildAppOptions;
+					const info = await getBuildInfo(providedArgs);
+					const response: Response = {
+						id: request.id,
+						result: info
+					};
+					event.session.customRequest('extensionResponse', response);
 				} else if (request.code === 'END') {
 					ExtensionContainer.terminal.stop();
 				}
@@ -353,6 +365,70 @@ function activate (context) {
 
 	return init();
 }
+
+async function getBuildInfo (providedArgs: BuildAppOptions) {
+	const extraArgs: any = {};
+	if (!providedArgs.platform) {
+		try {
+			const platform = await selectPlatform();
+			extraArgs.platform = platform.id;
+		} catch (error) {
+			let message = error.message;
+			if (error instanceof UserCancellation) {
+				message = 'Failed to start debug session as no platform was selected';
+			}
+			throw new Error(message);
+		}
+	}
+
+	if (!providedArgs.target) {
+		try {
+			const { id } = await selectBuildTarget(providedArgs.platform);
+			extraArgs.target = id;
+		} catch (error) {
+			let message = error.message;
+			if (error instanceof UserCancellation) {
+				message = 'Failed to start debug session as no target was selected';
+			}
+			throw new Error(message);
+		}
+	}
+
+	if (!providedArgs.deviceId) {
+		try {
+			const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
+			extraArgs.deviceId = udid;
+		} catch (error) {
+			let message = error.message;
+			if (error instanceof UserCancellation) {
+				message = 'Failed to start debug session as no target was selected';
+			}
+			throw new Error(message);
+		}
+	}
+
+	if (providedArgs.platform === 'ios' && providedArgs.target === 'device') {
+		if (!providedArgs.iOSCertificate) {
+			try {
+				const certificate = await selectiOSCertificate('run');
+				const provisioning = await selectiOSProvisioningProfile(certificate, providedArgs.target, project.appId());
+
+				extraArgs.iOSCertificate = certificate.label;
+				extraArgs.iOSProvisioningProfile = provisioning.uuid;
+			} catch (error) {
+				let message = error.message;
+				if (error instanceof UserCancellation) {
+					message = 'Failed to start debug session as no code signing information was selected';
+				}
+				throw new Error(message);
+			}
+
+		}
+	}
+
+	return extraArgs;
+}
+
 exports.activate = activate; // eslint-disable-line no-undef
 
 /**
