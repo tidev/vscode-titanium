@@ -225,8 +225,7 @@ export async function getReferences (files, regExp?: RegExp, callback?: any) {
 			}
 			for (const match of matches) {
 				const position = document.positionAt(matches.index);
-				const location = callback(file, new Range(position.line, position.character, position.line, 0));
-				definitions.push(location);
+				definitions.push(callback(file, new Range(position.line, position.character, position.line, 0)));
 			}
 		}
 	}
