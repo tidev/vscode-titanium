@@ -71,7 +71,7 @@ export const viewSuggestions = [
 		}
 	},
 	{ // handler
-		regExp: /on(.*?)=["']$/,
+		regExp: /on(.*?)=["'][A-Za-z]*$/,
 		files () {
 			return [ related.getTargetPath('js') ];
 		},
