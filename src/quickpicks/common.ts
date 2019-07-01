@@ -46,11 +46,10 @@ export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = fa
 export async function inputBox (options: InputBoxOptions) {
 	const input = await window.showInputBox(options);
 
-	if (!input) {
-		throw new UserCancellation();
+	if (input !== undefined) {
+		return input;
 	}
-
-	return input;
+	throw new UserCancellation();
 }
 
 export async function quickPick (items: any[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}) {
@@ -177,10 +176,13 @@ export async function enterAndroidKeystoreInfo (lastUsed, savedKeystorePath) {
 	}
 	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias });
 	const password = await enterPassword({ placeHolder: 'Enter your keystore password' });
+	const privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore private key password (optional)' });
+
 	return {
 		alias,
 		location,
-		password
+		password,
+		privateKeyPassword
 	};
 }
 
