@@ -215,7 +215,7 @@ export async function getReferences (files, regExp?: RegExp, callback?: any) {
 		try {
 			document = await workspace.openTextDocument(file);
 		} catch (error) {
-			// ignore the error, it's most likelty the file doesn't exist
+			// ignore the error, it's most likely the file doesn't exist
 			continue;
 		}
 		if (document.getText().length > 0) {

@@ -3,7 +3,8 @@ import * as path from 'path';
 import * as xml2js from 'xml2js';
 import * as utils from './utils';
 
-import { EventEmitter, workspace } from 'vscode';
+import { EventEmitter, Range, window, workspace } from 'vscode';
+import { handleInteractionError, InteractionError } from './commands/common';
 
 const TIAPP_FILENAME = 'tiapp.xml';
 const TIMODULEXML_FILENAME = 'timodule.xml';
@@ -130,28 +131,45 @@ export class Project {
 	 * Load tiapp file
 	 *
 	 */
-	private loadTiappFile () {
+	private async loadTiappFile  () {
 		this.isTitaniumApp = false;
-		// tslint:disable-next-line:no-console
+		let error;
 		const rootPath = workspace.rootPath;
 		if (!rootPath) {
-			// tslint:disable-next-line:no-console
 			return;
 		}
 		const filePath = path.join(rootPath, TIAPP_FILENAME);
 		if (utils.fileExists(filePath)) {
+			this.isTitaniumApp = true;
 			const fileData = fs.readFileSync(filePath, 'utf-8');
 			const parser = new xml2js.Parser();
 			let json;
 			parser.parseString(fileData, (err, result) => {
-				if (!err) {
-					json = result;
+				if (err) {
+					error = new InteractionError(`Errors found in tiapp.xml \n ${err}`);
+					error.interactionChoices.push({
+						title: 'Open tiapp.xml',
+						run: async () => {
+							const file = path.join(workspace.rootPath, 'tiapp.xml');
+							const document = await workspace.openTextDocument(file);
+							const columnExp = /Column: (.*?)(?:\s|$)/g;
+							const column = columnExp.exec(err)[1];
+							const lineExp = /Line: (.*?)(?:\s|$)/g;
+							const line = lineExp.exec(err)[1];
+							const linePrefix = new Range(+line, 0, +line, +column);
+							await window.showTextDocument(document.uri, { selection: linePrefix });
+						}
+					});
+					return error;
 				}
+				json = result;
 			});
+			if (error instanceof InteractionError) {
+				await handleInteractionError(error);
+			}
 
 			if (json && json['ti:app']) {
 				this.tiapp = json['ti:app'];
-				this.isTitaniumApp = true;
 			}
 
 			if (!this.emitter) {
