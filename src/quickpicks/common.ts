@@ -19,7 +19,7 @@ export async function selectFromFileSystem (options: OpenDialogOptions) {
 	return filePath;
 }
 
-export async function enterPassword (options: InputBoxOptions, optional = false) {
+export async function enterPassword (options: InputBoxOptions) {
 	if (!options.password) {
 		options.password = true;
 	}
@@ -27,7 +27,7 @@ export async function enterPassword (options: InputBoxOptions, optional = false)
 	if (!options.placeHolder) {
 		options.placeHolder = 'Enter your password';
 	}
-	return inputBox(options, optional);
+	return inputBox(options);
 }
 
 export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false) {
@@ -43,14 +43,13 @@ export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = fa
 	}
 }
 
-export async function inputBox (options: InputBoxOptions, optional?: boolean ) {
+export async function inputBox (options: InputBoxOptions) {
 	const input = await window.showInputBox(options);
 
-	if (!input && !optional) {
-		throw new UserCancellation();
+	if (input !== undefined) {
+		return input;
 	}
-
-	return input;
+	throw new UserCancellation();
 }
 
 export async function quickPick (items: any[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}) {
@@ -177,7 +176,7 @@ export async function enterAndroidKeystoreInfo (lastUsed, savedKeystorePath) {
 	}
 	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias });
 	const password = await enterPassword({ placeHolder: 'Enter your keystore password' });
-	const privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore key (optional)' }, true);
+	const privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore private key password (optional)' });
 
 	return {
 		alias,
