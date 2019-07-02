@@ -1,4 +1,5 @@
 
+import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from './appc';
 import DeviceExplorer from './explorer/tiExplorer';
@@ -37,7 +38,7 @@ import { LogLevel } from './types/common';
 
 import * as ms from 'ms';
 import { environment, updates } from 'titanium-editor-commons';
-import { InteractionChoice } from './commands/common';
+import { handleInteractionError, InteractionChoice, InteractionError,  } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { selectUpdates } from './quickpicks/common';
@@ -430,10 +431,29 @@ function setStatusBar () {
 async function generateCompletions ({ force = false, progress = null } = {}) {
 	let sdkVersion;
 	try {
-		sdkVersion = project.sdk()[0];
-		if (!sdkVersion) {
-			// handle?
+		sdkVersion = project.sdk();
+		if (sdkVersion.length > 1) {
+			const error = new InteractionError('Errors found in tiapp.xml: multiple sdk-version tags found.');
+			error.interactionChoices.push({
+				title: 'Open tiapp.xml',
+				run: async () => {
+					const file = path.join(vscode.workspace.rootPath, 'tiapp.xml');
+					const document = await vscode.workspace.openTextDocument(file);
+					await vscode.window.showTextDocument(document);
+				}
+			});
+			throw error;
+		} else {
+			sdkVersion = sdkVersion[0];
 		}
+
+	} catch (error) {
+		if (error instanceof InteractionError) {
+			await handleInteractionError(error);
+		}
+		return;
+	}
+	try {
 		// Generate the completions
 		const [ alloy, sdk ] = await Promise.all([
 			completionItemProviderHelper.generateAlloyCompletions({ force, progress }),
