@@ -9,4 +9,9 @@ export interface Response {
 	result: any;
 }
 
+export interface FeedbackOptions {
+	type: 'info' | 'error';
+	message: string;
+}
+
 export const MESSAGE_STRING = 'titanium-debug-message';
