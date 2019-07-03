@@ -587,9 +587,7 @@
     }
   },
   "lint-staged": {
-    "linters": {
-      "*.ts": "npm run lint"
-    }
+    "*.ts": "npm run lint"
   },
   "config": {
     "commitizen": {
