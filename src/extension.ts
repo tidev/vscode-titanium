@@ -28,10 +28,8 @@ import { StyleCompletionItemProvider } from './providers/completion/styleComplet
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
 import { UserCancellation } from './commands/common';
-import { MESSAGE_STRING, Request, Response } from './common/extensionProtocol';
+import { FeedbackOptions, MESSAGE_STRING, Request, Response } from './common/extensionProtocol';
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
@@ -356,6 +354,17 @@ function activate (context) {
 						result: info
 					};
 					event.session.customRequest('extensionResponse', response);
+				} else if (request.code === 'FEEDBACK') {
+					const feedback = request.args as FeedbackOptions;
+					switch (feedback.type) {
+						case 'error':
+							await vscode.window.showErrorMessage(feedback.message);
+							break;
+						case 'info':
+						default:
+							await vscode.window.showInformationMessage(feedback.message);
+							break;
+					}
 				} else if (request.code === 'END') {
 					ExtensionContainer.terminal.stop();
 				}

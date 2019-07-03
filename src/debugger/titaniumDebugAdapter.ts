@@ -1,4 +1,5 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
+import { which } from 'appcd-subprocess';
 import * as got from 'got';
 import { URL } from 'url';
 import { ChromeDebugAdapter, ChromeDebugSession, IAttachRequestArgs, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
@@ -117,6 +118,9 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			sourceMaps: true,
 			deployType: 'development'
 		};
+
+		await this.checkForIWDB();
+
 		const info: any = await this.sendRequest('BUILD', args);
 		if (info.isError) {
 			await this.disconnect({});
@@ -138,6 +142,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	}
 
 	private async attachIOS (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
+
+		await this.checkForIWDB();
 
 		if (this.needExtraInfo(attachArgs)) {
 			const extraArgs: any = await this.sendRequest('INFO', attachArgs);
@@ -175,6 +181,18 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 
 		return super.attach(attachArgs);
+	}
+
+	private async checkForIWDB () {
+		try {
+			await which('ios_webkit_debug_proxy');
+		} catch (error) {
+			this.sendRequest('FEEDBACK', {
+				type: 'error',
+				message: 'Unable to find ios-webkit-debug-proxy. Please ensure it is installed'
+			});
+			throw new Error('Unable to start debugger');
+		}
 	}
 
 	private needExtraInfo (args) {
