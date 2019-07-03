@@ -2,8 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { BasePathTransformer, chromeUtils, IPathMapping, ISetBreakpointsArgs, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
 import { DebugProtocol } from 'vscode-debugprotocol';
+import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { determineProjectType, getAppName } from '../common/utils';
-import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from './titaniumDebugAdapter';
 
 export class TitaniumPathTransformer extends BasePathTransformer {
 
