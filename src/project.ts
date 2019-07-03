@@ -15,6 +15,7 @@ export class Project {
 
 	public isTitaniumApp: boolean = false;
 	public isTitaniumModule: boolean = false;
+	public isValidTiapp: boolean = false;
 
 	private tiapp: any;
 	private modules: any[] = [];
@@ -26,6 +27,14 @@ export class Project {
 	 */
 	public isTitaniumProject () {
 		return this.isTitaniumApp || this.isTitaniumModule;
+	}
+
+	/**
+	 * Check if the current project has a valid tiapp.
+	 * @returns {Boolean} Whether the project has a valid tiapp.xml.
+	 */
+	public isValid () {
+		return this.isValidTiapp;
 	}
 
 	/**
@@ -133,6 +142,7 @@ export class Project {
 	 */
 	private async loadTiappFile  () {
 		this.isTitaniumApp = false;
+		this.isValidTiapp = false;
 		let error;
 		const rootPath = workspace.rootPath;
 		if (!rootPath) {
@@ -146,31 +156,39 @@ export class Project {
 			let json;
 			parser.parseString(fileData, (err, result) => {
 				if (err) {
-					error = new InteractionError(`Errors found in tiapp.xml \n ${err}`);
+					let line: number;
+					let column: number;
+					let message = 'Errors found in tiapp.xml';
+					const columnExp = /Column: (.*?)(?:\s|$)/g;
+					const lineExp = /Line: (.*?)(?:\s|$)/g;
+					const columnMatch = columnExp.exec(err.message);
+					const lineMatch = lineExp.exec(err.message);
+
+					if (lineMatch) {
+						line = parseInt(lineMatch[1], 10);
+						message = `${message} on line ${line + 1}`;
+					}
+
+					if (columnMatch) {
+						column = parseInt(columnMatch[1], 10);
+						message = `${message} in column ${column + 1}`;
+					}
+
+					error = new InteractionError(message);
 					error.interactionChoices.push({
 						title: 'Open tiapp.xml',
 						run: async () => {
 							const file = path.join(workspace.rootPath, 'tiapp.xml');
 							const document = await workspace.openTextDocument(file);
-							const columnExp = /Column: (.*?)(?:\s|$)/g;
-							const column = columnExp.exec(err)[1];
-							const lineExp = /Line: (.*?)(?:\s|$)/g;
-							const line = lineExp.exec(err)[1];
-							const linePrefix = new Range(+line, 0, +line, +column);
+							const linePrefix = new Range(line, 0, line, column);
 							await window.showTextDocument(document.uri, { selection: linePrefix });
 						}
 					});
 					return error;
 				}
 				json = result;
+				this.isValidTiapp = true;
 			});
-			if (error instanceof InteractionError) {
-				await handleInteractionError(error);
-			}
-
-			if (json && json['ti:app']) {
-				this.tiapp = json['ti:app'];
-			}
 
 			if (!this.emitter) {
 				this.emitter = new EventEmitter();
@@ -180,6 +198,14 @@ export class Project {
 						this.emitter.fire();
 					}
 				});
+			}
+
+			if (json && json['ti:app']) {
+				this.tiapp = json['ti:app'];
+			}
+
+			if (error instanceof InteractionError) {
+				await handleInteractionError(error);
 			}
 		}
 	}
