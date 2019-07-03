@@ -2,34 +2,12 @@ import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
 import { which } from 'appcd-subprocess';
 import * as got from 'got';
 import { URL } from 'url';
-import { ChromeDebugAdapter, ChromeDebugSession, IAttachRequestArgs, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, ChromeDebugSession } from 'vscode-chrome-debug-core';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
-import { MESSAGE_STRING, Request } from '../common/extensionProtocol';
+import { MESSAGE_STRING, Request, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { BuildAppOptions } from '../types/cli';
 import { LogLevel } from '../types/common';
-
-export interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
-	appRoot?: string;
-	platform: 'android' | 'ios';
-	deviceId?: string;
-	port: number;
-	target: string;
-	cwd: string;
-	projectType: string;
-	appName: string;
-}
-
-export interface TitaniumAttachRequestArgs extends IAttachRequestArgs {
-	appRoot?: string;
-	platform: 'android' | 'ios';
-	deviceId?: string;
-	port: number;
-	target: string;
-	cwd: string;
-	projectType: string;
-	appName: string;
-}
 
 export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
@@ -74,7 +52,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	}
 
 	private async launchAndroid (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
-		const args: BuildAppOptions = {
+		const args: BuildAppOptions & TitaniumLaunchRequestArgs = {
 			platform: launchArgs.platform,
 			projectDir: launchArgs.appRoot,
 			buildOnly: false,
@@ -85,7 +63,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			debugPort: launchArgs.port || 51388,
 			target: launchArgs.target || 'emulator',
 			skipJsMinify: true,
-			deployType: 'development'
+			deployType: 'development',
+			...launchArgs
 		};
 		const info: any = await this.sendRequest('BUILD', args);
 		if (info.isError) {
@@ -104,7 +83,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	}
 
 	private async launchIOS (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
-		const args: BuildAppOptions = {
+		const args: BuildAppOptions & TitaniumLaunchRequestArgs = {
 			platform: launchArgs.platform,
 			projectDir: launchArgs.appRoot,
 			buildOnly: false,
@@ -116,7 +95,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			target: launchArgs.target || 'simulator',
 			skipJsMinify: true,
 			sourceMaps: true,
-			deployType: 'development'
+			deployType: 'development',
+			...launchArgs
 		};
 
 		await this.checkForIWDB();

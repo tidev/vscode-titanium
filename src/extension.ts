@@ -29,7 +29,7 @@ import { TiappCompletionItemProvider } from './providers/completion/tiappComplet
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
 import { UserCancellation } from './commands/common';
-import { FeedbackOptions, MESSAGE_STRING, Request, Response } from './common/extensionProtocol';
+import { FeedbackOptions, MESSAGE_STRING, Request, Response, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from './common/extensionProtocol';
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
@@ -293,7 +293,7 @@ function activate (context) {
 				const request: Request = event.body;
 
 				if (request.code === 'BUILD') {
-					const providedArgs = request.args as BuildAppOptions;
+					const providedArgs = request.args as BuildAppOptions & TitaniumLaunchRequestArgs;
 					const response: Response = {
 						id: request.id,
 						result: {
@@ -347,7 +347,7 @@ function activate (context) {
 						}
 					});
 				} else if (request.code === 'INFO') {
-					const providedArgs = request.args as BuildAppOptions;
+					const providedArgs = request.args as BuildAppOptions & TitaniumAttachRequestArgs;
 					const info = await getBuildInfo(providedArgs);
 					const response: Response = {
 						id: request.id,
@@ -375,7 +375,7 @@ function activate (context) {
 	return init();
 }
 
-async function getBuildInfo (providedArgs: BuildAppOptions) {
+async function getBuildInfo (providedArgs: BuildAppOptions & TitaniumAttachRequestArgs & TitaniumLaunchRequestArgs) {
 	const extraArgs: any = {};
 	if (!providedArgs.platform) {
 		try {
@@ -416,7 +416,7 @@ async function getBuildInfo (providedArgs: BuildAppOptions) {
 		}
 	}
 
-	if (providedArgs.platform === 'ios' && providedArgs.target === 'device') {
+	if (providedArgs.platform === 'ios' && providedArgs.target === 'device' && providedArgs.request !== 'attach') {
 		if (!providedArgs.iOSCertificate) {
 			try {
 				const certificate = await selectiOSCertificate('run');
