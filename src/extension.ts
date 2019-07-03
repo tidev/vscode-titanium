@@ -403,6 +403,9 @@ async function init () {
  * Set project name and link to dashboard in status bar
  */
 function setStatusBar () {
+	if (!project.isValid()) {
+		return;
+	}
 	if (!projectStatusBarItem) {
 		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
 	}
@@ -429,6 +432,9 @@ function setStatusBar () {
  * @param {Object} progress - Progress reporter.
  */
 async function generateCompletions ({ force = false, progress = null } = {}) {
+	if (!project.isValid()) {
+		return;
+	}
 	let sdkVersion;
 	try {
 		sdkVersion = project.sdk();
