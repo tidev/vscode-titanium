@@ -313,7 +313,7 @@ async function init () {
 				const { missing } = await environment.validateEnvironment();
 
 				if (missing.length) {
-					let message = `You are missing the following required components for:`;
+					let message = `You are missing the following required components for Titanium development:`;
 					for (let i = 0; i < missing.length; i++) {
 						const product = missing[i];
 						if (i < missing.length - 1) {
