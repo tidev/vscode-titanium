@@ -612,9 +612,8 @@
     "commit": "git-cz",
     "compile": "tsc -p ./",
     "lint": "tslint -p tsconfig.json --format stylish",
-    "postinstall": "node ./node_modules/vscode/bin/install",
     "release": "node ./scripts/generate-settings-table.js &&  standard-version && npx vsce package",
-    "test": "node ./node_modules/vscode/bin/test",
+    "test": "node ./test/runTest.js",
     "vscode:prepublish": "npm run compile",
     "watch": "tsc -watch -p ./"
   },
@@ -627,16 +626,19 @@
     "@types/node": "8.10.25",
     "@types/semver": "^6.0.0",
     "@types/underscore": "^1.8.13",
+    "@types/vscode": "1.31.0",
     "@types/xml2js": "^0.4.3",
     "commitizen": "^3.0.7",
     "cz-conventional-changelog": "^2.1.0",
+    "glob": "^7.1.4",
     "husky": "^3.0.0",
     "lint-staged": "^9.0.0",
+    "mocha": "^6.1.4",
     "standard-version": "^6.0.1",
     "tslint": "^5.15.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.4.1",
-    "vscode": "^1.1.31"
+    "vscode-test": "1.0.0"
   },
   "dependencies": {
     "fs-extra": "^8.0.1",
