@@ -162,8 +162,8 @@ function activate (context) {
 
 		vscode.window.registerTreeDataProvider('titanium.view.updateExplorer', updateExplorer),
 
-		vscode.commands.registerCommand(Commands.RefreshUpdates, () => {
-			updateExplorer.refresh();
+		vscode.commands.registerCommand(Commands.RefreshUpdates, async () => {
+			await updateExplorer.refresh();
 		}),
 
 		vscode.commands.registerCommand(Commands.EnableLiveView, async () => {
@@ -197,8 +197,8 @@ function activate (context) {
 		}),
 
 		vscode.commands.registerCommand(Commands.CheckForUpdates, async () => {
-			vscode.commands.executeCommand(Commands.RefreshUpdates);
-			const updateInfo = await updates.checkAllUpdates();
+			await vscode.commands.executeCommand(Commands.RefreshUpdates);
+			const updateInfo = updateExplorer.updates;
 			const numberOfUpdates = updateInfo.length;
 			if (!numberOfUpdates) {
 				return;
