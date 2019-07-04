@@ -24,7 +24,12 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 		try {
 			this.updates = await updates.checkAllUpdates();
 		} catch (error) {
-			// squash
+			let message = 'Failed to check for updates';
+			// Need to check in string as titaniumlib currently returns a string as the error
+			if (error.code === 'ENOTFOUND' || /ENOTFOUND/.test(error)) {
+				message = `${message} as you are offline`;
+			}
+			await vscode.window.showErrorMessage(message);
 		}
 		this.checkingForUpdates = false;
 		this._onDidChangeTreeData.fire();
