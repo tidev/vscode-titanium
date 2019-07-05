@@ -1,4 +1,5 @@
 import { IAttachRequestArgs, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
+import { LogLevel } from '../types/common';
 
 export interface Request {
 	id: string;
@@ -18,24 +19,26 @@ export interface FeedbackOptions {
 
 export interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
 	request: string;
-	appRoot?: string;
+	projectDir: string;
 	platform: 'android' | 'ios';
 	deviceId?: string;
 	port: number;
 	target: string;
 	cwd: string;
 	appName: string;
+	logLevel: LogLevel;
 }
 
 export interface TitaniumAttachRequestArgs extends IAttachRequestArgs {
 	request: string;
-	appRoot?: string;
+	projectDir: string;
 	platform: 'android' | 'ios';
 	deviceId?: string;
 	port: number;
 	target: string;
 	cwd: string;
 	appName: string;
+	logLevel: LogLevel;
 }
 
 export const MESSAGE_STRING = 'titanium-debug-message';

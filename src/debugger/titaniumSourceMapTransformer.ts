@@ -21,7 +21,7 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 	}
 
 	public async configureOptions (args: TitaniumLaunchRequestArgs) {
-		this.appDirectory = args.appRoot;
+		this.appDirectory = args.projectDir;
 		this.platform = args.platform === 'ios' ? 'iphone' : args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);
 	}

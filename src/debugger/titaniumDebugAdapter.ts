@@ -2,7 +2,7 @@ import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
 import { which } from 'appcd-subprocess';
 import * as got from 'got';
 import { URL } from 'url';
-import { ChromeDebugAdapter, ChromeDebugSession } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, ChromeDebugSession, ErrorWithMessage } from 'vscode-chrome-debug-core';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
@@ -53,29 +53,23 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 	private async launchAndroid (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
 		const args: BuildAppOptions & TitaniumLaunchRequestArgs = {
-			platform: launchArgs.platform,
-			projectDir: launchArgs.appRoot,
 			buildOnly: false,
 			projectType: 'app',
 			logLevel: LogLevel.Trace,
 			buildType: 'run',
-			deviceId: launchArgs.deviceId,
-			debugPort: launchArgs.port || 51388,
-			target: launchArgs.target || 'emulator',
 			skipJsMinify: true,
 			deployType: 'development',
 			...launchArgs
 		};
+
 		const info: any = await this.sendRequest('BUILD', args);
+
 		if (info.isError) {
 			await this.disconnect({});
 			throw new Error(info.message);
 		}
-		// TODO: Clean up to be more correct
-		launchArgs.port = args.debugPort;
-		launchArgs.cwd = args.projectDir;
 
-		return this.attach(launchArgs);
+		return this.attach(args);
 	}
 
 	private attachAndroid (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
@@ -84,15 +78,10 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 	private async launchIOS (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
 		const args: BuildAppOptions & TitaniumLaunchRequestArgs = {
-			platform: launchArgs.platform,
-			projectDir: launchArgs.appRoot,
 			buildOnly: false,
 			projectType: 'app',
 			logLevel: LogLevel.Trace,
 			buildType: 'run',
-			deviceId: launchArgs.deviceId,
-			debugPort: launchArgs.port || 51388,
-			target: launchArgs.target || 'simulator',
 			skipJsMinify: true,
 			sourceMaps: true,
 			deployType: 'development',
@@ -102,34 +91,18 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		await this.checkForIWDB();
 
 		const info: any = await this.sendRequest('BUILD', args);
+
 		if (info.isError) {
 			await this.disconnect({});
 			throw new Error(info.message);
 		}
-		launchArgs.port = args.debugPort;
-		launchArgs.cwd = args.projectDir;
 
-		if (!launchArgs.target) {
-			launchArgs.target = info.target;
-		}
-
-		if (!launchArgs.deviceId) {
-			launchArgs.deviceId = info.deviceId;
-		}
-		launchArgs.appName = info.appName;
-
-		return this.attach(launchArgs);
+		return this.attach(args);
 	}
 
 	private async attachIOS (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
 
 		await this.checkForIWDB();
-
-		if (this.needExtraInfo(attachArgs)) {
-			const extraArgs: any = await this.sendRequest('INFO', attachArgs);
-			attachArgs.deviceId = extraArgs.deviceId;
-			// attachArgs.target = extraArgs.target;
-		}
 
 		this.server = new ProxyServer();
 
@@ -140,11 +113,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			throw error;
 		}
 
-		await this.sleep(500);
-
-		const { body } = await got(`http://localhost:${attachArgs.port}/json`, {
-			json: true
-		});
+		const body = await this.pollForApp(`http://localhost:${attachArgs.port}/json`, 'Unable to discover app', 5);
 
 		for (const context of body) {
 			if (context.metadata) {
@@ -163,6 +132,30 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return super.attach(attachArgs);
 	}
 
+	private async pollForApp (url: string, errorMessage: string, maxRetries= 5, iteration: number = 0) {
+		if (iteration > maxRetries) {
+			throw Error(errorMessage);
+
+		}
+
+		await this.sleep(250);
+
+		let body;
+		try {
+			const resp = await got(url, {
+				json: true
+			});
+			body = resp.body;
+		} catch (error) {
+			// squelch
+		}
+		if (body && body.length > 0) {
+			return body;
+		}
+
+		return this.pollForApp(url, errorMessage, maxRetries, iteration + 1);
+	}
+
 	private async checkForIWDB () {
 		try {
 			await which('ios_webkit_debug_proxy');
@@ -172,16 +165,6 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 				message: 'Unable to find ios-webkit-debug-proxy. Please ensure it is installed'
 			});
 			throw new Error('Unable to start debugger');
-		}
-	}
-
-	private needExtraInfo (args) {
-		if (!args.target) {
-			return true;
-		}
-
-		if (!args.deviceId) {
-			return true;
 		}
 	}
 
