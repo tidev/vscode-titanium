@@ -9,6 +9,7 @@ class TitaniumAndroidConnection extends chromeConnection.ChromeConnection {
 		super(new TitaniumTargetDiscovery());
 	}
 }
+
 ChromeDebugSession.run(ChromeDebugSession.getSession({
 	adapter: TitaniumDebugAdapter,
 	extensionName: 'titanium-extension',

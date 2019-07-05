@@ -48,6 +48,9 @@ import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { selectUpdates } from './quickpicks/common';
 let projectStatusBarItem;
+
+import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConfigurationProvider';
+
 /**
  * Activate
  *
@@ -297,25 +300,10 @@ function activate (context) {
 					const response: Response = {
 						id: request.id,
 						result: {
-							port: providedArgs.debugPort,
-							udid: providedArgs.deviceId,
-							name: project.appName()
+							isError: false
 						}
 					};
-					try {
-						const extraInfo = await getBuildInfo(providedArgs);
-						Object.assign(providedArgs, extraInfo);
-						Object.assign(response.result, providedArgs);
-					} catch (error) {
-						vscode.window.showErrorMessage(error.message);
-						ExtensionContainer.terminal.showOutput();
-						response.result = {
-							isError: true,
-							message: error.message
-						};
-						event.session.customRequest('extensionResponse', response);
-						return;
-					}
+
 					const buildArgs = buildArguments(providedArgs);
 					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
 
@@ -346,14 +334,6 @@ function activate (context) {
 							event.session.customRequest('extensionResponse', response);
 						}
 					});
-				} else if (request.code === 'INFO') {
-					const providedArgs = request.args as BuildAppOptions & TitaniumAttachRequestArgs;
-					const info = await getBuildInfo(providedArgs);
-					const response: Response = {
-						id: request.id,
-						result: info
-					};
-					event.session.customRequest('extensionResponse', response);
 				} else if (request.code === 'FEEDBACK') {
 					const feedback = request.args as FeedbackOptions;
 					switch (feedback.type) {
@@ -369,73 +349,13 @@ function activate (context) {
 					ExtensionContainer.terminal.stop();
 				}
 			}
-		}))
+		})),
+
+		context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('titanium', new TitaniumDebugConfigurationProvider()))
+
 	);
 
 	return init();
-}
-
-async function getBuildInfo (providedArgs: BuildAppOptions & TitaniumAttachRequestArgs & TitaniumLaunchRequestArgs) {
-	const extraArgs: any = {};
-	if (!providedArgs.platform) {
-		try {
-			const platform = await selectPlatform();
-			extraArgs.platform = platform.id;
-		} catch (error) {
-			let message = error.message;
-			if (error instanceof UserCancellation) {
-				message = 'Failed to start debug session as no platform was selected';
-			}
-			throw new Error(message);
-		}
-	}
-
-	if (!providedArgs.target) {
-		try {
-			const { id } = await selectBuildTarget(providedArgs.platform);
-			extraArgs.target = id;
-		} catch (error) {
-			let message = error.message;
-			if (error instanceof UserCancellation) {
-				message = 'Failed to start debug session as no target was selected';
-			}
-			throw new Error(message);
-		}
-	}
-
-	if (!providedArgs.deviceId) {
-		try {
-			const { udid } = await selectDevice(providedArgs.platform, providedArgs.target);
-			extraArgs.deviceId = udid;
-		} catch (error) {
-			let message = error.message;
-			if (error instanceof UserCancellation) {
-				message = 'Failed to start debug session as no target was selected';
-			}
-			throw new Error(message);
-		}
-	}
-
-	if (providedArgs.platform === 'ios' && providedArgs.target === 'device' && providedArgs.request !== 'attach') {
-		if (!providedArgs.iOSCertificate) {
-			try {
-				const certificate = await selectiOSCertificate('run');
-				const provisioning = await selectiOSProvisioningProfile(certificate, providedArgs.target, project.appId());
-
-				extraArgs.iOSCertificate = certificate.label;
-				extraArgs.iOSProvisioningProfile = provisioning.uuid;
-			} catch (error) {
-				let message = error.message;
-				if (error instanceof UserCancellation) {
-					message = 'Failed to start debug session as no code signing information was selected';
-				}
-				throw new Error(message);
-			}
-
-		}
-	}
-
-	return extraArgs;
 }
 
 exports.activate = activate; // eslint-disable-line no-undef

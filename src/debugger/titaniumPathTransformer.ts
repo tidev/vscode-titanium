@@ -27,7 +27,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 	public async configureTransformOptions (args: TitaniumAttachRequestArgs|TitaniumLaunchRequestArgs) {
 		this._pathMapping = args.pathMapping;
-		this.appDirectory = args.appRoot;
+		this.appDirectory = args.projectDir;
 		this.platform = args.platform === 'ios' ? 'iphone' : args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);
 		this.appName = await getAppName(this.appDirectory);
