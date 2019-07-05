@@ -62,36 +62,58 @@
             "name": "Launch on Android",
             "type": "titanium",
             "request": "launch",
-            "platform": "android",
-            "appRoot": "${workspaceRoot}",
-            "sourceMaps": true
+            "platform": "android"
+          },
+          {
+            "name": "Launch on iOS",
+            "type": "titanium",
+            "request": "launch",
+            "platform": "ios"
           }
         ],
         "configurationSnippets": [
           {
             "label": "Titanium: Launch on Android Emulator",
-            "description": "Configuration for launch app on Android",
+            "description": "Configuration for launch app on Android emulator",
             "body": {
-              "name": "Launch on Android",
+              "name": "Launch on Android emulator",
               "type": "titanium",
               "request": "launch",
               "platform": "android",
-              "appRoot": "^\"\\${workspaceRoot}\"",
-              "sourceMaps": true,
               "target": "emulator"
             }
           },
           {
-            "label": "Titanium: Launch on iOS",
+            "label": "Titanium: Launch on Android Device",
+            "description": "Configuration for launch app on Android device",
+            "body": {
+              "name": "Launch on Android device",
+              "type": "titanium",
+              "request": "launch",
+              "platform": "android",
+              "target": "device"
+            }
+          },
+          {
+            "label": "Titanium: Launch on iOS simulator",
             "description": "Configuration for launch app on iOS simulator",
             "body": {
-              "name": "Launch on iOS",
+              "name": "Launch on iOS simulator",
               "type": "titanium",
               "request": "launch",
               "platform": "ios",
-              "appRoot": "^\"\\${workspaceRoot}\"",
-              "sourceMaps": true,
               "target": "simulator"
+            }
+          },
+          {
+            "label": "Titanium: Launch on iOS device",
+            "description": "Configuration for launch app on iOS device",
+            "body": {
+              "name": "Launch on iOS device",
+              "type": "titanium",
+              "request": "launch",
+              "platform": "ios",
+              "target": "device"
             }
           }
         ],
@@ -99,28 +121,28 @@
           "launch": {
             "required": [
               "platform",
-              "appRoot"
+              "projectDir"
             ],
             "properties": {
               "platform": {
                 "type": "string",
-                "description": "Platform to debug"
+                "description": "Platform to build to"
               },
-              "appRoot": {
+              "projectDir": {
                 "type": "string",
-                "description": "Root for folder to debug"
+                "description": "Root of the Titanium project being debugged"
               },
               "port": {
                 "type": "number",
-                "description": "Port number"
+                "description": "Port number to use for the debugger"
               },
               "deviceId": {
                 "type": "string",
-                "description": "Device ID"
+                "description": "Device ID of the device to debug to"
               },
               "target": {
                 "type": "string",
-                "description": "Target"
+                "description": "Target to debug to"
               }
             }
           }
