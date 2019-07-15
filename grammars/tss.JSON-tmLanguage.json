@@ -67,6 +67,20 @@
               "match": "android|ios|Alloy\\.Globals\\."
             }
           ]
+        },
+        {
+          "name": "entity.name.tag.css.tss",
+          "begin": "\\[",
+          "end": "\\]",
+          "patterns": [{
+              "name": "variable.interpolation.tss",
+              "match": "(platform|if)\\="
+            },
+            {
+              "name": "meta.link.tss",
+              "match": "android|ios|Alloy\\.CFG\\."
+            }
+          ]
         }
       ]
     },
@@ -325,6 +339,11 @@
         {
           "name": "support.class.tss.alloyglobals",
           "begin": "Alloy\\.Globals",
+          "end": "(?=[,\\}\\]\\n\\r])"
+        },
+        {
+          "name": "support.class.tss.alloyCFG",
+          "begin": "Alloy\\.CFG",
           "end": "(?=[,\\}\\]\\n\\r])"
         },
         {
