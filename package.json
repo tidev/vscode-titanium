@@ -120,17 +120,16 @@
         "configurationAttributes": {
           "launch": {
             "required": [
-              "platform",
-              "projectDir"
+              "platform"
             ],
             "properties": {
               "platform": {
                 "type": "string",
-                "description": "Platform to build to"
+                "description": "Platform to debug"
               },
               "projectDir": {
                 "type": "string",
-                "description": "Root of the Titanium project being debugged"
+                "description": "Directory of the Titanium project being debugged"
               },
               "port": {
                 "type": "number",
@@ -142,7 +141,7 @@
               },
               "target": {
                 "type": "string",
-                "description": "Target to debug to"
+                "description": "Build target to debug on"
               }
             }
           }
