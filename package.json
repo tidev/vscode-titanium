@@ -46,7 +46,7 @@
     "debuggers": [
       {
         "type": "titanium",
-        "label": "Titanium Debugger",
+        "label": "Titanium",
         "languages": [
           "javascript"
         ],
