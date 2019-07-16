@@ -85,7 +85,9 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 		if (this.platform === 'iphone') {
 			try {
-				const appName = `${this.appName}.app`;
+				// We must encode the app name here as the sourceUrl we're provided
+				// is also encoded
+				const appName = `${encodeURIComponent(this.appName)}.app`;
 				sourceUrl = sourceUrl.split(appName)[1];
 			} catch (error) {
 				throw error;
