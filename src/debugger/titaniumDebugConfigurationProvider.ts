@@ -8,12 +8,12 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
 		if (!config.projectDir) {
-			config.projectDir = '${workspaceRoot}';
+			config.projectDir = '${workspaceFolder}';
 		}
 
 		if (!config.port) {
 			config.port = 9000;
-			config.debugPort = 900;
+			config.debugPort = 9000;
 		}
 
 		if (!config.logLevel) {
