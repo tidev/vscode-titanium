@@ -1,6 +1,32 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [0.4.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.3.2...v0.4.0) (2019-07-17)
+
+
+### Bug Fixes
+
+* ensure progress notification is continuous ([f78397a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/f78397a))
+* **autocomplete:** check if there are multiple sdks in tiapp ([#91](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/91)) ([47e8f66](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/47e8f66)), closes [#79](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/79)
+* **creation:** use fsPath when dealing with selected directory ([17e2be6](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/17e2be6)), closes [#108](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/108)
+* **definition:** fixed go to definition for event handlers ([#96](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/96)) ([e70dbdc](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/e70dbdc)), closes [#94](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/94)
+* **project:** add feedback for tiapp validation ([#97](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/97)) ([5527dc5](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/5527dc5)), closes [#95](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/95)
+* **textmate:** fixed syntax highlight for alloy.cfg ([#104](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/104)) ([da1798c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/da1798c)), closes [#103](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/103)
+* **updates:** fix message on single update message ([71d51fb](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/71d51fb))
+* **updates:** handle error properly in update check ([bb527fb](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bb527fb)), closes [#100](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/100)
+* **validation:** correct verbiage on fail message ([0b39031](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0b39031)), closes [#88](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/88)
+
+
+### Features
+
+* **explorer:** add update checks for components ([e193754](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/e193754))
+* prompt to install apps sdk if not installed ([bec5204](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bec5204))
+* validate environment on startup ([f615f3d](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/f615f3d))
+* **explorer/updates:** change explorer text when checking for updates ([96ce5b7](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/96ce5b7))
+* **package/android:** prompt for keystore key password ([#92](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/92)) ([73048bd](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/73048bd))
+
+
 
 <a name="0.3.2"></a>
 ## [0.3.2](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.3.1...v0.3.2) (2019-05-01)
