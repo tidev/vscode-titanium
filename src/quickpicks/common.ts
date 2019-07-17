@@ -4,7 +4,7 @@ import * as utils from '../utils';
 
 import { pathExists } from 'fs-extra';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, window, workspace } from 'vscode';
+import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
 
@@ -91,9 +91,9 @@ export async function selectCreationLocation (lastUsed?) {
 		if (!filePath) {
 			throw new UserCancellation();
 		}
-		return filePath[0].path;
+		return filePath[0];
 	} else {
-		return lastUsed;
+		return Uri.file(lastUsed);
 	}
 }
 
