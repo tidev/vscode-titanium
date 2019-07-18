@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { UserCancellation } from '../commands';
+import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import project from '../project';
-import { selectBuildTarget, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from '../quickpicks/common';
-
+import { quickPick, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from '../quickpicks/common';
+import * as utils from '../utils';
 export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
@@ -39,7 +40,36 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 		if (!config.target) {
 			try {
-				config.target = (await selectBuildTarget(config.platform)).id;
+				let lastDebugState;
+				if (config.platform === 'android') {
+					lastDebugState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastAndroidDebug);
+				} else if (config.platform === 'ios') {
+					lastDebugState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastiOSDebug);
+				}
+				const targets = utils.targetsForPlatform(config.platform)
+					.filter(target => !/^dist/.test(target))
+					.map(target => ({ label: utils.nameForTarget(target), id: target }));
+
+				if (lastDebugState) {
+					try {
+						targets.push({
+							label: `Last debug session (${lastDebugState.target} - ${lastDebugState.deviceName})`,
+							id: 'last'
+						});
+					} catch (error) {
+						// squelch error as it might be due to bad last state
+					}
+				}
+				const targetInfo = await quickPick(targets);
+				if (targetInfo.id === 'last') {
+					config.target = lastDebugState.target;
+					config.deviceId = lastDebugState.deviceId;
+					config.deviceName = lastDebugState.deviceName;
+					config.iOSCertificate = lastDebugState.iOSCertificate;
+					config.iOSProvisioningProfile = lastDebugState.iOSProvisioningProfile;
+				} else {
+					config.target = targetInfo.id;
+				}
 			} catch (error) {
 				let message = error.message;
 				if (error instanceof UserCancellation) {
@@ -51,7 +81,9 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 		if (!config.deviceId) {
 			try {
-				config.deviceId = (await selectDevice(config.platform, config.target)).udid;
+				const deviceInfo = await selectDevice(config.platform, config.target);
+				config.deviceId = deviceInfo.udid;
+				config.deviceName = deviceInfo.label;
 			} catch (error) {
 				let message = error.message;
 				if (error instanceof UserCancellation) {
@@ -77,6 +109,12 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 					throw new Error(message);
 				}
 			}
+		}
+
+		if (config.platform === 'android') {
+			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastAndroidDebug, config);
+		} else if (config.platform === 'ios') {
+			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastiOSDebug, config);
 		}
 
 		return config;
