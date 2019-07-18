@@ -1,3 +1,6 @@
+import { Socket } from 'net';
+import * as semver from 'semver';
+import { updates } from 'titanium-editor-commons';
 import * as vscode from 'vscode';
 import { UserCancellation } from '../commands';
 import { WorkspaceState } from '../constants';
@@ -5,6 +8,7 @@ import { ExtensionContainer } from '../container';
 import project from '../project';
 import { quickPick, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from '../quickpicks/common';
 import * as utils from '../utils';
+
 export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
@@ -15,6 +19,24 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 		if (!config.port) {
 			config.port = 9000;
 			config.debugPort = 9000;
+		} else {
+			config.debugPort = config.port;
+		}
+
+		try {
+			await validatePortIsFree(config.port);
+		} catch (error) {
+			// Increment by 1000 and retry the connection, we do this to ensure that we clear the range used by remotedebug
+			// when spawning ios-webkit-debug-proxy and avoid any potential conflicts
+			const newPort = config.port + 1000;
+			vscode.window.showWarningMessage(`Port ${config.port} is in use, trying ${newPort}`);
+			try {
+				await validatePortIsFree(newPort);
+				config.port = newPort;
+				config.debugPort = newPort;
+			} catch (e) {
+				throw new Error(`Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.`);
+			}
 		}
 
 		if (!config.logLevel) {
@@ -119,4 +141,38 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 		return config;
 	}
+}
+
+async function validatePortIsFree (port: number) {
+
+	return new Promise((resolve, reject) => {
+		const socket = new Socket();
+
+		function cleanup () {
+			if (socket) {
+				socket.removeAllListeners('connect');
+				socket.removeAllListeners('error');
+				socket.end();
+				socket.destroy();
+				socket.unref();
+			}
+		}
+
+		socket.once('error', (err: NodeJS.ErrnoException) => {
+			if (err.code === 'ECONNREFUSED') {
+				// port is currently in use
+				resolve();
+			} else {
+				reject();
+			}
+			cleanup();
+		});
+
+		socket.once('connect', () => {
+			reject();
+			cleanup();
+		});
+
+		socket.connect({ port });
+	});
 }

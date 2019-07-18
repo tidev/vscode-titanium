@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-* To debug an application on iOS you must install [ios-webkit-debug-proxy](https://github.com/google/ios-webkit-debug-proxy). The latest versions of `usbmuxd` and `libimobiledevice` are required in order to ensure compatability.
+* To debug an application on iOS you must install [ios-webkit-debug-proxy](https://github.com/google/ios-webkit-debug-proxy). The latest versions of `usbmuxd` and `libimobiledevice` are required in order to ensure compatability with the latest iOS versions.
   1. Firstly ensure you have [brew](https://brew.sh/) installed.
   2. Install the latest `usbmuxd` using `brew install --HEAD usbmuxd`
   3. Install the latest `libimobiledevice` using `brew install --HEAD libimobiledevice`
