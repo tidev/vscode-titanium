@@ -628,7 +628,7 @@
     "@types/underscore": "^1.8.13",
     "@types/vscode": "1.31.0",
     "@types/xml2js": "^0.4.3",
-    "commitizen": "^3.0.7",
+    "commitizen": "^4.0.0",
     "cz-conventional-changelog": "^2.1.0",
     "glob": "^7.1.4",
     "husky": "^3.0.0",
