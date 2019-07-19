@@ -24,11 +24,22 @@ export class OSVerNode extends BaseNode {
 
 	public getChildren (): DeviceNode[] {
 		const simulators: DeviceNode[] = [];
-		const sims = appc.iOSSimulators();
-		for (const sim of sims[this.version]) {
-			simulators.push(new DeviceNode(sim.name, this.platform, this.target, sim.udid, this.targetId, this.version));
+		if (this.platform === 'ios') {
+			const sims = appc.iOSSimulators();
+			for (const sim of sims[this.version]) {
+				simulators.push(new DeviceNode(sim.name, this.platform, this.target, sim.udid, this.targetId, this.version));
+			}
+		} else if (this.platform === 'windows') {
+			for (const emulator of appc.windowsEmulators()['10.0']) {
+				if (emulator.uapVersion !== this.version) {
+					continue;
+				}
+				const label = emulator.name.replace('Mobile Emulator ', '');
+				simulators.push(new DeviceNode(label, this.platform, 'wp-emulator', emulator.udid, this.targetId));
+			}
 		}
 		return simulators;
+
 	}
 
 	get tooltip () {
