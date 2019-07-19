@@ -3,6 +3,7 @@ import { BaseNode } from './baseNode';
 import { DeviceNode } from './deviceNode';
 import { OSVerNode } from './osVerNode';
 
+import * as semver from 'semver';
 import appc from '../../appc';
 import { targetForName } from '../../utils';
 
@@ -67,9 +68,16 @@ export class TargetNode extends BaseNode {
 					devices.push(new DeviceNode('Local Machine', this.platform, 'ws-local', null, 'ws-local'));
 					break;
 				case 'Emulator':
+					const emulatorVersions: Set<string> = new Set();
 					for (const emulator of appc.windowsEmulators()['10.0']) {
-						const label = emulator.name.replace('Mobile Emulator ', '');
-						devices.push(new DeviceNode(label, this.platform, 'wp-emulator', emulator.udid, this.targetId));
+						emulatorVersions.add(emulator.uapVersion);
+					}
+					// Sort into descending value
+					const orderedVersions = Array.from(emulatorVersions).sort((a, b) => {
+						return semver.compare(semver.coerce(a), semver.coerce(b));
+					}).reverse();
+					for (const version of orderedVersions) {
+						devices.push(new OSVerNode(version, 'windows', 'wp-emulator'));
 					}
 					break;
 			}
