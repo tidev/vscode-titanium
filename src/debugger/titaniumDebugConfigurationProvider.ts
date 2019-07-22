@@ -1,3 +1,4 @@
+import { which } from 'appcd-subprocess';
 import { Socket } from 'net';
 import * as semver from 'semver';
 import { updates } from 'titanium-editor-commons';
@@ -58,6 +59,22 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 		if (config.platform === 'android' && config.request === 'attach') {
 			throw new Error('Attaching to a running Android app is currently not supported');
+		}
+
+		if (config.platform === 'ios') {
+			try {
+				await which('ios_webkit_debug_prox');
+			} catch (error) {
+				vscode.window.showErrorMessage('Unable to find ios-webkit-debug-proxy. Please ensure it is installed', {
+					title: 'Open docs'
+				}).then(action => {
+					if (action) {
+						// TODO: Update to master branch before release
+						vscode.env.openExternal(vscode.Uri.parse('https://github.com/ewanharris/vscode-appcelerator-titanium/blob/debugger_spike/doc/debugging.md'));
+					}
+				});
+				throw new Error('Unable to start debugger as ios_webkit_debug_proxy is not installed.');
+			}
 		}
 
 		if (!config.target) {
