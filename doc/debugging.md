@@ -58,7 +58,7 @@ Once you have generated the debug configuration, you're ready to start debugging
     ![VS Code Debug Configuration Dropdown](./images/ConfigurationSelect.png)
 3. Press the green play button
 
-If you are missing any required information such as the build targer and device id you will be prompted for it. Once all the required information is gathered, the build will be started and the debugger will connect when the application is launched on your build target. You can set breakpoints in your code and they will be hit as you step through your application.
+If you are missing any required information such as the build target and device id you will be prompted for it. Once all the required information is gathered, the build will be started and the debugger will connect when the application is launched on your build target. You can set breakpoints in your code and they will be hit as you step through your application.
 
 **Note**: On Android the debugger will pause on the first line that is executed which will probably not be your code but some internal SDK code. You can press `Continue` or `F5` to continue after it has broke on this line.
 
