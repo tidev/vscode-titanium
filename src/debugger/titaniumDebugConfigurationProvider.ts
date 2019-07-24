@@ -63,7 +63,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 		if (config.platform === 'ios') {
 			try {
-				await which('ios_webkit_debug_prox');
+				await which('ios_webkit_debug_proxy');
 			} catch (error) {
 				vscode.window.showErrorMessage('Unable to find ios-webkit-debug-proxy. Please ensure it is installed', {
 					title: 'Open docs'
