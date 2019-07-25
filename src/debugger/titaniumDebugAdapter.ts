@@ -111,10 +111,17 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			const simUdid = attachArgs.target === 'simulator' ? attachArgs.deviceId : null;
 			await this.server.run(attachArgs.port, simUdid);
 		} catch (error) {
+			await this.disconnect({});
 			throw error;
 		}
 
-		const body = await this.pollForApp(`http://localhost:${attachArgs.port}/json`, 'Unable to discover app', 5);
+		let body;
+		try {
+			body = await this.pollForApp(`http://localhost:${attachArgs.port}/json`, 'Unable to discover app', 5);
+		} catch (error) {
+			await this.disconnect({});
+			throw error;
+		}
 
 		for (const context of body) {
 			if (context.metadata) {
