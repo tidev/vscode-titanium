@@ -8,6 +8,7 @@
   3. Install the latest `libimobiledevice` using `brew install --HEAD libimobiledevice`
   4. Install `ios_webkit_debug_proxy` `brew install ios-webkit-debug-proxy`
 * To debug an Alloy application you must be using Alloy 1.14.0 (Appcelerator CLI 7.1.0) or higher.
+* To debug on an iOS device, you must enable the [web inspector in safari](https://developer.apple.com/library/archive/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW8)
 
 ## Generating a debug configuration
 
