@@ -1,4 +1,5 @@
 import { which } from 'appcd-subprocess';
+import * as getPort from 'get-port';
 import { Socket } from 'net';
 import * as semver from 'semver';
 import { updates } from 'titanium-editor-commons';
@@ -25,19 +26,13 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 		}
 
 		try {
-			await validatePortIsFree(config.port);
-		} catch (error) {
-			// Increment by 1000 and retry the connection, we do this to ensure that we clear the range used by remotedebug
-			// when spawning ios-webkit-debug-proxy and avoid any potential conflicts
-			const newPort = config.port + 1000;
-			vscode.window.showWarningMessage(`Port ${config.port} is in use, trying ${newPort}`);
-			try {
-				await validatePortIsFree(newPort);
-				config.port = newPort;
-				config.debugPort = newPort;
-			} catch (e) {
-				throw new Error(`Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.`);
+			const port = await getPort({ port: config.port });
+			if (port !== config.port) {
+				config.port = port;
+				config.debugPort = port;
 			}
+		} catch (error) {
+			throw new Error(`Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.`);
 		}
 
 		if (!config.logLevel) {
