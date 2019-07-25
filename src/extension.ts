@@ -346,7 +346,18 @@ function activate (context) {
 							break;
 					}
 				} else if (request.code === 'END') {
+					const providedArgs = request.args as BuildAppOptions & TitaniumLaunchRequestArgs;
 					ExtensionContainer.terminal.stop();
+					if (providedArgs.platform === 'android') {
+						const adbPath = appc.getAdbPath();
+						if (adbPath) {
+							try {
+								ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', `tcp:${providedArgs.port}` ]);
+							} catch (error) {
+								// squash
+							}
+						}
+					}
 				}
 			}
 		})),

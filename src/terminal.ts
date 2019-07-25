@@ -73,7 +73,20 @@ export default class Terminal {
 				});
 			});
 		});
+	}
 
+	// TODO: refactor this and the above command
+	public runInBackground (command: string, args: string[], spawnOptions: SpawnOptions = { shell: true }) {
+		return new Promise((resolve, reject) => {
+			const proc = spawn(command, args, spawnOptions);
+
+			proc.on('close', code => {
+				if (code) {
+					return reject();
+				}
+				return resolve();
+			});
+		});
 	}
 
 	public runCommandInOutput (args: string[], cwd?: string) {
