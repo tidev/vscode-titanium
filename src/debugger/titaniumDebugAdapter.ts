@@ -117,7 +117,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 		let body;
 		try {
-			body = await this.pollForApp(`http://localhost:${attachArgs.port}/json`, 'Unable to discover app', 5);
+			body = await this.pollForApp(`http://localhost:${attachArgs.port}/json`, 'Unable to discover app', 10);
 		} catch (error) {
 			await this.disconnect({});
 			throw error;
