@@ -1,8 +1,9 @@
 
+import { completion } from 'titanium-editor-commons';
 import * as _ from 'underscore';
+import project from '../../project';
 import * as related from '../../related';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
-import * as completionItemProviderHelper from './completionItemProviderHelper';
 
 import { CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
 
@@ -77,7 +78,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 				}
 				for (let matches = regex.exec(file.getText()); matches !== null; matches = regex.exec(file.getText())) {
 					for (const value of matches[1].split(' ')) {
-						if (value && value.length > 0 && !values.includes(value) && (!prefix || completionItemProviderHelper.matches(value, prefix))) {
+						if (value && value.length > 0 && !values.includes(value) && (!prefix || completion.matches(value, prefix))) {
 							completions.push({
 								label: value,
 								kind: CompletionItemKind.Reference,
@@ -107,7 +108,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 		const range = document.getWordRangeAtPosition(position, /\w+["']/);
 		const quote = /'/.test(linePrefix) ? '\'' : '\"';
 		for (const [ key, value ] of Object.entries(this.completions.alloy.tags) as any[]) {
-			if (!prefix || completionItemProviderHelper.matches(key, prefix)) {
+			if (!prefix || completion.matches(key, prefix)) {
 				completions.push({
 					label: key,
 					kind: CompletionItemKind.Class,
@@ -155,7 +156,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 
 		const candidateProperties = _.isEmpty(innerProperties) ? properties : innerProperties;
 		for (const property in candidateProperties) {
-			if (!prefix || completionItemProviderHelper.matches(property, prefix)) {
+			if (!prefix || completion.matches(property, prefix)) {
 
 				//
 				// Object types
@@ -211,7 +212,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 
 		const completions = [];
 		for (const value of values) {
-			if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
+			if (!prefix || completion.matches(value, prefix)) {
 				completions.push({
 					label: value,
 					kind: CompletionItemKind.Value
@@ -249,6 +250,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	}
 
 	public async loadCompletions () {
-		this.completions = await completionItemProviderHelper.loadCompletions();
+		const sdk = project.sdk()[0];
+		this.completions = await completion.loadCompletions(sdk);
 	}
 }

@@ -1,10 +1,11 @@
 
 import * as path from 'path';
+import { completion } from 'titanium-editor-commons';
 import * as _ from 'underscore';
+import project from '../../project';
 import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
-import * as completionItemProviderHelper from './completionItemProviderHelper';
 
 import { CompletionItem, CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
 /**
@@ -78,17 +79,17 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		const useSnippet = new RegExp(`^\\s*</?${prefix || ''}\\s*>?\\s*$`).test(line);
 		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) : new Range(position.line, position.character, position.line, line.length);
 		for (const tag in tags) {
-			if (!prefix || completionItemProviderHelper.matches(tag, prefix)) {
-				const completion: CompletionItem = {
+			if (!prefix || completion.matches(tag, prefix)) {
+				const completionItem: CompletionItem = {
 					label: tag,
 					kind: CompletionItemKind.Class,
 					detail: tags[tag].apiName
 				};
 				if (useSnippet) {
-					completion.insertText = isClosing ? new SnippetString(`${tag}>`) : new SnippetString(`${tag}$1>$2</${tag}>`);
-					completion.range = range;
+					completionItem.insertText = isClosing ? new SnippetString(`${tag}>`) : new SnippetString(`${tag}$1>$2</${tag}>`);
+					completionItem.range = range;
 				}
-				completions.push(completion);
+				completions.push(completionItem);
 			}
 		}
 		return completions;
@@ -126,7 +127,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		// Class properties
 		//
 		for (const attribute of tagAttributes) {
-			if (!prefix || completionItemProviderHelper.matches(attribute, prefix)) {
+			if (!prefix || completion.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
 					insertText: new SnippetString(`${attribute}="$1"$0`),
@@ -140,7 +141,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		//
 		for (const event of events) {
 			const attribute = `on${utils.capitalizeFirstLetter(event)}`;
-			if (!prefix || completionItemProviderHelper.matches(attribute, prefix)) {
+			if (!prefix || completion.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
 					kind: CompletionItemKind.Event,
@@ -193,7 +194,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 					}
 					const fileName = path.parse(file).name;
 					for (const value of values) {
-						if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
+						if (!prefix || completion.matches(value, prefix)) {
 							completions.push({
 								label: value,
 								kind: CompletionItemKind.Reference,
@@ -257,7 +258,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 			values = this.getAttributeValues(attribute);
 			for (let value of values) {
 				value = value.replace(/["']/g, '');
-				if (!prefix || completionItemProviderHelper.matches(value, prefix)) {
+				if (!prefix || completion.matches(value, prefix)) {
 					completions.push({
 						label: value,
 						kind: CompletionItemKind.Value
@@ -324,6 +325,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	}
 
 	private async loadCompletions () {
-		this.completions = await completionItemProviderHelper.loadCompletions();
+		const sdk = project.sdk()[0];
+		this.completions = await completion.loadCompletions(sdk);
 	}
 }
