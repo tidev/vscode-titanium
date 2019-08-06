@@ -1,7 +1,7 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
 import * as got from 'got';
 import { URL } from 'url';
-import { ChromeDebugAdapter, ChromeDebugSession } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, ChromeDebugSession, Crdp } from 'vscode-chrome-debug-core';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
@@ -54,6 +54,15 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		this.isDisconnecting = true;
 		await this.cleanup();
 		return super.disconnect(args);
+	}
+
+	protected globalEvaluate (args: Crdp.Runtime.EvaluateRequest): Promise<Crdp.Runtime.EvaluateResponse> {
+		// On Android we don't correctly handle no contextId being sent in an evaluate request
+		if (this.platform === 'android' && !args.contextId) {
+			args.contextId = 1;
+		}
+
+		return super.globalEvaluate(args);
 	}
 
 	private async launchAndroid (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
