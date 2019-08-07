@@ -63,10 +63,25 @@ export default class Terminal {
 	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }) {
 		return window.withProgress(progressOptions, () => {
 			return new Promise((resolve, reject) => {
+				if (!this.channel) {
+					this.channel = window.createOutputChannel('Appcelerator');
+				}
+				this.channel.clear();
+				this.channel.append(`${this.command} ${args.join(' ')}\n\n`);
 				const proc = spawn(this.command, args, spawnOptions);
+
+				proc.stdout.on('data', data => {
+					const message = data.toString();
+					this.channel.append(message);
+				});
+				proc.stderr.on('data', data => {
+					const message = data.toString();
+					this.channel.append(message);
+				});
 
 				proc.on('close', code => {
 					if (code) {
+						this.channel.show();
 						return reject();
 					}
 					return resolve();
