@@ -350,12 +350,30 @@ function activate (context) {
 					ExtensionContainer.terminal.stop();
 					if (providedArgs.platform === 'android') {
 						const adbPath = appc.getAdbPath();
-						if (adbPath) {
-							try {
-								ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', `tcp:${providedArgs.port}` ]);
-							} catch (error) {
-								// squash
+						if (!adbPath) {
+							return;
+						}
+						const tcpPort = `tcp:${providedArgs.port}`;
+
+						if (providedArgs.target === 'emulator') {
+							const { stdout } = await ExtensionContainer.terminal.runInBackground(adbPath, [ 'forward', '--list' ]);
+
+							for (const line of stdout.split('\n')) {
+								if (!line.includes(tcpPort)) {
+									continue;
+								}
+								const emulatorId = line.match(/emulator-\d+/);
+								if (emulatorId) {
+									providedArgs.deviceId = emulatorId[0];
+									break;
+								}
 							}
+						}
+
+						try {
+							ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', tcpPort ]);
+						} catch (error) {
+							// squash
 						}
 					}
 				}

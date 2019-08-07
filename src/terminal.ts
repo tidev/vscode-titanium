@@ -4,6 +4,11 @@ import { ProgressLocation, ProgressOptions, Terminal as VSTerminal, window } fro
 import { GlobalState } from './constants';
 import { ExtensionContainer } from './container';
 
+interface CommandResponse {
+	stdout: string;
+	stderr: string;
+}
+
 export default class Terminal {
 
 	private name: string;
@@ -76,15 +81,28 @@ export default class Terminal {
 	}
 
 	// TODO: refactor this and the above command
-	public runInBackground (command: string, args: string[], spawnOptions: SpawnOptions = { shell: true }) {
+	public runInBackground (command: string, args: string[], spawnOptions: SpawnOptions = { shell: true }): Promise<CommandResponse> {
 		return new Promise((resolve, reject) => {
 			const proc = spawn(command, args, spawnOptions);
+			let stdout = '';
+			let stderr = '';
+
+			proc.stdout.on('data', data => {
+				stdout += data.toString();
+			});
+
+			proc.stderr.on('data', data => {
+				stderr += data.toString();
+			});
 
 			proc.on('close', code => {
 				if (code) {
 					return reject();
 				}
-				return resolve();
+				return resolve({
+					stdout,
+					stderr
+				});
 			});
 		});
 	}

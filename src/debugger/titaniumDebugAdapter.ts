@@ -18,6 +18,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	private platform: string;
 	private port: number;
 	private server: ProxyServer;
+	private target: string;
 
 	constructor (adapterOpts, session) {
 		super(adapterOpts, session);
@@ -29,6 +30,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		this.deviceId = args.deviceId;
 		this.platform = args.platform;
 		this.port = args.port;
+		this.target = args.target;
 		super.commonArgs(args);
 	}
 
@@ -185,7 +187,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		this.sendRequest('END', {
 			platform: this.platform,
 			deviceId: this.deviceId,
-			port: this.port
+			port: this.port,
+			target: this.target
 		});
 
 		if (this.server) {
