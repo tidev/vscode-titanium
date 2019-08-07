@@ -79,7 +79,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		const useSnippet = new RegExp(`^\\s*</?${prefix || ''}\\s*>?\\s*$`).test(line);
 		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) : new Range(position.line, position.character, position.line, line.length);
 		for (const tag in tags) {
-			if (!prefix || completion.matches(tag, prefix)) {
+			if (!prefix || utils.matches(tag, prefix)) {
 				const completionItem: CompletionItem = {
 					label: tag,
 					kind: CompletionItemKind.Class,
@@ -127,7 +127,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		// Class properties
 		//
 		for (const attribute of tagAttributes) {
-			if (!prefix || completion.matches(attribute, prefix)) {
+			if (!prefix || utils.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
 					insertText: new SnippetString(`${attribute}="$1"$0`),
@@ -141,7 +141,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		//
 		for (const event of events) {
 			const attribute = `on${utils.capitalizeFirstLetter(event)}`;
-			if (!prefix || completion.matches(attribute, prefix)) {
+			if (!prefix || utils.matches(attribute, prefix)) {
 				completions.push({
 					label: attribute,
 					kind: CompletionItemKind.Event,
@@ -194,7 +194,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 					}
 					const fileName = path.parse(file).name;
 					for (const value of values) {
-						if (!prefix || completion.matches(value, prefix)) {
+						if (!prefix || utils.matches(value, prefix)) {
 							completions.push({
 								label: value,
 								kind: CompletionItemKind.Reference,
@@ -258,7 +258,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 			values = this.getAttributeValues(attribute);
 			for (let value of values) {
 				value = value.replace(/["']/g, '');
-				if (!prefix || completion.matches(value, prefix)) {
+				if (!prefix || utils.matches(value, prefix)) {
 					completions.push({
 						label: value,
 						kind: CompletionItemKind.Value

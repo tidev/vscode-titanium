@@ -195,7 +195,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		const apiObj = types[apiName];
 		if (apiObj) {
 			for (const func of apiObj.functions) {
-				if ((!attribute || completion.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
+				if ((!attribute || utils.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
 					completions.push({
 						label: func,
 						kind: CompletionItemKind.Method
@@ -203,7 +203,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 				}
 			}
 			for (const property of apiObj.properties) {
-				if ((!attribute || completion.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
+				if ((!attribute || utils.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
 					completions.push({
 						label: property,
 						kind: CompletionItemKind.Property
