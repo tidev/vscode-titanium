@@ -230,7 +230,7 @@
       },
       "patterns": [
         {
-          "include": "#coment-block"
+          "include": "#comment-block"
         },
         {
           "name": "meta.property-name.css.tss",
