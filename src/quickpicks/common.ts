@@ -240,11 +240,13 @@ export function selectiOSSimulatorVersion () {
 }
 
 export function selectWindowsDevice () {
-	// TODO
+	const devices = appc.windowsDevices().map(({ name, udid}) => ({ label: name, udid }));
+	return quickPick(devices, { placeHolder: 'Select device' });
 }
 
 export function selectWindowsEmulator () {
-	// TODO
+	const emulators = appc.windowsEmulators()['10.0'].map(({ name, udid }) => ({ label: name, udid }));
+	return quickPick(emulators, { placeHolder: 'Select emulator' });
 }
 
 export async function selectUpdates (updates: UpdateInfo[]) {

@@ -102,8 +102,12 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 				// TODO finish wiring these up
 				if (target === 'wp-device') {
 					const deviceInfo = await selectWindowsDevice();
+					deviceId = deviceInfo.udid;
+					deviceLabel = deviceInfo.label;
 				} else if (target === 'wp-emulator') {
 					const emulatorInfo = await selectWindowsEmulator();
+					deviceId = emulatorInfo.udid;
+					deviceLabel = emulatorInfo.label;
 				}
 			}
 		}
