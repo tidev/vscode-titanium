@@ -287,3 +287,56 @@ export async function selectDevice (platform: string, target: string) {
 		return selectiOSSimulator(simVersion);
 	}
 }
+
+export async function enterWindowsSigningInfo (lastUsed, savedCertPath) {
+	const location = await selectWindowsCertificate(lastUsed, savedCertPath);
+
+	if (location && !await pathExists(location)) {
+		throw new InteractionError(`The certificate file ${location} does not exist`);
+	}
+	const password = await enterPassword({ placeHolder: 'Enter the certificate password' });
+
+	return {
+		location,
+		password
+	};
+}
+
+export async function selectWindowsCertificate (lastUsed, savedCertPath) {
+	const items = [
+		{
+			label: 'Browse for certificate',
+			id: 'browse'
+		},
+		{
+			label: 'Create certificate',
+			id: 'create'
+		}
+	];
+	if (lastUsed) {
+		items.push({
+			label: `Last used ${lastUsed}`,
+			id: 'last'
+		});
+	}
+	if (savedCertPath) {
+		items.push({
+			label: `Saved ${savedCertPath}`,
+			id: 'saved'
+		});
+	}
+	const certificateAction = await quickPick(items, { placeHolder: 'Browse for certificate or use last certificate' });
+	if (certificateAction.id === 'browse') {
+		const uri = await window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
+		return uri[0].path;
+	} else if (certificateAction.id === 'create') {
+		return undefined;
+	} else if (certificateAction.id === 'saved') {
+		if (!path.isAbsolute(savedCertPath)) {
+			savedCertPath = path.resolve(workspace.rootPath, savedCertPath);
+		}
+		return savedCertPath;
+	} else {
+		return lastUsed;
+	}
+}

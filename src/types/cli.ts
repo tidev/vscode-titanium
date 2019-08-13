@@ -1,4 +1,4 @@
-import { KeystoreInfo, LogLevel } from './common';
+import { KeystoreInfo, LogLevel, WindowsCertInfo } from './common';
 
 export interface BaseCLIOptions {
 	logLevel: LogLevel;
@@ -39,6 +39,8 @@ export interface PackageOptions extends BaseCLIOptions {
 	platform: 'android' | 'ios' | 'windows';
 	projectDir: string;
 	target: string;
+	windowsCertInfo: WindowsCertInfo;
+	windowsPublisherID?: string;
 }
 
 export interface CreateOptions extends BaseCLIOptions {

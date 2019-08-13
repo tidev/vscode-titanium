@@ -8,9 +8,9 @@ import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/no
 import { nameForPlatform, packageArguments, } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
-import { enterAndroidKeystoreInfo, enterPassword, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
+import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, inputBox, quickPick, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
 import { PackageOptions } from '../types/cli';
-import { KeystoreInfo } from '../types/common';
+import { KeystoreInfo, WindowsCertInfo } from '../types/common';
 
 export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -27,7 +27,9 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		let lastBuildDescription;
 		let outputDirectory;
 		let platform;
+		let publisherID;
 		let target;
+		let windowsCertInfo: WindowsCertInfo;
 
 		if (node) {
 			platform = node.platform;
@@ -77,6 +79,15 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			iOSProvisioningProfile = codesigning.provisioningProfile.uuid;
 		} else if (platform === 'windows') {
 			// TODO
+			// publisher id, select pfx, pfx password
+			publisherID = ExtensionContainer.config.windows.publisherID;
+			if (!publisherID) {
+				publisherID = await inputBox({ placeHolder: 'What is your Microsoft Publisher ID' });
+			}
+			const lastWindowsCertPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastWindowsCertPath);
+			const savedWindowsCertPath = ExtensionContainer.config.windows.signingCertPath;
+			windowsCertInfo = await enterWindowsSigningInfo(lastWindowsCertPath, savedWindowsCertPath);
+			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastWindowsCertPath, windowsCertInfo.location);
 		}
 
 		if (!outputDirectory) {
@@ -96,7 +107,9 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			iOSCertificate,
 			iOSProvisioningProfile,
 			logLevel,
-			projectDir
+			projectDir,
+			windowsPublisherID: publisherID,
+			windowsCertInfo
 		};
 		const args = packageArguments(buildInfo);
 		ExtensionContainer.terminal.runCommand(args);
