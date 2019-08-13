@@ -345,6 +345,14 @@ export function packageArguments (options: PackageOptions) {
 			'--distribution-name', options.iOSCertificate,
 			'--pp-uuid', options.iOSProvisioningProfile
 		);
+	} else if (options.platform === 'windows') {
+		if (options.windowsCertInfo.location) {
+			args.push('--win-cert', options.windowsCertInfo.location);
+		} else {
+			args.push('--win-cert');
+		}
+		args.push('--pfx-password', options.windowsCertInfo.password);
+		args.push('--win-publisher-id', options.windowsPublisherID);
 	}
 	return args.map(arg => quoteArgument(arg));
 }

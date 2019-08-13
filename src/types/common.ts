@@ -31,6 +31,11 @@ export interface ProvisioningProfile {
 	uuid: string;
 }
 
+export interface WindowsCertInfo {
+	location: string|undefined;
+	password: string;
+}
+
 export enum LogLevel {
 	Debug = 'debug',
 	Error = 'error',
