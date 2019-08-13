@@ -267,7 +267,7 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 		'run',
 		'--platform', options.platform,
 		'--log-level', options.logLevel,
-		'--project-dir', options.projectDir
+		'--project-dir', normalizeDriveLetter(options.projectDir)
 	];
 
 	if (options.buildOnly) {
@@ -324,7 +324,7 @@ export function packageArguments (options: PackageOptions) {
 		'--platform', options.platform,
 		'--target', options.target,
 		'--log-level', options.logLevel,
-		'--project-dir', options.projectDir
+		'--project-dir', normalizeDriveLetter(options.projectDir)
 	];
 
 	if (options.target !== 'dist-appstore') {
@@ -363,7 +363,7 @@ export function createAppArguments (options: CreateAppOptions) {
 		'--type', 'titanium',
 		'--name', options.name,
 		'--id', options.id,
-		'--project-dir', path.join(options.workspaceDir, options.name),
+		'--project-dir', normalizeDriveLetter(path.join(options.workspaceDir, options.name)),
 		'--platforms', options.platforms.join(','),
 		'--no-prompt',
 		'--log-level', options.logLevel
@@ -386,7 +386,7 @@ export function createModuleArguments (options: CreateModuleOptions) {
 		'--type', 'timodule',
 		'--name', options.name,
 		'--id', options.id,
-		'--project-dir', path.join(options.workspaceDir, options.name),
+		'--project-dir', normalizeDriveLetter(path.join(options.workspaceDir, options.name)),
 		'--platforms', options.platforms.join(','),
 		'--no-prompt',
 		'--log-level', options.logLevel
@@ -424,4 +424,12 @@ function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is 
  */
 export function matches (text: string, test: RegExp) {
 	return new RegExp(test, 'i').test(text);
+}
+
+function normalizeDriveLetter (filePath: string): string {
+	if (process.platform !== 'win32') {
+		return filePath;
+	}
+	const rootDir = path.resolve('/');
+	return `${rootDir.substr(0, 1)}${filePath.slice(1)}`;
 }
