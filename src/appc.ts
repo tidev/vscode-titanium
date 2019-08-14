@@ -433,6 +433,12 @@ export class Appc {
 		return alloyVersion;
 	}
 
+	public getAdbPath () {
+		if (this.info.android && this.info.android.sdk && this.info.android.sdk.executables) {
+			return this.info.android.sdk.executables.adb;
+		}
+	}
+
 	/**
 	 * Returns appc CLI session for current user
 	 *

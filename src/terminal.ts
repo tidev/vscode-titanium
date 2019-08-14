@@ -4,6 +4,11 @@ import { ProgressLocation, ProgressOptions, Terminal as VSTerminal, window } fro
 import { GlobalState } from './constants';
 import { ExtensionContainer } from './container';
 
+interface CommandResponse {
+	stdout: string;
+	stderr: string;
+}
+
 export default class Terminal {
 
 	private name: string;
@@ -73,10 +78,36 @@ export default class Terminal {
 				});
 			});
 		});
-
 	}
 
-	public runCommandInOutput (args: string[]) {
+	// TODO: refactor this and the above command
+	public runInBackground (command: string, args: string[], spawnOptions: SpawnOptions = { shell: true }): Promise<CommandResponse> {
+		return new Promise((resolve, reject) => {
+			const proc = spawn(command, args, spawnOptions);
+			let stdout = '';
+			let stderr = '';
+
+			proc.stdout.on('data', data => {
+				stdout += data.toString();
+			});
+
+			proc.stderr.on('data', data => {
+				stderr += data.toString();
+			});
+
+			proc.on('close', code => {
+				if (code) {
+					return reject();
+				}
+				return resolve({
+					stdout,
+					stderr
+				});
+			});
+		});
+	}
+
+	public runCommandInOutput (args: string[], cwd?: string) {
 		if (this.proc) {
 			window.showInformationMessage('A build is already in progress');
 			return;
@@ -87,7 +118,7 @@ export default class Terminal {
 		args.push('--no-prompt');
 		this.channel.clear();
 		this.channel.append(`${this.command} ${args.join(' ')}\n\n`);
-		this.proc = spawn(this.command, args, { shell: true });
+		this.proc = spawn(this.command, args, { shell: true, cwd  });
 		this.proc.stdout.on('data', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 			vscode.commands.executeCommand('setContext', GlobalState.Running, true);
@@ -108,6 +139,7 @@ export default class Terminal {
 		});
 
 		this.channel.show();
+		return this.proc;
 	}
 
 	public clear () {
@@ -118,6 +150,12 @@ export default class Terminal {
 		if (this.proc) {
 			this.proc.kill();
 			this.proc = null;
+		}
+	}
+
+	public showOutput () {
+		if (this.channel) {
+			this.channel.show();
 		}
 	}
 }

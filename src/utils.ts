@@ -291,6 +291,28 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 		if (options.liveview) {
 			args.push('--liveview');
 		}
+
+		if (options.debugPort && options.platform === 'android') {
+			args.push(
+				'--debug-host',
+				`/localhost:${options.debugPort}`
+			);
+		}
+
+		if (options.skipJsMinify) {
+			args.push('--skip-js-minify');
+		}
+
+		if (options.sourceMaps) {
+			args.push('--source-maps');
+		}
+
+		if (options.deployType) {
+			args.push(
+				'--deploy-type',
+				options.deployType
+			);
+		}
 	}
 
 	return args.map(arg => quoteArgument(arg));

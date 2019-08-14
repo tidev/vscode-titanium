@@ -12,7 +12,10 @@
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
-            "preLaunchTask": "npm: watch"
+            "preLaunchTask": "npm: watch",
+            "skipFiles": [
+                "<node_internals>/**/*.js"
+            ]
         },
         {
             "name": "Extension Tests",
@@ -27,6 +30,28 @@
                 "${workspaceFolder}/out/test/**/*.js"
             ],
             "preLaunchTask": "npm: watch"
+        },
+        {
+            "name": "Server",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/src/debugger/titaniumDebugger.ts",
+            "args": [
+                "--server=4711"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/**/*.js",
+            ],
+            "skipFiles": [
+                "<node_internals>/**/*.js"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Extension + Server",
+            "configurations": [ "Extension", "Server" ]
         }
     ]
 }

@@ -20,6 +20,11 @@ export interface BuildAppOptions extends BaseBuildOptions {
 	iOSProvisioningProfile?: string;
 	target?: string;
 	keystore?: string;
+	debugPort?: number;
+	skipJsMinify?: boolean;
+	sourceMaps?: boolean;
+	sdkVersion?: string;
+	deployType?: string;
 }
 
 export interface BuildModuleOptions extends BaseBuildOptions {

@@ -12,7 +12,10 @@
         "rootDir": "src",
         "strict": false,
         "noUnusedLocals": false,
-        "baseUrl": "."
+        "baseUrl": ".",
+        "types": [
+            "node"
+        ]
     },
     "exclude": [
         "node_modules",
