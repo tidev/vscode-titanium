@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.4.0...v0.5.0) (2019-08-21)
+
+
+### Bug Fixes
+
+* **creation:** show output when error occurs during creation ([#121](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/121)) ([f291b26](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/f291b26)), closes [#107](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/107)
+* **tmlanguage:** fixed highlighting when using comments in tss ([#120](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/120)) ([6a3ea30](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/6a3ea30)), closes [#114](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/114)
+
+
+### Features
+
+* add support for debugging Titanium applications ([#116](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/116)) ([5923ae1](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/5923ae1))
+
 ## [0.4.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.3.2...v0.4.0) (2019-07-17)
 
 
