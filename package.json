@@ -733,7 +733,7 @@
     "@types/node": "8.10.25",
     "@types/semver": "^6.0.1",
     "@types/underscore": "^1.9.2",
-    "@types/vscode": "1.31.0",
+    "@types/vscode": "1.38.0",
     "@types/xml2js": "^0.4.4",
     "commitizen": "^4.0.1",
     "cz-conventional-changelog": "^2.1.0",
