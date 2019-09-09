@@ -120,7 +120,7 @@ export function  normalisedPlatform (targetPlatform: string) {
  * @param {String} appId 			app ID
  * @returns {Boolean}
  */
-export function iOSProvisioinngProfileMatchesAppId (profileAppId: string, appId: string) {
+export function iOSProvisioningProfileMatchesAppId (profileAppId: string, appId: string) {
 
 	// allow wildcard
 	if (String(profileAppId) === '*') {

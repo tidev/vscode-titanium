@@ -34,7 +34,8 @@
     "linterOptions": {
         "exclude": [
             "scripts/*.js",
-            "grammars/*.json"
+            "grammars/*.json",
+            "src/test/suite/fixtures/data/*"
         ]
     }
 }

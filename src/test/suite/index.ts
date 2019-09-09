@@ -1,15 +1,15 @@
-const path = require('path');
-const Mocha = require('mocha');
-const glob = require('glob');
+import * as glob from 'glob';
+import * as Mocha from 'mocha';
+import * as path from 'path';
 
-const testsRoot = path.join(__dirname, '..');
-function run() {
+export function run (): Promise<void> {
 	// Create the mocha test
 	const mocha = new Mocha({
-		ui: 'tdd'
+		ui: 'tdd',
 	});
-	// Use any mocha API
 	mocha.useColors(true);
+
+	const testsRoot = path.resolve(__dirname, '..');
 
 	return new Promise((c, e) => {
 		glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
@@ -35,7 +35,3 @@ function run() {
 		});
 	});
 }
-
-module.exports = {
-	run
-};
