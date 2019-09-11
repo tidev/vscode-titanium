@@ -406,11 +406,14 @@ function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is 
 	return (options as BuildAppOptions).projectType === 'app';
 }
 
-export class CustomError extends Error {
-
-	public code: string;
-	constructor (message: string, code: string) {
-		super(message);
-		this.code = code;
-	}
+/**
+ * Matches
+ *
+ * @param {String} text text to test
+ * @param {String} test text to match against
+ *
+ * @returns {Boolean}
+ */
+export function matches (text: string, test: RegExp) {
+	return new RegExp(test, 'i').test(text);
 }

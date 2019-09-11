@@ -22,7 +22,6 @@ import {
 import { GlobalState, VSCodeCommands } from './constants';
 import { ExtensionContainer } from './container';
 
-import * as completionItemProviderHelper from './providers/completion/completionItemProviderHelper';
 import { ControllerCompletionItemProvider } from './providers/completion/controllerCompletionItemProvider';
 import { StyleCompletionItemProvider } from './providers/completion/styleCompletionItemProvider';
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
@@ -42,7 +41,7 @@ import { LogLevel } from './types/common';
 import { buildArguments } from './utils';
 
 import * as ms from 'ms';
-import { environment, updates } from 'titanium-editor-commons';
+import { completion, environment, updates } from 'titanium-editor-commons';
 import { handleInteractionError, InteractionChoice, InteractionError,  } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
@@ -560,10 +559,11 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 		return;
 	}
 	try {
+		const sdkPath = appc.sdkInfo(sdkVersion).path;
 		// Generate the completions
 		const [ alloy, sdk ] = await Promise.all([
-			completionItemProviderHelper.generateAlloyCompletions({ force, progress }),
-			completionItemProviderHelper.generateSDKCompletions({ force, progress, sdkVersion })
+			completion.generateAlloyCompletions(force),
+			completion.generateSDKCompletions(force, sdkVersion, sdkPath)
 		]);
 		if (sdk || alloy) {
 			let message = 'Autocomplete suggestions generated for';

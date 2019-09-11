@@ -761,7 +761,7 @@
     "ms": "^2.1.2",
     "semver": "^6.2.0",
     "sinon": "^7.4.2",
-    "titanium-editor-commons": "^0.2.0",
+    "titanium-editor-commons": "^0.3.0",
     "underscore": "^1.8.3",
     "uuid": "^3.3.2",
     "vscode-chrome-debug-core": "^6.7.48",

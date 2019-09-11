@@ -1,9 +1,10 @@
 
 import * as path from 'path';
+import { completion } from 'titanium-editor-commons';
+import project from '../../project';
 import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
-import * as completionItemProviderHelper from './completionItemProviderHelper';
 
 import { CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
 
@@ -194,7 +195,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		const apiObj = types[apiName];
 		if (apiObj) {
 			for (const func of apiObj.functions) {
-				if ((!attribute || completionItemProviderHelper.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
+				if ((!attribute || utils.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
 					completions.push({
 						label: func,
 						kind: CompletionItemKind.Method
@@ -202,7 +203,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 				}
 			}
 			for (const property of apiObj.properties) {
-				if ((!attribute || completionItemProviderHelper.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
+				if ((!attribute || utils.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
 					completions.push({
 						label: property,
 						kind: CompletionItemKind.Property
@@ -304,6 +305,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	}
 
 	public async loadCompletions () {
-		this.completions = await completionItemProviderHelper.loadCompletions();
+		const sdk = project.sdk()[0];
+		this.completions = await completion.loadCompletions(sdk);
 	}
 }
