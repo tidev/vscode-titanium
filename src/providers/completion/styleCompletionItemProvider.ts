@@ -202,7 +202,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 			property = matches[1];
 		}
 
-		if (properties[property]) {
+		if (!properties[property]) {
 			return null;
 		}
 
