@@ -3,10 +3,10 @@ import * as fs from 'fs';
 import { after, before, describe, it } from 'mocha';
 import * as path from 'path';
 import * as sinon from 'sinon';
+import * as tce from 'titanium-editor-commons';
 import * as vscode from 'vscode';
 import project from '../../project';
 
-import * as completionItemProviderHelper from '../../providers/completion/completionItemProviderHelper';
 import { StyleCompletionItemProvider } from '../../providers/completion/styleCompletionItemProvider';
 
 const fixturesPath = path.join(__dirname, '../../..', 'src', 'test', 'suite', 'fixtures');
@@ -34,7 +34,7 @@ describe('TSS Suggestions', () => {
 		this.timeout(5000);
 		sandbox = sinon.createSandbox();
 		sandbox.stub(project, 'sdk').returns(['8.0.2.GA']);
-		sandbox.stub(completionItemProviderHelper, 'loadCompletions').returns(completions);
+		sandbox.stub(tce.completion, 'loadCompletions').resolves(completions);
 	});
 
 	after(async function () {
