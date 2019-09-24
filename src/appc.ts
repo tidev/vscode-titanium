@@ -7,7 +7,7 @@ import { homedir } from 'os';
 import { window } from 'vscode';
 import { ExtensionContainer } from './container';
 import { IosCert } from './types/common';
-import { iOSProvisioinngProfileMatchesAppId } from './utils';
+import { iOSProvisioningProfileMatchesAppId } from './utils';
 
 export interface AlloyGenerateOptions {
 	adapterType?: string;
@@ -19,7 +19,7 @@ export interface AlloyGenerateOptions {
 
 export class Appc {
 
-	private info: any;
+	public info: any;
 	private proc: any;
 	private killed: boolean;
 
@@ -327,7 +327,7 @@ export class Appc {
 					profile.disabled = true;
 				} else if (pem && profile.certs.indexOf(pem) === -1) {
 					profile.disabled = true;
-				} else if (appId && !iOSProvisioinngProfileMatchesAppId(profile.appId, appId)) {
+				} else if (appId && !iOSProvisioningProfileMatchesAppId(profile.appId, appId)) {
 					profile.disabled = true;
 				}
 				if (!profile.disabled) {

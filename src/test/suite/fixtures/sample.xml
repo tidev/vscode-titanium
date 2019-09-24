@@ -1,0 +1,9 @@
+<Alloy>
+    <Tab title="test">
+        <Window onOpen >
+            <ScrollView id="scrollView">
+
+            </ScrollView>
+        </Window>
+    </Tab>
+</Alloy>
