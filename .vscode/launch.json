@@ -32,7 +32,7 @@
             "preLaunchTask": "npm: watch"
         },
         {
-            "name": "Server",
+            "name": "Debugger",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}",
@@ -50,8 +50,8 @@
     ],
     "compounds": [
         {
-            "name": "Extension + Server",
-            "configurations": [ "Extension", "Server" ]
+            "name": "Extension + Debugger",
+            "configurations": [ "Extension", "Debugger" ]
         }
     ]
 }
