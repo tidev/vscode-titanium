@@ -8,13 +8,29 @@ For any contribution we first ask that you [file an issue](https://github.com/ap
 
 ## Getting set up for development
 
-1. Just to be safe, remove or move your existing installation at `~/.vscode/extensions/???`
-2. Fork into your GitHub account and clone your fork.
-3. `cd` into and run `npm install` in your project.
-4. Open the project in VS Code `code .`
-5. Open the debug tab and click "Start Debugging" (the green play icon). The debugger will start a the TypeScript compiler in watch mode.
+1. Fork into your GitHub account and clone your fork
+2. `cd` into and run `npm install` in the directory
+3. Open the project in VS Code `code .`
+4. Open the debug tab, select the "Extension" debug target and click "Start Debugging" (the green play icon). 
 
-You're now up and running with the extension running in another workspace. When you make changes to the TypeScript the watch task will automatically compile then for you, and you just need to reload the extension yourself using the green restart button on the main window, or by click `Cmd+R` (Windows: `Ctrl+R`) in the extension window.
+## Working on the debugger
+
+1. `cd` into and run `npm install` in the directory
+2. Open the project in VS Code `code .`
+3. Open the debug tab, select the "Extension + Debugger" debug target and click "Start Debugging" (the green play icon).
+4. Configure your Titanium project for debugging, and add `"debugServer": 4711` to your launch configuration. For example:
+
+```json
+{
+	"name": "Launch on iOS",
+	"type": "titanium",
+	"request": "launch",
+	"platform": "ios",
+	"debugServer": 4711
+}
+```
+
+You're now up and running with the extension running in another workspace. When you make changes to the TypeScript the watch task will automatically compile then for you, and you just need to reload the extension yourself using the green restart button on the main window, or by click `Cmd+R` (Windows: `Ctrl+R`) in the extension window. If you're debugging the debugger and the extension make sure to select the correct target in the Debug Toolbar when reloading.
 
 ## Sending in a PR
 
