@@ -5,3 +5,4 @@ node_modules
 .DS_Store
 out/
 out.json
+junit_report.xml
