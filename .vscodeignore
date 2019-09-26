@@ -12,3 +12,4 @@ vsc-extension-quickstart.md
 .github/**
 Jenkinsfile
 scripts/
+junit_report.xml

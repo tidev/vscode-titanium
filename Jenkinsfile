@@ -19,7 +19,7 @@ timestamps {
       ansiColor('xterm') {
         stage('Install') {
           timeout(15) {
-            // Ensure we have yarn
+            // Ensure we have npm
             ensureNPM(npmVersion)
             sh 'npm ci'
           } // timeout
@@ -27,8 +27,11 @@ timestamps {
 
         stage('Lint and Test') {
           sh 'npm run lint'
-          // This is pointless right now, for shame! :D
-          sh 'npm run test'
+          try {
+            sh 'npm run test'
+          } finally {
+            junit 'junit_report.xml'
+          }
         } // stage lint and test
 
         stage('Build vsix') {
@@ -36,7 +39,12 @@ timestamps {
           sh 'npx vsce package'
           // Archive it
           archiveArtifacts '*.vsix'
-          // TODO: Can we add this to GitHub in the releases section automatically?
+        }
+
+        stage('Danger') {
+          withEnv(["BUILD_STATUS=${currentBuild.currentResult}","DANGER_JS_APP_INSTALL_ID=''"]) {
+            sh returnStatus: true, script: 'npx danger ci --verbose' // Don't fail build if danger fails. We want to retain existing build status.
+          } // withEnv
         }
       } // ansiColor
     } // nodejs
