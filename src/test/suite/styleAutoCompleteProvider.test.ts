@@ -33,7 +33,7 @@ describe('TSS Suggestions', () => {
 	before(async function () {
 		this.timeout(5000);
 		sandbox = sinon.createSandbox();
-		sandbox.stub(project, 'sdk').returns(['8.0.2.GA']);
+		sandbox.stub(project, 'sdk').returns(['8.1.0.GA']);
 		sandbox.stub(tce.completion, 'loadCompletions').resolves(completions);
 	});
 
@@ -47,7 +47,7 @@ describe('TSS Suggestions', () => {
 		const position = new vscode.Position(17, 1); // "W
 		const suggestions: any = await testCompletion(position);
 
-		expect(suggestions.length).to.equal(33);
+		expect(suggestions.length).to.equal(29);
 
 		expect(suggestions[0].label).to.equal('ActionView');
 		expect(suggestions[0].detail).to.equal('_ProxyProperty.ActionView');
@@ -71,7 +71,7 @@ describe('TSS Suggestions', () => {
 		const position = new vscode.Position(20, 8); // scroll
 		const suggestions: any = await testCompletion(position);
 
-		expect(suggestions.length).to.equal(13);
+		expect(suggestions.length).to.equal(14);
 
 		expect(suggestions[0].label).to.equal('autoAdjustScrollViewInsets');
 		expect(suggestions[0].kind).to.equal(9);
@@ -85,9 +85,9 @@ describe('TSS Suggestions', () => {
 		expect(suggestions[2].kind).to.equal(9);
 		expect(suggestions[2].insertText).to.equal('fastScroll: ');
 
-		expect(suggestions[3].label).to.equal('overScrollMode');
+		expect(suggestions[3].label).to.equal('hidesSearchBarWhenScrolling');
 		expect(suggestions[3].kind).to.equal(9);
-		expect(suggestions[3].insertText).to.equal('overScrollMode: ');
+		expect(suggestions[3].insertText).to.equal('hidesSearchBarWhenScrolling: ');
 
 	});
 

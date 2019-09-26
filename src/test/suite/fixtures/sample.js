@@ -1,5 +1,6 @@
-function doClick(e) {
-	alert($.label.text);
-}
-
-$.index.open();
+Ti.
+Ti.UI
+Ti.UI.ActivityIndicator.rota
+Alloy.
+Alloy.Controller.
+Alloy.Controller.add
