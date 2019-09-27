@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.5.0...v0.6.0) (2019-09-27)
+
+
+### Bug Fixes
+
+* fixed issue where ti.ui.size/fill were missing ([#128](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/128)) ([ae12980](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ae12980)), closes [#122](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/122)
+* **windows:** normalize drive letter before passing path to cli ([d08138a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/d08138a)), closes [#124](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/124)
+* set default publisherID to null ([ebacd90](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ebacd90))
+
+
+### Features
+
+* **build:** add support for building to Windows ([2a8e2be](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/2a8e2be))
+* **explorer/device:** sort Windows Mobile Emulators by OS version ([191a2f3](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/191a2f3))
+* **packaging:** add support for packaging windows apps ([d5d5aa1](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/d5d5aa1))
+
 ## [0.5.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.4.0...v0.5.0) (2019-08-21)
 
 
