@@ -457,7 +457,8 @@
         },
         "titanium.windows.publisherID": {
           "type": "string",
-          "description": "Publisher ID"
+          "description": "Publisher ID",
+          "default": null
         }
       }
     },
