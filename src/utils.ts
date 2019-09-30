@@ -430,6 +430,6 @@ function normalizeDriveLetter (filePath: string): string {
 	if (process.platform !== 'win32') {
 		return filePath;
 	}
-	const rootDir = path.resolve('/');
-	return `${rootDir.substr(0, 1)}${filePath.slice(1)}`;
+	const { root } = path.parse(filePath);
+	return `${root.substr(0, 1).toUpperCase()}${filePath.slice(1)}`;
 }
