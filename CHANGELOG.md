@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.6.0...v0.6.1) (2019-10-01)
+
+
+### Bug Fixes
+
+* ensure correct drive letter is used when normalizing path ([bac6f8a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bac6f8a)), closes [#142](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/142)
+
 ## [0.6.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.5.0...v0.6.0) (2019-09-27)
 
 
