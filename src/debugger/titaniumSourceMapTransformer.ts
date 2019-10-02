@@ -22,18 +22,19 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 
 	public async configureOptions (args: TitaniumLaunchRequestArgs) {
 		this.appDirectory = args.projectDir;
-		this.platform = args.platform === 'ios' ? 'iphone' : args.platform;
+		this.platform = args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);
 	}
 
 	public async scriptParsed (pathToGenerated: string, sourceMapUrl: string): Promise<string[]> {
 		if (this.projectType === 'alloy') {
-			const mapDir = path.join(this.appDirectory, 'build', 'map', 'Resources', this.platform);
+			const platform = this.platform === 'ios' ? 'iphone' : this.platform;
+			const mapDir = path.join(this.appDirectory, 'build', 'map', 'Resources', platform);
 			const libDir = path.join(this.appDirectory, 'app', 'lib');
 			const filename = path.basename(pathToGenerated);
 			const relative = path.relative(path.join(this.appDirectory, 'app'), pathToGenerated);
-			const dir = path.dirname(relative);
 			const isLib = pathToGenerated.includes(libDir);
+			let dir = path.dirname(relative);
 			// if its under lib then its at the top level
 			if (filename === 'alloy.js' || filename === 'app.js') {
 				sourceMapUrl = path.join(mapDir, 'app.js.map');
@@ -41,6 +42,7 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 				const filepath = path.relative(libDir, pathToGenerated);
 				sourceMapUrl = path.join(mapDir, `${filepath}.map`);
 			} else {
+				dir = dir.split('/').filter(e => e !== this.platform).join('/');
 				const overridePath = path.join(mapDir, 'alloy', dir, `${filename}.map`);
 				if (await fs.pathExists(overridePath)) {
 					sourceMapUrl = overridePath;
