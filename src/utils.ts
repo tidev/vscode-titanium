@@ -5,7 +5,7 @@ import * as _ from 'underscore';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
-import { BuildAppOptions, BuildModuleOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
+import { BuildAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
 
 /**
  * Returns available target platforms
@@ -395,6 +395,17 @@ export function createModuleArguments (options: CreateModuleOptions) {
 	if (options.force) {
 		args.push('--force');
 	}
+	return args.map(arg => quoteArgument(arg));
+}
+
+export function cleanAppArguments (options: CleanAppOptions) {
+	const args = [
+		'ti',
+		'clean',
+		'--project-dir', normalizeDriveLetter(options.projectDir),
+		'--log-level', options.logLevel
+	];
+
 	return args.map(arg => quoteArgument(arg));
 }
 

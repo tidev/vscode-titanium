@@ -329,6 +329,11 @@
         "command": "titanium.updates.install",
         "title": "Install Update",
         "category": "Titanium"
+      },
+      {
+        "command": "titanium.clean",
+        "title": "Clean project",
+        "category": "Titanium"
       }
     ],
     "keybindings": [
@@ -572,6 +577,10 @@
         {
           "command": "titanium.updates.install",
           "when": "false"
+        },
+        {
+          "command": "titanium.clean",
+          "when": "titanium:enabled"
         }
       ],
       "editor/context": [

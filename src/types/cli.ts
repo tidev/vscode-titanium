@@ -58,3 +58,7 @@ export interface CreateAppOptions extends CreateOptions {
 export interface CreateModuleOptions extends CreateOptions {
 	codeBase?: 'swift' | 'objc';
 }
+
+export interface CleanAppOptions extends BaseCLIOptions {
+	projectDir: string;
+}

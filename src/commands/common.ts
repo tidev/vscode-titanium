@@ -34,7 +34,8 @@ export enum Commands {
 	SelectUpdates = 'titanium.updates.select',
 	SetLogLevel = 'titanium.build.setLogLevel',
 	StopBuild = 'titanium.build.stop',
-	ShowUpdatesView = 'titanium.view.updateExplorer.focus'
+	ShowUpdatesView = 'titanium.view.updateExplorer.focus',
+	Clean = 'titanium.clean',
 }
 
 export class UserCancellation extends Error {
