@@ -655,6 +655,11 @@
           "when": "view == titanium.view.buildExplorer"
         },
         {
+          "command": "titanium.clean",
+          "group": "2_workspace",
+          "when": "view == titanium.view.buildExplorer"
+        },
+        {
           "command": "titanium.updates.installAll",
           "group": "2_workspace",
           "when": "view == titanium.view.updateExplorer && titanium:update:hasUpdates"
