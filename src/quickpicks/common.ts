@@ -63,8 +63,8 @@ export async function quickPick (items: any[], quickPickOptions?: QuickPickOptio
 	return result;
 }
 
-export function selectPlatform (lastBuildDescription?: any) {
-	const platforms = utils.platforms().map(platform => ({ label: utils.nameForPlatform(platform), id: platform }));
+export function selectPlatform (lastBuildDescription?: string, filter?) {
+	const platforms = utils.platforms().filter(filter ? filter : () => true).map(platform => ({ label: utils.nameForPlatform(platform), id: platform }));
 	if (lastBuildDescription) {
 		platforms.unshift({
 			label: `Last: ${lastBuildDescription}`,
