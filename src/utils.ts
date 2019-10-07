@@ -445,6 +445,6 @@ function normalizeDriveLetter (filePath: string): string {
 	return `${root.substr(0, 1).toUpperCase()}${filePath.slice(1)}`;
 }
 
-export function isValidPlatform (targetPlatform) {
+export function isValidPlatform (targetPlatform: string) {
 	return fs.pathExistsSync(path.join(workspace.rootPath, targetPlatform));
 }

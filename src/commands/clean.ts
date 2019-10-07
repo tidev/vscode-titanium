@@ -14,7 +14,7 @@ export async function cleanApplication () {
 		let projectDir = workspace.rootPath;
 
 		if (project.isTitaniumModule) {
-			const platformInfo = await selectPlatform('', isValidPlatform);
+			const platformInfo = await selectPlatform(undefined, isValidPlatform);
 			projectDir = path.join(projectDir, platformInfo.id);
 		}
 
