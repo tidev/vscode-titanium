@@ -5,12 +5,12 @@ import { workspace } from 'vscode';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
-import { nameForPlatform, packageArguments, } from '../utils';
+import { getCorrectCertificateName, nameForPlatform, packageArguments, } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, inputBox, quickPick, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
 import { PackageOptions } from '../types/cli';
-import { KeystoreInfo, WindowsCertInfo } from '../types/common';
+import { IosCertificateType, KeystoreInfo, WindowsCertInfo } from '../types/common';
 
 export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -49,7 +49,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			if (platformInfo.id === 'last') {
 				platform = lastBuildState.platform;
 				target = lastBuildState.target;
-				iOSCertificate = lastBuildState.iOSCertificate;
+				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.distribution);
 				iOSProvisioningProfile = lastBuildState.iOSProvisioningProfile;
 				keystoreInfo = lastBuildState.keystoreInfo;
 				if (platform === 'android') {
@@ -75,7 +75,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastKeystorePath, keystoreInfo.location);
 		} else if (platform === 'ios' && !iOSCertificate) {
 			const codesigning = await selectiOSCodeSigning(buildType, target, project.appId());
-			iOSCertificate = codesigning.certificate.label;
+			iOSCertificate = getCorrectCertificateName(codesigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
 			iOSProvisioningProfile = codesigning.provisioningProfile.uuid;
 		} else if (platform === 'windows') {
 			// TODO

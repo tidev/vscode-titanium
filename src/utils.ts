@@ -1,11 +1,14 @@
 import * as fs from 'fs-extra';
 import * as walkSync from 'klaw-sync';
 import * as path from 'path';
+import * as semver from 'semver';
 import * as _ from 'underscore';
+import appc from './appc';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
 import { BuildAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
+import { IosCert, IosCertificateType } from './types/common';
 
 /**
  * Returns available target platforms
@@ -447,4 +450,28 @@ function normalizeDriveLetter (filePath: string): string {
 
 export function isValidPlatform (targetPlatform: string) {
 	return fs.pathExistsSync(path.join(workspace.rootPath, targetPlatform));
+}
+
+/**
+ * Determine the correct certificate name value to provide to the SDK build process.
+ * Prior to SDK 8.2.0 only the "name" property was allowed, but for 8.2.0 and above
+ * we should prefer the fullname as it differentiates between the iPhone certs and
+ * the generic Apple certs.
+ *
+ * @param {String} certificateName - Certificate fullname.
+ * @param {String} sdkVersion - Projects SDK version in the tiapp.xml.
+ * @param {String} certificateType - Type of certificate type to look up, developer or distribution.
+ *
+ * @returns {String}
+ */
+export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType) {
+	const certificate = appc.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
+	if (!certificate) {
+		return;
+	}
+	if (semver.gte(semver.coerce(sdkVersion), '8.2.0')) {
+		return certificate.fullname;
+	} else {
+		return certificate.name;
+	}
 }
