@@ -732,7 +732,7 @@
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@awam/danger-plugin-tslint": "^1.0.0",
+    "@awam/danger-plugin-tslint": "^1.1.0",
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^8.1.0",
     "@seadub/danger-plugin-dependencies": "^0.1.0",
