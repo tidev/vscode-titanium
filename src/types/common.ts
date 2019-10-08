@@ -43,3 +43,8 @@ export enum LogLevel {
 	Trace = 'trace',
 	Warn = 'warn'
 }
+
+export enum IosCertificateType {
+	developer = 'developer',
+	distribution = 'distribution'
+}

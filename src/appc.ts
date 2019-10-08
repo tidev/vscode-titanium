@@ -6,7 +6,7 @@ import { spawn } from 'child_process';
 import { homedir } from 'os';
 import { window } from 'vscode';
 import { ExtensionContainer } from './container';
-import { IosCert } from './types/common';
+import { IosCert, IosCertificateType } from './types/common';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 
 export interface AlloyGenerateOptions {
@@ -283,7 +283,7 @@ export class Appc {
 	 * @param {String} type     developer (default), distribution
 	 * @returns {Array}
 	 */
-	public iOSCertificates (type = 'developer') {
+	public iOSCertificates (type: IosCertificateType = IosCertificateType.developer) {
 		const certificates = [];
 		if (this.info.ios && this.info.ios.certs) {
 			for (const keychain of Object.values(this.info.ios.certs.keychains)) {

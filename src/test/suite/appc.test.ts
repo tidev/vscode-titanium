@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
 import Appc from '../../appc';
+import { IosCertificateType } from '../../types/common';
 import info from './fixtures/data/ti_info';
 
 Appc.info = info;
@@ -45,7 +46,7 @@ describe('iOS certificates', () => {
 	});
 
 	it('should list all distribution certificates', () => {
-		const certificates = Appc.iOSCertificates('distribution');
+		const certificates = Appc.iOSCertificates(IosCertificateType.distribution);
 		expect(certificates.length).to.equal(3);
 		expect(certificates[0].name).to.equal('Mrs Developer (VNUS781234)');
 	});

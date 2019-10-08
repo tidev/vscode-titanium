@@ -7,6 +7,7 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
+import { IosCertificateType } from '../types/common';
 
 export async function selectFromFileSystem (options: OpenDialogOptions) {
 	if (!options.canSelectMany) {
@@ -187,10 +188,10 @@ export async function enterAndroidKeystoreInfo (lastUsed, savedKeystorePath) {
 }
 
 export function selectiOSCertificate (buildType: string) {
-	const certificateType = buildType === 'run' ? 'developer' : 'distribution';
+	const certificateType: IosCertificateType = buildType === 'run' ? IosCertificateType.developer : IosCertificateType.distribution;
 	const certificates = appc.iOSCertificates(certificateType).map(cert => ({
 		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
-		label: cert.name,
+		label: cert.fullname,
 		pem: cert.pem
 	}));
 	return quickPick(certificates, { placeHolder: 'Select certificate' });

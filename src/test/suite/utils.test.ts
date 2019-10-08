@@ -2,7 +2,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { iOSProvisioningProfileMatchesAppId } from '../../utils';
+import { IosCertificateType } from '../../types/common';
+import { getCorrectCertificateName, iOSProvisioningProfileMatchesAppId } from '../../utils';
 
 describe('iOS provisioning profile matches app ID', () => {
 
@@ -39,4 +40,17 @@ describe('iOS provisioning profile matches app ID', () => {
 		});
 	});
 
+});
+
+describe('#getCorrectCertificateName', () => {
+
+	it('Should return correct name property for <8.2.0', () => {
+		const certificate = getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41234)', '8.1.1.GA', IosCertificateType.developer);
+		expect(certificate).to.equal('Mrs Developer (D4BDS41234)');
+	});
+
+	it('Should return correct name property for >=8.2.0', () => {
+		const certificate = getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41234)', '8.2.0.GA', IosCertificateType.developer);
+		expect(certificate).to.equal('iPhone Developer: Mrs Developer (D4BDS41234)');
+	});
 });

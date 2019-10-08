@@ -1,10 +1,10 @@
 import project from '../project';
 
 import { workspace } from 'vscode';
-import { GlobalState, WorkspaceState } from '../constants';
+import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
-import { buildArguments, nameForPlatform, nameForTarget, } from '../utils';
+import { buildArguments, getCorrectCertificateName, nameForPlatform, nameForTarget, } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import {
@@ -19,6 +19,7 @@ import {
 	selectWindowsEmulator
 } from '../quickpicks/common';
 import { BuildAppOptions } from '../types/cli';
+import { IosCertificateType } from '../types/common';
 
 export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -60,7 +61,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			if (platformInfo.id === 'last') {
 				deviceId = lastBuildState.deviceId;
 				deviceLabel = lastBuildState.deviceLabel;
-				iOSCertificate = lastBuildState.iOSCertificate;
+				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.developer);
 				osVersion = lastBuildState.osVersion;
 				platform = lastBuildState.platform;
 				iOSProvisioningProfile = lastBuildState.iOSProvisioningProfile;
@@ -114,7 +115,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 
 		if (platform === 'ios' && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
 			const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId());
-			iOSCertificate = codeSigning.certificate.label;
+			iOSCertificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
 			iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
 		}
 
