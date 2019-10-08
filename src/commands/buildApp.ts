@@ -112,7 +112,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			}
 		}
 
-		if (platform === 'ios' && target === 'device' && (!iOSCertificate || iOSProvisioningProfile)) {
+		if (platform === 'ios' && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
 			const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId());
 			iOSCertificate = codeSigning.certificate.label;
 			iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
