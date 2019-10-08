@@ -61,7 +61,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		} else if (/Alloy\.(createWidget|Widgets\.instance)\(["']([-a-zA-Z0-9-_/.]*)$/.test(linePrefix)) {
 			return this.getWidgetCompletions();
 			// Alloy APIs - Alloy._
-		} else if (/(?:Alloy|alloy)\.?\S+/i.test(linePrefix)) {
+		} else if (/(?:Alloy)\.?\S+/i.test(linePrefix)) {
 			return this.getAlloyApiCompletions(linePrefix);
 		} else {
 			let ruleResult;
