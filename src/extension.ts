@@ -12,6 +12,7 @@ import {
 	AlloyComponentType,
 	buildApplication,
 	buildModule,
+	cleanApplication,
 	Commands,
 	createApplication,
 	createModule,
@@ -289,6 +290,7 @@ function activate (context) {
 				// stuff
 			}
 		}),
+		vscode.commands.registerCommand(Commands.Clean, cleanApplication),
 
 		context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
 			if (event.event === MESSAGE_STRING) {

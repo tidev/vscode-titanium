@@ -5,7 +5,7 @@ import * as _ from 'underscore';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
-import { BuildAppOptions, BuildModuleOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
+import { BuildAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
 
 /**
  * Returns available target platforms
@@ -398,6 +398,17 @@ export function createModuleArguments (options: CreateModuleOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
+export function cleanAppArguments (options: CleanAppOptions) {
+	const args = [
+		'ti',
+		'clean',
+		'--project-dir', normalizeDriveLetter(options.projectDir),
+		'--log-level', options.logLevel
+	];
+
+	return args.map(arg => quoteArgument(arg));
+}
+
 function quoteArgument (arg: string) {
 	return `"${arg}"`;
 }
@@ -432,4 +443,8 @@ function normalizeDriveLetter (filePath: string): string {
 	}
 	const { root } = path.parse(filePath);
 	return `${root.substr(0, 1).toUpperCase()}${filePath.slice(1)}`;
+}
+
+export function isValidPlatform (targetPlatform: string) {
+	return fs.pathExistsSync(path.join(workspace.rootPath, targetPlatform));
 }
