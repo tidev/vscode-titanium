@@ -564,8 +564,8 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 		const sdkPath = appc.sdkInfo(sdkVersion).path;
 		// Generate the completions
 		const [ alloy, sdk ] = await Promise.all([
-			completion.generateAlloyCompletions(force),
-			completion.generateSDKCompletions(force, sdkVersion, sdkPath)
+			completion.generateAlloyCompletions(force, completion.CompletionsFormat.v2),
+			completion.generateSDKCompletions(force, sdkVersion, sdkPath, completion.CompletionsFormat.v2)
 		]);
 		if (sdk || alloy) {
 			let message = 'Autocomplete suggestions generated for';

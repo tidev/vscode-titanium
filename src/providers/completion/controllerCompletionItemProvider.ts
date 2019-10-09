@@ -60,6 +60,9 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		// Alloy.createWidget('')
 		} else if (/Alloy\.(createWidget|Widgets\.instance)\(["']([-a-zA-Z0-9-_/.]*)$/.test(linePrefix)) {
 			return this.getWidgetCompletions();
+			// Alloy APIs - Alloy._
+		} else if (/(?:Alloy)\.?\S+/.test(linePrefix)) {
+			return this.getAlloyApiCompletions(linePrefix);
 		} else {
 			let ruleResult;
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
@@ -216,6 +219,65 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	}
 
 	/**
+	 * Get Alloy API completions
+	 *
+	 * @param {String} linePrefix line prefix text
+	 *
+	 * @returns {Array}
+	 */
+	public getAlloyApiCompletions (linePrefix: string) {
+		const { types } = this.completions.alloy;
+		const matches = linePrefix.match(/(Alloy\.(?:(?:[A-Z]\w*)\.?)*)([a-z]\w*)*$/);
+		let apiName;
+		let attribute;
+		if (matches && matches.length === 3) {
+			apiName = matches[1];
+			if (apiName.lastIndexOf('.') === apiName.length - 1) {
+				apiName = apiName.substr(0, apiName.length - 1);
+			}
+			attribute = matches[2];
+		}
+
+		const completions = [];
+		// suggest class completion
+		if (!attribute || attribute.length === 0) {
+			for (const key of Object.keys(types)) {
+				if (key.indexOf(apiName) === 0 && key.indexOf('_') === -1) {
+					const replaceSections = key.split('.');
+					completions.push({
+						label: key,
+						kind: CompletionItemKind.Class,
+						insertText: replaceSections[replaceSections.length - 1]
+					});
+				}
+			}
+		}
+
+		// if type exists suggest function and properties
+		const apiObj = types[apiName];
+		if (apiObj) {
+			for (const func of apiObj.functions) {
+				if ((!attribute || utils.matches(func, attribute)) && func.indexOf('deprecated') === -1) {
+					completions.push({
+						label: func,
+						kind: CompletionItemKind.Method
+					});
+				}
+			}
+			for (const property of apiObj.properties) {
+				if ((!attribute || utils.matches(property, attribute)) && property.indexOf('deprecated') === -1) {
+					completions.push({
+						label: property,
+						kind: CompletionItemKind.Property
+					});
+				}
+			}
+		}
+
+		return completions;
+	}
+
+	/**
 	 * Get event name completions
 	 *
 	 * @param {String} linePrefix line prefix text
@@ -306,6 +368,6 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 
 	public async loadCompletions () {
 		const sdk = project.sdk()[0];
-		this.completions = await completion.loadCompletions(sdk);
+		this.completions = await completion.loadCompletions(sdk, completion.CompletionsFormat.v2);
 	}
 }

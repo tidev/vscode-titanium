@@ -252,6 +252,6 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 
 	public async loadCompletions () {
 		const sdk = project.sdk()[0];
-		this.completions = await completion.loadCompletions(sdk);
+		this.completions = await completion.loadCompletions(sdk, completion.CompletionsFormat.v2);
 	}
 }
