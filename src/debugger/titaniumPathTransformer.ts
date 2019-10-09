@@ -28,7 +28,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	public async configureTransformOptions (args: TitaniumAttachRequestArgs|TitaniumLaunchRequestArgs) {
 		this._pathMapping = args.pathMapping;
 		this.appDirectory = args.projectDir;
-		this.platform = args.platform === 'ios' ? 'iphone' : args.platform;
+		this.platform = args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);
 		this.appName = await getAppName(this.appDirectory);
 	}
@@ -78,17 +78,20 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 	public async getLocalPath (sourceUrl: string): Promise<string> {
 		const appRoot = this.projectType === 'alloy' ? path.join(this.appDirectory, 'app') : path.join(this.appDirectory, 'Resources');
-		const platformAppRoot = path.join(this.appDirectory, 'Resources', this.platform);
 		const platformRoot = path.join(appRoot, this.platform);
 		let defaultPath = '';
+		let platformAppRoot = '';
 		const searchFolders = [ appRoot ];
 
-		if (this.platform === 'iphone') {
+		if (this.platform === 'ios') {
 			try {
 				// We must encode the app name here as the sourceUrl we're provided
 				// is also encoded
 				const appName = `${encodeURIComponent(this.appName)}.app`;
 				sourceUrl = sourceUrl.split(appName)[1];
+				if ((/\/alloy/).test(sourceUrl)) {
+					platformAppRoot = sourceUrl.match(/(?<=\/alloy).*$/g)[0];
+				}
 			} catch (error) {
 				throw error;
 			}
@@ -101,6 +104,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 		if (this.projectType === 'alloy') {
 			searchFolders.push(path.join(appRoot, 'lib'));
+			searchFolders.push(path.join(appRoot, 'controllers' , this.platform));
 		}
 
 		for (const folder of searchFolders) {
@@ -112,14 +116,6 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 			if (mappedPath) {
 				defaultPath = mappedPath;
 				break;
-			}
-		}
-
-		if (defaultPath.toLowerCase().includes(appRoot.toLowerCase())) {
-			const relative = path.relative(appRoot, defaultPath);
-			const platformPath = path.join(platformRoot, relative);
-			if (await fs.pathExists(platformPath)) {
-				defaultPath = platformPath;
 			}
 		}
 
