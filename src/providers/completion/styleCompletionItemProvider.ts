@@ -42,7 +42,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 			if (ruleResult) {
 				return ruleResult;
 			} else {
-				return this.getPropertyValueCompletions(linePrefix, prefix);
+				return this.getPropertyValueCompletions(linePrefix, prefix, position, document);
 			}
 		// property name - _ or fo_
 		} else if (/^\s*\w*$/.test(linePrefix)) {
@@ -194,8 +194,9 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Array}
 	 */
-	public getPropertyValueCompletions (linePrefix, prefix) {
+	public getPropertyValueCompletions (linePrefix, prefix, position, document) {
 		const { properties } = this.completions.titanium;
+		const range = document.getWordRangeAtPosition(position, /([\w\"\.\'\$]+)/);
 		let property;
 		const matches = /^\s*(\S+)\s*:/.exec(linePrefix);
 		if (matches && matches.length >= 2) {
@@ -216,6 +217,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 			if (!prefix || utils.matches(value, prefix)) {
 				completions.push({
 					label: value,
+					range,
 					kind: CompletionItemKind.Value
 				});
 			}
