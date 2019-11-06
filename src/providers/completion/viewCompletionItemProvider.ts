@@ -167,6 +167,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		let values;
 		let tag;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
+		const range = document.getWordRangeAtPosition(position, /([\w.\$]+)/);
 		if (matches) {
 			tag = matches[1];
 		}
@@ -261,6 +262,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 				if (!prefix || utils.matches(value, prefix)) {
 					completions.push({
 						label: value,
+						range,
 						kind: CompletionItemKind.Value
 					});
 				}

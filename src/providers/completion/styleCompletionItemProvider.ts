@@ -191,12 +191,14 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @param {String} linePrefix line prefix text
 	 * @param {String} prefix word prefix text
+	 * @param {Position} position caret position
+	 * @param {TextDocument} document active text document
 	 *
 	 * @returns {Array}
 	 */
 	public getPropertyValueCompletions (linePrefix, prefix, position, document) {
 		const { properties } = this.completions.titanium;
-		const range = document.getWordRangeAtPosition(position, /([\w\"\.\'\$]+)/);
+		const range = document.getWordRangeAtPosition(position, /([\w".'\$]+)/);
 		let property;
 		const matches = /^\s*(\S+)\s*:/.exec(linePrefix);
 		if (matches && matches.length >= 2) {
