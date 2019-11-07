@@ -1,8 +1,6 @@
 import { which } from 'appcd-subprocess';
 import * as getPort from 'get-port';
 import { Socket } from 'net';
-import * as semver from 'semver';
-import { updates } from 'titanium-editor-commons';
 import * as vscode from 'vscode';
 import { UserCancellation } from '../commands';
 import { WorkspaceState } from '../constants';

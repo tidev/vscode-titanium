@@ -1,7 +1,7 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
 import * as got from 'got';
 import { URL } from 'url';
-import { ChromeDebugAdapter, ChromeDebugSession, Crdp } from 'vscode-chrome-debug-core';
+import { ChromeDebugAdapter, Crdp } from 'vscode-chrome-debug-core';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
@@ -12,18 +12,12 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 	private activeRequests = new Map();
 	private deviceId: string;
-	private session: ChromeDebugSession;
 	private idCount = 0;
 	private isDisconnecting: boolean = false;
 	private platform: string;
 	private port: number;
 	private server: ProxyServer;
 	private target: string;
-
-	constructor (adapterOpts, session) {
-		super(adapterOpts, session);
-		this.session = session;
-	}
 
 	public commonArgs (args: TitaniumLaunchRequestArgs) {
 		args.sourceMaps = typeof args.sourceMaps === 'undefined' || args.sourceMaps;

@@ -790,8 +790,8 @@
     "titanium-editor-commons": "^0.4.1",
     "underscore": "^1.8.3",
     "uuid": "^3.3.2",
-    "vscode-chrome-debug-core": "^6.7.48",
-    "vscode-debugadapter": "^1.34.0",
+    "vscode-chrome-debug-core": "^6.8.4",
+    "vscode-debugadapter": "^1.37.1",
     "xml2js": "^0.4.22"
   }
 }

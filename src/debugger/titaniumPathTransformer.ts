@@ -1,6 +1,5 @@
-import * as fs from 'fs-extra';
 import * as path from 'path';
-import { BasePathTransformer, chromeUtils, IPathMapping, ISetBreakpointsArgs, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
+import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { determineProjectType, getAppName } from '../common/utils';
@@ -33,25 +32,25 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		this.appName = await getAppName(this.appDirectory);
 	}
 
-	public setBreakpoints (args: ISetBreakpointsArgs): ISetBreakpointsArgs {
-		if (!args.source.path) {
+	public setBreakpoints (source: DebugProtocol.Source): DebugProtocol.Source {
+		if (!source.path) {
 			// sourceReference script, nothing to do
-			return args;
+			return source;
 		}
 
-		if (utils.isURL(args.source.path)) {
+		if (utils.isURL(source.path)) {
 			// already a url, use as-is
-			return args;
+			return source;
 		}
 
-		const canonicalPath = utils.canonicalizeUrl(args.source.path);
+		const canonicalPath = utils.canonicalizeUrl(source.path);
 		const url = this.getTargetPathFromClientPath(canonicalPath);
 		if (url) {
-			args.source.path = url;
-			return args;
+			source.path = url;
+			return source;
 		} else {
-			args.source.path = canonicalPath;
-			return args;
+			source.path = canonicalPath;
+			return source;
 		}
 	}
 
