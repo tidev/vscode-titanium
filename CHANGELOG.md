@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.6.1...v0.7.0) (2019-11-07)
+
+
+### Bug Fixes
+
+* **build/ios:** dont prompt for cert info if we already have it ([5439414](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/5439414))
+* **debugger:** add support for platform specific breakpoints ([#144](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/144)) ([87ac694](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/87ac694))
+* fixed value completions in tss and views with word fragment ([#153](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/153)) ([d43e180](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/d43e180)), closes [#150](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/150) [#155](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/155)
+
+
+### Features
+
+* add clean to command palette ([#145](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/145)) ([0ea8420](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0ea8420)), closes [#141](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/141)
+* **completions:** added completions for Alloy namespace in cont… ([#134](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/134)) ([578cd8a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/578cd8a)), closes [#133](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/133)
+* **ios:** support usage of Apple certificates ([6192056](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/6192056)), closes [#147](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/147)
+
 ### [0.6.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.6.0...v0.6.1) (2019-10-01)
 
 
