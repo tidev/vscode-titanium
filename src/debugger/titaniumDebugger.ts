@@ -1,4 +1,4 @@
-import { chromeConnection, ChromeDebugSession } from 'vscode-chrome-debug-core';
+import { chromeConnection, ChromeDebugSession } from '@awam/vscode-chrome-debug-core';
 import { TitaniumDebugAdapter } from './titaniumDebugAdapter';
 import { TitaniumPathTransformer } from './titaniumPathTransformer';
 import { TitaniumSourceMapTransformer } from './titaniumSourceMapTransformer';
