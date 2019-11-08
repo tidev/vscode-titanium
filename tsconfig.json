@@ -9,7 +9,7 @@
         "moduleResolution": "node",
         "sourceMap": true,
         "rootDir": "src",
-        "strict": false,
+        "strict": true,
         "noUnusedLocals": false,
         "baseUrl": ".",
         "types": [
