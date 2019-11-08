@@ -15,7 +15,7 @@ import { IosCert, IosCertificateType } from './types/common';
  *
  * @returns {Array}
  */
-export function platforms () {
+export function platforms (): string[] {
 	switch (platform()) {
 		case 'darwin':
 			return [ 'ios', 'android' ];
@@ -23,6 +23,8 @@ export function platforms () {
 			return [ 'android', 'windows' ];
 		case 'linux':
 			return [ 'android' ];
+		default:
+			return[];
 	}
 }
 

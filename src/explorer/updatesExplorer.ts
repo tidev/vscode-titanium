@@ -39,7 +39,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 		}
 	}
 
-	public getTreeItem (element) {
+	public getTreeItem (element: BaseNode) {
 		return element.getTreeItem(element);
 	}
 

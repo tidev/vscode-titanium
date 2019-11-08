@@ -1,8 +1,7 @@
 import { BaseNode } from './baseNode';
 import { TargetNode } from './targetNode';
 
-import { TreeItem, TreeItemCollapsibleState } from 'vscode';
-import { Commands } from '../../commands/common';
+import { TreeItemCollapsibleState } from 'vscode';
 import { nameForPlatform } from '../../utils';
 
 export class PlatformNode extends BaseNode {
@@ -15,7 +14,7 @@ export class PlatformNode extends BaseNode {
 		public readonly label: string
 	) {
 		super(label);
-		this.label = nameForPlatform(label);
+		this.label = nameForPlatform(label)!;
 		this.platform = label;
 		this.contextValue = 'PlatformNode';
 	}
@@ -38,7 +37,7 @@ export class PlatformNode extends BaseNode {
 					new TargetNode('Emulator', this.platform)
 				];
 			default:
-				break;
+				return [];
 		}
 	}
 
