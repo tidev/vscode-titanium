@@ -1,13 +1,13 @@
 import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 export abstract class BaseNode {
 
-	public abstract readonly collapsibleState;
+	public abstract readonly collapsibleState: TreeItemCollapsibleState;
 	public abstract readonly contextValue: string;
 	public readonly deviceId: string | undefined;
 	public readonly label: string;
 	public readonly targetId: string | undefined;
 	public readonly osVersion: string | undefined;
-	constructor (label) {
+	constructor (label: string) {
 		this.label = label;
 	}
 

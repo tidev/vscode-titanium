@@ -65,7 +65,7 @@ export class TargetNode extends BaseNode {
 					for (const device of appc.windowsDevices()) {
 						devices.push(new DeviceNode(device.name, this.platform, this.label, device.udid, this.targetId));
 					}
-					devices.push(new DeviceNode('Local Machine', this.platform, 'ws-local', null, 'ws-local'));
+					devices.push(new DeviceNode('Local Machine', this.platform, 'ws-local', 'ws-local', 'ws-local'));
 					break;
 				case 'Emulator':
 					const emulatorVersions: Set<string> = new Set();
@@ -74,7 +74,7 @@ export class TargetNode extends BaseNode {
 					}
 					// Sort into descending value
 					const orderedVersions = Array.from(emulatorVersions).sort((a, b) => {
-						return semver.compare(semver.coerce(a), semver.coerce(b));
+						return semver.compare(semver.coerce(a)!, semver.coerce(b)!);
 					}).reverse();
 					for (const version of orderedVersions) {
 						devices.push(new OSVerNode(version, 'windows', 'wp-emulator'));

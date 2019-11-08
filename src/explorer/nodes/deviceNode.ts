@@ -1,7 +1,6 @@
 import { BaseNode } from './baseNode';
 
-import { TreeItem, TreeItemCollapsibleState } from 'vscode';
-import { targetForName } from '../../utils';
+import { TreeItemCollapsibleState } from 'vscode';
 
 export class DeviceNode extends BaseNode {
 
