@@ -4,20 +4,20 @@ import * as got from 'got';
 import { URL } from 'url';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
-import { MESSAGE_STRING, Request, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
+import { MESSAGE_STRING, Request, Response, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { BuildAppOptions } from '../types/cli';
 import { LogLevel } from '../types/common';
 
 export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 	private activeRequests = new Map();
-	private deviceId: string;
+	private deviceId: string|undefined;
 	private idCount = 0;
 	private isDisconnecting: boolean = false;
-	private platform: string;
-	private port: number;
-	private server: ProxyServer;
-	private target: string;
+	private platform: string|undefined;
+	private port: number|undefined;
+	private server!: ProxyServer;
+	private target: string|undefined;
 
 	public commonArgs (args: TitaniumLaunchRequestArgs) {
 		args.sourceMaps = typeof args.sourceMaps === 'undefined' || args.sourceMaps;
@@ -34,6 +34,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			return this.launchAndroid(launchArgs);
 		} else if (platform === 'ios') {
 			return this.launchIOS(launchArgs);
+		} else {
+			throw new Error(`Unknown platform ${platform}`);
 		}
 	}
 
@@ -43,6 +45,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			return this.attachAndroid(attachArgs);
 		} else if (platform === 'ios') {
 			return this.attachIOS(attachArgs);
+		} else {
+			throw new Error(`Unknown platform ${platform}`);
 		}
 	}
 
@@ -113,7 +117,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		this.server = new ProxyServer();
 
 		try {
-			const simUdid = attachArgs.target === 'simulator' ? attachArgs.deviceId : null;
+			const simUdid = attachArgs.target === 'simulator' ? attachArgs.deviceId : undefined;
 			await this.server.run(attachArgs.port, simUdid);
 		} catch (error) {
 			await this.disconnect({});
@@ -145,10 +149,9 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return super.attach(attachArgs);
 	}
 
-	private async pollForApp (url: string, errorMessage: string, maxRetries= 5, iteration: number = 0) {
+	private async pollForApp (url: string, errorMessage: string, maxRetries= 5, iteration: number = 0): Promise<Array<{ metadata: { deviceId: string; url: string }, webSocketDebuggerUrl: string }>> {
 		if (iteration > maxRetries) {
 			throw Error(errorMessage);
-
 		}
 
 		await this.sleep(250);
@@ -169,7 +172,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return this.pollForApp(url, errorMessage, maxRetries, iteration + 1);
 	}
 
-	private sleep (time) {
+	private sleep (time: number) {
 		return new Promise(resolve => {
 			setTimeout(() => {
 				resolve();
@@ -190,7 +193,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 	}
 
-	private sendRequest (code, args?) {
+	private sendRequest (code: string, args?: object) {
 		const request: Request = {
 			id: `request-${++this.idCount}`,
 			code,
@@ -204,7 +207,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		});
 	}
 
-	private extensionResponse (request) {
+	private extensionResponse (request: Response) {
 		const resolver = this.activeRequests.get(request.id);
 		if (resolver) {
 			resolver(request.result);

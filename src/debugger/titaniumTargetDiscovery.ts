@@ -1,18 +1,18 @@
-import { chromeConnection, chromeTargetDiscoveryStrategy, logger, telemetry } from '@awam/vscode-chrome-debug-core';
+import { chromeConnection, chromeTargetDiscoveryStrategy, logger, TargetVersions, telemetry, Version } from '@awam/vscode-chrome-debug-core';
 import * as uuid from 'uuid';
 
 export class TitaniumTargetDiscovery extends chromeTargetDiscoveryStrategy.ChromeTargetDiscovery {
 	constructor () {
 		super(logger, new telemetry.TelemetryReporter());
 	}
-	public getTarget (address: string, port: number, targetFilter?: any, targetUrl?: string): Promise<chromeConnection.ITarget> {
+	public getTarget (address: string, port: number, targetFilter?: chromeConnection.ITargetFilter, targetUrl?: string): Promise<chromeConnection.ITarget> {
 		return Promise.resolve({
 			description: 'Titanium Debug Target',
 			devtoolsFrontendUrl: `chrome-devtools://devtools/bundled/inspector.html?experiments=true&ws=${address}:${port}`,
 			id: uuid.v4(),
 			title: 'Titanium Debug Target',
 			type: 'node',
-			version: null,
+			version: Promise.resolve(new TargetVersions(Version.unknownVersion(), Version.unknownVersion())),
 			webSocketDebuggerUrl: `ws://${address}:${port}`,
 		});
 	}

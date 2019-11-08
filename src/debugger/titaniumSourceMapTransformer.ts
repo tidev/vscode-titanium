@@ -6,9 +6,9 @@ import { determineProjectType } from '../common/utils';
 
 export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 
-	private appDirectory: string;
-	private platform: string;
-	private projectType: string;
+	private appDirectory!: string;
+	private platform!: string;
+	private projectType!: string;
 
 	public async attach (args: TitaniumAttachRequestArgs) {
 		await this.configureOptions(args);
