@@ -1,7 +1,7 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
+import { ChromeDebugAdapter, Crdp } from '@awam/vscode-chrome-debug-core';
 import * as got from 'got';
 import { URL } from 'url';
-import { ChromeDebugAdapter, Crdp } from 'vscode-chrome-debug-core';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';

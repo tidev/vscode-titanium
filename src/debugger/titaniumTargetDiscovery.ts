@@ -1,5 +1,5 @@
+import { chromeConnection, chromeTargetDiscoveryStrategy, logger, telemetry } from '@awam/vscode-chrome-debug-core';
 import * as uuid from 'uuid';
-import { chromeConnection, chromeTargetDiscoveryStrategy, logger, telemetry } from 'vscode-chrome-debug-core';
 
 export class TitaniumTargetDiscovery extends chromeTargetDiscoveryStrategy.ChromeTargetDiscovery {
 	constructor () {

@@ -1,4 +1,4 @@
-import { IAttachRequestArgs, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
+import { IAttachRequestArgs, ILaunchRequestArgs } from '@awam/vscode-chrome-debug-core';
 import { LogLevel } from '../types/common';
 
 export interface Request {
