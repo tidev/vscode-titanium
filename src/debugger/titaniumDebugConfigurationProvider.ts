@@ -1,7 +1,7 @@
-import { which } from 'appcd-subprocess';
 import * as getPort from 'get-port';
 import { Socket } from 'net';
 import * as vscode from 'vscode';
+import * as which from 'which';
 import { UserCancellation } from '../commands';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
