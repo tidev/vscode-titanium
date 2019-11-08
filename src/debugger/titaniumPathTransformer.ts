@@ -6,13 +6,13 @@ import { determineProjectType, getAppName } from '../common/utils';
 
 export class TitaniumPathTransformer extends BasePathTransformer {
 
-	private appDirectory: string;
-	private platform: string;
-	private _pathMapping: IPathMapping;
+	private appDirectory!: string;
+	private platform!: string;
+	private _pathMapping!: IPathMapping;
 	private _localPathToTargetUrl = new Map<string, string>();
 	private _targetUrlToLocalPath = new Map<string, string>();
-	private projectType: string;
-	private appName: string;
+	private projectType!: string;
+	private appName!: string;
 
 	public async attach (args: TitaniumAttachRequestArgs) {
 		await this.configureTransformOptions(args);
@@ -25,7 +25,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	}
 
 	public async configureTransformOptions (args: TitaniumAttachRequestArgs|TitaniumLaunchRequestArgs) {
-		this._pathMapping = args.pathMapping;
+		this._pathMapping = args.pathMapping || {};
 		this.appDirectory = args.projectDir;
 		this.platform = args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);
@@ -69,10 +69,10 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	}
 
 	public getTargetPathFromClientPath (clientPath: string): string {
-		// If it's already a URL, skip the Map
-		return path.isAbsolute(clientPath) ?
-			this._localPathToTargetUrl.get(utils.canonicalizeUrl(clientPath)) :
-			clientPath;
+		if (path.isAbsolute(clientPath) && this._localPathToTargetUrl.has(utils.canonicalizeUrl(clientPath))) {
+			clientPath = this._localPathToTargetUrl.get(utils.canonicalizeUrl(clientPath))!;
+		}
+		return clientPath;
 	}
 
 	public async getLocalPath (sourceUrl: string): Promise<string> {
@@ -89,7 +89,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 				const appName = `${encodeURIComponent(this.appName)}.app`;
 				sourceUrl = sourceUrl.split(appName)[1];
 				if ((/\/alloy/).test(sourceUrl)) {
-					platformAppRoot = sourceUrl.match(/(?<=\/alloy).*$/g)[0];
+					platformAppRoot = sourceUrl.match(/(?<=\/alloy).*$/g)![0];
 				}
 			} catch (error) {
 				throw error;
@@ -103,7 +103,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 		if (this.projectType === 'alloy') {
 			searchFolders.push(path.join(appRoot, 'lib'));
-			searchFolders.push(path.join(appRoot, 'controllers' , this.platform));
+			searchFolders.push(path.join(appRoot, 'controllers' , this.platform!));
 		}
 
 		for (const folder of searchFolders) {
@@ -122,18 +122,18 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	}
 
 	public async stackTraceResponse (response: IStackTraceResponseBody): Promise<void> {
-		await Promise.all(response.stackFrames.map(frame => this.fixSource(frame.source)));
+		await Promise.all(response.stackFrames.map(frame => frame && frame.source && this.fixSource(frame.source)));
 	}
 
 	public getClientPathFromTargetPath (targetPath: string): string {
-		return this._targetUrlToLocalPath.get(targetPath);
+		return this._targetUrlToLocalPath.get(targetPath) || targetPath;
 	}
 
 	public async fixSource (source: DebugProtocol.Source): Promise<void> {
 		if (source && source.path) {
 
-			const clientPath = this.getClientPathFromTargetPath(source.path) ||
-				await this.targetUrlToClientPath(source.path);
+			const clientPath = this._targetUrlToLocalPath.get(source.path) ||
+				await chromeUtils.targetUrlToClientPath(source.path, this._pathMapping);
 
 			if (clientPath) {
 				source.path = clientPath;
@@ -142,9 +142,5 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 				source.name = path.basename(clientPath);
 			}
 		}
-	}
-
-	protected async targetUrlToClientPath (scriptUrl: string): Promise<string> {
-		return Promise.resolve(chromeUtils.targetUrlToClientPath(scriptUrl, this._pathMapping));
 	}
 }

@@ -4,7 +4,7 @@ import { LogLevel } from '../types/common';
 export interface Request {
 	id: string;
 	code: string;
-	args: object;
+	args?: object;
 }
 
 export interface Response {

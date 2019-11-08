@@ -73,7 +73,7 @@ export function nameForTarget (target: string) {
  * @param {String} targetPlatform - platform to get target for.
  * @returns {String}
  */
-export function targetForName (name: string, targetPlatform: string) {
+export function targetForName (name: string, targetPlatform: string): string {
 	name = name.toLowerCase();
 	switch (name) {
 		case 'Ad-Hoc':
@@ -92,7 +92,7 @@ export function targetForName (name: string, targetPlatform: string) {
 	}
 }
 
-export function targetsForPlatform (platformName: string) {
+export function targetsForPlatform (platformName: string): string[] {
 	platformName = normalisedPlatform(platformName);
 	switch (platformName) {
 		case 'android':
@@ -101,6 +101,8 @@ export function targetsForPlatform (platformName: string) {
 			return [ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ];
 		case 'windows':
 			return [ 'dist-phonestore', 'dist-winstore', 'wp-emulator', 'wp-device', 'ws-local' ];
+		default:
+			return [];
 	}
 }
 /**
@@ -162,7 +164,7 @@ export function  capitalizeFirstLetter (s: string) {
  * @returns {String}
  */
 export function getAlloyRootPath () {
-	return path.join(workspace.rootPath, 'app');
+	return path.join(workspace.rootPath!, 'app');
 }
 
 /**
@@ -236,7 +238,7 @@ export function toUnixPath (p: string) { // https://github.com/anodynos/upath
  * @param {Object} obj 	object to get keys of
  * @returns {Array}
  */
-export function getAllKeys (obj: object) {
+export function getAllKeys (obj: object): string[] {
 	if (!_.isObject(obj)) {
 		return [];
 	}
@@ -278,16 +280,16 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 	}
 
 	if (isAppBuild(options)) {
-		args.push('--target', options.target);
+		args.push('--target', options.target!);
 
 		if (options.target !== 'ws-local') {
-			args.push('--device-id', options.deviceId);
+			args.push('--device-id', options.deviceId!);
 		}
 
 		if (options.target === 'device' && options.platform === 'ios') {
 			args.push(
-				'--developer-name', options.iOSCertificate,
-				'--pp-uuid', options.iOSProvisioningProfile
+				'--developer-name', options.iOSCertificate!,
+				'--pp-uuid', options.iOSProvisioningProfile!
 			);
 		}
 
@@ -345,8 +347,8 @@ export function packageArguments (options: PackageOptions) {
 		}
 	} else if (options.platform === 'ios') {
 		args.push(
-			'--distribution-name', options.iOSCertificate,
-			'--pp-uuid', options.iOSProvisioningProfile
+			'--distribution-name', options.iOSCertificate!,
+			'--pp-uuid', options.iOSProvisioningProfile!
 		);
 	} else if (options.platform === 'windows') {
 		if (options.windowsCertInfo.location) {
@@ -355,7 +357,7 @@ export function packageArguments (options: PackageOptions) {
 			args.push('--win-cert');
 		}
 		args.push('--pfx-password', options.windowsCertInfo.password);
-		args.push('--win-publisher-id', options.windowsPublisherID);
+		args.push('--win-publisher-id', options.windowsPublisherID!);
 	}
 	return args.map(arg => quoteArgument(arg));
 }
@@ -449,7 +451,7 @@ function normalizeDriveLetter (filePath: string): string {
 }
 
 export function isValidPlatform (targetPlatform: string) {
-	return fs.pathExistsSync(path.join(workspace.rootPath, targetPlatform));
+	return fs.pathExistsSync(path.join(workspace.rootPath!, targetPlatform));
 }
 
 /**
@@ -469,7 +471,7 @@ export function getCorrectCertificateName (certificateName: string, sdkVersion: 
 	if (!certificate) {
 		return;
 	}
-	if (semver.gte(semver.coerce(sdkVersion), '8.2.0')) {
+	if (semver.gte(semver.coerce(sdkVersion)!, '8.2.0')) {
 		return certificate.fullname;
 	} else {
 		return certificate.name;

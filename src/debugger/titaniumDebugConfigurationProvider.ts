@@ -7,7 +7,7 @@ import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import project from '../project';
 import { quickPick, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from '../quickpicks/common';
-import * as utils from '../utils';
+import { nameForTarget, targetsForPlatform } from '../utils';
 
 export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
@@ -77,9 +77,10 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 				} else if (config.platform === 'ios') {
 					lastDebugState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastiOSDebug);
 				}
-				const targets = utils.targetsForPlatform(config.platform)
+
+				const targets = targetsForPlatform(config.platform)
 					.filter(target => !/^dist/.test(target))
-					.map(target => ({ label: utils.nameForTarget(target), id: target }));
+					.map(target => ({ label: nameForTarget(target), id: target }));
 
 				if (lastDebugState) {
 					try {
