@@ -2,11 +2,12 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { homedir } from 'os';
 import { window } from 'vscode';
 import { ExtensionContainer } from './container';
-import { IosCert, IosCertificateType } from './types/common';
+import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common';
+import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, WindowsEmulator } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 
 export interface AlloyGenerateOptions {
@@ -19,9 +20,9 @@ export interface AlloyGenerateOptions {
 
 export class Appc {
 
-	public info: any;
-	private proc: any;
-	private killed: boolean;
+	public info!: AppcInfo;
+	private proc!: ChildProcess|null;
+	private killed: boolean = false;
 
 	/**
 	 * Returns true if user has active session
@@ -40,7 +41,7 @@ export class Appc {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public getInfo (callback) {
+	public getInfo (callback: (error: Error|null|object, info?: any) => void) {
 		let result = '';
 		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
@@ -147,7 +148,7 @@ export class Appc {
 		}
 	}
 
-	public sdkInfo (version) {
+	public sdkInfo (version: string) {
 		if (this.info.titanium) {
 			return this.info.titanium[version];
 		}
@@ -158,16 +159,16 @@ export class Appc {
 	 *
 	 * @returns {Object}
 	 */
-	public iOSSimulators () {
+	public iOSSimulators (): { [key: string]: IosSimulator[] } {
 		if (this.info.ios && this.info.ios.simulators) {
 			return this.info.ios.simulators.ios;
 		}
 		return {};
 	}
 
-	public iOSSimulatorVersions () {
+	public iOSSimulatorVersions (): string[] {
 		const sims = this.iOSSimulators();
-		return Object.keys(sims).sort((a, b) => semver.compare(semver.coerce(a), semver.coerce(b))).reverse();
+		return Object.keys(sims).sort((a, b) => semver.compare(semver.coerce(a)!, semver.coerce(b)!)).reverse();
 	}
 
 	/**
@@ -175,7 +176,7 @@ export class Appc {
 	 *
 	 * @returns {Array}
 	 */
-	public iOSDevices () {
+	public iOSDevices (): IosDevice[] {
 		if (this.info.ios && this.info.ios.devices) {
 			return this.info.ios.devices;
 		}
@@ -199,9 +200,9 @@ export class Appc {
 	 *
 	 * @returns {Object}
 	 */
-	public androidEmulators () {
+	public androidEmulators (): { AVDs: AndroidEmulator[]; Genymotion: AndroidEmulator[] } {
 		if (this.info.android && this.info.android.emulators.length) {
-			const emulators = {
+			const emulators: { AVDs: AndroidEmulator[]; Genymotion: AndroidEmulator[] } = {
 				AVDs: [],
 				Genymotion: []
 			};
@@ -214,7 +215,10 @@ export class Appc {
 			}
 			return emulators;
 		}
-		return {};
+		return {
+			AVDs: [],
+			Genymotion: []
+		};
 	}
 
 	/**
@@ -256,13 +260,13 @@ export class Appc {
 	/**
 	 * Windows emulators
 	 *
-	 * @returns {Array}
+	 * @returns {Object}
 	 */
-	public windowsEmulators () {
+	public windowsEmulators (): { [key: string]: WindowsEmulator[] } {
 		if (this.info.windows && this.info.windows.emulators) {
 			return this.info.windows.emulators;
 		}
-		return [];
+		return {};
 	}
 
 	/**
@@ -301,8 +305,8 @@ export class Appc {
 	 * @param {String} appId        enable by matching app ID
 	 * @returns {Array}
 	 */
-	public iOSProvisioningProfiles (deployment = 'development', certificate: IosCert, appId) {
-		let pem: string;
+	public iOSProvisioningProfiles (deployment = 'development', certificate: IosCert, appId: string) {
+		let pem: string|undefined;
 		if (certificate.pem) {
 			pem = certificate.pem.replace('-----BEGIN CERTIFICATE-----', '');
 			pem = pem.replace('-----END CERTIFICATE-----', '');
@@ -311,7 +315,7 @@ export class Appc {
 		const profiles = [];
 		if (this.info.ios && this.info.ios.provisioning) {
 
-			let deploymentProfiles = [];
+			let deploymentProfiles: ProvisioningProfile[] = [];
 			if (deployment === 'development') {
 				deploymentProfiles = this.info.ios.provisioning.development;
 			} else if (deployment === 'distribution') {
@@ -322,17 +326,14 @@ export class Appc {
 			}
 
 			for (const profile of deploymentProfiles) {
-				profile.disabled = false;
 				if (profile.managed) {
-					profile.disabled = true;
+					continue;
 				} else if (pem && profile.certs.indexOf(pem) === -1) {
-					profile.disabled = true;
+					continue;
 				} else if (appId && !iOSProvisioningProfileMatchesAppId(profile.appId, appId)) {
-					profile.disabled = true;
+					continue;
 				}
-				if (!profile.disabled) {
-					profiles.push(profile);
-				}
+				profiles.push(profile);
 			}
 		}
 		return profiles;
@@ -347,7 +348,7 @@ export class Appc {
 	 *
 	 * @param {Object} opts arguments
 	 */
-	public run (opts) {
+	public run (opts: { args: string[]; error: (message: string) => void; exit: (code: number) => void }) {
 		if (this.proc) {
 			return;
 		}
@@ -364,7 +365,7 @@ export class Appc {
 				channel.append(message);
 			}
 		});
-		this.proc.stderr.on('data', data => {
+		this.proc.stderr.on('data', data  => {
 			if (this.killed) {
 				const message = data.toString();
 				channel.append(message);
@@ -408,7 +409,7 @@ export class Appc {
 		return new Promise((resolve, reject) => {
 			const args = [ 'alloy', 'generate', type, name ];
 			if (type === 'model') {
-				args.push(adapterType);
+				args.push(adapterType!);
 			}
 			if (force) {
 				args.push('--force');
