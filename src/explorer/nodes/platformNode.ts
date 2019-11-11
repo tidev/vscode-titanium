@@ -2,20 +2,20 @@ import { BaseNode } from './baseNode';
 import { TargetNode } from './targetNode';
 
 import { TreeItemCollapsibleState } from 'vscode';
+import { Platform, PlatformPretty } from '../../types/common';
 import { nameForPlatform } from '../../utils';
 
 export class PlatformNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Expanded;
 	public readonly contextValue: string = 'PlatformNode';
-	public readonly platform: string;
+	public readonly label: PlatformPretty;
+	public readonly platform: Platform;
 
-	constructor (
-		public readonly label: string
-	) {
-		super(label);
-		this.label = nameForPlatform(label)!;
-		this.platform = label;
+	constructor (platform: Platform) {
+		super(platform);
+		this.label = nameForPlatform(platform)!;
+		this.platform = platform;
 		this.contextValue = 'PlatformNode';
 	}
 

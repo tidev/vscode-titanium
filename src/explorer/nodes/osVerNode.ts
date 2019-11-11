@@ -3,6 +3,7 @@ import { BaseNode } from './baseNode';
 import { DeviceNode } from './deviceNode';
 
 import appc from '../../appc';
+import { Platform} from '../../types/common';
 import { targetForName } from '../../utils';
 
 export class OSVerNode extends BaseNode {
@@ -14,7 +15,7 @@ export class OSVerNode extends BaseNode {
 
 	constructor (
 		public readonly label: string,
-		public readonly platform: string,
+		public readonly platform: Platform,
 		public readonly target: string
 	) {
 		super(label);

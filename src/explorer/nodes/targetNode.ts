@@ -5,6 +5,7 @@ import { OSVerNode } from './osVerNode';
 
 import * as semver from 'semver';
 import appc from '../../appc';
+import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
 
 export class TargetNode extends BaseNode {
@@ -15,7 +16,7 @@ export class TargetNode extends BaseNode {
 
 	constructor (
 		public readonly label: string,
-		public readonly platform: string
+		public readonly platform: Platform
 	) {
 		super(label);
 		this.targetId = targetForName(this.label, this.platform);

@@ -1,8 +1,8 @@
 export interface KeystoreInfo {
 	alias: string;
 	location: string;
-	password: string;
-	privateKeyPassword?: string;
+	password: string|undefined;
+	privateKeyPassword: string|undefined;
 }
 export interface IosCert {
 	after: string;
@@ -47,4 +47,16 @@ export enum LogLevel {
 export enum IosCertificateType {
 	developer = 'developer',
 	distribution = 'distribution'
+}
+
+export enum PlatformPretty {
+	android = 'Android',
+	ios = 'iOS',
+	windows = 'Windows'
+}
+
+export enum Platform {
+	android = 'android',
+	ios = 'ios',
+	windows = 'windows'
 }

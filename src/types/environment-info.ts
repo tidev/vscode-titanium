@@ -44,6 +44,7 @@ export interface TitaniumSDK {
 export interface WindowsEmulator {
 	udid: string;
 	name: string;
+	uapVersion: string;
 }
 
 export interface WindowsDevice {

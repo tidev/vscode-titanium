@@ -1,6 +1,7 @@
 import { BaseNode } from './baseNode';
 
 import { TreeItemCollapsibleState } from 'vscode';
+import { Platform } from '../../types/common';
 
 export class DeviceNode extends BaseNode {
 
@@ -9,7 +10,7 @@ export class DeviceNode extends BaseNode {
 
 	constructor (
 		public readonly label: string,
-		public readonly platform: string,
+		public readonly platform: Platform,
 		public readonly target: string,
 		public readonly deviceId: string,
 		public readonly targetId: string,

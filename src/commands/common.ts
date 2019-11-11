@@ -45,7 +45,7 @@ export class UserCancellation extends Error {
 }
 
 export class InteractionError extends Error {
-	public messageOptions: MessageOptions;
+	public messageOptions: MessageOptions = { modal: false };
 	public interactionChoices: InteractionChoice[] = [];
 }
 
@@ -70,7 +70,7 @@ export function checkLogin () {
 	}
 }
 
-export async function handleInteractionError (error) {
+export async function handleInteractionError (error: InteractionError) {
 	const actionToTake: any = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
 	if (actionToTake) {
 		actionToTake.run();

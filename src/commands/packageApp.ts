@@ -8,7 +8,7 @@ import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/no
 import { getCorrectCertificateName, nameForPlatform, packageArguments, } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
-import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, inputBox, quickPick, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
+import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, inputBox, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
 import { PackageOptions } from '../types/cli';
 import { IosCertificateType, KeystoreInfo, WindowsCertInfo } from '../types/common';
 
@@ -19,17 +19,17 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		const buildType = 'dist';
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastPackageState);
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		const projectDir = workspace.rootPath;
+		const projectDir = workspace.rootPath!;
 
-		let iOSCertificate;
-		let iOSProvisioningProfile;
-		let keystoreInfo: KeystoreInfo;
+		let iOSCertificate: string|undefined;
+		let iOSProvisioningProfile: string|undefined;
+		let keystoreInfo: KeystoreInfo|undefined;
 		let lastBuildDescription;
 		let outputDirectory;
 		let platform;
 		let publisherID;
 		let target;
-		let windowsCertInfo: WindowsCertInfo;
+		let windowsCertInfo: WindowsCertInfo|undefined;
 
 		if (node) {
 			platform = node.platform;
@@ -51,7 +51,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 				target = lastBuildState.target;
 				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.distribution);
 				iOSProvisioningProfile = lastBuildState.iOSProvisioningProfile;
-				keystoreInfo = lastBuildState.keystoreInfo;
+				keystoreInfo = lastBuildState.keystoreInfo as KeystoreInfo;
 				if (platform === 'android') {
 					keystoreInfo.password = await enterPassword({ placeHolder: 'Enter your keystore password' });
 				}
@@ -74,7 +74,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			keystoreInfo = await enterAndroidKeystoreInfo(lastKeystore, savedKeystorePath);
 			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastKeystorePath, keystoreInfo.location);
 		} else if (platform === 'ios' && !iOSCertificate) {
-			const codesigning = await selectiOSCodeSigning(buildType, target, project.appId());
+			const codesigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
 			iOSCertificate = getCorrectCertificateName(codesigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
 			iOSProvisioningProfile = codesigning.provisioningProfile.uuid;
 		} else if (platform === 'windows') {
@@ -93,7 +93,7 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		if (!outputDirectory) {
 			const distDirectory = ExtensionContainer.config.package.distributionOutputDirectory;
 			if (!path.isAbsolute(distDirectory)) {
-				outputDirectory = path.join(workspace.rootPath, distDirectory);
+				outputDirectory = path.join(workspace.rootPath!, distDirectory);
 			} else {
 				outputDirectory = distDirectory;
 			}
@@ -113,8 +113,10 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		};
 		const args = packageArguments(buildInfo);
 		ExtensionContainer.terminal.runCommand(args);
-		buildInfo.keystoreInfo.password = null;
-		buildInfo.keystoreInfo.privateKeyPassword = null;
+		if (buildInfo.keystoreInfo) {
+			buildInfo.keystoreInfo.password = undefined;
+			buildInfo.keystoreInfo.privateKeyPassword = undefined;
+		}
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, buildInfo);
 	} catch (error) {
 		if (error instanceof InteractionError) {

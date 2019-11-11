@@ -29,7 +29,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 		const liveview = ExtensionContainer.config.build.liveview;
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastBuildState);
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		const projectDir = workspace.rootPath;
+		const projectDir = workspace.rootPath!;
 
 		let deviceId;
 		let deviceLabel;
@@ -82,7 +82,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 				if (target === 'device') {
 					const deviceInfo = await selectAndroidDevice();
 					deviceId = deviceInfo.udid;
-					deviceLabel = deviceId.label;
+					deviceLabel = deviceInfo.label;
 				} else if (target === 'emulator') {
 					const emulatorInfo = await selectAndroidEmulator();
 					deviceId = emulatorInfo.udid;
@@ -92,7 +92,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 				if (target === 'device') {
 					const deviceInfo = await selectiOSDevice();
 					deviceId = deviceInfo.udid;
-					deviceLabel = deviceId.label;
+					deviceLabel = deviceInfo.label;
 				} else if (target === 'simulator') {
 					const simulatorInfo = await selectiOSSimulator(osVersion);
 					deviceId = simulatorInfo.udid;
@@ -114,7 +114,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 		}
 
 		if (platform === 'ios' && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
-			const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId());
+			const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
 			iOSCertificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
 			iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
 		}

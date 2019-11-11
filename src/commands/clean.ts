@@ -11,7 +11,7 @@ import { CleanAppOptions } from '../types/cli';
 export async function cleanApplication () {
 	try {
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		let projectDir = workspace.rootPath;
+		let projectDir = workspace.rootPath!;
 
 		if (project.isTitaniumModule) {
 			const platformInfo = await selectPlatform(undefined, isValidPlatform);
