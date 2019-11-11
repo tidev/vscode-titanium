@@ -8,6 +8,7 @@ import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
 import { BuildModuleOptions } from '../types/cli';
+import { Platform } from '../types/common';
 
 export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -15,17 +16,16 @@ export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode |
 		// TODO: Handle a build in progress, allow passing in emulators etc. here? And actually use package for dist modules?
 		const buildType = 'run';
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		let platform;
+		let platform: Platform;
 
 		if (node) {
 			platform = node.platform;
+		} else {
+			const platformInfo = await selectPlatform();
+			platform = platformInfo.id as Platform;
 		}
 
-		if (!platform) {
-			const platformInfo = await selectPlatform();
-			platform = platformInfo.id;
-		}
-		const projectDir = path.join(workspace.rootPath, platform);
+		const projectDir = path.join(workspace.rootPath!, platform);
 		const buildInfo: BuildModuleOptions = {
 			buildType,
 			platform,

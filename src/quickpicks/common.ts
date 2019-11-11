@@ -13,6 +13,8 @@ export interface CustomQuickPick extends QuickPickItem {
 	label: string;
 	id: string;
 	udid?: string;
+	version?: string;
+	uuid?: string;
 }
 
 export async function selectFromFileSystem (options: OpenDialogOptions) {
@@ -185,7 +187,7 @@ export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePat
 export async function enterAndroidKeystoreInfo (lastUsed?: string, savedKeystorePath?: string) {
 	const location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
 
-	if (!await pathExists(location!)) {
+	if (!location || !await pathExists(location)) {
 		throw new InteractionError(`The Keystore file ${location} does not exist`);
 	}
 	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias || '' });
@@ -228,7 +230,7 @@ export function selectiOSProvisioningProfile (certificate: any, target: string, 
 	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
 
-export async function selectiOSCodeSigning (buildType: string, target: string, appId: string) {
+export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick, provisioningProfile: CustomQuickPick }> {
 	const certificate = await selectiOSCertificate(buildType);
 
 	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId);
@@ -306,7 +308,7 @@ export async function selectDevice (platform: string, target: string) {
 	}
 }
 
-export async function enterWindowsSigningInfo (lastUsed: string, savedCertPath: string) {
+export async function enterWindowsSigningInfo (lastUsed?: string, savedCertPath?: string) {
 	const location = await selectWindowsCertificate(lastUsed, savedCertPath);
 
 	if (location && !await pathExists(location)) {
@@ -320,7 +322,7 @@ export async function enterWindowsSigningInfo (lastUsed: string, savedCertPath: 
 	};
 }
 
-export async function selectWindowsCertificate (lastUsed: string, savedCertPath: string) {
+export async function selectWindowsCertificate (lastUsed?: string, savedCertPath?: string) {
 	const items = [
 		{
 			label: 'Browse for certificate',
@@ -352,7 +354,7 @@ export async function selectWindowsCertificate (lastUsed: string, savedCertPath:
 		return uri[0].path;
 	} else if (certificateAction.id === 'create') {
 		return undefined;
-	} else if (certificateAction.id === 'saved') {
+	} else if (savedCertPath && certificateAction.id === 'saved') {
 		if (!path.isAbsolute(savedCertPath)) {
 			savedCertPath = path.resolve(workspace.rootPath!, savedCertPath);
 		}

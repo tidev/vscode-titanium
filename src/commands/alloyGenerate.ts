@@ -41,7 +41,7 @@ export enum AlloyComponentExtension {
 async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension) {
 	const name = await inputBox({ prompt: `Enter the name for your ${type}` });
 
-	const cwd = workspace.rootPath;
+	const cwd = workspace.rootPath!;
 	const mainFile = path.join(cwd, 'app', folder, `${name}${extension}`);
 	const filePaths = [];
 	if (type === AlloyComponentType.Widget) {
@@ -54,8 +54,8 @@ async function promptForDetails (type: AlloyComponentType, folder: AlloyComponen
 		filePaths.push(mainFile);
 	}
 	if (await fs.pathExists(mainFile)) {
-		const shouldDelete = await quickPick([ 'Yes', 'No' ], { placeHolder: ` ${name} already exists. Overwrite it?` });
-		if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
+		const shouldDelete = await quickPick([ { id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' } ], { placeHolder: ` ${name} already exists. Overwrite it?` });
+		if (shouldDelete.id === 'yes') {
 			throw new UserCancellation();
 		}
 	}
@@ -96,12 +96,12 @@ export async function generateModel () {
 	let name;
 	try {
 		const creationArgs = await promptForDetails(AlloyComponentType.Model, AlloyComponentFolder.Model, AlloyComponentExtension.Model);
-		const adapterType = await quickPick([ 'properties', 'sql' ], { canPickMany: false, placeHolder: 'Which adapter type?' });
+		const adapterType = await quickPick([ { id: 'properties', label: 'properties' }, { id: 'sql', label: 'sql' } ], { canPickMany: false, placeHolder: 'Which adapter type?' });
 		const cwd = creationArgs.cwd;
 		const filePaths = creationArgs.filePaths;
 		name = creationArgs.name;
 		await appc.generate({
-			adapterType,
+			adapterType: adapterType.id,
 			cwd,
 			type: AlloyComponentType.Model,
 			name,

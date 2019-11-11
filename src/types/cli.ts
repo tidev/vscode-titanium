@@ -1,4 +1,4 @@
-import { KeystoreInfo, LogLevel, WindowsCertInfo } from './common';
+import { KeystoreInfo, LogLevel, Platform, WindowsCertInfo } from './common';
 
 export interface BaseCLIOptions {
 	logLevel: LogLevel;
@@ -7,7 +7,7 @@ export interface BaseCLIOptions {
 export interface BaseBuildOptions extends BaseCLIOptions {
 	buildOnly: boolean;
 	buildType: string;
-	platform: 'android' | 'ios' | 'windows';
+	platform: Platform;
 	projectDir: string;
 	projectType: 'app' | 'module';
 }
@@ -34,12 +34,12 @@ export interface BuildModuleOptions extends BaseBuildOptions {
 export interface PackageOptions extends BaseCLIOptions {
 	iOSCertificate?: string;
 	iOSProvisioningProfile?: string;
-	keystoreInfo: KeystoreInfo;
+	keystoreInfo?: KeystoreInfo;
 	outputDirectory: string;
-	platform: 'android' | 'ios' | 'windows';
+	platform: Platform;
 	projectDir: string;
 	target: string;
-	windowsCertInfo: WindowsCertInfo;
+	windowsCertInfo?: WindowsCertInfo;
 	windowsPublisherID?: string;
 }
 

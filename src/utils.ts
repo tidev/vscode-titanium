@@ -8,7 +8,7 @@ import appc from './appc';
 import { platform } from 'os';
 import { workspace } from 'vscode';
 import { BuildAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
-import { IosCert, IosCertificateType } from './types/common';
+import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
 
 /**
  * Returns available target platforms
@@ -38,11 +38,11 @@ export function nameForPlatform (targetPlatform: string) {
 	targetPlatform =  normalisedPlatform(targetPlatform);
 	switch (targetPlatform) {
 		case 'android':
-			return 'Android';
+			return PlatformPretty.android;
 		case 'ios':
-			return 'iOS';
+			return PlatformPretty.ios;
 		case 'windows':
-			return 'Windows';
+			return PlatformPretty.windows;
 	}
 }
 
