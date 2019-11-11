@@ -4,10 +4,16 @@ import * as utils from '../utils';
 
 import { pathExists } from 'fs-extra';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { InputBoxOptions, OpenDialogOptions, QuickPickOptions, Uri, window, workspace } from 'vscode';
+import { InputBoxOptions, OpenDialogOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
 import { IosCertificateType } from '../types/common';
+
+export interface CustomQuickPick extends QuickPickItem {
+	label: string;
+	id: string;
+	udid?: string;
+}
 
 export async function selectFromFileSystem (options: OpenDialogOptions) {
 	if (!options.canSelectMany) {
@@ -32,8 +38,8 @@ export async function enterPassword (options: InputBoxOptions) {
 }
 
 export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false) {
-	const shouldDelete = await window.showQuickPick([ 'Yes', 'No' ], options);
-	if (shouldDelete.toLowerCase() !== 'yes' || shouldDelete.toLowerCase() === 'y') {
+	const response = await window.showQuickPick([ 'Yes', 'No' ], options);
+	if (response?.toLowerCase() !== 'yes' || response?.toLowerCase() !== 'y') {
 		if (shouldThrow) {
 			throw new UserCancellation();
 		} else {
@@ -53,7 +59,9 @@ export async function inputBox (options: InputBoxOptions) {
 	throw new UserCancellation();
 }
 
-export async function quickPick (items: any[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}) {
+export async function quickPick (items: CustomQuickPick[], quickPickOptions: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick[]>;
+export async function quickPick (items: CustomQuickPick[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick>;
+export async function quickPick<T extends QuickPickItem> (items: T[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}): Promise<T> {
 	if (items.length === 1 && !forceShow) {
 		return items[0];
 	}
@@ -65,7 +73,7 @@ export async function quickPick (items: any[], quickPickOptions?: QuickPickOptio
 }
 
 export function selectPlatform (lastBuildDescription?: string, filter?: (platform: string) => boolean) {
-	const platforms = utils.platforms().filter(filter ? filter : () => true).map(platform => ({ label: utils.nameForPlatform(platform), id: platform }));
+	const platforms = utils.platforms().filter(filter ? filter : () => true).map(platform => ({ label: utils.nameForPlatform(platform)!, id: platform }));
 	if (lastBuildDescription) {
 		platforms.unshift({
 			label: `Last: ${lastBuildDescription}`,
@@ -75,7 +83,7 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 	return quickPick(platforms);
 }
 
-export async function selectCreationLocation (lastUsed?) {
+export async function selectCreationLocation (lastUsed?: string) {
 	const items = [{
 		label: 'Browse for directory',
 		id: 'browse'
@@ -93,7 +101,7 @@ export async function selectCreationLocation (lastUsed?) {
 			throw new UserCancellation();
 		}
 		return filePath[0];
-	} else {
+	} else if (lastUsed && directory.id === 'last') {
 		return Uri.file(lastUsed);
 	}
 }
@@ -113,16 +121,17 @@ export function selectDistributionTarget (platform: string) {
 }
 
 export function selectAndroidDevice () {
-	const devices = appc.androidDevices().map(({ id, name }) => ({ label: name, udid: id }));
+	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
 	return quickPick(devices);
 }
 
 export function selectAndroidEmulator () {
-	const emulators: any = appc.androidEmulators();
+	const emulators = appc.androidEmulators();
 	const options = [];
 
 	for (const emulator of emulators.AVDs) {
 		options.push({
+			id: emulator.id,
 			udid: emulator.id,
 			label: emulator.name
 		});
@@ -130,6 +139,7 @@ export function selectAndroidEmulator () {
 
 	for (const emulator of emulators.Genymotion) {
 		options.push({
+			id: emulator.id,
 			udid: emulator.id,
 			label: emulator.name
 		});
@@ -138,7 +148,7 @@ export function selectAndroidEmulator () {
 	return quickPick(options, { placeHolder: 'Select emulator' });
 }
 
-export async function selectAndroidKeystore (lastUsed, savedKeystorePath) {
+export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string) {
 	const items = [{
 		label: 'Browse for keystore',
 		id: 'browse'
@@ -158,10 +168,13 @@ export async function selectAndroidKeystore (lastUsed, savedKeystorePath) {
 	const keystoreAction = await quickPick(items, { placeHolder: 'Browse for keystore or use last keystore' });
 	if (keystoreAction.id === 'browse') {
 		const uri = await window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
+		if (!uri) {
+			throw new UserCancellation();
+		}
 		return uri[0].path;
-	} else if (keystoreAction.id === 'saved') {
+	} else if (savedKeystorePath && keystoreAction.id === 'saved') {
 		if (!path.isAbsolute(savedKeystorePath)) {
-			savedKeystorePath = path.resolve(workspace.rootPath, savedKeystorePath);
+			savedKeystorePath = path.resolve(workspace.rootPath!, savedKeystorePath);
 		}
 		return savedKeystorePath;
 	} else {
@@ -169,13 +182,13 @@ export async function selectAndroidKeystore (lastUsed, savedKeystorePath) {
 	}
 }
 
-export async function enterAndroidKeystoreInfo (lastUsed, savedKeystorePath) {
+export async function enterAndroidKeystoreInfo (lastUsed?: string, savedKeystorePath?: string) {
 	const location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
 
-	if (!await pathExists(location)) {
+	if (!await pathExists(location!)) {
 		throw new InteractionError(`The Keystore file ${location} does not exist`);
 	}
-	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias });
+	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias || '' });
 	const password = await enterPassword({ placeHolder: 'Enter your keystore password' });
 	const privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore private key password (optional)' });
 
@@ -192,12 +205,13 @@ export function selectiOSCertificate (buildType: string) {
 	const certificates = appc.iOSCertificates(certificateType).map(cert => ({
 		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
 		label: cert.fullname,
-		pem: cert.pem
+		pem: cert.pem,
+		id: cert.fullname
 	}));
 	return quickPick(certificates, { placeHolder: 'Select certificate' });
 }
 
-export function selectiOSProvisioningProfile (certificate: any, target: string, appId) {
+export function selectiOSProvisioningProfile (certificate: any, target: string, appId: string) {
 	let deployment = 'development';
 	if (target === 'dist-adhoc') {
 		deployment = 'distribution';
@@ -208,7 +222,8 @@ export function selectiOSProvisioningProfile (certificate: any, target: string, 
 		description: uuid,
 		detail: `Expires: ${new Date(expirationDate).toLocaleString('en-US')}`,
 		label: name,
-		uuid
+		uuid,
+		id: uuid
 	}));
 	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
@@ -224,29 +239,30 @@ export async function selectiOSCodeSigning (buildType: string, target: string, a
 }
 
 export function selectiOSDevice () {
-	const devices = appc.iOSDevices().map(device => ({ label: device.name, udid: device.udid }));
+	const devices = appc.iOSDevices().map(device => ({ id: device.udid, label: device.name, udid: device.udid }));
 	return quickPick(devices, { placeHolder: 'Select device' });
 }
 
-export async function selectiOSSimulator (iOSVersion) {
+export async function selectiOSSimulator (iOSVersion: string) {
 	if (!iOSVersion) {
-		iOSVersion = await selectiOSSimulatorVersion();
+		iOSVersion = (await selectiOSSimulatorVersion()).label;
 	}
-	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, udid, version: iOSVersion }));
+	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
 	return quickPick(simulators, { placeHolder: 'Select simulator'});
 }
 
 export function selectiOSSimulatorVersion () {
-	return quickPick(appc.iOSSimulatorVersions(), { placeHolder: 'Select simulator version' });
+	const versions = appc.iOSSimulatorVersions().map(version => ({ id: version, label: version }));
+	return quickPick(versions, { placeHolder: 'Select simulator version' });
 }
 
 export function selectWindowsDevice () {
-	const devices = appc.windowsDevices().map(({ name, udid}) => ({ label: name, udid }));
+	const devices = appc.windowsDevices().map(({ name, udid }) => ({ id: udid, label: name, udid }));
 	return quickPick(devices, { placeHolder: 'Select device' });
 }
 
 export function selectWindowsEmulator () {
-	const emulators = appc.windowsEmulators()['10.0'].map(({ name, udid }) => ({ label: name, udid }));
+	const emulators = appc.windowsEmulators()['10.0'].map(({ name, udid }) => ({ id: udid, label: name, udid }));
 	return quickPick(emulators, { placeHolder: 'Select emulator' });
 }
 
@@ -258,7 +274,8 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 			latestVersion: update.latestVersion,
 			priority: update.priority,
 			picked: true,
-			productName: update.productName
+			productName: update.productName,
+			id: update.productName
 		})
 	);
 
@@ -285,11 +302,11 @@ export async function selectDevice (platform: string, target: string) {
 		return selectiOSDevice();
 	} else if (platform === 'ios' && target === 'simulator') {
 		const simVersion = await selectiOSSimulatorVersion();
-		return selectiOSSimulator(simVersion);
+		return selectiOSSimulator(simVersion.label);
 	}
 }
 
-export async function enterWindowsSigningInfo (lastUsed, savedCertPath) {
+export async function enterWindowsSigningInfo (lastUsed: string, savedCertPath: string) {
 	const location = await selectWindowsCertificate(lastUsed, savedCertPath);
 
 	if (location && !await pathExists(location)) {
@@ -303,7 +320,7 @@ export async function enterWindowsSigningInfo (lastUsed, savedCertPath) {
 	};
 }
 
-export async function selectWindowsCertificate (lastUsed, savedCertPath) {
+export async function selectWindowsCertificate (lastUsed: string, savedCertPath: string) {
 	const items = [
 		{
 			label: 'Browse for certificate',
@@ -329,12 +346,15 @@ export async function selectWindowsCertificate (lastUsed, savedCertPath) {
 	const certificateAction = await quickPick(items, { placeHolder: 'Browse for certificate or use last certificate' });
 	if (certificateAction.id === 'browse') {
 		const uri = await window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
+		if (!uri) {
+			throw new UserCancellation();
+		}
 		return uri[0].path;
 	} else if (certificateAction.id === 'create') {
 		return undefined;
 	} else if (certificateAction.id === 'saved') {
 		if (!path.isAbsolute(savedCertPath)) {
-			savedCertPath = path.resolve(workspace.rootPath, savedCertPath);
+			savedCertPath = path.resolve(workspace.rootPath!, savedCertPath);
 		}
 		return savedCertPath;
 	} else {
