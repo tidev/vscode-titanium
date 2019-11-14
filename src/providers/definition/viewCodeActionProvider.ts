@@ -17,17 +17,17 @@ export class ViewCodeActionProvider implements vscode.CodeActionProvider {
 			return;
 		}
 
-		// suggestions = suggestions.concat(this.suggestions);
-		for (const suggestion of suggestions as any) {
+		for (const suggestion of suggestions) {
 			if (suggestion.regExp.test(linePrefix)) {
-				const suggestionsRegex = suggestion.definitionRegExp(word);
-				const definitions: any = await definitionProviderHelper.getReferences(suggestion.files(document, word));
+				const suggestionFiles = suggestion.files(document, word);
+				const definitionRegexp = suggestion.definitionRegExp!(word);
+				const definitions: any = await definitionProviderHelper.getReferences(suggestionFiles, definitionRegexp);
 				if ((!definitions || definitions.length === 0) && suggestion.insertText) {
 					const insertText = suggestion.insertText(word);
 					if (insertText) {
-						suggestion.files(document, word).forEach(file => {
+						suggestionFiles.forEach((file: string) => {
 							codeActions.push({
-								title: suggestion.title(path.parse(file).name),
+								title: suggestion.title!(path.parse(file).name),
 								command: definitionProviderHelper.insertCommandId,
 								arguments: [ insertText, file ]
 							});

@@ -6,7 +6,7 @@ import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
+import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 
 /**
  * Alloy Controller completion provider
@@ -22,7 +22,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async provideCompletionItems (document, position) {
+	public async provideCompletionItems (document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[]> {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);
 		const prefix = prefixRange ? document.getText(prefixRange) : null;
@@ -45,7 +45,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 			return this.getEventNameCompletions(linePrefix);
 		// require('')
 		} else if (/require\(["']?([^'");]*)["']?\)?$/.test(linePrefix)) {
-			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/);
+			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/)!;
 			const requestedModule = matches[1];
 			// return this.getRequireCompletions(linePrefix, prefix);
 			return this.getFileCompletions('lib', requestedModule);
@@ -84,12 +84,15 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 * @returns {Thenable}
 	 */
 	public async getIdCompletions () {
-		const completions = [];
+		const completions: CompletionItem[] = [];
 		const relatedFile = related.getTargetPath('xml');
+		if (!relatedFile) {
+			return completions;
+		}
 		const fileName = relatedFile.split('/').pop();
 		const document = await workspace.openTextDocument(relatedFile);
 		const regex = /id="(.+?)"/g;
-		const ids = [];
+		const ids: string[] = [];
 		for (let matches = regex.exec(document.getText()); matches !== null; matches = regex.exec(document.getText())) {
 			const id = matches[1];
 			if (!ids.includes(id)) {
@@ -115,9 +118,12 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 
-		const id = linePrefix.match(/\$\.([-a-zA-Z0-9-_]*)\.?$/)[1];
-		const completions = [];
+		const id = linePrefix.match(/\$\.([-a-zA-Z0-9-_]*)\.?$/)![1];
+		const completions: CompletionItem[] = [];
 		const relatedFile = related.getTargetPath('xml');
+		if (!relatedFile) {
+			return completions;
+		}
 		const document = await workspace.openTextDocument(relatedFile);
 		let tagName;
 		const regex = new RegExp(`id=["']${id}["']`, 'g');
@@ -164,8 +170,9 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	public getTitaniumApiCompletions (linePrefix: string) {
 		const { types } = this.completions.titanium;
 		const matches = linePrefix.match(/(Ti\.(?:(?:[A-Z]\w*|iOS|iPad)\.?)*)([a-z]\w*)*$/);
-		let apiName;
-		let attribute;
+		const completions: CompletionItem[] = [];
+		let apiName: string|undefined;
+		let attribute: string|undefined;
 		if (matches && matches.length === 3) {
 			apiName = matches[1];
 			if (apiName.lastIndexOf('.') === apiName.length - 1) {
@@ -174,12 +181,15 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 			attribute = matches[2];
 		}
 
-		if ('iOS'.indexOf(attribute) === 0 || 'iPad'.indexOf(attribute) === 0) {
+		if (attribute && ('iOS'.indexOf(attribute) === 0 || 'iPad'.indexOf(attribute) === 0)) {
 			apiName += '.' + attribute;
-			attribute = null;
+			attribute = undefined;
 		}
 
-		const completions = [];
+		if (!apiName) {
+			return completions;
+		}
+
 		// suggest class completion
 		if (!attribute || attribute.length === 0) {
 			for (const key of Object.keys(types)) {
@@ -228,8 +238,10 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	public getAlloyApiCompletions (linePrefix: string) {
 		const { types } = this.completions.alloy;
 		const matches = linePrefix.match(/(Alloy\.(?:(?:[A-Z]\w*)\.?)*)([a-z]\w*)*$/);
-		let apiName;
-		let attribute;
+		const completions: CompletionItem[] = [];
+
+		let apiName: string|undefined;
+		let attribute: string|undefined;
 		if (matches && matches.length === 3) {
 			apiName = matches[1];
 			if (apiName.lastIndexOf('.') === apiName.length - 1) {
@@ -238,7 +250,10 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 			attribute = matches[2];
 		}
 
-		const completions = [];
+		if (!apiName) {
+			return completions;
+		}
+
 		// suggest class completion
 		if (!attribute || attribute.length === 0) {
 			for (const key of Object.keys(types)) {
@@ -288,9 +303,16 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 		const matches = /\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.exec(linePrefix);
+		const completions: CompletionItem[] = [];
+
+		if (!matches) {
+			return completions;
+		}
 		const id = matches[1];
-		const completions = [];
 		const relatedFile = related.getTargetPath('xml');
+		if (!relatedFile) {
+			return completions;
+		}
 		const document = await workspace.openTextDocument(relatedFile);
 		let tagName;
 		const regex = new RegExp(`id=["']${id}["']`, 'g');
@@ -326,9 +348,9 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 * @returns {Thenable}
 	 */
 	public getFileCompletions (directory: string, moduleName?: string) {
-		const completions = [];
+		const completions: CompletionItem[] = [];
 		const filesPath = path.join(utils.getAlloyRootPath(), directory);
-		if (moduleName.startsWith('/')) {
+		if (moduleName && moduleName.startsWith('/')) {
 			moduleName = moduleName.substring(0);
 		}
 		if (utils.directoryExists(filesPath)) {
@@ -341,9 +363,9 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 					kind: CompletionItemKind.Reference
 				});
 			}
-			// console.log(completions);
-			return completions;
+
 		}
+		return completions;
 	}
 
 	/**

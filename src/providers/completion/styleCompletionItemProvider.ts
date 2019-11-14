@@ -6,7 +6,7 @@ import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
+import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 
 /**
  * Alloy Style completion provider
@@ -22,18 +22,18 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async provideCompletionItems (document, position) {
+	public async provideCompletionItems (document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[]> {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character + 1));
 		const prefixRange = document.getWordRangeAtPosition(position);
-		const prefix = prefixRange ? document.getText(prefixRange) : null;
-
+		const prefix = prefixRange ? document.getText(prefixRange) : undefined;
+		const completions: CompletionItem[] = [];
 		if (!this.completions) {
 			await this.loadCompletions();
 		}
 		// property value - foo: _ or foo: ba_
 		if (/\s*\w+\s*:\s*\w*[(]?["'.]?\w*["'.]?[,]?$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
-			let ruleResult;
+			let ruleResult: CompletionItem[] = [];
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
 					ruleResult = await rule.getCompletions();
@@ -42,69 +42,75 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 			if (ruleResult) {
 				return ruleResult;
 			} else {
-				return this.getPropertyValueCompletions(linePrefix, prefix, position, document);
+				return this.getPropertyValueCompletions(linePrefix, position, document, prefix);
 			}
 		// property name - _ or fo_
 		} else if (/^\s*\w*$/.test(linePrefix)) {
-			return this.getPropertyNameCompletions(linePrefix, prefix, position, document);
+			return this.getPropertyNameCompletions(linePrefix, position, document, prefix);
 			// class or id - ".foo_ or "#foo
 		} else if (/^\s*['"][.#][\w*]["']?$/.test(linePrefix)) {
-			return this.getClassOrIdCompletions(linePrefix, prefix, position, document);
+			return this.getClassOrIdCompletions(linePrefix, position, document, prefix);
 			// tag - "Wind_ or "_
 		} else if (/^\s*['"][\w*]["']?$/.test(linePrefix)) {
-			return this.getTagCompletions(linePrefix, prefix, position, document);
+			return this.getTagCompletions(linePrefix, position, document, prefix);
 		}
+
+		return completions;
 	}
 
 	/**
 	 * Get class or ID completions
 	 *
 	 * @param {String} linePrefix line prefix text
-	 * @param {String} prefix word prefix text
+	 * @param {Position} position caret position
+	 * @param {TextDocument} document
+	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Thenable}
 	 */
-	public getClassOrIdCompletions (linePrefix, prefix, position, document) {
-		return new Promise(resolve => {
-			const relatedFile = related.getTargetPath('xml');
-			const fileName = relatedFile.split('/').pop();
-			const quote = /'/.test(linePrefix) ? '\'' : '\"';
-			const range = document.getWordRangeAtPosition(position, /\w+["']/);
-			workspace.openTextDocument(relatedFile).then(file => {
-				const completions = [];
-				const values = [];
-				let regex = /class="(.*?)"/g;
-				if (/^['"]#\w*["']?$/.test(linePrefix)) {
-					regex = /id="(.*?)"/g;
+	public async getClassOrIdCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string) {
+		const completions: CompletionItem[] = [];
+		const values: string[] = [];
+		const relatedFile = related.getTargetPath('xml');
+		if (!relatedFile) {
+			return completions;
+		}
+		const fileName = relatedFile.split('/').pop();
+		const quote = /'/.test(linePrefix) ? '\'' : '\"';
+		const range = document.getWordRangeAtPosition(position, /\w+["']/);
+		const file = await workspace.openTextDocument(relatedFile);
+		let regex = /class="(.*?)"/g;
+		if (/^['"]#\w*["']?$/.test(linePrefix)) {
+			regex = /id="(.*?)"/g;
+		}
+		for (let matches = regex.exec(file.getText()); matches !== null; matches = regex.exec(file.getText())) {
+			for (const value of matches[1].split(' ')) {
+				if (value && value.length > 0 && !values.includes(value) && (!prefix || utils.matches(value, prefix))) {
+					completions.push({
+						label: value,
+						kind: CompletionItemKind.Reference,
+						detail: `${fileName}`,
+						range,
+						insertText: new SnippetString(`${value}${quote}: {\n\t\${1}\t\n}`)
+					});
+					values.push(value);
 				}
-				for (let matches = regex.exec(file.getText()); matches !== null; matches = regex.exec(file.getText())) {
-					for (const value of matches[1].split(' ')) {
-						if (value && value.length > 0 && !values.includes(value) && (!prefix || utils.matches(value, prefix))) {
-							completions.push({
-								label: value,
-								kind: CompletionItemKind.Reference,
-								detail: `${fileName}`,
-								range,
-								insertText: new SnippetString(`${value}${quote}: {\n\t\${1}\t\n}`)
-							});
-							values.push(value);
-						}
-					}
-				}
-				resolve(completions);
-			});
-		});
+			}
+		}
+		return completions;
 	}
 
 	/**
 	 * Get tag completions
 	 *
 	 * @param {String} linePrefix line prefix text
-	 * @param {String} prefix word prefix text
+	 * @param {Position} position caret position
+	 * @param {TextDocument} document
+	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Array}
 	 */
-	public getTagCompletions (linePrefix, prefix, position, document) {
+	public getTagCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string) {
 		const completions = [];
 		const range = document.getWordRangeAtPosition(position, /\w+["']/);
 		const quote = /'/.test(linePrefix) ? '\'' : '\"';
@@ -127,20 +133,24 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 * Get property name completions
 	 *
 	 * @param {String} linePrefix line prefix text
-	 * @param {String} prefix word prefix text
 	 * @param {Position} position caret position
-	 * @param {TextDocument} document active text document
+	 * @param {TextDocument} document
+	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Array}
 	 */
-	public getPropertyNameCompletions (linePrefix, prefix, position, document) {
+	public getPropertyNameCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string) {
 		const parentObjName = this.getParentObjectName(position, document);
 		const { properties, types } = this.completions.titanium;
-		const innerProperties = {};
-		const completions = [];
+		const innerProperties: { [key: string]: {  }} = {};
+		const completions: CompletionItem[] = [];
+
+		if (!parentObjName) {
+			return completions;
+		}
 
 		// Lookup the property data
-		const propertyData = properties[parentObjName];
+		const propertyData: { description: string; type: string } = properties[parentObjName];
 		if (propertyData) {
 			const propertyType = properties[parentObjName].type;
 			const typeData = types[propertyType];
@@ -190,31 +200,32 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 * Get property value completions
 	 *
 	 * @param {String} linePrefix line prefix text
-	 * @param {String} prefix word prefix text
 	 * @param {Position} position caret position
-	 * @param {TextDocument} document active text document
+	 * @param {TextDocument} document
+	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Array}
 	 */
-	public getPropertyValueCompletions (linePrefix, prefix, position, document) {
+	public getPropertyValueCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string) {
 		const { properties } = this.completions.titanium;
 		const range = document.getWordRangeAtPosition(position, /([\w".'\$]+)/);
+		const completions: CompletionItem[] = [];
+
 		let property;
 		const matches = /^\s*(\S+)\s*:/.exec(linePrefix);
 		if (matches && matches.length >= 2) {
 			property = matches[1];
 		}
 
-		if (!properties[property]) {
-			return null;
+		if (!property || !properties[property]) {
+			return completions;
 		}
 
 		const { values } = properties[property];
 		if (!values) {
-			return null;
+			return completions;
 		}
 
-		const completions = [];
 		for (const value of values) {
 			if (!prefix || utils.matches(value, prefix)) {
 				completions.push({
@@ -236,7 +247,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {String}
 	 */
-	public getParentObjectName (position, document) {
+	public getParentObjectName (position: Position, document: TextDocument) {
 		let lineNumber = position.line;
 		while (lineNumber >= 0) {
 			const line = document.lineAt(lineNumber).text;

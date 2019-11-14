@@ -38,7 +38,7 @@ export interface TitaniumSDK {
 	platforms: string[];
 	githash: string;
 	timestamp: string;
-	fullversion?: string;
+	fullversion: string;
 }
 
 export interface WindowsEmulator {

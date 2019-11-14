@@ -2,15 +2,20 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 
-import { CompletionItemKind, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, workspace } from 'vscode';
 import { parseString } from 'xml2js';
 import { ExtensionContainer } from '../../container';
 
-export const cfgAutoComplete = {
+interface AlloyAutoCompleteRule {
+	regExp: RegExp;
+	getCompletions: () => Promise<CompletionItem[]>|CompletionItem[];
+}
+
+export const cfgAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)[,]?$/,
 	async getCompletions () {
 		const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
-		const completions = [];
+		const completions: CompletionItem[] = [];
 		if (utils.fileExists(cfgPath)) {
 			const document = await workspace.openTextDocument(cfgPath);
 			const cfgObj = JSON.parse(document.getText());
@@ -30,20 +35,20 @@ export const cfgAutoComplete = {
 					kind: CompletionItemKind.Value
 				});
 			}
-			return completions;
 		}
+		return completions;
 	}
 };
 
-export const i18nAutoComplete = {
+export const i18nAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*["']?)$/,
 	getCompletions () {
 		return new Promise(async (resolve, reject) => {
 			const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
-			const i18nPath = utils.getI18nPath();
+			const i18nPath = utils.getI18nPath()!;
 			if (utils.directoryExists(i18nPath)) {
 				const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
-				const completions = [];
+				const completions: CompletionItem[] = [];
 				if (utils.fileExists(i18nStringPath)) {
 					const document = await workspace.openTextDocument(i18nStringPath);
 					parseString(document.getText(), (error, result) => {
@@ -63,12 +68,13 @@ export const i18nAutoComplete = {
 		});
 	}
 };
-export const imageAutoComplete = {
+
+export const imageAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)['"]?$/,
 	getCompletions () {
 		const alloyRootPath = utils.getAlloyRootPath();
 		const assetPath = path.join(alloyRootPath, 'assets');
-		const completions = [];
+		const completions: CompletionItem[] = [];
 		// limit search to these sub-directories
 		let paths = [ 'images', 'iphone', 'android', 'windows' ];
 		paths = paths.map(aPath => path.join(assetPath, aPath));
@@ -83,9 +89,9 @@ export const imageAutoComplete = {
 			});
 			const images = [];
 			for (const file of files) {
-				let prefix;
-				let scale;
-				let suffix;
+				let prefix: string|undefined;
+				let scale: string|undefined;
+				let suffix: string|undefined;
 				// test whether image is includes scaling factor (for iOS)
 				let matches = file.path.match(/(^[\w\s\\/\-_():]+)(@[\w~]+)(.\w+$)/);
 				if (matches && matches.length === 4) {
