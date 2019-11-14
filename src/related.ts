@@ -20,7 +20,7 @@ export function openRelatedFile (type: string) {
 	if (!window.activeTextEditor) {
 		return;
 	}
-	const relatedPath = this.getTargetPath(type);
+	const relatedPath = getTargetPath(type);
 	if (relatedPath && !window.visibleTextEditors.find(editor => editor.document.fileName === relatedPath)) {
 		return window.showTextDocument(Uri.file(relatedPath), { preview: false });
 	}
@@ -53,7 +53,7 @@ export async function  toggleAllRelatedFiles () {
 
 	// // if hanve 3 pane and active is already relatedfiles
 	// if (editorPanes.length < 3 || !isAlreadyAllFocused) {
-	this.openAllFiles();
+	openAllFiles();
 	// } else {
 	// 	this.closeRelatedFiles();
 	// }
@@ -76,7 +76,7 @@ export async function openAllFiles () {
 	// }
 
 	[ 'xml', 'tss', 'js' ].forEach(type => {
-		this.openRelatedFile(type);
+		openRelatedFile(type);
 	});
 
 	// // if number of panes is under 3, make more.
@@ -133,7 +133,7 @@ export function getRelatedFilePaths () {
 		return [];
 	}
 
-	let relatedFilePaths = [];
+	let relatedFilePaths: string[] = [];
 
 	if (isAppTss) {
 		relatedFilePaths = [ currentPath.replace(path.join('/app/styles/app.tss'), path.join('/app/alloy.js')) ];
@@ -142,7 +142,7 @@ export function getRelatedFilePaths () {
 	} else {
 		_.each(alloyDirectoryMap, (folderName, ext) => {
 			if (ext !== fileExt) {
-				return relatedFilePaths.push(this.getTargetPath(ext, currentPath));
+				return relatedFilePaths.push(getTargetPath(ext, currentPath));
 			}
 		});
 	}
@@ -159,10 +159,10 @@ export function getRelatedFilePaths () {
  */
 export function getTargetPath (type: string, currentFilePath?: string) {
 	if (!currentFilePath) {
-		currentFilePath = window.activeTextEditor.document.fileName;
+		currentFilePath = window.activeTextEditor?.document.fileName;
 	}
 
-	if (currentFilePath.indexOf(getAlloyRootPath()) === -1) {
+	if (!currentFilePath || currentFilePath.indexOf(getAlloyRootPath()) === -1) {
 		return;
 	}
 

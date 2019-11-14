@@ -440,7 +440,7 @@ function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is 
  *
  * @returns {Boolean}
  */
-export function matches (text: string, test: RegExp) {
+export function matches (text: string, test: string) {
 	return new RegExp(test, 'i').test(text);
 }
 

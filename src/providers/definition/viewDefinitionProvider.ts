@@ -1,7 +1,7 @@
 
 import * as definitionProviderHelper from './definitionProviderHelper';
 
-import { DefinitionProvider } from 'vscode';
+import { DefinitionProvider, Position, TextDocument } from 'vscode';
 import { viewSuggestions } from './common';
 
 export class ViewDefinitionProvider implements DefinitionProvider {
@@ -14,7 +14,7 @@ export class ViewDefinitionProvider implements DefinitionProvider {
 	 *
 	 * @returns {Thenable}
 	 */
-	public provideDefinition (document, position) {
+	public provideDefinition (document: TextDocument, position: Position) {
 		return definitionProviderHelper.provideDefinition(document, position, viewSuggestions);
 	}
 }

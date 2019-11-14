@@ -7,7 +7,7 @@ import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CompletionItem, CompletionItemKind, CompletionItemProvider, Range, SnippetString, workspace } from 'vscode';
+import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 /**
  * Alloy View completion provider
  */
@@ -22,11 +22,11 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async provideCompletionItems (document, position) {
+	public async provideCompletionItems (document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[]> {
 		const line = document.lineAt(position).text;
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);
-		const prefix = prefixRange ? document.getText(prefixRange) : null;
+		const prefix = prefixRange ? document.getText(prefixRange) : undefined;
 
 		if (!this.completions) {
 			await this.loadCompletions();
@@ -34,7 +34,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 
 		// opening tag <_ or <Vie_
 		if (/^\s*<\/?\w*$/.test(linePrefix)) {
-			return this.getTagNameCompletions(line, linePrefix, prefix, position, prefixRange);
+			return this.getTagNameCompletions(line, linePrefix, position, prefixRange, prefix);
 			// attribute <View _ or <View backg_
 		} else if (/^\s*<\w+[\s+\w*="()']*\s+\w*$/.test(linePrefix)) {
 			return this.getAttributeNameCompletions(linePrefix, position, prefix);
@@ -50,7 +50,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 			if (ruleResult) {
 				return ruleResult;
 			} else {
-				return await this.getAttributeValueCompletions(linePrefix, position, prefix, document);
+				return await this.getAttributeValueCompletions(linePrefix, position, document, prefix);
 			}
 		}
 		// outside tag, test localised string function
@@ -62,15 +62,15 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @param {String} line line text
 	 * @param {String} linePrefix line prefix text
-	 * @param {String} prefix word prefix
 	 * @param {Position} position caret position
 	 * @param {Range} prefixRange work prefix range
+	 * @param {String} [prefix] word prefix
 	 *
 	 * @returns {Array}
 	 */
-	public getTagNameCompletions (line, linePrefix, prefix, position, prefixRange) {
+	public getTagNameCompletions (line: string, linePrefix: string, position: Position, prefixRange?: Range, prefix?: string) {
 		// ensure prefix contains valid characters
-		if (!/^[a-zA-Z]+$/.test(prefix)) {
+		if (prefix && !/^[a-zA-Z]+$/.test(prefix)) {
 			return [];
 		}
 		const { tags } = this.completions.alloy;
@@ -99,20 +99,25 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 * Get attribute name completions
 	 *
 	 * @param {String} linePrefix line prefix text
-	 * @param {Position} position caret posiiton
-	 * @param {String} prefix prefix text
+	 * @param {Position} position caret position
+	 * @param {String} [prefix] word prefix
 	 *
 	 * @returns {Array}
 	 */
-	public getAttributeNameCompletions (linePrefix, position, prefix) {
+	public getAttributeNameCompletions (linePrefix: string, position: Position, prefix?: string) {
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
-		const completions = [];
-		let tagName;
+		const completions: CompletionItem[] = [];
+		let tagName: string|undefined;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
 		if (matches) {
 			tagName = matches[1];
 		}
+
+		if (!tagName) {
+			return completions;
+		}
+
 		const tagAttributes = this.getTagAttributes(tagName).concat([ 'id', 'class', 'platform', 'bindId' ]);
 		let apiName = tagName;
 		if (tags[tagName] && tags[tagName].apiName) {
@@ -158,12 +163,12 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @param {String} linePrefix text string upto posiiton
 	 * @param {Position} position caret position
-	 * @param {String} prefix word prefix
 	 * @param {TextDocument} document active text document
+	 * @param {String} [prefix] word prefix
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async getAttributeValueCompletions (linePrefix, position, prefix, document) {
+	public async getAttributeValueCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string) {
 		let values;
 		let tag;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
@@ -172,17 +177,17 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 			tag = matches[1];
 		}
 		const attribute = this.getPreviousAttribute(linePrefix, position);
-		const completions = [];
+		const completions: CompletionItem[] = [];
 
 		//
 		// Related and global TSS
 		//
 		if (attribute === 'id' || attribute === 'class') {
 			const relatedFile = related.getTargetPath('tss', document.fileName);
-			const appTss = path.join(workspace.rootPath, 'app', 'styles', 'app.tss');
+			const appTss = path.join(workspace.rootPath!, 'app', 'styles', 'app.tss');
 
 			const files = [];
-			async function getCompletions (file) {
+			async function getCompletions (file: string) {
 				const doc = await workspace.openTextDocument(file);
 				if (doc.getText().length) {
 					let regex = /["'](#)([a-z0-9_]+)[[\]=a-z0-9_]*["']\s*:\s*{/ig;
@@ -207,6 +212,9 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 			}
 
 			for (const file of [ relatedFile, appTss ]) {
+				if (!file) {
+					continue;
+				}
 				files.push(getCompletions(file));
 			}
 
@@ -255,7 +263,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		//
 		// Attribute values for prefix
 		//
-		if (completions.length === 0) {
+		if (completions.length === 0 && attribute) {
 			values = this.getAttributeValues(attribute);
 			for (let value of values) {
 				value = value.replace(/["']/g, '');
@@ -279,7 +287,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Array}
 	 */
-	public getTagAttributes (tag) {
+	public getTagAttributes (tag: string) {
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 		const type = types[tags[tag] ? tags[tag].apiName : undefined];
@@ -296,7 +304,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Array}
 	 */
-	public getAttributeValues (attributeName) {
+	public getAttributeValues (attributeName: string) {
 		const { properties } = this.completions.titanium;
 		const attribute = properties[attributeName];
 		if (attribute) {
@@ -313,7 +321,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {String}
 	 */
-	public getPreviousAttribute (linePrefix, position) {
+	public getPreviousAttribute (linePrefix: string, position: Position) {
 		// Remove everything until the opening quote
 		let quoteIndex = position.character - 1;
 		while (linePrefix[quoteIndex] && !([ '"', '\'' ].includes(linePrefix[quoteIndex]))) {

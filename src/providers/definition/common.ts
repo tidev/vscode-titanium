@@ -2,25 +2,33 @@
 import * as path from 'path';
 import * as related from '../../related';
 
-import { workspace } from 'vscode';
+import { TextDocument, workspace } from 'vscode';
 import { ExtensionContainer } from '../../container';
 
-export const viewSuggestions = [
+export interface DefinitionSuggestion {
+	regExp: RegExp;
+	i18nString?: boolean;
+	files (document: TextDocument, text: string, value: string): string[];
+	files (document: TextDocument, text: string, value?: string): string[];
+	files (document: TextDocument, text?: string, value?: string): string[];
+	definitionRegExp? (text: string): RegExp;
+	title? (fileName: string): string;
+	insertText? (text: string): string|undefined;
+}
+
+export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // class
 		regExp: /class=["'][\s0-9a-zA-Z-_^]*$/,
 		files () {
-			return [
-				related.getTargetPath('tss'),
-				path.join(workspace.rootPath, 'app', 'styles', 'app.tss')
-			];
+			return getRelatedFiles('tss');
 		},
-		definitionRegExp (text) {
+		definitionRegExp (text: string) {
 			return new RegExp(`["']\\.${text}["'[]`, 'g');
 		},
-		title (fileName) {
+		title (fileName: string) {
 			return `Generate style (${fileName})`;
 		},
-		insertText (text) {
+		insertText (text: string) {
 			let insertText = ExtensionContainer.config.codeTemplates.tssClass;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
@@ -29,18 +37,15 @@ export const viewSuggestions = [
 	{ // id
 		regExp: /id=["'][\s0-9a-zA-Z-_^]*$/,
 		files () {
-			return [
-				related.getTargetPath('tss'),
-				path.join(workspace.rootPath, 'app', 'styles', 'app.tss')
-			];
+			return getRelatedFiles('tss');
 		},
-		definitionRegExp (text) {
+		definitionRegExp (text: string) {
 			return new RegExp(`["']#${text}["'[]`, 'g');
 		},
-		title (fileName) {
+		title (fileName: string) {
 			return `Generate style (${fileName})`;
 		},
-		insertText (text) {
+		insertText (text: string) {
 			let insertText = ExtensionContainer.config.codeTemplates.tssId;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
@@ -49,18 +54,15 @@ export const viewSuggestions = [
 	{ // tag
 		regExp: /<[A-Z][A-Za-z]*$/,
 		files () {
-			return [
-				related.getTargetPath('tss'),
-				path.join(workspace.rootPath, 'app', 'styles', 'app.tss')
-			];
+			return getRelatedFiles('tss');
 		},
-		definitionRegExp (text) {
+		definitionRegExp (text: string) {
 			return new RegExp(`["']${text}`, 'g');
 		},
-		title (fileName) {
+		title (fileName: string) {
 			return `Generate style (${fileName})`;
 		},
-		insertText (text) {
+		insertText (text: string) {
 			if ([ 'Alloy', 'Annotation', 'Collection', 'Menu', 'Model', 'Require', 'Widget' ].indexOf(text) !== -1
 				|| text.startsWith('/')) {
 				return;
@@ -73,15 +75,15 @@ export const viewSuggestions = [
 	{ // handler
 		regExp: /on(.*?)=["'][A-Za-z]*$/,
 		files () {
-			return [ related.getTargetPath('js') ];
+			return getRelatedFiles('js');
 		},
-		definitionRegExp (text) {
+		definitionRegExp (text: string) {
 			return new RegExp(`function ${text}\\s*?\\(`);
 		},
-		title (fileName) {
+		title (fileName: string) {
 			return `Generate function (${fileName})`;
 		},
-		insertText (text) {
+		insertText (text: string) {
 			let insertText = ExtensionContainer.config.codeTemplates.jsFunction;
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
@@ -89,14 +91,26 @@ export const viewSuggestions = [
 	},
 	{ // widget
 		regExp: /<Widget[\s0-9a-zA-Z-_^='"]*src=["']$/,
-		files (document, text) {
-			return document.fileName.replace(/app\/(.*)$/, `app/widgets/${text}/controllers/widget.js`);
+		files (document: TextDocument, text: string) {
+			return [ document.fileName.replace(/app\/(.*)$/, `app/widgets/${text}/controllers/widget.js`) ];
 		}
 	},
 	{ // require
-		regExp: /<Require[\s0-9a-zA-Z-_^='"]*src=["']$/,
-		files (document, text) {
-			return document.fileName.replace(/app\/(.*)$/, `app/controllers/${text}.js`);
+		regExp: /<Require[\s0-9a-zA-Z-_^='"]*src=["']/,
+		files (document: TextDocument, text: string) {
+			return [ document.fileName.replace(/app\/(.*)$/, `app/controllers/${text}.js`) ];
 		}
 	}
 ];
+
+function getRelatedFiles (fileType: string) {
+	const relatedFiles: string[] = [];
+	if (fileType === 'tss') {
+		relatedFiles.push(path.join(workspace.rootPath!, 'app', 'styles', 'app.tss'));
+	}
+	const relatedFile = related.getTargetPath(fileType);
+	if (relatedFile) {
+		relatedFiles.push(relatedFile);
+	}
+	return relatedFiles;
+}

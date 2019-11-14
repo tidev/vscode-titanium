@@ -3,8 +3,9 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 
-import { commands, DefinitionLink, Hover, Location, MarkdownString, Position, Range, Uri, workspace, WorkspaceEdit } from 'vscode';
+import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit } from 'vscode';
 import { ExtensionContainer } from '../../container';
+import { DefinitionSuggestion } from './common';
 
 /**
  * Definition provider helper
@@ -15,14 +16,14 @@ import { ExtensionContainer } from '../../container';
 export const insertCommandId = 'titanium.insertCodeAction';
 export const insertI18nStringCommandId = 'titanium.insertI18nStringCodeAction';
 
-const i18nSuggestions = [
+const i18nSuggestions: Array<DefinitionSuggestion & { i18nString: true }> = [
 	{ // i18n
 		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*$/,
-		definitionRegExp (text) {
+		definitionRegExp (text: string) {
 			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
 		},
 		files () {
-			return [ path.join(utils.getI18nPath(), ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
+			return [ path.join(utils.getI18nPath()!, ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
 		},
 		i18nString: true
 	}
@@ -48,15 +49,15 @@ const i18nSuggestions = [
  *
  * @returns {Hover}
  */
-export function provideHover (document, position) {
+export function provideHover (document: TextDocument, position: Position) {
 	const line = document.lineAt(position).text;
 	const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 	// const wordRange = document.getWordRangeAtPosition(position);
 	// const word = wordRange ? document.getText(wordRange) : null;
 
 	const regExp = /['"]/g;
-	let startIndex;
-	let endIndex;
+	let startIndex = 0;
+	let endIndex = position.character;
 
 	for (let matches = regExp.exec(line); matches !== null; matches = regExp.exec(line)) {
 		if (matches.index < position.character) {
@@ -101,15 +102,15 @@ export function provideHover (document, position) {
  *
  * @returns {Thenable}
  */
-export async function provideDefinition (document, position, suggestions) {
+export async function provideDefinition (document: TextDocument, position: Position, suggestions: DefinitionSuggestion[]) {
 	const line = document.lineAt(position).text;
 	const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 	const wordRange = document.getWordRangeAtPosition(position);
-	const word = wordRange ? document.getText(wordRange) : null;
+	const word = wordRange ? document.getText(wordRange) : undefined;
 
 	const regExp = /['"]/g;
-	let startIndex;
-	let endIndex;
+	let startIndex = 0;
+	let endIndex = position.character;
 
 	for (let matches = regExp.exec(line); matches !== null; matches = regExp.exec(line)) {
 		if (matches.index < position.character) {
@@ -122,12 +123,12 @@ export async function provideDefinition (document, position, suggestions) {
 
 	const value = (startIndex && endIndex) ? line.substring(startIndex + 1, endIndex) : '';
 
-	suggestions = suggestions.concat(this.suggestions);
-
 	for (const suggestion of suggestions) {
 		if (suggestion.regExp.test(linePrefix)) {
 			if (suggestion.definitionRegExp) {
-				return await getReferences(suggestion.files(document, word, value), suggestion.definitionRegExp(word, value), (file, range) => {
+				const suggestionFiles = suggestion.files(document, word, value);
+				const definitionRegExp = suggestion.definitionRegExp(word || value);
+				return await getReferences(suggestionFiles, definitionRegExp, (file: string, range: Range) => {
 					return new Location(Uri.file(file), range);
 				});
 			} else {
@@ -156,7 +157,7 @@ export async function provideDefinition (document, position, suggestions) {
  *
  * @returns {Thenable}
  */
-export async function provideCodeActions (document, range, suggestions) {
+export async function provideCodeActions (document: TextDocument, range: Range|Selection, suggestions: DefinitionSuggestion[]) {
 	const linePrefix = document.getText(new Range(range.end.line, 0, range.end.line, range.end.character));
 	const wordRange = document.getWordRangeAtPosition(range.end);
 	const word = wordRange ? document.getText(wordRange) : null;
@@ -167,12 +168,11 @@ export async function provideCodeActions (document, range, suggestions) {
 		return;
 	}
 
-	suggestions = suggestions.concat(this.suggestions);
 	const codeActions = [];
 	for (const suggestion of suggestions) {
 		if (suggestion.regExp.test(linePrefix)) {
-			const suggestionsRegex = suggestion.definitionRegExp(word);
-			const definitions = await getReferences(suggestion.files(document, word), suggestionsRegex, () => {
+			const suggestionsRegex = suggestion.definitionRegExp!(word);
+			const definitions = await getReferences(suggestion.files!(document, word), suggestionsRegex, () => {
 				return {};
 			});
 			if ((!definitions || definitions.length === 0) && suggestion.insertText) {
@@ -180,7 +180,7 @@ export async function provideCodeActions (document, range, suggestions) {
 				if (insertText) {
 					suggestion.files(document, word).forEach(file => {
 						codeActions.push({
-							title: suggestion.title(path.parse(file).name),
+							title: suggestion.title?.(path.parse(file).name),
 							command: insertCommandId,
 							arguments: [ insertText, file ]
 						});
@@ -207,9 +207,12 @@ export async function provideCodeActions (document, range, suggestions) {
  *
  * @returns {Array}
  */
-export async function getReferences (files, regExp?: RegExp, callback?: any) {
+export async function getReferences (files: string[]|string, regExp: RegExp, callback?: any) {
 	const definitions = [];
 	const searches = [];
+	if (!Array.isArray(files)) {
+		files = [ files ];
+	}
 	for (const file of files ) {
 		let document;
 		try {
@@ -238,7 +241,7 @@ export async function getReferences (files, regExp?: RegExp, callback?: any) {
  * @param {String} text text to insert
  * @param {String} filePath file in which to insert text
  */
-export function insert (text, filePath) {
+export function insert (text: string, filePath: string) {
 	workspace.openTextDocument(filePath).then(document => {
 		const position = new Position(document.lineCount, 0);
 		if (document.lineAt(position.line - 1).text.trim().length) {
@@ -255,11 +258,15 @@ export function insert (text, filePath) {
  *
  * @param {String} text text to insert
  */
-export function insertI18nString (text) {
+export function insertI18nString (text: string) {
 	const defaultLang =  ExtensionContainer.config.project.defaultI18nLanguage;
-	const i18nStringPath = path.join(utils.getI18nPath(), defaultLang, 'strings.xml');
+	const i18nPath = utils.getI18nPath();
+	if (!i18nPath) {
+		return;
+	}
+	const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
 	if (!utils.fileExists(i18nStringPath)) {
-		fs.ensureDirSync(path.join(utils.getI18nPath(), defaultLang));
+		fs.ensureDirSync(path.join(i18nPath, defaultLang));
 		fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
 	}
 	workspace.openTextDocument(i18nStringPath).then(document => {
