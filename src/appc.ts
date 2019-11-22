@@ -41,7 +41,7 @@ export class Appc {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public getInfo (callback: (error: Error|null|object, info?: any) => void) {
+	public getInfo (callback: (error: Error|null, info?: any) => void) {
 		let result = '';
 		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
@@ -54,7 +54,7 @@ export class Appc {
 					return callback(error);
 				}
 			} else {
-				callback({});
+				callback(new Error('Failed to get environment information'));
 			}
 		});
 	}

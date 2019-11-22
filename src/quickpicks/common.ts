@@ -7,7 +7,7 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, OpenDialogOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
-import { IosCertificateType } from '../types/common';
+import { IosCertificateType, UpdateChoice } from '../types/common';
 
 export interface CustomQuickPick extends QuickPickItem {
 	label: string;
@@ -63,6 +63,7 @@ export async function inputBox (options: InputBoxOptions) {
 
 export async function quickPick (items: CustomQuickPick[], quickPickOptions: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick[]>;
 export async function quickPick (items: CustomQuickPick[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick>;
+export async function quickPick (items: string[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: { forceShow: boolean }): Promise<string>;
 export async function quickPick<T extends QuickPickItem> (items: T[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}): Promise<T> {
 	if (items.length === 1 && !forceShow) {
 		return items[0];
@@ -75,7 +76,7 @@ export async function quickPick<T extends QuickPickItem> (items: T[], quickPickO
 }
 
 export function selectPlatform (lastBuildDescription?: string, filter?: (platform: string) => boolean) {
-	const platforms = utils.platforms().filter(filter ? filter : () => true).map(platform => ({ label: utils.nameForPlatform(platform)!, id: platform }));
+	const platforms = utils.platforms().filter(filter ? filter : () => true).map(platform => ({ label: utils.nameForPlatform(platform) as string, id: platform }));
 	if (lastBuildDescription) {
 		platforms.unshift({
 			label: `Last: ${lastBuildDescription}`,
@@ -269,7 +270,7 @@ export function selectWindowsEmulator () {
 }
 
 export async function selectUpdates (updates: UpdateInfo[]) {
-	const choices = updates
+	const choices: UpdateChoice[] = updates
 		.map(update => ({
 			label: `${update.productName}: ${update.latestVersion}`,
 			action: update.action,
@@ -277,7 +278,8 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 			priority: update.priority,
 			picked: true,
 			productName: update.productName,
-			id: update.productName
+			id: update.productName,
+			currentVersion: update.currentVersion
 		})
 	);
 
@@ -292,7 +294,7 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 		throw new UserCancellation();
 	}
 
-	return selected;
+	return choices as UpdateChoice[];
 }
 
 export async function selectDevice (platform: string, target: string) {
@@ -305,6 +307,8 @@ export async function selectDevice (platform: string, target: string) {
 	} else if (platform === 'ios' && target === 'simulator') {
 		const simVersion = await selectiOSSimulatorVersion();
 		return selectiOSSimulator(simVersion.label);
+	} else {
+		throw new Error(`Unsupported platform and combination target ${platform} + ${target}`);
 	}
 }
 
@@ -359,7 +363,7 @@ export async function selectWindowsCertificate (lastUsed?: string, savedCertPath
 			savedCertPath = path.resolve(workspace.rootPath!, savedCertPath);
 		}
 		return savedCertPath;
-	} else {
+	} else if (certificateAction.id === 'last' && lastUsed) {
 		return lastUsed;
 	}
 }

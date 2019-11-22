@@ -1,10 +1,10 @@
 import { ExtensionContext } from 'vscode';
-import appc from './appc';
+import appc, { Appc } from './appc';
 import { Config, configuration } from './configuration';
 import Terminal from './terminal';
 
 export class ExtensionContainer {
-	private static _appc;
+	private static _appc: Appc;
 	private static _config: Config | undefined;
 	private static _context: ExtensionContext;
 	private static _terminal: Terminal;
