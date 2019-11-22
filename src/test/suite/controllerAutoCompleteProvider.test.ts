@@ -10,23 +10,22 @@ import project from '../../project';
 import { ControllerCompletionItemProvider } from '../../providers/completion/controllerCompletionItemProvider';
 
 const fixturesPath = path.join(__dirname, '../../..', 'src', 'test', 'suite', 'fixtures');
-const xmlFile = path.join(fixturesPath, 'sample.js');
-const uri = vscode.Uri.file(xmlFile);
+const file = path.join(fixturesPath, 'sample.js');
+const uri = vscode.Uri.file(file);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
 const completions = JSON.parse(rawData);
 
-function testCompletion (position: vscode.Position) {
-	return new Promise(resolve => {
-		vscode.workspace.openTextDocument(uri).then(text => {
-			const provider = new ControllerCompletionItemProvider();
-			provider.provideCompletionItems(text, position).then(items => {
-				return resolve(items);
-			});
-		});
-	});
+async function testCompletion (position: vscode.Position) {
+	const text = await vscode.workspace.openTextDocument(uri);
+	const provider = new ControllerCompletionItemProvider();
+	const context: vscode.CompletionContext = {
+		triggerKind: vscode.CompletionTriggerKind.Invoke,
+	};
+	const cancellationToken = new vscode.CancellationTokenSource();
+	return provider.provideCompletionItems(text, position, cancellationToken.token, context);
 }
 
-let sandbox;
+let sandbox: sinon.SinonSandbox;
 
 describe('Controller suggestions', () => {
 

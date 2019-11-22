@@ -18,7 +18,7 @@ describe('SDKs', () => {
 		});
 
 		it('should retrieve the latest SDK', () => {
-			expect(Appc.latestSdk(false).fullversion).to.equal('7.0.0.v20170815160201');
+			expect(Appc.latestSdk(false)!.fullversion).to.equal('7.0.0.v20170815160201');
 		});
 	});
 
@@ -31,7 +31,7 @@ describe('SDKs', () => {
 		});
 
 		it('should retrieve the latest GA SDK', () => {
-			expect(Appc.latestSdk().fullversion).to.equal('6.1.2.GA');
+			expect(Appc.latestSdk()!.fullversion).to.equal('6.1.2.GA');
 		});
 	});
 
