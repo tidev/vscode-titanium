@@ -12,14 +12,11 @@ export interface BaseBuildOptions extends BaseCLIOptions {
 	projectType: 'app' | 'module';
 }
 
-export interface BuildAppOptions extends BaseBuildOptions {
-	iOSCertificate?: string;
+export interface BuildAppBase extends BaseBuildOptions {
 	deviceId?: string;
 	deviceLabel?: string;
 	liveview?: boolean;
-	iOSProvisioningProfile?: string;
 	target?: string;
-	keystore?: string;
 	debugPort?: number;
 	skipJsMinify?: boolean;
 	sourceMaps?: boolean;
@@ -27,21 +24,48 @@ export interface BuildAppOptions extends BaseBuildOptions {
 	deployType?: string;
 }
 
+export interface BuildAndroidAppOptions extends BuildAppBase {
+	keystore?: string;
+}
+
+export interface BuildIosAppOptions extends BuildAppBase {
+	iOSCertificate?: string;
+	iOSProvisioningProfile: string;
+}
+
+export interface BuildWindowsAppOptions extends BuildAppBase {
+	windowsCertInfo?: WindowsCertInfo;
+	windowsPublisherID?: string;
+}
+
+export type BuildAppOptions = BuildAndroidAppOptions | BuildIosAppOptions | BuildWindowsAppOptions;
+
 export interface BuildModuleOptions extends BaseBuildOptions {
 	outputDirectory?: string;
 }
 
-export interface PackageOptions extends BaseCLIOptions {
-	iOSCertificate?: string;
-	iOSProvisioningProfile?: string;
-	keystoreInfo?: KeystoreInfo;
+export interface BasePackageOptions extends BaseCLIOptions {
 	outputDirectory: string;
 	platform: Platform;
 	projectDir: string;
 	target: string;
-	windowsCertInfo?: WindowsCertInfo;
+}
+
+export interface AndroidPackageOptions extends BasePackageOptions {
+	keystoreInfo: KeystoreInfo;
+}
+
+export interface IosPackageOptions extends BasePackageOptions {
+	iOSCertificate: string;
+	iOSProvisioningProfile: string;
+}
+
+export interface WindowsPackageOptions extends BasePackageOptions {
+	windowsCertInfo: WindowsCertInfo;
 	windowsPublisherID?: string;
 }
+
+export type PackageAppOptions = AndroidPackageOptions | IosPackageOptions | WindowsPackageOptions;
 
 export interface CreateOptions extends BaseCLIOptions {
 	id: string;
