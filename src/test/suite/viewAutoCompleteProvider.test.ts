@@ -31,7 +31,7 @@ describe('View suggestions', () => {
 	before(async function () {
 		this.timeout(5000);
 		sandbox = sinon.createSandbox();
-		sandbox.stub(project, 'sdk').returns(['8.1.0.GA']);
+		sandbox.stub(project, 'sdk').returns([ '8.1.0.GA' ]);
 		sandbox.stub(tce.completion, 'loadCompletions').resolves(completions);
 	});
 

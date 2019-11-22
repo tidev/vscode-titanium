@@ -59,8 +59,8 @@ export interface AppcInfo {
 		sdk: {
 			executables: {
 				adb: string;
-			}
-		}
+			};
+		};
 	};
 	ios: {
 		certs: {
@@ -68,13 +68,13 @@ export interface AppcInfo {
 				[key: string]: {
 					developer: IosCert[];
 					distribution: IosCert[];
-				}
-			}
-		}
+				};
+			};
+		};
 		devices: IosDevice[];
 		simulators: {
 			ios: {
-				[key: string]: IosSimulator[]
+				[key: string]: IosSimulator[];
 			};
 		};
 		provisioning: {
@@ -82,7 +82,7 @@ export interface AppcInfo {
 			development: ProvisioningProfile[];
 			distribution: ProvisioningProfile[];
 			enterprise: ProvisioningProfile[];
-		}
+		};
 	};
 	titanium: {
 		[key: string]: TitaniumSDK;

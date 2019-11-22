@@ -87,10 +87,10 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 }
 
 export async function selectCreationLocation (lastUsed?: string) {
-	const items = [{
+	const items = [ {
 		label: 'Browse for directory',
 		id: 'browse'
-	}];
+	} ];
 	if (lastUsed) {
 		items.push({
 			label: `Last used ${lastUsed}`,
@@ -152,10 +152,10 @@ export function selectAndroidEmulator () {
 }
 
 export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string) {
-	const items = [{
+	const items = [ {
 		label: 'Browse for keystore',
 		id: 'browse'
-	}];
+	} ];
 	if (lastUsed) {
 		items.push({
 			label: `Last used ${lastUsed}`,
@@ -231,7 +231,7 @@ export function selectiOSProvisioningProfile (certificate: any, target: string, 
 	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
 
-export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick, provisioningProfile: CustomQuickPick }> {
+export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick; provisioningProfile: CustomQuickPick }> {
 	const certificate = await selectiOSCertificate(buildType);
 
 	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId);
@@ -251,7 +251,7 @@ export async function selectiOSSimulator (iOSVersion: string) {
 		iOSVersion = (await selectiOSSimulatorVersion()).label;
 	}
 	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
-	return quickPick(simulators, { placeHolder: 'Select simulator'});
+	return quickPick(simulators, { placeHolder: 'Select simulator' });
 }
 
 export function selectiOSSimulatorVersion () {
@@ -281,7 +281,7 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 			id: update.productName,
 			currentVersion: update.currentVersion
 		})
-	);
+		);
 
 	const selected = await quickPick(choices, {
 		canPickMany: true,

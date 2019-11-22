@@ -31,7 +31,7 @@ describe('TSS Suggestions', () => {
 	before(async function () {
 		this.timeout(5000);
 		sandbox = sinon.createSandbox();
-		sandbox.stub(project, 'sdk').returns(['8.1.0.GA']);
+		sandbox.stub(project, 'sdk').returns([ '8.1.0.GA' ]);
 		sandbox.stub(tce.completion, 'loadCompletions').resolves(completions);
 	});
 
@@ -49,19 +49,19 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions[0].label).to.equal('ActionView');
 		expect(suggestions[0].detail).to.equal('_ProxyProperty.ActionView');
-		expect(suggestions[0].insertText.value).to.equal(`ActionView": {\n\t\${1}\t\n}`);
+		expect(suggestions[0].insertText.value).to.equal('ActionView": {\n\t${1}\t\n}');
 
 		expect(suggestions[1].label).to.equal('AndroidView');
 		expect(suggestions[1].detail).to.equal('Ti.UI.AndroidView');
-		expect(suggestions[1].insertText.value).to.equal(`AndroidView": {\n\t\${1}\t\n}`);
+		expect(suggestions[1].insertText.value).to.equal('AndroidView": {\n\t${1}\t\n}');
 
 		expect(suggestions[2].label).to.equal('CardView');
 		expect(suggestions[2].detail).to.equal('Ti.UI.Android.CardView');
-		expect(suggestions[2].insertText.value).to.equal(`CardView": {\n\t\${1}\t\n}`);
+		expect(suggestions[2].insertText.value).to.equal('CardView": {\n\t${1}\t\n}');
 
 		expect(suggestions[3].label).to.equal('CenterView');
 		expect(suggestions[3].detail).to.equal('Ti.UI.Android.DrawerLayout.CenterView');
-		expect(suggestions[3].insertText.value).to.equal(`CenterView": {\n\t\${1}\t\n}`);
+		expect(suggestions[3].insertText.value).to.equal('CenterView": {\n\t${1}\t\n}');
 
 	});
 
@@ -117,10 +117,10 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions.length).to.equal(2);
 
-		expect(suggestions[0].label).to.equal(`'magenta'`);
+		expect(suggestions[0].label).to.equal('\'magenta\'');
 		expect(suggestions[0].kind).to.equal(11);
 
-		expect(suggestions[1].label).to.equal(`'maroon'`);
+		expect(suggestions[1].label).to.equal('\'maroon\'');
 		expect(suggestions[1].kind).to.equal(11);
 
 	});
@@ -131,10 +131,10 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions.length).to.equal(2);
 
-		expect(suggestions[0].label).to.equal(`'magenta'`);
+		expect(suggestions[0].label).to.equal('\'magenta\'');
 		expect(suggestions[0].kind).to.equal(11);
 
-		expect(suggestions[1].label).to.equal(`'maroon'`);
+		expect(suggestions[1].label).to.equal('\'maroon\'');
 		expect(suggestions[1].kind).to.equal(11);
 
 	});
@@ -145,13 +145,13 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions.length).to.equal(3);
 
-		expect(suggestions[0].label).to.equal(`'vertical'`);
+		expect(suggestions[0].label).to.equal('\'vertical\'');
 		expect(suggestions[0].kind).to.equal(11);
 
-		expect(suggestions[1].label).to.equal(`'horizontal'`);
+		expect(suggestions[1].label).to.equal('\'horizontal\'');
 		expect(suggestions[1].kind).to.equal(11);
 
-		expect(suggestions[2].label).to.equal(`'composite'`);
+		expect(suggestions[2].label).to.equal('\'composite\'');
 		expect(suggestions[2].kind).to.equal(11);
 
 	});

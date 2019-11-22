@@ -30,7 +30,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 				config.debugPort = port;
 			}
 		} catch (error) {
-			throw new Error(`Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.`);
+			throw new Error('Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.');
 		}
 
 		if (!config.logLevel) {

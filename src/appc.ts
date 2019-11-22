@@ -22,7 +22,7 @@ export class Appc {
 
 	public info!: AppcInfo;
 	private proc!: ChildProcess|null;
-	private killed: boolean = false;
+	private killed = false;
 
 	/**
 	 * Returns true if user has active session

@@ -11,7 +11,7 @@ import { checkLogin, handleInteractionError, InteractionError } from './common';
 export async function createModule () {
 	try {
 		checkLogin();
-		let force: boolean = false;
+		let force = false;
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 

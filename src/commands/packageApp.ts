@@ -4,8 +4,8 @@ import project from '../project';
 import { workspace } from 'vscode';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
-import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
-import { getCorrectCertificateName, nameForPlatform, packageArguments, } from '../utils';
+import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
+import { getCorrectCertificateName, nameForPlatform, packageArguments } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, inputBox, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';

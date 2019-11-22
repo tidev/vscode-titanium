@@ -2,7 +2,7 @@ import * as path from 'path';
 import { workspace } from 'vscode';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
-import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
+import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
 import { buildArguments } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
