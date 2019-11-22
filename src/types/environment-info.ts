@@ -13,15 +13,15 @@ export interface AndroidEmulator {
 }
 
 export interface IosDevice {
-	buildVersion: string;
-	cpuArchitecture: string;
-	deviceClass: string;
-	deviceColor: string;
-	hardwareModel: string;
+	buildVersion?: string;
+	cpuArchitecture?: string;
+	deviceClass?: string;
+	deviceColor?: string;
+	hardwareModel?: string;
 	name: string;
-	productType: string;
-	productVersion: string;
-	serialNumber: string;
+	productType?: string;
+	productVersion?: string;
+	serialNumber?: string;
 	udid: string;
 }
 
@@ -38,7 +38,7 @@ export interface TitaniumSDK {
 	platforms: string[];
 	githash: string;
 	timestamp: string;
-	fullversion: string;
+	fullversion?: string;
 }
 
 export interface WindowsEmulator {
@@ -85,7 +85,7 @@ export interface AppcInfo {
 		}
 	};
 	titanium: {
-		[key: string]: TitaniumSDK
+		[key: string]: TitaniumSDK;
 	};
 	titaniumCLI: {
 		version: string;

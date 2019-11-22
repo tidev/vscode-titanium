@@ -78,7 +78,7 @@ export class TargetNode extends BaseNode {
 						return semver.compare(semver.coerce(a)!, semver.coerce(b)!);
 					}).reverse();
 					for (const version of orderedVersions) {
-						devices.push(new OSVerNode(version, 'windows', 'wp-emulator'));
+						devices.push(new OSVerNode(version, Platform.windows, 'wp-emulator'));
 					}
 					break;
 			}
