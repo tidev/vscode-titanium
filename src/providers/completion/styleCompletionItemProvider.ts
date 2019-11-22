@@ -39,7 +39,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 					ruleResult = await rule.getCompletions();
 				}
 			}
-			if (ruleResult) {
+			if (ruleResult.length) {
 				return ruleResult;
 			} else {
 				return this.getPropertyValueCompletions(linePrefix, position, document, prefix);
