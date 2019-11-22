@@ -9,8 +9,8 @@ import { getCorrectCertificateName, nameForPlatform, packageArguments, } from '.
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, inputBox, selectDistributionTarget, selectiOSCodeSigning, selectPlatform } from '../quickpicks/common';
-import { PackageOptions } from '../types/cli';
-import { IosCertificateType, KeystoreInfo, WindowsCertInfo } from '../types/common';
+import { AndroidPackageOptions, BasePackageOptions, IosPackageOptions, PackageAppOptions, WindowsPackageOptions } from '../types/cli';
+import { IosCertificateType, KeystoreInfo, Platform, WindowsCertInfo } from '../types/common';
 
 export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -25,10 +25,9 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 		let iOSProvisioningProfile: string|undefined;
 		let keystoreInfo: KeystoreInfo|undefined;
 		let lastBuildDescription;
-		let outputDirectory;
+		let outputDirectory: string|undefined;
 		let platform;
-		let publisherID;
-		let target;
+		let target: string|undefined = node?.targetId;
 		let windowsCertInfo: WindowsCertInfo|undefined;
 
 		if (node) {
@@ -49,45 +48,21 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			if (platformInfo.id === 'last') {
 				platform = lastBuildState.platform;
 				target = lastBuildState.target;
-				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.distribution);
+				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.distribution)!;
 				iOSProvisioningProfile = lastBuildState.iOSProvisioningProfile;
 				keystoreInfo = lastBuildState.keystoreInfo as KeystoreInfo;
-				if (platform === 'android') {
+				if (platform === Platform.android) {
 					keystoreInfo.password = await enterPassword({ placeHolder: 'Enter your keystore password' });
 				}
 				outputDirectory = lastBuildState.outputDirectory;
 			} else {
-				platform = platformInfo.id;
-
+				platform = platformInfo.id as Platform;
 			}
 		}
 
 		if (!target) {
 			const targetInfo = await selectDistributionTarget(platform);
 			target = targetInfo.id;
-		}
-
-		if (platform === 'android' && !keystoreInfo) {
-			const lastKeystore = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastKeystorePath);
-			const savedKeystorePath = ExtensionContainer.config.android.keystorePath;
-			// TODO: Private key password?
-			keystoreInfo = await enterAndroidKeystoreInfo(lastKeystore, savedKeystorePath);
-			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastKeystorePath, keystoreInfo.location);
-		} else if (platform === 'ios' && !iOSCertificate) {
-			const codesigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
-			iOSCertificate = getCorrectCertificateName(codesigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
-			iOSProvisioningProfile = codesigning.provisioningProfile.uuid;
-		} else if (platform === 'windows') {
-			// TODO
-			// publisher id, select pfx, pfx password
-			publisherID = ExtensionContainer.config.windows.publisherID;
-			if (!publisherID) {
-				publisherID = await inputBox({ placeHolder: 'What is your Microsoft Publisher ID' });
-			}
-			const lastWindowsCertPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastWindowsCertPath);
-			const savedWindowsCertPath = ExtensionContainer.config.windows.signingCertPath;
-			windowsCertInfo = await enterWindowsSigningInfo(lastWindowsCertPath, savedWindowsCertPath);
-			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastWindowsCertPath, windowsCertInfo.location);
 		}
 
 		if (!outputDirectory) {
@@ -99,28 +74,73 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			}
 		}
 
-		const buildInfo: PackageOptions = {
+		const baseOptions: BasePackageOptions = {
 			platform,
 			outputDirectory,
-			keystoreInfo,
-			target,
-			iOSCertificate,
-			iOSProvisioningProfile,
-			logLevel,
 			projectDir,
-			windowsPublisherID: publisherID,
-			windowsCertInfo
+			target,
+			logLevel
 		};
-		const args = packageArguments(buildInfo);
-		ExtensionContainer.terminal.runCommand(args);
-		if (buildInfo.keystoreInfo) {
-			buildInfo.keystoreInfo.password = undefined;
-			buildInfo.keystoreInfo.privateKeyPassword = undefined;
+
+		if (platform === Platform.android) {
+			if (!keystoreInfo) {
+				const lastKeystore = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastKeystorePath);
+				const savedKeystorePath = ExtensionContainer.config.android.keystorePath;
+				// TODO: Private key password?
+				keystoreInfo = await enterAndroidKeystoreInfo(lastKeystore, savedKeystorePath);
+				ExtensionContainer.context.workspaceState.update(WorkspaceState.LastKeystorePath, keystoreInfo.location);
+			}
+
+			const buildInfo: AndroidPackageOptions = {
+				...baseOptions,
+				keystoreInfo
+			};
+			return runPackage(buildInfo);
+
+		} else if (platform === Platform.ios) {
+			const codesigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
+			iOSCertificate = getCorrectCertificateName(codesigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
+			iOSProvisioningProfile = codesigning.provisioningProfile.id;
+
+			const buildInfo: IosPackageOptions = {
+				...baseOptions,
+				iOSCertificate,
+				iOSProvisioningProfile
+			};
+			return runPackage(buildInfo);
+
+		} else if (platform === Platform.windows) {
+			// publisher id, select pfx, pfx password
+			let windowsPublisherID = ExtensionContainer.config.windows.publisherID;
+			if (!windowsPublisherID) {
+				windowsPublisherID = await inputBox({ placeHolder: 'What is your Microsoft Publisher ID' });
+			}
+			const lastWindowsCertPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastWindowsCertPath);
+			const savedWindowsCertPath = ExtensionContainer.config.windows.signingCertPath;
+			windowsCertInfo = await enterWindowsSigningInfo(lastWindowsCertPath, savedWindowsCertPath);
+			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastWindowsCertPath, windowsCertInfo.location);
+
+			const buildInfo: WindowsPackageOptions = {
+				...baseOptions,
+				windowsCertInfo,
+				windowsPublisherID
+			};
+			return runPackage(buildInfo);
+
 		}
-		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, buildInfo);
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
 		}
 	}
+}
+
+function runPackage (options: PackageAppOptions) {
+	const args = packageArguments(options);
+	ExtensionContainer.terminal.runCommand(args);
+	if (options.platform === Platform.android) {
+		delete (options as AndroidPackageOptions).keystoreInfo.password;
+		delete (options as AndroidPackageOptions).keystoreInfo.privateKeyPassword;
+	}
+	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, options);
 }

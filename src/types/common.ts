@@ -1,7 +1,7 @@
 export interface KeystoreInfo {
 	alias: string;
 	location: string;
-	password: string|undefined;
+	password: string;
 	privateKeyPassword: string|undefined;
 }
 export interface IosCert {

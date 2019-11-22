@@ -18,8 +18,8 @@ import {
 	selectWindowsDevice,
 	selectWindowsEmulator
 } from '../quickpicks/common';
-import { BuildAppOptions } from '../types/cli';
-import { IosCertificateType } from '../types/common';
+import { BuildAndroidAppOptions, BuildAppBase, BuildAppOptions, BuildWindowsAppOptions } from '../types/cli';
+import { IosCertificateType, Platform } from '../types/common';
 
 export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
 	try {
@@ -77,68 +77,75 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			target = targetInfo.id;
 		}
 
-		if (!deviceId && target !== 'ws-local') {
-			if (platform === 'android') {
-				if (target === 'device') {
-					const deviceInfo = await selectAndroidDevice();
-					deviceId = deviceInfo.udid;
-					deviceLabel = deviceInfo.label;
-				} else if (target === 'emulator') {
-					const emulatorInfo = await selectAndroidEmulator();
-					deviceId = emulatorInfo.udid;
-					deviceLabel = emulatorInfo.label;
-				}
-			} else if (platform === 'ios') {
-				if (target === 'device') {
-					const deviceInfo = await selectiOSDevice();
-					deviceId = deviceInfo.udid;
-					deviceLabel = deviceInfo.label;
-				} else if (target === 'simulator') {
-					const simulatorInfo = await selectiOSSimulator(osVersion);
-					deviceId = simulatorInfo.udid;
-					osVersion = simulatorInfo.version;
-					deviceLabel = simulatorInfo.label;
-				}
-			} else if (platform === 'windows') {
-				// TODO finish wiring these up
-				if (target === 'wp-device') {
-					const deviceInfo = await selectWindowsDevice();
-					deviceId = deviceInfo.udid;
-					deviceLabel = deviceInfo.label;
-				} else if (target === 'wp-emulator') {
-					const emulatorInfo = await selectWindowsEmulator();
-					deviceId = emulatorInfo.udid;
-					deviceLabel = emulatorInfo.label;
-				}
-			}
-		}
-
-		if (platform === 'ios' && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
-			const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
-			iOSCertificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
-			iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
-		}
-
-		const buildInfo: BuildAppOptions = {
-			buildType,
-			deviceId,
-			deviceLabel,
-			liveview,
+		const baseOptions: BuildAppBase = {
 			platform,
-			target,
-			iOSCertificate,
-			iOSProvisioningProfile,
+			buildOnly: false,
+			buildType,
 			projectDir,
 			logLevel,
 			projectType: 'app',
-			buildOnly: false
+			liveview
 		};
-		const args = buildArguments(buildInfo);
-		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, buildInfo);
-		ExtensionContainer.terminal.runCommand(args);
+
+		if (platform === Platform.android) {
+			if (target === 'device') {
+				const deviceInfo = await selectAndroidDevice();
+				deviceId = deviceInfo.udid;
+				deviceLabel = deviceInfo.label;
+			} else if (target === 'emulator') {
+				const emulatorInfo = await selectAndroidEmulator();
+				deviceId = emulatorInfo.udid;
+				deviceLabel = emulatorInfo.label;
+			}
+			const androidOptions: BuildAndroidAppOptions = {
+				...baseOptions,
+				deviceId,
+				deviceLabel
+			};
+			return runBuild(androidOptions);
+		} else if (platform === Platform.ios) {
+			if (target === 'device') {
+				const deviceInfo = await selectiOSDevice();
+				deviceId = deviceInfo.udid;
+				deviceLabel = deviceInfo.label;
+			} else if (target === 'simulator') {
+				const simulatorInfo = await selectiOSSimulator(osVersion);
+				deviceId = simulatorInfo.udid;
+				osVersion = simulatorInfo.version;
+				deviceLabel = simulatorInfo.label;
+			}
+
+			if (platform === 'ios' && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
+				const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
+				iOSCertificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
+				iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
+			}
+		} else if (platform === Platform.windows) {
+			if (target === 'wp-device') {
+				const deviceInfo = await selectWindowsDevice();
+				deviceId = deviceInfo.udid;
+				deviceLabel = deviceInfo.label;
+			} else if (target === 'wp-emulator') {
+				const emulatorInfo = await selectWindowsEmulator();
+				deviceId = emulatorInfo.udid;
+				deviceLabel = emulatorInfo.label;
+			}
+			const windowsOptions: BuildWindowsAppOptions = {
+				...baseOptions
+			};
+
+			return runBuild(windowsOptions);
+		}
+
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
 		}
 	}
+}
+
+function runBuild (options: BuildAppOptions) {
+	const args = buildArguments(options);
+	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, options);
+	ExtensionContainer.terminal.runCommand(args);
 }
