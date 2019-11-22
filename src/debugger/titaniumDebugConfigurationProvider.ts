@@ -129,7 +129,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			if (!config.iOSCertificate) {
 				try {
 					const certificate = await selectiOSCertificate('run');
-					const provisioning = await selectiOSProvisioningProfile(certificate, config.target, project.appId());
+					const provisioning = await selectiOSProvisioningProfile(certificate, config.target, project.appId()!);
 
 					config.iOSCertificate = certificate.label;
 					config.iOSProvisioningProfile = provisioning.uuid;
