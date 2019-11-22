@@ -4,7 +4,7 @@ import { getAlloyRootPath, isAlloyProject } from './utils';
 
 import { Uri, window } from 'vscode';
 
-const alloyDirectoryMap = {
+const alloyDirectoryMap: { [key: string]: string } = {
 	xml: 'views',
 	tss: 'styles',
 	js: 'controllers'
@@ -142,7 +142,10 @@ export function getRelatedFilePaths () {
 	} else {
 		_.each(alloyDirectoryMap, (folderName, ext) => {
 			if (ext !== fileExt) {
-				return relatedFilePaths.push(getTargetPath(ext, currentPath));
+				const relatedFilePath = getTargetPath(ext, currentPath);
+				if (relatedFilePath) {
+					return relatedFilePaths.push();
+				}
 			}
 		});
 	}

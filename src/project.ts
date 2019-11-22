@@ -5,6 +5,7 @@ import * as utils from './utils';
 
 import { EventEmitter, Range, window, workspace } from 'vscode';
 import { handleInteractionError, InteractionError } from './commands/common';
+import { Platform } from './types/common';
 
 const TIAPP_FILENAME = 'tiapp.xml';
 const TIMODULEXML_FILENAME = 'timodule.xml';
@@ -19,7 +20,7 @@ export class Project {
 
 	private tiapp: any;
 	private modules: any[] = [];
-	private emitter: EventEmitter<void>;
+	private emitter: EventEmitter<void>|undefined;
 
 	/**
 	 * Check if the current project is a Titanium app or module.
@@ -56,8 +57,8 @@ export class Project {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public onModified (callback) {
-		if (this.isTitaniumApp) {
+	public onModified (callback: () => void) {
+		if (this.isTitaniumApp && this.emitter) {
 			this.emitter.event(callback);
 		}
 	}
@@ -88,7 +89,7 @@ export class Project {
 
 	public dashboardUrl () {
 		// this.tiapp.property[2].$.name
-		const appcAppIdProperty = this.tiapp.property.find(property => property.$.name === 'appc-app-id');
+		const appcAppIdProperty = this.tiapp.property.find((property: { $: { name: string }}) => property.$.name === 'appc-app-id');
 		if (appcAppIdProperty) {
 			return path.join(DASHBOARD_URL_ROOT, appcAppIdProperty._);
 		}
@@ -111,7 +112,7 @@ export class Project {
 	 * @param {String} platform		Platform name
 	 * @returns {String}
 	 */
-	public pathForPlatform (platform) {
+	public pathForPlatform (platform: Platform) {
 		const moduleInfo: any = this.modules.find((mod: any) => utils.normalisedPlatform(mod.platform) === platform);
 		if (moduleInfo) {
 			return moduleInfo.path;
@@ -133,7 +134,9 @@ export class Project {
 	 * Dispose of resources
 	 */
 	public dispose () {
-		this.emitter.dispose();
+		if (this.emitter) {
+			this.emitter.dispose();
+		}
 	}
 
 	/**
@@ -143,7 +146,7 @@ export class Project {
 	private async loadTiappFile  () {
 		this.isTitaniumApp = false;
 		this.isValidTiapp = false;
-		let error;
+		let error: InteractionError | undefined;
 		const rootPath = workspace.rootPath;
 		if (!rootPath) {
 			return;
@@ -154,7 +157,7 @@ export class Project {
 			const fileData = fs.readFileSync(filePath, 'utf-8');
 			const parser = new xml2js.Parser();
 			let json;
-			parser.parseString(fileData, (err, result) => {
+			parser.parseString(fileData, (err: Error, result: unknown) => {
 				if (err) {
 					let line: number;
 					let column: number;
@@ -178,7 +181,7 @@ export class Project {
 					error.interactionChoices.push({
 						title: 'Open tiapp.xml',
 						run: async () => {
-							const file = path.join(workspace.rootPath, 'tiapp.xml');
+							const file = path.join(workspace.rootPath!, 'tiapp.xml');
 							const document = await workspace.openTextDocument(file);
 							const linePrefix = new Range(line, 0, line, column);
 							await window.showTextDocument(document.uri, { selection: linePrefix });
@@ -195,7 +198,9 @@ export class Project {
 				workspace.onDidSaveTextDocument(event => {
 					if (event.fileName === filePath) {
 						this.loadTiappFile();
-						this.emitter.fire();
+						if (this.emitter) {
+							this.emitter.fire();
+						}
 					}
 				});
 			}
@@ -235,7 +240,7 @@ export class Project {
 	 *
 	 * @param {String} modulePath		path to module
 	 */
-	private loadModuleAt (modulePath) {
+	private loadModuleAt (modulePath: string) {
 		if (utils.directoryExists(modulePath)) {
 			const timodulePath = path.join(modulePath, TIMODULEXML_FILENAME);
 			const manifestPath = path.join(modulePath, MANIFEST_FILENAME);
@@ -247,7 +252,7 @@ export class Project {
 			const fileData = fs.readFileSync(timodulePath, 'utf-8');
 			const parser = new xml2js.Parser();
 			let json;
-			parser.parseString(fileData, (err, result) => {
+			parser.parseString(fileData, (err: Error, result: unknown) => {
 				if (!err) {
 					json = result;
 				}

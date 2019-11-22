@@ -7,7 +7,7 @@ import appc from './appc';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
-import { BuildAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, PackageOptions } from './types/cli';
+import { AndroidPackageOptions, BuildAppOptions, BuildIosAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, IosPackageOptions, PackageAppOptions, WindowsPackageOptions } from './types/cli';
 import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
 
 /**
@@ -268,7 +268,7 @@ export function filterJSFiles (directory: string) {
 	});
 }
 
-export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
+export function buildArguments (options: BuildAppOptions) {
 
 	const args = [
 		'run',
@@ -290,8 +290,8 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 
 		if (options.target === 'device' && options.platform === 'ios') {
 			args.push(
-				'--developer-name', options.iOSCertificate!,
-				'--pp-uuid', options.iOSProvisioningProfile!
+				'--developer-name', (options as BuildIosAppOptions).iOSCertificate!,
+				'--pp-uuid', (options as BuildIosAppOptions).iOSProvisioningProfile
 			);
 		}
 
@@ -325,7 +325,7 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function packageArguments (options: PackageOptions) {
+export function packageArguments (options: PackageAppOptions) {
 	const args = [
 		'run',
 		'--platform', options.platform,
@@ -340,26 +340,26 @@ export function packageArguments (options: PackageOptions) {
 
 	if (options.platform === 'android') {
 		args.push(
-			'--keystore', options.keystoreInfo.location,
-			'--alias', options.keystoreInfo.alias,
-			'--store-password', options.keystoreInfo.password
+			'--keystore', (options as AndroidPackageOptions).keystoreInfo.location,
+			'--alias', (options as AndroidPackageOptions).keystoreInfo.alias,
+			'--store-password', (options as AndroidPackageOptions).keystoreInfo.password
 		);
-		if (options.keystoreInfo.privateKeyPassword) {
-			args.push('--key-password', options.keystoreInfo.privateKeyPassword);
+		if ((options as AndroidPackageOptions).keystoreInfo.privateKeyPassword) {
+			args.push('--key-password', (options as AndroidPackageOptions).keystoreInfo.privateKeyPassword!);
 		}
 	} else if (options.platform === 'ios') {
 		args.push(
-			'--distribution-name', options.iOSCertificate!,
-			'--pp-uuid', options.iOSProvisioningProfile!
+			'--distribution-name', (options as IosPackageOptions).iOSCertificate!,
+			'--pp-uuid', (options as IosPackageOptions).iOSProvisioningProfile!
 		);
 	} else if (options.platform === 'windows') {
-		if (options.windowsCertInfo.location) {
-			args.push('--win-cert', options.windowsCertInfo.location);
+		if ((options as WindowsPackageOptions).windowsCertInfo.location) {
+			args.push('--win-cert', (options as WindowsPackageOptions).windowsCertInfo.location!);
 		} else {
 			args.push('--win-cert');
 		}
-		args.push('--pfx-password', options.windowsCertInfo.password);
-		args.push('--win-publisher-id', options.windowsPublisherID!);
+		args.push('--pfx-password', (options as WindowsPackageOptions).windowsCertInfo.password);
+		args.push('--win-publisher-id', (options as WindowsPackageOptions).windowsPublisherID!);
 	}
 	return args.map(arg => quoteArgument(arg));
 }
@@ -470,12 +470,10 @@ export function isValidPlatform (targetPlatform: string) {
  */
 export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType) {
 	const certificate = appc.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
-	if (!certificate) {
-		return;
-	}
+
 	if (semver.gte(semver.coerce(sdkVersion)!, '8.2.0')) {
-		return certificate.fullname;
+		return certificate!.fullname;
 	} else {
-		return certificate.name;
+		return certificate!.name;
 	}
 }

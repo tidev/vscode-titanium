@@ -12,10 +12,10 @@ interface CommandResponse {
 export default class Terminal {
 
 	private name: string;
-	private terminal: VSTerminal;
+	private terminal: VSTerminal|undefined;
 	private command: string;
-	private proc: ChildProcess;
-	private channel: vscode.OutputChannel;
+	private proc: ChildProcess|undefined;
+	private channel: vscode.OutputChannel|undefined;
 
 	constructor (name: string, command: string = 'appc' ) {
 
@@ -29,7 +29,7 @@ export default class Terminal {
 		this.command = command;
 	}
 
-	public setCommandPath (commandPath) {
+	public setCommandPath (commandPath: string) {
 		this.command = commandPath;
 	}
 
@@ -77,17 +77,17 @@ export default class Terminal {
 
 				proc.stdout.on('data', data => {
 					const message = data.toString();
-					this.channel.append(message);
+					this.channel!.append(message);
 				});
 				proc.stderr.on('data', data => {
 					const message = data.toString();
-					this.channel.append(message);
+					this.channel!.append(message);
 				});
 
 				proc.on('close', code => {
 					if (code) {
 						window.showErrorMessage(`Failed to create the application, please check the output.`);
-						this.channel.show();
+						this.channel!.show();
 						return reject();
 					}
 					return resolve();
@@ -139,19 +139,19 @@ export default class Terminal {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 			vscode.commands.executeCommand('setContext', GlobalState.Running, true);
 			const message = data.toString();
-			this.channel.append(message);
+			this.channel!.append(message);
 		});
 		this.proc.stderr.on('data', data => {
 			const message = data.toString();
-			this.channel.append(message);
+			this.channel!.append(message);
 		});
 		this.proc.on('close', data => {
-			this.proc = null;
+			this.proc = undefined;
 		});
 		this.proc.on('exit', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, false);
 			vscode.commands.executeCommand('setContext', GlobalState.Running, false);
-			this.proc = null;
+			this.proc = undefined;
 		});
 
 		this.channel.show();
@@ -159,13 +159,15 @@ export default class Terminal {
 	}
 
 	public clear () {
-		this.terminal.sendText('clear');
+		if (this.terminal) {
+			this.terminal.sendText('clear');
+		}
 	}
 
 	public stop () {
 		if (this.proc) {
 			this.proc.kill();
-			this.proc = null;
+			this.proc = undefined;
 		}
 	}
 

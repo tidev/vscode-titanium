@@ -16,7 +16,7 @@ export async function getAppName (projectDirectory: string): Promise<string> {
 			const tiappPath = path.join(projectDirectory, 'tiapp.xml');
 			const fileData = fs.readFileSync(tiappPath, 'utf-8');
 			const parser = new xml2js.Parser();
-			parser.parseString(fileData, (err, result) => {
+			parser.parseString(fileData, (err: Error, result: any) => {
 				if (!err) {
 					return resolve(result['ti:app'].name[0]);
 				}
