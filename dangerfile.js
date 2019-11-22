@@ -1,4 +1,4 @@
-const tslint = require('@awam/danger-plugin-tslint').default;
+const eslint = require('@seadub/danger-plugin-eslint').default;
 const junit = require('@seadub/danger-plugin-junit').default;
 const dependencies = require('@seadub/danger-plugin-dependencies').default;
 
@@ -13,7 +13,7 @@ async function linkToVsix () {
 
 async function main() {
 	await Promise.all([
-		tslint(),
+		eslint(),
 		junit({ pathToReport: './junit_report.xml' }),
 		dependencies({ type: 'npm' }),
 		linkToVsix()

@@ -1,0 +1,13 @@
+{
+	"extends": [ "axway/env-node", "axway/+mocha", "axway/+typescript"],
+	"parserOptions": {
+		"project": "./tsconfig.json"
+	},
+	"rules": {
+		"node/no-unsupported-features/es-syntax": ["warn", {
+			"ignores": [
+				"modules"
+			]
+		}]
+	}
+}
