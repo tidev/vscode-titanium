@@ -13,7 +13,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	private activeRequests = new Map();
 	private deviceId: string|undefined;
 	private idCount = 0;
-	private isDisconnecting: boolean = false;
+	private isDisconnecting = false;
 	private platform: string|undefined;
 	private port: number|undefined;
 	private server!: ProxyServer;
@@ -151,7 +151,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return super.attach(attachArgs);
 	}
 
-	private async pollForApp (url: string, errorMessage: string, maxRetries= 5, iteration: number = 0): Promise<Array<{ metadata: { deviceId: string; url: string }, webSocketDebuggerUrl: string }>> {
+	private async pollForApp (url: string, errorMessage: string, maxRetries = 5, iteration = 0): Promise<Array<{ metadata: { deviceId: string; url: string }; webSocketDebuggerUrl: string }>> {
 		if (iteration > maxRetries) {
 			throw Error(errorMessage);
 		}

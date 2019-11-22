@@ -16,7 +16,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	private updateMap: Map<string, UpdateNode> = new Map();
 
-	private checkingForUpdates: boolean = false;
+	private checkingForUpdates = false;
 
 	public async refresh () {
 		this.checkingForUpdates = true;

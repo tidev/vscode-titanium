@@ -103,7 +103,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 		if (this.projectType === 'alloy') {
 			searchFolders.push(path.join(appRoot, 'lib'));
-			searchFolders.push(path.join(appRoot, 'controllers' , this.platform!));
+			searchFolders.push(path.join(appRoot, 'controllers', this.platform!));
 		}
 
 		for (const folder of searchFolders) {
@@ -132,8 +132,8 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	public async fixSource (source: DebugProtocol.Source): Promise<void> {
 		if (source && source.path) {
 
-			const clientPath = this._targetUrlToLocalPath.get(source.path) ||
-				await chromeUtils.targetUrlToClientPath(source.path, this._pathMapping);
+			const clientPath = this._targetUrlToLocalPath.get(source.path)
+				|| await chromeUtils.targetUrlToClientPath(source.path, this._pathMapping);
 
 			if (clientPath) {
 				source.path = clientPath;

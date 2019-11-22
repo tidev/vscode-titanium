@@ -213,7 +213,7 @@ export async function getReferences (files: string[]|string, regExp: RegExp, cal
 	if (!Array.isArray(files)) {
 		files = [ files ];
 	}
-	for (const file of files ) {
+	for (const file of files) {
 		let document;
 		try {
 			document = await workspace.openTextDocument(file);

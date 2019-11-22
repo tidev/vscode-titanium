@@ -24,7 +24,7 @@ export function platforms (): string[] {
 		case 'linux':
 			return [ 'android' ];
 		default:
-			return[];
+			return [];
 	}
 }
 

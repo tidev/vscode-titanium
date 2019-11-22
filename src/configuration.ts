@@ -12,11 +12,11 @@ export class Configuration {
 	public get<T> (section?: string, resource?: Uri, defaultValue?: T) {
 		return defaultValue === undefined
 			? workspace
-					.getConfiguration(section === undefined ? undefined : ExtensionId, resource!)
-					.get<T>(section === undefined ? ExtensionId : section)!
+				.getConfiguration(section === undefined ? undefined : ExtensionId, resource!)
+				.get<T>(section === undefined ? ExtensionId : section)!
 			: workspace
-					.getConfiguration(section === undefined ? undefined : ExtensionId, resource!)
-					.get<T>(section === undefined ? ExtensionId : section, defaultValue)!;
+				.getConfiguration(section === undefined ? undefined : ExtensionId, resource!)
+				.get<T>(section === undefined ? ExtensionId : section, defaultValue)!;
 	}
 
 	public update (section: string, value: any, target: ConfigurationTarget, resourece?: Uri) {

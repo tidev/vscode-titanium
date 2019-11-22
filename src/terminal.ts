@@ -17,7 +17,7 @@ export default class Terminal {
 	private proc: ChildProcess|undefined;
 	private channel: vscode.OutputChannel|undefined;
 
-	constructor (name: string, command: string = 'appc' ) {
+	constructor (name: string, command = 'appc') {
 
 		this.name = name;
 		this.terminal = window.createTerminal({ name });
@@ -33,7 +33,7 @@ export default class Terminal {
 		this.command = commandPath;
 	}
 
-	public runCommand (args: string[], { forceTerminal = false } = {} ) {
+	public runCommand (args: string[], { forceTerminal = false } = {}) {
 		if (ExtensionContainer.config.general.useTerminalForBuild || forceTerminal) {
 			if (!this.terminal) {
 				this.terminal = window.createTerminal({ name: this.name });
@@ -86,7 +86,7 @@ export default class Terminal {
 
 				proc.on('close', code => {
 					if (code) {
-						window.showErrorMessage(`Failed to create the application, please check the output.`);
+						window.showErrorMessage('Failed to create the application, please check the output.');
 						this.channel!.show();
 						return reject();
 					}

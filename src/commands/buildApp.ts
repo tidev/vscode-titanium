@@ -3,8 +3,8 @@ import project from '../project';
 import { workspace } from 'vscode';
 import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
-import { DeviceNode, OSVerNode, PlatformNode, TargetNode, } from '../explorer/nodes';
-import { buildArguments, getCorrectCertificateName, nameForPlatform, nameForTarget, } from '../utils';
+import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
+import { buildArguments, getCorrectCertificateName, nameForPlatform, nameForTarget } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import {

@@ -3,7 +3,7 @@ import { BaseNode } from './baseNode';
 import { DeviceNode } from './deviceNode';
 
 import appc from '../../appc';
-import { Platform} from '../../types/common';
+import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
 
 export class OSVerNode extends BaseNode {

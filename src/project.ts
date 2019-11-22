@@ -14,9 +14,9 @@ const DASHBOARD_URL_ROOT = 'https://platform.axway.com/#/app/';
 
 export class Project {
 
-	public isTitaniumApp: boolean = false;
-	public isTitaniumModule: boolean = false;
-	public isValidTiapp: boolean = false;
+	public isTitaniumApp = false;
+	public isTitaniumModule = false;
+	public isValidTiapp = false;
 
 	private tiapp: any;
 	private modules: any[] = [];

@@ -41,7 +41,7 @@ import { buildArguments } from './utils';
 
 import ms = require('ms');
 import { completion, environment, updates } from 'titanium-editor-commons';
-import { handleInteractionError, InteractionChoice, InteractionError,  } from './commands/common';
+import { handleInteractionError, InteractionChoice, InteractionError  } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { quickPick, selectUpdates } from './quickpicks/common';
@@ -243,7 +243,7 @@ function activate (context: vscode.ExtensionContext) {
 						vscode.commands.executeCommand(Commands.RefreshUpdates);
 						vscode.commands.executeCommand(Commands.RefreshExplorer);
 						resolve();
-						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
+						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
 					});
 				});
 			} catch (error) {
@@ -265,7 +265,7 @@ function activate (context: vscode.ExtensionContext) {
 						vscode.commands.executeCommand(Commands.RefreshUpdates);
 						vscode.commands.executeCommand(Commands.RefreshExplorer);
 						resolve();
-						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update' }`);
+						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
 					});
 				});
 			} catch (error) {
@@ -418,7 +418,7 @@ async function init () {
 				const { missing } = await environment.validateEnvironment();
 
 				if (missing.length) {
-					let message = `You are missing the following required components for Titanium development:`;
+					let message = 'You are missing the following required components for Titanium development:';
 					for (let i = 0; i < missing.length; i++) {
 						const product = missing[i];
 						if (i < missing.length - 1) {
@@ -536,7 +536,7 @@ function setStatusBar () {
  * @param {Object} opts - Options
  * @param {Object} progress - Progress reporter.
  */
-async function generateCompletions (force: boolean = false) {
+async function generateCompletions (force = false) {
 	if (!project.isValid()) {
 		return;
 	}

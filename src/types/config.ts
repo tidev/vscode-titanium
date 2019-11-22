@@ -2,33 +2,33 @@ import { LogLevel } from './common';
 
 export interface Config {
 	android: {
-		keystoreAlias: string | undefined,
-		keystorePath: string | undefined
+		keystoreAlias: string | undefined;
+		keystorePath: string | undefined;
 	};
 	build: {
-		liveview: boolean
+		liveview: boolean;
 	};
 	codeTemplates: {
-		jsFunction: string,
-		tssClass: string,
-		tssId: string,
-		tssTag: string
+		jsFunction: string;
+		tssClass: string;
+		tssId: string;
+		tssTag: string;
 	};
 	general: {
-		appcCommandPath: string,
-		displayBuildCommandInConsole: boolean,
-		logLevel: LogLevel,
-		useTerminalForBuild: boolean,
-		updateFrequency: string
+		appcCommandPath: string;
+		displayBuildCommandInConsole: boolean;
+		logLevel: LogLevel;
+		useTerminalForBuild: boolean;
+		updateFrequency: string;
 	};
 	package: {
-		distributionOutputDirectory: string
+		distributionOutputDirectory: string;
 	};
 	project: {
-		defaultI18nLanguage: string
+		defaultI18nLanguage: string;
 	};
 	windows: {
-		signingCertPath: string,
-		publisherID: string
+		signingCertPath: string;
+		publisherID: string;
 	};
 }
