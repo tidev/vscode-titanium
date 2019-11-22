@@ -37,13 +37,13 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 			sdkVersion = sdkVer[1];
 			const sdks = appc.sdks();
 			for (const sdk of sdks) {
-				if (sdkVersion && !sdk.fullversion.includes(sdkVersion)) {
+				if (sdkVersion && !sdk.fullversion?.includes(sdkVersion)) {
 					continue;
 				}
 				completions.push({
-					label: sdk.fullversion,
+					label: sdk.fullversion!,
 					kind: CompletionItemKind.Value,
-					insertText: sdk.fullversion.replace(sdkVersion, '')
+					insertText: sdk.fullversion?.replace(sdkVersion, '')
 				});
 			}
 		} else if (tag === 'module') {

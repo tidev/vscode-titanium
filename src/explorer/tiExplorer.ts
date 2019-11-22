@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import appc from '../appc';
+import { Platform } from '../types/common';
+import { platforms } from '../utils';
 import { BaseNode } from './nodes/baseNode';
 import { PlatformNode } from './nodes/platformNode';
-
-import { platforms } from '../utils';
 
 export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode> {
 
@@ -15,9 +15,9 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 	private platforms: Map<string, PlatformNode> = new Map();
 
 	public refresh () {
-		vscode. window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, () => {
+		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, () => {
 			return new Promise((resolve, reject) => {
-				appc.getInfo((error: Error, info: any) => {
+				appc.getInfo((error: Error|null, info: any) => {
 					if (info) {
 						this._onDidChangeTreeData.fire();
 						vscode.window.showInformationMessage('Updated device explorer');
@@ -43,7 +43,7 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 		const elements = [];
 
 		for (const platform of platforms()) {
-			const node = new PlatformNode(platform);
+			const node = new PlatformNode(platform as Platform);
 			this.platforms.set(platform, node);
 			elements.push(node);
 		}

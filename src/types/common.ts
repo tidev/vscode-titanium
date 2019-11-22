@@ -1,3 +1,5 @@
+import { UpdateInfo } from 'titanium-editor-commons/updates';
+
 export interface KeystoreInfo {
 	alias: string;
 	location: string;
@@ -7,9 +9,9 @@ export interface KeystoreInfo {
 export interface IosCert {
 	after: string;
 	before: string;
-	expired: string;
+	expired: string|boolean;
 	fullname: string;
-	invalid: string;
+	invalid: string|boolean;
 	name: string;
 	pem: string;
 }
@@ -20,7 +22,7 @@ export interface ProvisioningProfile {
 	apsEnvironment: string;
 	certs: string[];
 	creationDate: string;
-	devices: string[];
+	devices: string[]|null;
 	entitlements: object;
 	expirationDate: string;
 	file: string;
@@ -59,4 +61,10 @@ export enum Platform {
 	android = 'android',
 	ios = 'ios',
 	windows = 'windows'
+}
+
+export interface UpdateChoice extends Omit<UpdateInfo, 'hasUpdate' | 'releaseNotes'> {
+	label: string;
+	picked: boolean;
+	id: string;
 }
