@@ -28,27 +28,26 @@ import { StyleCompletionItemProvider } from './providers/completion/styleComplet
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
-import { UserCancellation } from './commands/common';
-import { FeedbackOptions, MESSAGE_STRING, Request, Response, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from './common/extensionProtocol';
+import { FeedbackOptions, MESSAGE_STRING, Request, Response, TitaniumLaunchRequestArgs } from './common/extensionProtocol';
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
-import { selectBuildTarget, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from './quickpicks/common';
 import { BuildAppOptions } from './types/cli';
-import { LogLevel } from './types/common';
+import { LogLevel, UpdateChoice } from './types/common';
 import { buildArguments } from './utils';
 
-import * as ms from 'ms';
+import ms = require('ms');
 import { completion, environment, updates } from 'titanium-editor-commons';
 import { handleInteractionError, InteractionChoice, InteractionError,  } from './commands/common';
 import { UpdateNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
-import { selectUpdates } from './quickpicks/common';
-let projectStatusBarItem;
+import { quickPick, selectUpdates } from './quickpicks/common';
+let projectStatusBarItem: vscode.StatusBarItem;
 
+import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConfigurationProvider';
 
 /**
@@ -56,7 +55,7 @@ import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConf
  *
  * @param {Object} context 	extension context
  */
-function activate (context) {
+function activate (context: vscode.ExtensionContext) {
 
 	Configuration.configure(context);
 
@@ -131,7 +130,7 @@ function activate (context) {
 
 		// register set log level command
 		vscode.commands.registerCommand(Commands.SetLogLevel, async () => {
-			const level = await vscode.window.showQuickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' });
+			const level = await quickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' }) as keyof typeof LogLevel;
 			const actualLevel = LogLevel[level];
 			if (actualLevel) {
 				await configuration.update('general.logLevel', actualLevel, vscode.ConfigurationTarget.Global);
@@ -154,11 +153,11 @@ function activate (context) {
 
 		// register generate autocomplete suggestions command
 		vscode.commands.registerCommand(Commands.GenerateAutocomplete, async () => {
-			await generateCompletions({ force: true });
+			await generateCompletions(true);
 		}),
 
 		vscode.commands.registerCommand(Commands.OpenAppOnDashboard, () => {
-			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()));
+			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()!));
 		}),
 
 		vscode.window.registerTreeDataProvider('titanium.view.buildExplorer', deviceExplorer),
@@ -225,7 +224,7 @@ function activate (context) {
 			}
 		}),
 
-		vscode.commands.registerCommand(Commands.SelectUpdates, async updateInfo => {
+		vscode.commands.registerCommand(Commands.SelectUpdates, async (updateInfo: UpdateInfo[]) => {
 			try {
 				if (!updateInfo) {
 					updateInfo = updateExplorer.updates;
@@ -292,7 +291,7 @@ function activate (context) {
 		}),
 		vscode.commands.registerCommand(Commands.Clean, cleanApplication),
 
-		context.subscriptions.push(vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
+		vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
 			if (event.event === MESSAGE_STRING) {
 				const request: Request = event.body;
 
@@ -307,7 +306,9 @@ function activate (context) {
 
 					const buildArgs = buildArguments(providedArgs);
 					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
-
+					if (!build) {
+						return;
+					}
 					build.stdout.on('data', data => {
 						data = data.toString();
 
@@ -370,7 +371,9 @@ function activate (context) {
 								}
 							}
 						}
-
+						if (!providedArgs.deviceId) {
+							return;
+						}
 						try {
 							ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', tcpPort ]);
 						} catch (error) {
@@ -379,9 +382,9 @@ function activate (context) {
 					}
 				}
 			}
-		})),
+		}),
 
-		context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('titanium', new TitaniumDebugConfigurationProvider()))
+		vscode.debug.registerDebugConfigurationProvider('titanium', new TitaniumDebugConfigurationProvider())
 
 	);
 
@@ -468,14 +471,14 @@ async function init () {
 					}
 
 					if (project.isTitaniumApp) {
-						generateCompletions({ progress });
+						generateCompletions();
 					}
 
 					// Call refresh incase the Titanium Explorer activity pane became active before info
 					vscode.commands.executeCommand(Commands.RefreshExplorer);
 
 					// Perform the update check if we need to
-					const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck);
+					const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
 					const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
 
 					// If there's no timestamp for when we last checked the updates then set to now
@@ -516,8 +519,8 @@ function setStatusBar () {
 			projectStatusBarItem.command = Commands.OpenAppOnDashboard;
 			projectStatusBarItem.tooltip = 'Open Axway Dashboard';
 		} else {
-			projectStatusBarItem.comand = null;
-			projectStatusBarItem.tooltip = null;
+			projectStatusBarItem.command = undefined;
+			projectStatusBarItem.tooltip = undefined;
 		}
 		projectStatusBarItem.show();
 	} else if (project.isTitaniumModule) {
@@ -532,19 +535,30 @@ function setStatusBar () {
  * @param {Object} opts - Options
  * @param {Object} progress - Progress reporter.
  */
-async function generateCompletions ({ force = false, progress = null } = {}) {
+async function generateCompletions (force: boolean = false) {
 	if (!project.isValid()) {
 		return;
 	}
-	let sdkVersion;
+	let sdkVersion: string|undefined;
 	try {
 		sdkVersion = project.sdk();
-		if (sdkVersion.length > 1) {
+		if (!sdkVersion) {
+			const error = new InteractionError('Errors found in tiapp.xml: no sdk-version found');
+			error.interactionChoices.push({
+				title: 'Open tiapp.xml',
+				run: async () => {
+					const file = path.join(vscode.workspace.rootPath!, 'tiapp.xml');
+					const document = await vscode.workspace.openTextDocument(file);
+					await vscode.window.showTextDocument(document);
+				}
+			});
+			throw error;
+		} else if (sdkVersion.length > 1) {
 			const error = new InteractionError('Errors found in tiapp.xml: multiple sdk-version tags found.');
 			error.interactionChoices.push({
 				title: 'Open tiapp.xml',
 				run: async () => {
-					const file = path.join(vscode.workspace.rootPath, 'tiapp.xml');
+					const file = path.join(vscode.workspace.rootPath!, 'tiapp.xml');
 					const document = await vscode.workspace.openTextDocument(file);
 					await vscode.window.showTextDocument(document);
 				}
@@ -561,7 +575,12 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 		return;
 	}
 	try {
-		const sdkPath = appc.sdkInfo(sdkVersion).path;
+		const sdkInfo = appc.sdkInfo(sdkVersion);
+		if (!sdkInfo) {
+			// TODO
+			return;
+		}
+		const sdkPath = sdkInfo.path;
 		// Generate the completions
 		const [ alloy, sdk ] = await Promise.all([
 			completion.generateAlloyCompletions(force, completion.CompletionsFormat.v2),
@@ -586,9 +605,9 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, () => {
 						return new Promise(async (resolve, reject) => {
 							try {
-								await updates.titanium.sdk.installUpdate(sdkVersion);
+								await updates.titanium.sdk.installUpdate(sdkVersion as string);
 								appc.getInfo(() => {
-									generateCompletions();
+									generateCompletions(force);
 									return resolve();
 								});
 							} catch (error) {
@@ -606,15 +625,15 @@ async function generateCompletions ({ force = false, progress = null } = {}) {
 	}
 }
 
-async function installUpdates (updateInfo, progress, incrementProgress = true) {
+async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progress: vscode.Progress<{}>, incrementProgress = true) {
 	const totalUpdates = updateInfo.length;
 	let counter = 1;
 
 	// sort prior to running
-	updateInfo.sort((curr, prev) => curr.priority - prev.priority);
+	updateInfo.sort((curr: UpdateChoice|UpdateInfo, prev: UpdateChoice|UpdateInfo) => curr.priority - prev.priority);
 
 	for (const update of updateInfo) {
-		const label = update.label || `${update.productName}: ${update.latestVersion}`;
+		const label = (update as UpdateChoice).label || `${update.productName}: ${update.latestVersion}`;
 		progress.report({
 			message: `Installing ${label} (${counter}/${totalUpdates})`
 		});
@@ -640,7 +659,7 @@ async function installUpdates (updateInfo, progress, incrementProgress = true) {
 			if (error.metadata) {
 				const { metadata } = error;
 				if (update.productName === updates.ProductNames.AppcInstaller && metadata.errorCode === 'EACCES') {
-					const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${update.label} as it must be ran with sudo`, {
+					const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${label} as it must be ran with sudo`, {
 						title: 'Install with Sudo',
 						run: () => {
 							ExtensionContainer.terminal.executeCommand(`sudo ${metadata.command}`);
@@ -652,7 +671,7 @@ async function installUpdates (updateInfo, progress, incrementProgress = true) {
 				}
 			} else {
 				// TODO should we show the error that we got passed?
-				await vscode.window.showErrorMessage(`Failed to update to ${update.label}`);
+				await vscode.window.showErrorMessage(`Failed to update to ${label}`);
 			}
 		}
 		counter++;
