@@ -30,7 +30,7 @@ export interface BuildAndroidAppOptions extends BuildAppBase {
 
 export interface BuildIosAppOptions extends BuildAppBase {
 	iOSCertificate?: string;
-	iOSProvisioningProfile: string;
+	iOSProvisioningProfile?: string;
 }
 
 export interface BuildWindowsAppOptions extends BuildAppBase {

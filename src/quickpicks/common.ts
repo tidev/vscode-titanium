@@ -246,7 +246,7 @@ export function selectiOSDevice () {
 	return quickPick(devices, { placeHolder: 'Select device' });
 }
 
-export async function selectiOSSimulator (iOSVersion: string) {
+export async function selectiOSSimulator (iOSVersion?: string) {
 	if (!iOSVersion) {
 		iOSVersion = (await selectiOSSimulatorVersion()).label;
 	}

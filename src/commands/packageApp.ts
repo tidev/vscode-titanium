@@ -12,12 +12,22 @@ import { enterAndroidKeystoreInfo, enterPassword, enterWindowsSigningInfo, input
 import { AndroidPackageOptions, BasePackageOptions, IosPackageOptions, PackageAppOptions, WindowsPackageOptions } from '../types/cli';
 import { IosCertificateType, KeystoreInfo, Platform, WindowsCertInfo } from '../types/common';
 
-export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
+function runPackage (options: PackageAppOptions): void {
+	const args = packageArguments(options);
+	ExtensionContainer.terminal.runCommand(args);
+	if (options.platform === Platform.android) {
+		delete (options as AndroidPackageOptions).keystoreInfo.password;
+		delete (options as AndroidPackageOptions).keystoreInfo.privateKeyPassword;
+	}
+	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, options);
+}
+
+export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 		// TODO: Handle a build in progress
 		const buildType = 'dist';
-		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastPackageState);
+		const lastBuildState = ExtensionContainer.context.workspaceState.get<PackageAppOptions>(WorkspaceState.LastPackageState); // TODO type this
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const projectDir = workspace.rootPath!;
 
@@ -45,13 +55,15 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 
 		if (!platform) {
 			const platformInfo = await selectPlatform(lastBuildDescription);
-			if (platformInfo.id === 'last') {
+			if (lastBuildState && platformInfo.id === 'last') {
 				platform = lastBuildState.platform;
 				target = lastBuildState.target;
-				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.distribution)!;
-				iOSProvisioningProfile = lastBuildState.iOSProvisioningProfile;
-				keystoreInfo = lastBuildState.keystoreInfo as KeystoreInfo;
+				if (platform === Platform.ios) {
+					iOSCertificate = getCorrectCertificateName((lastBuildState as IosPackageOptions).iOSCertificate, project.sdk()[0], IosCertificateType.distribution)!;
+					iOSProvisioningProfile = (lastBuildState as IosPackageOptions).iOSProvisioningProfile;
+				}
 				if (platform === Platform.android) {
+					keystoreInfo = (lastBuildState as AndroidPackageOptions).keystoreInfo;
 					keystoreInfo.password = await enterPassword({ placeHolder: 'Enter your keystore password' });
 				}
 				outputDirectory = lastBuildState.outputDirectory;
@@ -133,14 +145,4 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 			await handleInteractionError(error);
 		}
 	}
-}
-
-function runPackage (options: PackageAppOptions) {
-	const args = packageArguments(options);
-	ExtensionContainer.terminal.runCommand(args);
-	if (options.platform === Platform.android) {
-		delete (options as AndroidPackageOptions).keystoreInfo.password;
-		delete (options as AndroidPackageOptions).keystoreInfo.privateKeyPassword;
-	}
-	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastPackageState, options);
 }

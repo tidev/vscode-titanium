@@ -8,7 +8,7 @@ import { handleInteractionError, InteractionError } from './common';
 
 import { CleanAppOptions } from '../types/cli';
 
-export async function cleanApplication () {
+export async function cleanApplication (): Promise<void> {
 	try {
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		let projectDir = workspace.rootPath!;

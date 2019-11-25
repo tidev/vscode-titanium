@@ -38,7 +38,8 @@ export enum AlloyComponentExtension {
 	Widget = ''
 }
 
-async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension) {
+async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension):
+Promise<{ cwd: string; filePaths: string[]; name: string; type: AlloyComponentType }> {
 	const name = await inputBox({ prompt: `Enter the name for your ${type}` });
 
 	const cwd = workspace.rootPath!;
@@ -62,7 +63,7 @@ async function promptForDetails (type: AlloyComponentType, folder: AlloyComponen
 	return { cwd, filePaths, name, type };
 }
 
-export async function generateComponent (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension) {
+export async function generateComponent (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension): Promise<void> {
 	let name;
 	try {
 		const creationArgs = await promptForDetails(type, folder, extension);
@@ -92,7 +93,7 @@ export async function generateComponent (type: AlloyComponentType, folder: Alloy
 	}
 }
 
-export async function generateModel () {
+export async function generateModel (): Promise<void> {
 	let name;
 	try {
 		const creationArgs = await promptForDetails(AlloyComponentType.Model, AlloyComponentFolder.Model, AlloyComponentExtension.Model);

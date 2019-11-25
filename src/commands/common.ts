@@ -51,9 +51,8 @@ export class InteractionError extends Error {
 
 /**
  * Check Appcelerator login and prompt if necessary.
- * @returns {Boolean} Whether or not the login prompt should be shown.
  */
-export function checkLogin () {
+export function checkLogin (): void {
 	if (!ExtensionContainer.appc.isUserLoggedIn()) {
 		window.showInformationMessage('Please log in to the Appcelerator platform');
 		const error = new InteractionError('You are not logged in. Please log in to continue');
@@ -70,7 +69,7 @@ export function checkLogin () {
 	}
 }
 
-export async function handleInteractionError (error: InteractionError) {
+export async function handleInteractionError (error: InteractionError): Promise<void> {
 	const actionToTake: any = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
 	if (actionToTake) {
 		actionToTake.run();
