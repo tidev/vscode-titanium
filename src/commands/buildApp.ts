@@ -18,16 +18,22 @@ import {
 	selectWindowsDevice,
 	selectWindowsEmulator
 } from '../quickpicks/common';
-import { BuildAndroidAppOptions, BuildAppBase, BuildAppOptions, BuildIosAppOptions, BuildWindowsAppOptions } from '../types/cli';
+import { BuildAndroidAppOptions, BuildAppBase, BuildAppOptions, BuildWindowsAppOptions, BuildIosAppOptions } from '../types/cli';
 import { IosCertificateType, Platform } from '../types/common';
 
-export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
+function runBuild (options: BuildAppOptions): void {
+	const args = buildArguments(options);
+	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, options);
+	ExtensionContainer.terminal.runCommand(args);
+}
+
+export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 		// TODO: Handle a build in progress
 		const buildType = 'run';
 		const liveview = ExtensionContainer.config.build.liveview;
-		const lastBuildState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastBuildState);
+		const lastBuildState = ExtensionContainer.context.workspaceState.get<BuildAppOptions>(WorkspaceState.LastBuildState); // TODO type this
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const projectDir = workspace.rootPath!;
 
@@ -50,7 +56,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 
 		if (lastBuildState) {
 			try {
-				lastBuildDescription = `${nameForPlatform(lastBuildState.platform)} ${nameForTarget(lastBuildState.target)} ${lastBuildState.deviceLabel}`;
+				lastBuildDescription = `${nameForPlatform(lastBuildState.platform)} ${nameForTarget(lastBuildState.target!)} ${lastBuildState.deviceLabel}`;
 			} catch (error) {
 				// Squash in case we had an incompatible build state
 			}
@@ -58,17 +64,19 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 
 		if (!platform) {
 			const platformInfo = await selectPlatform(lastBuildDescription);
-			if (platformInfo.id === 'last') {
+			if (lastBuildState && platformInfo.id === 'last') {
 				deviceId = lastBuildState.deviceId;
 				deviceLabel = lastBuildState.deviceLabel;
-				iOSCertificate = getCorrectCertificateName(lastBuildState.iOSCertificate, project.sdk()[0], IosCertificateType.developer);
-				osVersion = lastBuildState.osVersion;
-				platform = lastBuildState.platform;
-				iOSProvisioningProfile = lastBuildState.iOSProvisioningProfile;
+				platform = lastBuildState.platform as Platform;
 				target = lastBuildState.target;
-			} else {
-				platform = platformInfo.id;
+				if (platform === Platform.ios) {
+					iOSCertificate = getCorrectCertificateName((lastBuildState as BuildIosAppOptions).iOSCertificate!, project.sdk()[0], IosCertificateType.developer);
+					osVersion = (lastBuildState as BuildIosAppOptions & { osVersion: string }).osVersion;
+					iOSProvisioningProfile = (lastBuildState as BuildIosAppOptions).iOSProvisioningProfile;
+				}
 
+			} else {
+				platform = platformInfo.id as Platform;
 			}
 		}
 
@@ -161,10 +169,4 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			await handleInteractionError(error);
 		}
 	}
-}
-
-function runBuild (options: BuildAppOptions) {
-	const args = buildArguments(options);
-	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, options);
-	ExtensionContainer.terminal.runCommand(args);
 }

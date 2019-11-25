@@ -8,7 +8,7 @@ import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from
 import { createAppArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError,  InteractionError } from './common';
 
-export async function createApplication () {
+export async function createApplication (): Promise<void> {
 	try {
 		checkLogin();
 		let force = false;

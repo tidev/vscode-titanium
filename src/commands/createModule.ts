@@ -8,7 +8,7 @@ import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from
 import { createModuleArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
-export async function createModule () {
+export async function createModule (): Promise<void> {
 	try {
 		checkLogin();
 		let force = false;

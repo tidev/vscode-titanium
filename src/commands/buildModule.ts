@@ -10,7 +10,7 @@ import { selectPlatform } from '../quickpicks/common';
 import { BuildModuleOptions } from '../types/cli';
 import { Platform } from '../types/common';
 
-export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
+export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 		// TODO: Handle a build in progress, allow passing in emulators etc. here? And actually use package for dist modules?
