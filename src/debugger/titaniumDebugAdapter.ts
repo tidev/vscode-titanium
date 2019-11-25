@@ -73,6 +73,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			buildType: 'run',
 			skipJsMinify: true,
 			deployType: 'development',
+			liveview: false,
 			...launchArgs
 		};
 
@@ -99,6 +100,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			skipJsMinify: true,
 			sourceMaps: true,
 			deployType: 'development',
+			liveview: false,
 			...launchArgs
 		};
 

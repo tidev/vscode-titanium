@@ -268,7 +268,7 @@ export function filterJSFiles (directory: string) {
 	});
 }
 
-export function buildArguments (options: BuildAppOptions) {
+export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 
 	const args = [
 		'run',

@@ -15,8 +15,8 @@ export interface BaseBuildOptions extends BaseCLIOptions {
 export interface BuildAppBase extends BaseBuildOptions {
 	deviceId?: string;
 	deviceLabel?: string;
-	liveview?: boolean;
-	target?: string;
+	liveview: boolean;
+	target: string;
 	debugPort?: number;
 	skipJsMinify?: boolean;
 	sourceMaps?: boolean;
