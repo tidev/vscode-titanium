@@ -18,7 +18,7 @@ import {
 	selectWindowsDevice,
 	selectWindowsEmulator
 } from '../quickpicks/common';
-import { BuildAndroidAppOptions, BuildAppBase, BuildAppOptions, BuildWindowsAppOptions } from '../types/cli';
+import { BuildAndroidAppOptions, BuildAppBase, BuildAppOptions, BuildIosAppOptions, BuildWindowsAppOptions } from '../types/cli';
 import { IosCertificateType, Platform } from '../types/common';
 
 export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode) {
@@ -43,7 +43,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 		if (node) {
 			deviceId = node.deviceId;
 			deviceLabel = node.label;
-			osVersion = node.osVersion;
+			osVersion = node?.version;
 			platform = node.platform;
 			target = node.targetId;
 		}
@@ -84,19 +84,23 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			projectDir,
 			logLevel,
 			projectType: 'app',
-			liveview
+			liveview,
+			target
 		};
 
 		if (platform === Platform.android) {
-			if (target === 'device') {
-				const deviceInfo = await selectAndroidDevice();
-				deviceId = deviceInfo.udid;
-				deviceLabel = deviceInfo.label;
-			} else if (target === 'emulator') {
-				const emulatorInfo = await selectAndroidEmulator();
-				deviceId = emulatorInfo.udid;
-				deviceLabel = emulatorInfo.label;
+			if (!deviceId) {
+				if (target === 'device') {
+					const deviceInfo = await selectAndroidDevice();
+					deviceId = deviceInfo.udid;
+					deviceLabel = deviceInfo.label;
+				} else if (target === 'emulator') {
+					const emulatorInfo = await selectAndroidEmulator();
+					deviceId = emulatorInfo.udid;
+					deviceLabel = emulatorInfo.label;
+				}
 			}
+
 			const androidOptions: BuildAndroidAppOptions = {
 				...baseOptions,
 				deviceId,
@@ -104,32 +108,47 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			};
 			return runBuild(androidOptions);
 		} else if (platform === Platform.ios) {
-			if (target === 'device') {
-				const deviceInfo = await selectiOSDevice();
-				deviceId = deviceInfo.udid;
-				deviceLabel = deviceInfo.label;
-			} else if (target === 'simulator') {
-				const simulatorInfo = await selectiOSSimulator(osVersion);
-				deviceId = simulatorInfo.udid;
-				osVersion = simulatorInfo.version;
-				deviceLabel = simulatorInfo.label;
+			if (!deviceId) {
+				if (target === 'device') {
+					const deviceInfo = await selectiOSDevice();
+					deviceId = deviceInfo.udid;
+					deviceLabel = deviceInfo.label;
+				} else if (target === 'simulator') {
+					const simulatorInfo = await selectiOSSimulator(osVersion);
+					deviceId = simulatorInfo.udid;
+					osVersion = simulatorInfo.version;
+					deviceLabel = simulatorInfo.label;
+				}
 			}
 
-			if (platform === 'ios' && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
+			if (platform === Platform.ios && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
 				const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
 				iOSCertificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
 				iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
 			}
+
+			const iosOptions: BuildIosAppOptions = {
+				...baseOptions,
+				deviceId,
+				deviceLabel,
+				iOSCertificate,
+				iOSProvisioningProfile
+			};
+
+			return runBuild(iosOptions);
 		} else if (platform === Platform.windows) {
-			if (target === 'wp-device') {
-				const deviceInfo = await selectWindowsDevice();
-				deviceId = deviceInfo.udid;
-				deviceLabel = deviceInfo.label;
-			} else if (target === 'wp-emulator') {
-				const emulatorInfo = await selectWindowsEmulator();
-				deviceId = emulatorInfo.udid;
-				deviceLabel = emulatorInfo.label;
+			if (!deviceId) {
+				if (target === 'wp-device') {
+					const deviceInfo = await selectWindowsDevice();
+					deviceId = deviceInfo.udid;
+					deviceLabel = deviceInfo.label;
+				} else if (target === 'wp-emulator') {
+					const emulatorInfo = await selectWindowsEmulator();
+					deviceId = emulatorInfo.udid;
+					deviceLabel = emulatorInfo.label;
+				}
 			}
+
 			const windowsOptions: BuildWindowsAppOptions = {
 				...baseOptions
 			};

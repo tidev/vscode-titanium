@@ -6,7 +6,7 @@ export abstract class BaseNode {
 	public readonly deviceId: string | undefined;
 	public readonly label: string;
 	public readonly targetId: string | undefined;
-	public readonly osVersion: string | undefined;
+	public readonly version?: string | undefined;
 	constructor (label: string) {
 		this.label = label;
 	}
