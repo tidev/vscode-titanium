@@ -27,3 +27,16 @@ export async function getAppName (projectDirectory: string): Promise<string> {
 	});
 
 }
+
+export function parseXmlString (xmlString: string): Promise<unknown> {
+	return new Promise((resolve, reject) => {
+		const parser = new xml2js.Parser();
+		parser.parseString(xmlString, (err: Error, result: unknown) => {
+			if (!err) {
+				return resolve(result);
+			} else {
+				return reject(err);
+			}
+		});
+	});
+}

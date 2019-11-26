@@ -19,13 +19,13 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @param {TextDocument} document active text document
 	 * @param {Position} position caret position
+	 * @param {CancellationToken} token cancellation token
+	 * @param {CompletionContext} context context for completion request
 	 *
 	 * @returns {Thenable|Array}
 	 */
 	public async provideCompletionItems (document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[]> {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
-		const prefixRange = document.getWordRangeAtPosition(position);
-		const prefix = prefixRange ? document.getText(prefixRange) : null;
 
 		if (!this.completions) {
 			await this.loadCompletions();
@@ -83,7 +83,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getIdCompletions () {
+	public async getIdCompletions (): Promise<CompletionItem[]> {
 		const completions: CompletionItem[] = [];
 		const relatedFile = related.getTargetPath('xml');
 		if (!relatedFile) {
@@ -114,7 +114,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getMethodAndPropertyCompletions (linePrefix: string) {
+	public async getMethodAndPropertyCompletions (linePrefix: string): Promise<CompletionItem[]> {
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 
@@ -167,7 +167,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Array}
 	 */
-	public getTitaniumApiCompletions (linePrefix: string) {
+	public getTitaniumApiCompletions (linePrefix: string): CompletionItem[] {
 		const { types } = this.completions.titanium;
 		const matches = linePrefix.match(/(Ti\.(?:(?:[A-Z]\w*|iOS|iPad)\.?)*)([a-z]\w*)*$/);
 		const completions: CompletionItem[] = [];
@@ -235,7 +235,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Array}
 	 */
-	public getAlloyApiCompletions (linePrefix: string) {
+	public getAlloyApiCompletions (linePrefix: string): CompletionItem[] {
 		const { types } = this.completions.alloy;
 		const matches = linePrefix.match(/(Alloy\.(?:(?:[A-Z]\w*)\.?)*)([a-z]\w*)*$/);
 		const completions: CompletionItem[] = [];
@@ -299,7 +299,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getEventNameCompletions (linePrefix: string) {
+	public async getEventNameCompletions (linePrefix: string): Promise<CompletionItem[]> {
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 		const matches = /\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.exec(linePrefix);
@@ -347,7 +347,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable}
 	 */
-	public getFileCompletions (directory: string, moduleName?: string) {
+	public getFileCompletions (directory: string, moduleName?: string): CompletionItem[] {
 		const completions: CompletionItem[] = [];
 		const filesPath = path.join(utils.getAlloyRootPath(), directory);
 		if (moduleName && moduleName.startsWith('/')) {
@@ -373,7 +373,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getWidgetCompletions () {
+	public async getWidgetCompletions (): Promise<CompletionItem[]> {
 		const completions = [];
 		const alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
 		const document = await workspace.openTextDocument(alloyConfigPath);
@@ -388,7 +388,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		return completions;
 	}
 
-	public async loadCompletions () {
+	public async loadCompletions (): Promise<void> {
 		const sdk = project.sdk()[0];
 		this.completions = await completion.loadCompletions(sdk, completion.CompletionsFormat.v2);
 	}
