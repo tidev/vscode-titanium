@@ -12,6 +12,11 @@ const TIMODULEXML_FILENAME = 'timodule.xml';
 const MANIFEST_FILENAME = 'manifest';
 const DASHBOARD_URL_ROOT = 'https://platform.axway.com/#/app/';
 
+interface ModuleInformation {
+	path: string;
+	[ key: string ]: string;
+}
+
 export class Project {
 
 	public isTitaniumApp = false;
@@ -19,14 +24,14 @@ export class Project {
 	public isValidTiapp = false;
 
 	private tiapp: any;
-	private modules: any[] = [];
+	private modules: ModuleInformation[] = [];
 	private emitter: EventEmitter<void>|undefined;
 
 	/**
 	 * Check if the current project is a Titanium app or module.
 	 * @returns {Boolean} Whether the project is a Titanium app or module.
 	 */
-	public isTitaniumProject () {
+	public isTitaniumProject (): boolean {
 		return this.isTitaniumApp || this.isTitaniumModule;
 	}
 
@@ -34,14 +39,14 @@ export class Project {
 	 * Check if the current project has a valid tiapp.
 	 * @returns {Boolean} Whether the project has a valid tiapp.xml.
 	 */
-	public isValid () {
+	public isValid (): boolean {
 		return this.isValidTiapp;
 	}
 
 	/**
 	 * Load tiapp.xml file
 	 */
-	public load () {
+	public load (): void {
 		this.isTitaniumApp = false;
 		this.isTitaniumModule = false;
 
@@ -57,7 +62,7 @@ export class Project {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public onModified (callback: () => void) {
+	public onModified (callback: () => void): void {
 		if (this.isTitaniumApp && this.emitter) {
 			this.emitter.event(callback);
 		}
@@ -68,7 +73,7 @@ export class Project {
 	 *
 	 * @returns {String}
 	 */
-	public appId () {
+	public appId (): string|undefined {
 		if (this.isTitaniumApp) {
 			return String(this.tiapp.id);
 		}
@@ -79,7 +84,7 @@ export class Project {
 	 *
 	 * @returns {String}
 	 */
-	public appName () {
+	public appName (): string {
 		if (this.isTitaniumApp) {
 			return String(this.tiapp.name);
 		} else {
@@ -87,7 +92,7 @@ export class Project {
 		}
 	}
 
-	public dashboardUrl () {
+	public dashboardUrl (): string|undefined {
 		// this.tiapp.property[2].$.name
 		const appcAppIdProperty = this.tiapp.property.find((property: { $: { name: string }}) => property.$.name === 'appc-app-id');
 		if (appcAppIdProperty) {
@@ -100,9 +105,9 @@ export class Project {
 	 *
 	 * @returns {Array}
 	 */
-	public platforms () {
+	public platforms (): string[]|undefined {
 		if (this.isTitaniumModule) {
-			return this.modules.map((mod: any) => mod.platform);
+			return this.modules.map((mod) => mod.platform);
 		}
 	}
 
@@ -112,8 +117,8 @@ export class Project {
 	 * @param {String} platform		Platform name
 	 * @returns {String}
 	 */
-	public pathForPlatform (platform: Platform) {
-		const moduleInfo: any = this.modules.find((mod: any) => utils.normalisedPlatform(mod.platform) === platform);
+	public pathForPlatform (platform: Platform): string|undefined {
+		const moduleInfo: any = this.modules.find((mod) => utils.normalisedPlatform(mod.platform) === platform);
 		if (moduleInfo) {
 			return moduleInfo.path;
 		}
@@ -124,16 +129,17 @@ export class Project {
 	 *
 	 * @returns {String}
 	 */
-	public sdk () {
+	public sdk (): string[] {
 		if (this.isTitaniumApp) {
 			return this.tiapp['sdk-version'];
 		}
+		return [];
 	}
 
 	/**
 	 * Dispose of resources
 	 */
-	public dispose () {
+	public dispose (): void {
 		if (this.emitter) {
 			this.emitter.dispose();
 		}
@@ -143,7 +149,7 @@ export class Project {
 	 * Load tiapp file
 	 *
 	 */
-	private async loadTiappFile  () {
+	private async loadTiappFile  (): Promise<void> {
 		this.isTitaniumApp = false;
 		this.isValidTiapp = false;
 		let error: InteractionError | undefined;
@@ -218,7 +224,7 @@ export class Project {
 	/**
 	 * Attempt to find module projects by loading timodule.xml and manifest files
 	 */
-	private loadModules () {
+	private loadModules (): void {
 		const rootPath = workspace.rootPath;
 		if (!rootPath) {
 			return;
@@ -240,7 +246,7 @@ export class Project {
 	 *
 	 * @param {String} modulePath		path to module
 	 */
-	private loadModuleAt (modulePath: string) {
+	private loadModuleAt (modulePath: string): void {
 		if (utils.directoryExists(modulePath)) {
 			const timodulePath = path.join(modulePath, TIMODULEXML_FILENAME);
 			const manifestPath = path.join(modulePath, MANIFEST_FILENAME);
@@ -263,7 +269,7 @@ export class Project {
 					return;
 				}
 
-				const manifest: any = {
+				const manifest: ModuleInformation = {
 					path: modulePath
 				};
 

@@ -1,6 +1,6 @@
 import { ChildProcess, spawn, SpawnOptions } from 'child_process';
-import * as vscode from 'vscode';
-import { ProgressLocation, ProgressOptions, Terminal as VSTerminal, window } from 'vscode';
+// import * as vscode from 'vscode';
+import { ProgressLocation, ProgressOptions, Terminal as VSTerminal, window, OutputChannel, commands } from 'vscode';
 import { GlobalState } from './constants';
 import { ExtensionContainer } from './container';
 
@@ -15,7 +15,7 @@ export default class Terminal {
 	private terminal: VSTerminal|undefined;
 	private command: string;
 	private proc: ChildProcess|undefined;
-	private channel: vscode.OutputChannel|undefined;
+	private channel: OutputChannel|undefined;
 
 	constructor (name: string, command = 'appc') {
 
@@ -29,11 +29,11 @@ export default class Terminal {
 		this.command = command;
 	}
 
-	public setCommandPath (commandPath: string) {
+	public setCommandPath (commandPath: string): void {
 		this.command = commandPath;
 	}
 
-	public runCommand (args: string[], { forceTerminal = false } = {}) {
+	public runCommand (args: string[], { forceTerminal = false } = {}): void {
 		if (ExtensionContainer.config.general.useTerminalForBuild || forceTerminal) {
 			if (!this.terminal) {
 				this.terminal = window.createTerminal({ name: this.name });
@@ -51,7 +51,7 @@ export default class Terminal {
 		}
 	}
 
-	public executeCommand (command: string) {
+	public executeCommand (command: string): void {
 		if (!this.terminal) {
 			this.terminal = window.createTerminal({ name: this.name });
 		}
@@ -65,7 +65,7 @@ export default class Terminal {
 
 	}
 
-	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }) {
+	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }): Thenable<unknown> {
 		return window.withProgress(progressOptions, () => {
 			return new Promise((resolve, reject) => {
 				if (!this.channel) {
@@ -123,7 +123,7 @@ export default class Terminal {
 		});
 	}
 
-	public runCommandInOutput (args: string[], cwd?: string) {
+	public runCommandInOutput (args: string[], cwd?: string): ChildProcess|undefined {
 		if (this.proc) {
 			window.showInformationMessage('A build is already in progress');
 			return;
@@ -137,7 +137,7 @@ export default class Terminal {
 		this.proc = spawn(this.command, args, { shell: true, cwd  });
 		this.proc.stdout.on('data', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
-			vscode.commands.executeCommand('setContext', GlobalState.Running, true);
+			commands.executeCommand('setContext', GlobalState.Running, true);
 			const message = data.toString();
 			this.channel!.append(message);
 		});
@@ -150,7 +150,7 @@ export default class Terminal {
 		});
 		this.proc.on('exit', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, false);
-			vscode.commands.executeCommand('setContext', GlobalState.Running, false);
+			commands.executeCommand('setContext', GlobalState.Running, false);
 			this.proc = undefined;
 		});
 
@@ -158,20 +158,20 @@ export default class Terminal {
 		return this.proc;
 	}
 
-	public clear () {
+	public clear (): void {
 		if (this.terminal) {
 			this.terminal.sendText('clear');
 		}
 	}
 
-	public stop () {
+	public stop (): void {
 		if (this.proc) {
 			this.proc.kill();
 			this.proc = undefined;
 		}
 	}
 
-	public showOutput () {
+	public showOutput (): void {
 		if (this.channel) {
 			this.channel.show();
 		}
