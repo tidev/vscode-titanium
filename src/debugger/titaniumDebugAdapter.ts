@@ -19,7 +19,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	private server!: ProxyServer;
 	private target: string|undefined;
 
-	public commonArgs (args: TitaniumLaunchRequestArgs) {
+	public commonArgs (args: TitaniumLaunchRequestArgs): void {
 		args.sourceMaps = typeof args.sourceMaps === 'undefined' || args.sourceMaps;
 		this.deviceId = args.deviceId;
 		this.platform = args.platform;
@@ -50,7 +50,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 	}
 
-	public async disconnect (args: DebugProtocol.DisconnectArguments) {
+	public async disconnect (args: DebugProtocol.DisconnectArguments): Promise<void> {
 		this.isDisconnecting = true;
 		await this.cleanup();
 		return super.disconnect(args);
@@ -174,7 +174,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return this.pollForApp(url, errorMessage, maxRetries, iteration + 1);
 	}
 
-	private sleep (time: number) {
+	private sleep (time: number): Promise<void> {
 		return new Promise(resolve => {
 			setTimeout(() => {
 				resolve();
@@ -182,7 +182,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		});
 	}
 
-	private cleanup () {
+	private cleanup (): void {
 		this.sendRequest('END', {
 			platform: this.platform,
 			deviceId: this.deviceId,
@@ -195,7 +195,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 	}
 
-	private sendRequest (code: string, args?: object) {
+	private sendRequest (code: string, args?: object): Promise<void> {
 		const request: Request = {
 			id: `request-${++this.idCount}`,
 			code,
@@ -209,7 +209,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		});
 	}
 
-	private extensionResponse (request: Response) {
+	private extensionResponse (request: Response): void {
 		const resolver = this.activeRequests.get(request.id);
 		if (resolver) {
 			resolver(request.result);

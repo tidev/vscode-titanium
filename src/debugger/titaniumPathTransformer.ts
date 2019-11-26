@@ -1,3 +1,4 @@
+/* eslint require-atomic-updates: 0 */
 import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from '@awam/vscode-chrome-debug-core';
 import * as path from 'path';
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -14,17 +15,17 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	private projectType!: string;
 	private appName!: string;
 
-	public async attach (args: TitaniumAttachRequestArgs) {
+	public async attach (args: TitaniumAttachRequestArgs): Promise<void> {
 		await this.configureTransformOptions(args);
 		return super.attach(args);
 	}
 
-	public async launch (args: TitaniumLaunchRequestArgs) {
+	public async launch (args: TitaniumLaunchRequestArgs): Promise<void> {
 		await this.configureTransformOptions(args);
 		return super.attach(args);
 	}
 
-	public async configureTransformOptions (args: TitaniumAttachRequestArgs|TitaniumLaunchRequestArgs) {
+	public async configureTransformOptions (args: TitaniumAttachRequestArgs|TitaniumLaunchRequestArgs): Promise<void> {
 		this._pathMapping = args.pathMapping || {};
 		this.appDirectory = args.projectDir;
 		this.platform = args.platform;
@@ -79,22 +80,13 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		const appRoot = this.projectType === 'alloy' ? path.join(this.appDirectory, 'app') : path.join(this.appDirectory, 'Resources');
 		const platformRoot = path.join(appRoot, this.platform);
 		let defaultPath = '';
-		let platformAppRoot = '';
 		const searchFolders = [ appRoot ];
 
 		if (this.platform === 'ios') {
-			try {
-				// We must encode the app name here as the sourceUrl we're provided
-				// is also encoded
-				const appName = `${encodeURIComponent(this.appName)}.app`;
-				sourceUrl = sourceUrl.split(appName)[1];
-				if ((/\/alloy/).test(sourceUrl)) {
-					platformAppRoot = sourceUrl.match(/(?<=\/alloy).*$/g)![0];
-				}
-			} catch (error) {
-				throw error;
-			}
-
+			// We must encode the app name here as the sourceUrl we're provided
+			// is also encoded
+			const appName = `${encodeURIComponent(this.appName)}.app`;
+			sourceUrl = sourceUrl.split(appName)[1];
 		}
 
 		if (this.projectType !== 'alloy') {
