@@ -11,6 +11,29 @@ import { AndroidPackageOptions, BuildAppOptions, BuildIosAppOptions, BuildModule
 import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
 
 /**
+ * Returns normalised name for platform
+ *
+ * @param {String} targetPlatform - Target platform.
+ * @returns {String}
+ */
+export function  normalisedPlatform (targetPlatform: string): string {
+	if (targetPlatform === 'iphone' || targetPlatform === 'ipad') {
+		return 'ios';
+	}
+	return targetPlatform.toLowerCase();
+}
+
+/**
+ * Returns string with capitalized first letter
+ *
+ * @param {String} s - string.
+ * @returns {String}
+ */
+export function  capitalizeFirstLetter (s: string): string {
+	return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/**
  * Returns available target platforms
  *
  * @returns {Array}
@@ -31,10 +54,10 @@ export function platforms (): string[] {
 /**
  * Returns correct name for given platform
  *
- * @param {String} platform - target platform.
+ * @param {String} targetPlatform - target platform.
  * @returns {String}
  */
-export function nameForPlatform (targetPlatform: string) {
+export function nameForPlatform (targetPlatform: string): PlatformPretty|undefined {
 	targetPlatform =  normalisedPlatform(targetPlatform);
 	switch (targetPlatform) {
 		case 'android':
@@ -51,7 +74,7 @@ export function nameForPlatform (targetPlatform: string) {
  * @param {String} target - target to get pretty name for.
  * @returns {String}
  */
-export function nameForTarget (target: string) {
+export function nameForTarget (target: string): string {
 	target = target.toLowerCase();
 	switch (target) {
 		case 'device':
@@ -107,18 +130,6 @@ export function targetsForPlatform (platformName: string): string[] {
 			return [];
 	}
 }
-/**
- * Returns normalised name for platform
- *
- * @param {String} targetPlatform - Target platform.
- * @returns {String}
- */
-export function  normalisedPlatform (targetPlatform: string) {
-	if (targetPlatform === 'iphone' || targetPlatform === 'ipad') {
-		return 'ios';
-	}
-	return targetPlatform.toLowerCase();
-}
 
 /**
  * iOS provisioning profile matches App ID
@@ -127,7 +138,7 @@ export function  normalisedPlatform (targetPlatform: string) {
  * @param {String} appId 			app ID
  * @returns {Boolean}
  */
-export function iOSProvisioningProfileMatchesAppId (profileAppId: string, appId: string) {
+export function iOSProvisioningProfileMatchesAppId (profileAppId: string, appId: string): boolean {
 
 	// allow wildcard
 	if (String(profileAppId) === '*') {
@@ -151,22 +162,27 @@ export function iOSProvisioningProfileMatchesAppId (profileAppId: string, appId:
 }
 
 /**
- * Returns string with capitalized first letter
- *
- * @param {String} s - string.
- * @returns {String}
- */
-export function  capitalizeFirstLetter (s: string) {
-	return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-/**
  * Alloy app directory
  *
  * @returns {String}
  */
-export function getAlloyRootPath () {
+export function getAlloyRootPath (): string {
 	return path.join(workspace.rootPath!, 'app');
+}
+
+/**
+ * Returns true if directory exists at given path
+ *
+ * @param {String} directoryPath 	directory path
+ * @returns {Boolean}
+ */
+export function directoryExists (directoryPath: string): boolean {
+	try {
+		const stat = fs.statSync(directoryPath);
+		return stat.isDirectory();
+	} catch (err) {
+		return !(err && err.code === 'ENOENT');
+	}
 }
 
 /**
@@ -174,7 +190,7 @@ export function getAlloyRootPath () {
  *
  * @returns {Boolean}
  */
-export function isAlloyProject () {
+export function isAlloyProject (): boolean {
 	return directoryExists(getAlloyRootPath());
 }
 
@@ -183,37 +199,24 @@ export function isAlloyProject () {
  *
  * @returns {String}
  */
-export function getI18nPath () {
+export function getI18nPath (): string {
 	if (isAlloyProject()) {
 		return path.join(getAlloyRootPath(), 'i18n');
+	} else {
+		return path.join(workspace.rootPath!, 'i18n');
 	}
 }
 
 /**
  * Returns true if file exists at given path
  *
- * @param {String} path		file path
+ * @param {String} filePath		file path
  * @returns {Boolean}
  */
-export function fileExists (filePath: string) {
+export function fileExists (filePath: string): boolean {
 	try {
 		const stat = fs.statSync(filePath);
 		return stat.isFile();
-	} catch (err) {
-		return !(err && err.code === 'ENOENT');
-	}
-}
-
-/**
- * Returns true if directory exists at given path
- *
- * @param {String} path 	directory path
- * @returns {Boolean}
- */
-export function directoryExists (directoryPath: string) {
-	try {
-		const stat = fs.statSync(directoryPath);
-		return stat.isDirectory();
 	} catch (err) {
 		return !(err && err.code === 'ENOENT');
 	}
@@ -225,7 +228,7 @@ export function directoryExists (directoryPath: string) {
  * @param {String} p 	path
  * @returns {String}
  */
-export function toUnixPath (p: string) { // https://github.com/anodynos/upath
+export function toUnixPath (p: string): string { // https://github.com/anodynos/upath
 	const double = /\/\//;
 	p = p.replace(/\\/g, '/');
 	while (p.match(double)) {
@@ -261,14 +264,30 @@ export function getAllKeys (obj: object): string[] {
  * @returns {Array<Object>} Array of objects of the structure { path, stats}, where path is the full path,
  * and stats is an fs.stats object.
  */
-export function filterJSFiles (directory: string) {
+export function filterJSFiles (directory: string): readonly walkSync.Item[] {
 	return walkSync(directory, {
 		nodir: true,
 		filter: (item: walkSync.Item) => item.stats.isDirectory() || path.extname(item.path) === '.js'
 	});
 }
 
-export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
+function normalizeDriveLetter (filePath: string): string {
+	if (process.platform !== 'win32') {
+		return filePath;
+	}
+	const { root } = path.parse(filePath);
+	return `${root.substr(0, 1).toUpperCase()}${filePath.slice(1)}`;
+}
+
+function quoteArgument (arg: string): string {
+	return `"${arg}"`;
+}
+
+function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is BuildAppOptions {
+	return (options as BuildAppOptions).projectType === 'app';
+}
+
+export function buildArguments (options: BuildAppOptions | BuildModuleOptions): string[] {
 
 	const args = [
 		'run',
@@ -325,7 +344,7 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function packageArguments (options: PackageAppOptions) {
+export function packageArguments (options: PackageAppOptions): string[] {
 	const args = [
 		'run',
 		'--platform', options.platform,
@@ -364,7 +383,7 @@ export function packageArguments (options: PackageAppOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function createAppArguments (options: CreateAppOptions) {
+export function createAppArguments (options: CreateAppOptions): string[] {
 	const args = [
 		'new',
 		'--type', 'titanium',
@@ -387,7 +406,7 @@ export function createAppArguments (options: CreateAppOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function createModuleArguments (options: CreateModuleOptions) {
+export function createModuleArguments (options: CreateModuleOptions): string[] {
 	const args = [
 		'new',
 		'--type', 'timodule',
@@ -405,7 +424,7 @@ export function createModuleArguments (options: CreateModuleOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-export function cleanAppArguments (options: CleanAppOptions) {
+export function cleanAppArguments (options: CleanAppOptions): string[] {
 	const args = [
 		'ti',
 		'clean',
@@ -416,20 +435,12 @@ export function cleanAppArguments (options: CleanAppOptions) {
 	return args.map(arg => quoteArgument(arg));
 }
 
-function quoteArgument (arg: string) {
-	return `"${arg}"`;
-}
-
-export function validateAppId (appId: string) {
+export function validateAppId (appId: string): boolean {
 	// TODO: Document this, add Java keyword detection, return what's wrong rather than true/false?
 	if (!/^([a-zA-Z_]{1}[a-zA-Z0-9]*(\.[a-zA-Z0-9]+)+)$/.test(appId)) {
 		return false;
 	}
 	return true;
-}
-
-function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is BuildAppOptions {
-	return (options as BuildAppOptions).projectType === 'app';
 }
 
 /**
@@ -440,19 +451,11 @@ function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is 
  *
  * @returns {Boolean}
  */
-export function matches (text: string, test: string) {
+export function matches (text: string, test: string): boolean {
 	return new RegExp(test, 'i').test(text);
 }
 
-function normalizeDriveLetter (filePath: string): string {
-	if (process.platform !== 'win32') {
-		return filePath;
-	}
-	const { root } = path.parse(filePath);
-	return `${root.substr(0, 1).toUpperCase()}${filePath.slice(1)}`;
-}
-
-export function isValidPlatform (targetPlatform: string) {
+export function isValidPlatform (targetPlatform: string): boolean {
 	return fs.pathExistsSync(path.join(workspace.rootPath!, targetPlatform));
 }
 
@@ -468,7 +471,7 @@ export function isValidPlatform (targetPlatform: string) {
  *
  * @returns {String}
  */
-export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType) {
+export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType): string {
 	const certificate = appc.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
 
 	if (semver.gte(semver.coerce(sdkVersion)!, '8.2.0')) {

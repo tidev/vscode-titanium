@@ -9,35 +9,35 @@ export class ExtensionContainer {
 	private static _context: ExtensionContext;
 	private static _terminal: Terminal;
 
-	public static inititalize (context: ExtensionContext, config: Config) {
+	public static inititalize (context: ExtensionContext, config: Config): void {
 		this._appc = appc;
 		this._config = config;
 		this._context = context;
 	}
 
-	static get appc () {
+	static get appc (): Appc {
 		return this._appc;
 	}
 
-	static get config () {
+	static get config (): Config {
 		if (this._config === undefined) {
 			this._config = configuration.get<Config>();
 		}
 		return this._config;
 	}
 
-	static get context () {
+	static get context (): ExtensionContext {
 		return this._context;
 	}
 
-	static get terminal () {
+	static get terminal (): Terminal {
 		if (this._terminal === undefined) {
 			this._terminal = new Terminal('Appcelerator');
 		}
 		return this._terminal;
 	}
 
-	public static resetConfig () {
+	public static resetConfig (): void {
 		this._config = undefined;
 	}
 }

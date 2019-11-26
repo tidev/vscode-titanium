@@ -540,7 +540,7 @@ async function generateCompletions (force = false) {
 	if (!project.isValid()) {
 		return;
 	}
-	let sdkVersion: string|undefined;
+	let sdkVersion: string|string[]|undefined;
 	try {
 		sdkVersion = project.sdk();
 		if (!sdkVersion) {

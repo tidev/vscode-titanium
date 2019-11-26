@@ -7,7 +7,7 @@ import { homedir } from 'os';
 import { window } from 'vscode';
 import { ExtensionContainer } from './container';
 import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common';
-import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, WindowsEmulator } from './types/environment-info';
+import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, WindowsEmulator, TitaniumSDK, AndroidDevice, WindowsDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 
 export interface AlloyGenerateOptions {
@@ -21,7 +21,7 @@ export interface AlloyGenerateOptions {
 export class Appc {
 
 	public info!: AppcInfo;
-	private proc!: ChildProcess|null;
+	private proc!: ChildProcess|undefined;
 	private killed = false;
 
 	/**
@@ -29,10 +29,12 @@ export class Appc {
 	 *
 	 * @returns {Boolean}
 	 */
-	public isUserLoggedIn () {
+	public isUserLoggedIn (): boolean {
 		const session = this.session();
-		if (session && session.hasOwnProperty('session') && session.hasOwnProperty('expiry')) {
+		if (session && Object.prototype.hasOwnProperty.call(session, 'session') && Object.prototype.hasOwnProperty.call(session, 'expiry')) {
 			return (session.expiry - +new Date() > 0);
+		} else {
+			return false;
 		}
 	}
 
@@ -41,7 +43,7 @@ export class Appc {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public getInfo (callback: (error: Error|null, info?: AppcInfo) => void) {
+	public getInfo (callback: (error: Error|null, info?: AppcInfo) => void): void {
 		let result = '';
 		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
@@ -65,7 +67,7 @@ export class Appc {
 	 * @param {Boolean} isGA    limit to only GA releases, default false
 	 * @returns {Array}
 	 */
-	public sdks (isGA = false) {
+	public sdks (isGA = false): TitaniumSDK[] {
 		if (this.info.titanium) {
 			let keys = Object.keys(this.info.titanium);
 			for (const key of keys) {
@@ -118,7 +120,7 @@ export class Appc {
 	 * @param {Object} SDK      latest SDK based on version number
 	 * @returns {Object}
 	 */
-	public latestSdk (isGA = true) {
+	public latestSdk (isGA = true): TitaniumSDK|undefined {
 		const sdks = this.sdks(isGA);
 		if (sdks.length > 0) {
 			return sdks[0];
@@ -130,7 +132,7 @@ export class Appc {
 	 *
 	 * @returns {Object}
 	 */
-	public selectedSdk () {
+	public selectedSdk (): TitaniumSDK|undefined {
 		if (this.info.titaniumCLI) {
 			const selectedVersion = this.info.titaniumCLI.selectedSDK;
 			let sdk;
@@ -148,7 +150,7 @@ export class Appc {
 		}
 	}
 
-	public sdkInfo (version: string) {
+	public sdkInfo (version: string): TitaniumSDK|undefined {
 		if (this.info.titanium) {
 			return this.info.titanium[version];
 		}
@@ -188,7 +190,7 @@ export class Appc {
 	 *
 	 * @returns {Object}
 	 */
-	public iOSTargets () {
+	public iOSTargets (): { devices: IosDevice[]; simulators: { [key: string]: IosSimulator[] } } {
 		return {
 			devices: this.iOSDevices(),
 			simulators: this.iOSSimulators()
@@ -226,7 +228,7 @@ export class Appc {
 	 *
 	 * @returns {Array}
 	 */
-	public androidDevices () {
+	public androidDevices (): AndroidDevice[] {
 		if (this.info.android && this.info.android.devices) {
 			return this.info.android.devices;
 		}
@@ -238,7 +240,7 @@ export class Appc {
 	 *
 	 * @returns {Object}
 	 */
-	public androidTargets () {
+	public androidTargets (): { devices: AndroidDevice[]; emulators: { AVDs: AndroidEmulator[]; Genymotion: AndroidEmulator[] }} {
 		return {
 			devices: this.androidDevices(),
 			emulators: this.androidEmulators()
@@ -250,7 +252,7 @@ export class Appc {
 	 *
 	 * @returns {Array}
 	 */
-	public windowsDevices () {
+	public windowsDevices (): WindowsDevice[] {
 		if (this.info.windows && this.info.windows.devices) {
 			return this.info.windows.devices;
 		}
@@ -274,7 +276,7 @@ export class Appc {
 	 *
 	 * @returns {Object}
 	 */
-	public windowsTargets () {
+	public windowsTargets (): { devices: WindowsDevice[]; emulators:  { [key: string]: WindowsEmulator[] } } {
 		return {
 			devices: this.windowsDevices(),
 			emulators: this.windowsEmulators()
@@ -287,7 +289,7 @@ export class Appc {
 	 * @param {String} type     developer (default), distribution
 	 * @returns {Array}
 	 */
-	public iOSCertificates (type: IosCertificateType = IosCertificateType.developer) {
+	public iOSCertificates (type: IosCertificateType = IosCertificateType.developer): IosCert[] {
 		const certificates = [];
 		if (this.info.ios && this.info.ios.certs) {
 			for (const keychain of Object.values(this.info.ios.certs.keychains)) {
@@ -305,7 +307,7 @@ export class Appc {
 	 * @param {String} appId        enable by matching app ID
 	 * @returns {Array}
 	 */
-	public iOSProvisioningProfiles (deployment = 'development', certificate: IosCert, appId: string) {
+	public iOSProvisioningProfiles (deployment = 'development', certificate: IosCert, appId: string): ProvisioningProfile[] {
 		let pem: string|undefined;
 		if (certificate.pem) {
 			pem = certificate.pem.replace('-----BEGIN CERTIFICATE-----', '');
@@ -339,7 +341,7 @@ export class Appc {
 		return profiles;
 	}
 
-	public buildInProgress () {
+	public buildInProgress (): ChildProcess|undefined {
 		return this.proc;
 	}
 
@@ -348,7 +350,7 @@ export class Appc {
 	 *
 	 * @param {Object} opts arguments
 	 */
-	public run (opts: { args: string[]; error: (message: string) => void; exit: (code: number) => void }) {
+	public run (opts: { args: string[]; error: (message: string) => void; exit: (code: number) => void }): void {
 		if (this.proc) {
 			return;
 		}
@@ -375,21 +377,21 @@ export class Appc {
 		this.proc.on('close', code => {
 			// console.log(`Exited with code ${code}`);
 			opts.exit(code);
-			this.proc = null;
+			this.proc = undefined;
 		});
 		this.proc.on('exit', code => {
 			// console.log(`Exited with code ${code}`);
 			opts.exit(code);
-			this.proc = null;
+			this.proc = undefined;
 		});
 
 		channel.show();
 	}
 
-	public stop () {
+	public stop (): void {
 		if (this.proc) {
 			this.proc.kill('SIGKILL');
-			this.proc = null;
+			this.proc = undefined;
 			this.killed = true;
 		}
 	}
@@ -405,7 +407,7 @@ export class Appc {
 	 * @param {String} opts.type - Type to generate.
 	 * @returns {Promise}
 	 */
-	public generate ({ adapterType, cwd, force, name, type }: AlloyGenerateOptions) {
+	public generate ({ adapterType, cwd, force, name, type }: AlloyGenerateOptions): Promise<void> {
 		return new Promise((resolve, reject) => {
 			const args = [ 'alloy', 'generate', type, name ];
 			if (type === 'model') {
@@ -426,7 +428,7 @@ export class Appc {
 		});
 	}
 
-	public async getAlloyVersion () {
+	public async getAlloyVersion (): Promise<string> {
 		const appcPath = path.join(homedir(), '.appcelerator', 'install');
 		const appcVersion = await fs.readFile(path.join(appcPath, '.version'), 'utf8');
 		const alloyPath = path.join(appcPath, appcVersion, 'package', 'node_modules', 'alloy');
@@ -434,18 +436,18 @@ export class Appc {
 		return alloyVersion;
 	}
 
-	public getAdbPath () {
+	public getAdbPath (): string|undefined {
 		if (this.info.android && this.info.android.sdk && this.info.android.sdk.executables) {
 			return this.info.android.sdk.executables.adb;
 		}
 	}
 
 	/**
-	 * Returns appc CLI session for current user
+	 * Returns appc CLI session for current user.
 	 *
 	 * @returns {Object}
 	 */
-	private session () {
+	private session (): { expiry: number }|undefined {
 		const sessionPath = path.join(homedir(), '.appcelerator/appc-cli.json');
 		if (fs.existsSync(sessionPath)) {
 			return JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
