@@ -43,7 +43,7 @@ export class OSVerNode extends BaseNode {
 
 	}
 
-	get tooltip () {
+	get tooltip (): string {
 		return this.label;
 	}
 }

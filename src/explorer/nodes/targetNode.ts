@@ -22,7 +22,7 @@ export class TargetNode extends BaseNode {
 		this.targetId = targetForName(this.label, this.platform);
 	}
 
-	public getChildren () {
+	public getChildren (): Array<OSVerNode|DeviceNode> {
 		const devices = [];
 		if (this.platform === 'ios') {
 			switch (this.label) {
@@ -49,7 +49,7 @@ export class TargetNode extends BaseNode {
 					}
 					break;
 				case 'Emulator':
-					for (const [ type, emulators ] of Object.entries(appc.androidEmulators()) as any) {
+					for (const [ type, emulators ] of Object.entries(appc.androidEmulators())) {
 						for (const emulator of emulators) {
 							let label = `${emulator.name}`;
 							if (type === 'Genymotion') {
@@ -86,7 +86,7 @@ export class TargetNode extends BaseNode {
 		return devices;
 	}
 
-	get tooltip () {
+	get tooltip (): string {
 		return this.label;
 	}
 }

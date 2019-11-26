@@ -19,7 +19,7 @@ export class DeviceNode extends BaseNode {
 		super(label);
 	}
 
-	get tooltip () {
+	get tooltip (): string {
 		return this.label;
 	}
 }
