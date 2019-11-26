@@ -13,7 +13,7 @@ export class BlankNode extends BaseNode {
 		this.contextValue = 'BlankNode';
 	}
 
-	get tooltip () {
+	get tooltip (): string {
 		return this.label;
 	}
 }

@@ -16,7 +16,7 @@ export class UpdateNode extends BaseNode {
 		this.contextValue = 'UpdateNode';
 	}
 
-	get tooltip () {
+	get tooltip (): string {
 		return this.label;
 	}
 }

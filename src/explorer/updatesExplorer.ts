@@ -18,7 +18,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	private checkingForUpdates = false;
 
-	public async refresh () {
+	public async refresh (): Promise<void> {
 		this.checkingForUpdates = true;
 		this._onDidChangeTreeData.fire();
 		try {
@@ -39,11 +39,11 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 		}
 	}
 
-	public getTreeItem (element: BaseNode) {
+	public getTreeItem (element: BaseNode): vscode.TreeItem {
 		return element.getTreeItem(element);
 	}
 
-	public getChildren () {
+	public getChildren (): Promise<Array<BlankNode|UpdateNode>> {
 
 		const elements = [];
 

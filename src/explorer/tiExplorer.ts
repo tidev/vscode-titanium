@@ -14,10 +14,10 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	private platforms: Map<string, PlatformNode> = new Map();
 
-	public refresh () {
+	public refresh (): void {
 		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, () => {
 			return new Promise((resolve, reject) => {
-				appc.getInfo((error: Error|null, info: any) => {
+				appc.getInfo((error, info) => {
 					if (info) {
 						this._onDidChangeTreeData.fire();
 						vscode.window.showInformationMessage('Updated device explorer');
@@ -31,11 +31,11 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 		});
 	}
 
-	public getTreeItem (element: BaseNode) {
+	public getTreeItem (element: BaseNode): vscode.TreeItem {
 		return element.getTreeItem(element);
 	}
 
-	public getChildren (element: BaseNode) {
+	public getChildren (element: BaseNode): BaseNode[] | Promise<BaseNode[]> {
 		if (element) {
 			return element.getChildren(element);
 		}

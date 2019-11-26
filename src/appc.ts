@@ -41,7 +41,7 @@ export class Appc {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public getInfo (callback: (error: Error|null, info?: any) => void) {
+	public getInfo (callback: (error: Error|null, info?: AppcInfo) => void) {
 		let result = '';
 		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
