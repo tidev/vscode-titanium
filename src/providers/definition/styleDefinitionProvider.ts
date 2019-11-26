@@ -6,10 +6,10 @@ import * as definitionProviderHelper from './definitionProviderHelper';
 const suggestions: DefinitionSuggestion[] = [
 	{ // id
 		regExp: /["']#[A-Za-z0-9_=[\]]+/,
-		definitionRegExp (text: string) {
+		definitionRegExp (text: string): RegExp {
 			return new RegExp(`id=["']${text.replace('#', '')}`, 'g');
 		},
-		files (document: vscode.TextDocument) {
+		files (document: vscode.TextDocument): string[] {
 			const relatedFile = related.getTargetPath('xml', document.fileName);
 			if (relatedFile) {
 				return [ relatedFile ];
@@ -19,10 +19,10 @@ const suggestions: DefinitionSuggestion[] = [
 	},
 	{ // class
 		regExp: /["']\.[A-Za-z0-9_=[\]]+/,
-		definitionRegExp (text: string) {
+		definitionRegExp (text: string): RegExp {
 			return new RegExp(`class=["']${text.replace('.', '')}`, 'g');
 		},
-		files (document: vscode.TextDocument) {
+		files (document: vscode.TextDocument): string[] {
 			const relatedFile = related.getTargetPath('xml', document.fileName);
 			if (relatedFile) {
 				return [ relatedFile ];
@@ -41,7 +41,7 @@ export class StyleDefinitionProvider implements vscode.DefinitionProvider {
 	 *
 	 * @returns {Thenable}
 	 */
-	public provideDefinition (document: vscode.TextDocument, position: vscode.Position) {
+	public provideDefinition (document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Definition|vscode.DefinitionLink[]>  {
 		return definitionProviderHelper.provideDefinition(document, position, suggestions);
 	}
 }

@@ -3,8 +3,8 @@ import * as path from 'path';
 import * as utils from '../../utils';
 
 import { CompletionItem, CompletionItemKind, workspace } from 'vscode';
-import { parseString } from 'xml2js';
 import { ExtensionContainer } from '../../container';
+import { parseXmlString } from '../../common/utils';
 
 interface AlloyAutoCompleteRule {
 	regExp: RegExp;
@@ -42,30 +42,27 @@ export const cfgAutoComplete: AlloyAutoCompleteRule = {
 
 export const i18nAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*["']?)$/,
-	getCompletions () {
-		return new Promise(async (resolve, reject) => {
-			const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
-			const i18nPath = utils.getI18nPath()!;
-			if (utils.directoryExists(i18nPath)) {
-				const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
-				const completions: CompletionItem[] = [];
-				if (utils.fileExists(i18nStringPath)) {
-					const document = await workspace.openTextDocument(i18nStringPath);
-					parseString(document.getText(), (error, result) => {
-						if (result && result.resources && result.resources.string) {
-							for (const value of result.resources.string) {
-								completions.push({
-									label: value.$.name,
-									kind: CompletionItemKind.Reference,
-									detail: value._
-								});
-							}
-							return resolve(completions);
-						}
-					});
+	async getCompletions () {
+		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
+		const i18nPath = utils.getI18nPath()!;
+		const completions: CompletionItem[] = [];
+		if (utils.directoryExists(i18nPath)) {
+			const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
+			if (utils.fileExists(i18nStringPath)) {
+				const document = await workspace.openTextDocument(i18nStringPath);
+				const result = await parseXmlString(document.getText()) as { resources: { string: { $: { name: string }; _: string }[] } };
+				if (result && result.resources && result.resources.string) {
+					for (const value of result.resources.string) {
+						completions.push({
+							label: value.$.name,
+							kind: CompletionItemKind.Reference,
+							detail: value._
+						});
+					}
 				}
 			}
-		});
+		}
+		return completions;
 	}
 };
 

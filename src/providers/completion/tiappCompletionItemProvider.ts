@@ -1,6 +1,5 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as _ from 'underscore';
 import appc from '../../appc';
 import * as utils from '../../utils';
 
@@ -16,6 +15,8 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @param {TextDocument} document active text document
 	 * @param {Position} position caret position
+	 * @param {CancellationToken} token cancellation token
+	 * @param {CompletionContext} context context for completion request
 	 *
 	 * @returns {Thenable|Array}
 	 */
@@ -30,11 +31,10 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 
 		if (tag === 'sdk-version') {
 			const sdkVer = /<sdk-version>([^<]*)<?/.exec(linePrefix);
-			let sdkVersion: string;
 			if (!sdkVer) {
 				return completions;
 			}
-			sdkVersion = sdkVer[1];
+			const sdkVersion = sdkVer[1];
 			const sdks = appc.sdks();
 			for (const sdk of sdks) {
 				if (sdkVersion && !sdk.fullversion?.includes(sdkVersion)) {
@@ -88,7 +88,7 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Array}
 	 */
-	private getDirectories (srcpath: string) {
+	private getDirectories (srcpath: string): string[] {
 		return fs.readdirSync(srcpath).filter(file => fs.statSync(path.join(srcpath, file)).isDirectory());
 	}
 }
