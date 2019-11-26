@@ -1,5 +1,4 @@
 import * as getPort from 'get-port';
-import { Socket } from 'net';
 import * as vscode from 'vscode';
 import * as which from 'which';
 import { UserCancellation } from '../commands';
@@ -13,34 +12,35 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
 		if (!config.projectDir) {
-			config.projectDir = '${workspaceFolder}';
+			config.projectDir = '${workspaceFolder}'; // eslint-disable-line no-template-curly-in-string
 		}
+		const ourConfig: vscode.DebugConfiguration = {
+			...config
+		};
 
-		if (!config.port) {
-			config.port = 9000;
-			config.debugPort = 9000;
+		if (!ourConfig.port) {
+			ourConfig.port = 9000;
 		} else {
 			config.debugPort = config.port;
 		}
 
 		try {
-			const port = await getPort({ port: config.port });
-			if (port !== config.port) {
-				config.port = port;
-				config.debugPort = port;
+			const port = await getPort({ port: ourConfig.port });
+			if (port !== ourConfig.port) {
+				ourConfig.port = port;
 			}
 		} catch (error) {
 			throw new Error('Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.');
 		}
 
-		if (!config.logLevel) {
-			config.logLevel = ExtensionContainer.config.general.logLevel;
+		if (!ourConfig.logLevel) {
+			ourConfig.logLevel = ExtensionContainer.config.general.logLevel;
 
 		}
 
-		if (!config.platform) {
+		if (!ourConfig.platform) {
 			try {
-				config.platform = (await selectPlatform()).id;
+				ourConfig.platform = (await selectPlatform()).id;
 			} catch (error) {
 				let message = error.message;
 				if (error instanceof UserCancellation) {
@@ -50,11 +50,11 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			}
 		}
 
-		if (config.platform === 'android' && config.request === 'attach') {
+		if (ourConfig.platform === 'android' && ourConfig.request === 'attach') {
 			throw new Error('Attaching to a running Android app is currently not supported');
 		}
 
-		if (config.platform === 'ios') {
+		if (ourConfig.platform === 'ios') {
 			try {
 				await which('ios_webkit_debug_proxy');
 			} catch (error) {
@@ -64,21 +64,22 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 					if (action) {
 						vscode.env.openExternal(vscode.Uri.parse('https://github.com/appcelerator/vscode-appcelerator-titanium/blob/master/doc/debugging.md'));
 					}
+					return;
 				});
 				throw new Error('Unable to start debugger as ios_webkit_debug_proxy is not installed.');
 			}
 		}
 
-		if (!config.target) {
+		if (!ourConfig.target) {
 			try {
 				let lastDebugState;
-				if (config.platform === 'android') {
-					lastDebugState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastAndroidDebug);
-				} else if (config.platform === 'ios') {
-					lastDebugState = ExtensionContainer.context.workspaceState.get<any>(WorkspaceState.LastiOSDebug);
+				if (ourConfig.platform === 'android') {
+					lastDebugState = ExtensionContainer.context.workspaceState.get<vscode.DebugConfiguration>(WorkspaceState.LastAndroidDebug);
+				} else if (ourConfig.platform === 'ios') {
+					lastDebugState = ExtensionContainer.context.workspaceState.get<vscode.DebugConfiguration>(WorkspaceState.LastiOSDebug);
 				}
 
-				const targets = targetsForPlatform(config.platform)
+				const targets = targetsForPlatform(ourConfig.platform)
 					.filter(target => !/^dist/.test(target))
 					.map(target => ({ label: nameForTarget(target), id: target }));
 
@@ -90,17 +91,18 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 						});
 					} catch (error) {
 						// squelch error as it might be due to bad last state
+						lastDebugState = undefined;
 					}
 				}
 				const targetInfo = await quickPick(targets);
-				if (targetInfo.id === 'last') {
-					config.target = lastDebugState.target;
-					config.deviceId = lastDebugState.deviceId;
-					config.deviceName = lastDebugState.deviceName;
-					config.iOSCertificate = lastDebugState.iOSCertificate;
-					config.iOSProvisioningProfile = lastDebugState.iOSProvisioningProfile;
+				if (lastDebugState && targetInfo.id === 'last') {
+					ourConfig.target = lastDebugState.target;
+					ourConfig.deviceId = lastDebugState.deviceId;
+					ourConfig.deviceName = lastDebugState.deviceName;
+					ourConfig.iOSCertificate = lastDebugState.iOSCertificate;
+					ourConfig.iOSProvisioningProfile = lastDebugState.iOSProvisioningProfile;
 				} else {
-					config.target = targetInfo.id;
+					ourConfig.target = targetInfo.id;
 				}
 			} catch (error) {
 				let message = error.message;
@@ -111,11 +113,11 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			}
 		}
 
-		if (!config.deviceId) {
+		if (!ourConfig.deviceId) {
 			try {
-				const deviceInfo = await selectDevice(config.platform, config.target);
-				config.deviceId = deviceInfo.udid;
-				config.deviceName = deviceInfo.label;
+				const deviceInfo = await selectDevice(ourConfig.platform, ourConfig.target);
+				ourConfig.deviceId = deviceInfo.udid;
+				ourConfig.deviceName = deviceInfo.label;
 			} catch (error) {
 				let message = error.message;
 				if (error instanceof UserCancellation) {
@@ -125,14 +127,14 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			}
 		}
 
-		if (config.platform === 'ios' && config.target === 'device' && config.request !== 'attach') {
-			if (!config.iOSCertificate) {
+		if (ourConfig.platform === 'ios' && ourConfig.target === 'device' && ourConfig.request !== 'attach') {
+			if (!ourConfig.iOSCertificate) {
 				try {
 					const certificate = await selectiOSCertificate('run');
-					const provisioning = await selectiOSProvisioningProfile(certificate, config.target, project.appId()!);
+					const provisioning = await selectiOSProvisioningProfile(certificate, ourConfig.target, project.appId()!);
 
-					config.iOSCertificate = certificate.label;
-					config.iOSProvisioningProfile = provisioning.uuid;
+					ourConfig.iOSCertificate = certificate.label;
+					ourConfig.iOSProvisioningProfile = provisioning.uuid;
 				} catch (error) {
 					let message = error.message;
 					if (error instanceof UserCancellation) {
@@ -143,46 +145,12 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			}
 		}
 
-		if (config.platform === 'android') {
-			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastAndroidDebug, config);
-		} else if (config.platform === 'ios') {
-			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastiOSDebug, config);
+		if (ourConfig.platform === 'android') {
+			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastAndroidDebug, ourConfig);
+		} else if (ourConfig.platform === 'ios') {
+			ExtensionContainer.context.workspaceState.update(WorkspaceState.LastiOSDebug, ourConfig);
 		}
 
-		return config;
+		return ourConfig;
 	}
-}
-
-async function validatePortIsFree (port: number) {
-
-	return new Promise((resolve, reject) => {
-		const socket = new Socket();
-
-		function cleanup () {
-			if (socket) {
-				socket.removeAllListeners('connect');
-				socket.removeAllListeners('error');
-				socket.end();
-				socket.destroy();
-				socket.unref();
-			}
-		}
-
-		socket.once('error', (err: NodeJS.ErrnoException) => {
-			if (err.code === 'ECONNREFUSED') {
-				// port is currently in use
-				resolve();
-			} else {
-				reject();
-			}
-			cleanup();
-		});
-
-		socket.once('connect', () => {
-			reject();
-			cleanup();
-		});
-
-		socket.connect({ port });
-	});
 }

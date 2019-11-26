@@ -10,17 +10,17 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 	private platform!: string;
 	private projectType!: string;
 
-	public async attach (args: TitaniumAttachRequestArgs) {
+	public async attach (args: TitaniumAttachRequestArgs): Promise<void> {
 		await this.configureOptions(args);
 		return super.attach(args);
 	}
 
-	public async launch (args: TitaniumLaunchRequestArgs) {
+	public async launch (args: TitaniumLaunchRequestArgs): Promise<void> {
 		await this.configureOptions(args);
 		return super.attach(args);
 	}
 
-	public async configureOptions (args: TitaniumLaunchRequestArgs) {
+	public async configureOptions (args: TitaniumLaunchRequestArgs): Promise<void> {
 		this.appDirectory = args.projectDir;
 		this.platform = args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);

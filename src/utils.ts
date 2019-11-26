@@ -291,7 +291,7 @@ export function buildArguments (options: BuildAppOptions | BuildModuleOptions) {
 		if (options.target === 'device' && options.platform === 'ios') {
 			args.push(
 				'--developer-name', (options as BuildIosAppOptions).iOSCertificate!,
-				'--pp-uuid', (options as BuildIosAppOptions).iOSProvisioningProfile
+				'--pp-uuid', (options as BuildIosAppOptions).iOSProvisioningProfile!
 			);
 		}
 
