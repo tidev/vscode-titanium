@@ -4,10 +4,10 @@ import * as utils from '../utils';
 
 import { pathExists } from 'fs-extra';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { InputBoxOptions, OpenDialogOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
+import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
-import { IosCertificateType, UpdateChoice } from '../types/common';
+import { IosCertificateType, UpdateChoice, KeystoreInfo } from '../types/common';
 
 export interface CustomQuickPick extends QuickPickItem {
 	label: string;
@@ -17,18 +17,16 @@ export interface CustomQuickPick extends QuickPickItem {
 	uuid?: string;
 }
 
-export async function selectFromFileSystem (options: OpenDialogOptions) {
-	if (!options.canSelectMany) {
-		options.canSelectMany = false;
+export async function inputBox (options: InputBoxOptions): Promise<string> {
+	const input = await window.showInputBox(options);
+
+	if (input !== undefined) {
+		return input;
 	}
-	const filePath = await window.showOpenDialog(options);
-	if (!filePath) {
-		throw new UserCancellation();
-	}
-	return filePath;
+	throw new UserCancellation();
 }
 
-export async function enterPassword (options: InputBoxOptions) {
+export async function enterPassword (options: InputBoxOptions): Promise<string> {
 	if (!options.password) {
 		options.password = true;
 	}
@@ -39,7 +37,7 @@ export async function enterPassword (options: InputBoxOptions) {
 	return inputBox(options);
 }
 
-export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false) {
+export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false): Promise<boolean> {
 	const response = await window.showQuickPick([ 'Yes', 'No' ], options);
 	if (response?.toLowerCase() !== 'yes' || response?.toLowerCase() !== 'y') {
 		if (shouldThrow) {
@@ -50,15 +48,6 @@ export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = fa
 	} else {
 		return true;
 	}
-}
-
-export async function inputBox (options: InputBoxOptions) {
-	const input = await window.showInputBox(options);
-
-	if (input !== undefined) {
-		return input;
-	}
-	throw new UserCancellation();
 }
 
 export async function quickPick (items: CustomQuickPick[], quickPickOptions: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick[]>;
@@ -75,8 +64,8 @@ export async function quickPick<T extends QuickPickItem> (items: T[], quickPickO
 	return result;
 }
 
-export function selectPlatform (lastBuildDescription?: string, filter?: (platform: string) => boolean) {
-	const platforms = utils.platforms().filter(filter ? filter : () => true).map(platform => ({ label: utils.nameForPlatform(platform) as string, id: platform }));
+export function selectPlatform (lastBuildDescription?: string, filter?: (platform: string) => boolean): Promise<{id: string; label: string}> {
+	const platforms = utils.platforms().filter(filter ? filter : (): boolean => true).map(platform => ({ label: utils.nameForPlatform(platform) as string, id: platform }));
 	if (lastBuildDescription) {
 		platforms.unshift({
 			label: `Last: ${lastBuildDescription}`,
@@ -86,7 +75,7 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 	return quickPick(platforms);
 }
 
-export async function selectCreationLocation (lastUsed?: string) {
+export async function selectCreationLocation (lastUsed?: string): Promise<Uri|undefined> {
 	const items = [ {
 		label: 'Browse for directory',
 		id: 'browse'
@@ -109,26 +98,26 @@ export async function selectCreationLocation (lastUsed?: string) {
 	}
 }
 
-export function selectBuildTarget (platform: string) {
+export function selectBuildTarget (platform: string): Promise<CustomQuickPick>  {
 	const targets = utils.targetsForPlatform(platform)
 		.filter(target => !/^dist/.test(target))
 		.map(target => ({ label: utils.nameForTarget(target), id: target }));
 	return quickPick(targets);
 }
 
-export function selectDistributionTarget (platform: string) {
+export function selectDistributionTarget (platform: string): Promise<CustomQuickPick>  {
 	const targets = utils.targetsForPlatform(platform)
 		.filter(target => /^dist/.test(target))
 		.map(target => ({ label: utils.nameForTarget(target), id: target }));
 	return quickPick(targets);
 }
 
-export function selectAndroidDevice () {
+export function selectAndroidDevice (): Promise<CustomQuickPick> {
 	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
 	return quickPick(devices);
 }
 
-export function selectAndroidEmulator () {
+export function selectAndroidEmulator (): Promise<CustomQuickPick>  {
 	const emulators = appc.androidEmulators();
 	const options = [];
 
@@ -151,7 +140,7 @@ export function selectAndroidEmulator () {
 	return quickPick(options, { placeHolder: 'Select emulator' });
 }
 
-export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string) {
+export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string): Promise<string|undefined> {
 	const items = [ {
 		label: 'Browse for keystore',
 		id: 'browse'
@@ -180,12 +169,12 @@ export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePat
 			savedKeystorePath = path.resolve(workspace.rootPath!, savedKeystorePath);
 		}
 		return savedKeystorePath;
-	} else {
+	} else if (lastUsed) {
 		return lastUsed;
 	}
 }
 
-export async function enterAndroidKeystoreInfo (lastUsed?: string, savedKeystorePath?: string) {
+export async function enterAndroidKeystoreInfo (lastUsed?: string, savedKeystorePath?: string): Promise<KeystoreInfo> {
 	const location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
 
 	if (!location || !await pathExists(location)) {
@@ -203,7 +192,7 @@ export async function enterAndroidKeystoreInfo (lastUsed?: string, savedKeystore
 	};
 }
 
-export function selectiOSCertificate (buildType: string) {
+export function selectiOSCertificate (buildType: string): Promise<CustomQuickPick> {
 	const certificateType: IosCertificateType = buildType === 'run' ? IosCertificateType.developer : IosCertificateType.distribution;
 	const certificates = appc.iOSCertificates(certificateType).map(cert => ({
 		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
@@ -214,7 +203,7 @@ export function selectiOSCertificate (buildType: string) {
 	return quickPick(certificates, { placeHolder: 'Select certificate' });
 }
 
-export function selectiOSProvisioningProfile (certificate: any, target: string, appId: string) {
+export function selectiOSProvisioningProfile (certificate: any, target: string, appId: string): Promise<CustomQuickPick> {
 	let deployment = 'development';
 	if (target === 'dist-adhoc') {
 		deployment = 'distribution';
@@ -241,35 +230,35 @@ export async function selectiOSCodeSigning (buildType: string, target: string, a
 	};
 }
 
-export function selectiOSDevice () {
+export function selectiOSDevice (): Promise<CustomQuickPick> {
 	const devices = appc.iOSDevices().map(device => ({ id: device.udid, label: device.name, udid: device.udid }));
 	return quickPick(devices, { placeHolder: 'Select device' });
 }
 
-export async function selectiOSSimulator (iOSVersion?: string) {
+export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
+	const versions = appc.iOSSimulatorVersions().map(version => ({ id: version, label: version }));
+	return quickPick(versions, { placeHolder: 'Select simulator version' });
+}
+
+export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQuickPick> {
 	if (!iOSVersion) {
-		iOSVersion = (await selectiOSSimulatorVersion()).label;
+		iOSVersion = (await selectiOSSimulatorVersion()).label; // eslint-disable-line require-atomic-updates
 	}
 	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
 	return quickPick(simulators, { placeHolder: 'Select simulator' });
 }
 
-export function selectiOSSimulatorVersion () {
-	const versions = appc.iOSSimulatorVersions().map(version => ({ id: version, label: version }));
-	return quickPick(versions, { placeHolder: 'Select simulator version' });
-}
-
-export function selectWindowsDevice () {
+export function selectWindowsDevice (): Promise<CustomQuickPick> {
 	const devices = appc.windowsDevices().map(({ name, udid }) => ({ id: udid, label: name, udid }));
 	return quickPick(devices, { placeHolder: 'Select device' });
 }
 
-export function selectWindowsEmulator () {
+export function selectWindowsEmulator (): Promise<CustomQuickPick> {
 	const emulators = appc.windowsEmulators()['10.0'].map(({ name, udid }) => ({ id: udid, label: name, udid }));
 	return quickPick(emulators, { placeHolder: 'Select emulator' });
 }
 
-export async function selectUpdates (updates: UpdateInfo[]) {
+export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateChoice[]> {
 	const choices: UpdateChoice[] = updates
 		.map(update => ({
 			label: `${update.productName}: ${update.latestVersion}`,
@@ -297,7 +286,7 @@ export async function selectUpdates (updates: UpdateInfo[]) {
 	return choices as UpdateChoice[];
 }
 
-export async function selectDevice (platform: string, target: string) {
+export async function selectDevice (platform: string, target: string): Promise<CustomQuickPick> {
 	if (platform === 'android' && target === 'emulator') {
 		return selectAndroidEmulator();
 	} else if (platform === 'android' && target === 'device') {
@@ -312,21 +301,7 @@ export async function selectDevice (platform: string, target: string) {
 	}
 }
 
-export async function enterWindowsSigningInfo (lastUsed?: string, savedCertPath?: string) {
-	const location = await selectWindowsCertificate(lastUsed, savedCertPath);
-
-	if (location && !await pathExists(location)) {
-		throw new InteractionError(`The certificate file ${location} does not exist`);
-	}
-	const password = await enterPassword({ placeHolder: 'Enter the certificate password' });
-
-	return {
-		location,
-		password
-	};
-}
-
-export async function selectWindowsCertificate (lastUsed?: string, savedCertPath?: string) {
+export async function selectWindowsCertificate (lastUsed?: string, savedCertPath?: string): Promise<string|undefined> {
 	const items = [
 		{
 			label: 'Browse for certificate',
@@ -366,4 +341,18 @@ export async function selectWindowsCertificate (lastUsed?: string, savedCertPath
 	} else if (certificateAction.id === 'last' && lastUsed) {
 		return lastUsed;
 	}
+}
+
+export async function enterWindowsSigningInfo (lastUsed?: string, savedCertPath?: string): Promise<{ location: string|undefined; password: string }> {
+	const location = await selectWindowsCertificate(lastUsed, savedCertPath);
+
+	if (location && !await pathExists(location)) {
+		throw new InteractionError(`The certificate file ${location} does not exist`);
+	}
+	const password = await enterPassword({ placeHolder: 'Enter the certificate password' });
+
+	return {
+		location,
+		password
+	};
 }
