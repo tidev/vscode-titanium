@@ -1,4 +1,4 @@
-
+/* eslint @typescript-eslint/no-use-before-define: off */
 import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from './appc';
@@ -50,12 +50,7 @@ let projectStatusBarItem: vscode.StatusBarItem;
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConfigurationProvider';
 
-/**
- * Activate
- *
- * @param {Object} context 	extension context
- */
-function activate (context: vscode.ExtensionContext) {
+function activate (context: vscode.ExtensionContext): Promise<void> {
 
 	Configuration.configure(context);
 
@@ -232,22 +227,20 @@ function activate (context: vscode.ExtensionContext) {
 				}
 
 				const updatesToInstall = await selectUpdates(updateInfo);
-				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
-					return new Promise(async resolve => {
-						const totalUpdates = updatesToInstall.length;
-						await installUpdates(updatesToInstall, progress);
-						if (updateInfo.length === totalUpdates) {
-							ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-							vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-						}
-						vscode.commands.executeCommand(Commands.RefreshUpdates);
-						vscode.commands.executeCommand(Commands.RefreshExplorer);
-						resolve();
-						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
-					});
+				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
+					const totalUpdates = updatesToInstall.length;
+					await installUpdates(updatesToInstall, progress);
+					if (updateInfo.length === totalUpdates) {
+						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+					}
+					vscode.commands.executeCommand(Commands.RefreshUpdates);
+					vscode.commands.executeCommand(Commands.RefreshExplorer);
+					await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
+					return Promise.resolve();
 				});
 			} catch (error) {
-				// stuff
+				// TODO: add some sort of error reporting
 			}
 		}),
 
@@ -256,38 +249,34 @@ function activate (context: vscode.ExtensionContext) {
 				if (!updateInfo) {
 					updateInfo = updateExplorer.updates;
 				}
-				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
-					return new Promise(async resolve => {
-						const totalUpdates = updateInfo.length;
-						await installUpdates(updateInfo, progress);
-						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-						vscode.commands.executeCommand(Commands.RefreshUpdates);
-						vscode.commands.executeCommand(Commands.RefreshExplorer);
-						resolve();
-						await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
-					});
+				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
+					const totalUpdates = updateInfo.length;
+					await installUpdates(updateInfo, progress);
+					ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+					vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+					vscode.commands.executeCommand(Commands.RefreshUpdates);
+					vscode.commands.executeCommand(Commands.RefreshExplorer);
+					await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
+					return Promise.resolve();
 				});
 			} catch (error) {
-				// stuff
+				// TODO: add some sort of error reporting
 			}
 		}),
 
 		vscode.commands.registerCommand(Commands.InstallUpdate, async updateInfo => {
 			try {
-				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, progress => {
-					return new Promise(async resolve => {
-						await installUpdates([ updateInfo.update ], progress);
-						ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-						vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-						vscode.commands.executeCommand(Commands.RefreshUpdates);
-						vscode.commands.executeCommand(Commands.RefreshExplorer);
-						resolve();
-						await vscode.window.showInformationMessage('Installed 1 update');
-					});
+				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
+					await installUpdates([ updateInfo.update ], progress);
+					ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
+					vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+					vscode.commands.executeCommand(Commands.RefreshUpdates);
+					vscode.commands.executeCommand(Commands.RefreshExplorer);
+					await vscode.window.showInformationMessage('Installed 1 update');
+					return Promise.resolve();
 				});
 			} catch (error) {
-				// stuff
+				// TODO: add some sort of error reporting
 			}
 		}),
 		vscode.commands.registerCommand(Commands.Clean, cleanApplication),
@@ -351,35 +340,36 @@ function activate (context: vscode.ExtensionContext) {
 				} else if (request.code === 'END') {
 					const providedArgs = request.args as BuildAppOptions & TitaniumLaunchRequestArgs;
 					ExtensionContainer.terminal.stop();
-					if (providedArgs.platform === 'android') {
-						const adbPath = appc.getAdbPath();
-						if (!adbPath) {
-							return;
-						}
-						const tcpPort = `tcp:${providedArgs.port}`;
+					if (providedArgs.platform !== 'android') {
+						return;
+					}
+					const adbPath = appc.getAdbPath();
+					if (!adbPath) {
+						return;
+					}
+					const tcpPort = `tcp:${providedArgs.port}`;
 
-						if (providedArgs.target === 'emulator') {
-							const { stdout } = await ExtensionContainer.terminal.runInBackground(adbPath, [ 'forward', '--list' ]);
+					if (providedArgs.target === 'emulator') {
+						const { stdout } = await ExtensionContainer.terminal.runInBackground(adbPath, [ 'forward', '--list' ]);
 
-							for (const line of stdout.split('\n')) {
-								if (!line.includes(tcpPort)) {
-									continue;
-								}
-								const emulatorId = line.match(/emulator-\d+/);
-								if (emulatorId) {
-									providedArgs.deviceId = emulatorId[0];
-									break;
-								}
+						for (const line of stdout.split('\n')) {
+							if (!line.includes(tcpPort)) {
+								continue;
+							}
+							const emulatorId = line.match(/emulator-\d+/);
+							if (emulatorId) {
+								providedArgs.deviceId = emulatorId[0];
+								break;
 							}
 						}
-						if (!providedArgs.deviceId) {
-							return;
-						}
-						try {
-							ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', tcpPort ]);
-						} catch (error) {
-							// squash
-						}
+					}
+					if (!providedArgs.deviceId) {
+						return;
+					}
+					try {
+						ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', tcpPort ]);
+					} catch (error) {
+						// squash
 					}
 				}
 			}
@@ -397,7 +387,7 @@ exports.activate = activate; // eslint-disable-line no-undef
 /**
  * Deactivate
  */
-function deactivate () {
+function deactivate (): void {
 	project.dispose();
 }
 exports.deactivate = deactivate;  // eslint-disable-line no-undef
@@ -405,99 +395,95 @@ exports.deactivate = deactivate;  // eslint-disable-line no-undef
 /**
  * Initialise extension - fetch appc info
  */
-async function init () {
+async function init (): Promise<void> {
 	const isEnabled = ExtensionContainer.context.globalState.get<boolean>(GlobalState.Enabled);
 	if (isEnabled) {
 		vscode.window.withProgress({ cancellable: false, location: vscode.ProgressLocation.Notification, title: 'Titanium' }, async progress => {
-			return new Promise(async (resolve, reject) => {
+			progress.report({
+				message: 'Validating environment'
+			});
 
-				progress.report({
-					message: 'Validating environment'
-				});
+			const { missing } = await environment.validateEnvironment();
 
-				const { missing } = await environment.validateEnvironment();
-
-				if (missing.length) {
-					let message = 'You are missing the following required components for Titanium development:';
-					for (let i = 0; i < missing.length; i++) {
-						const product = missing[i];
-						if (i < missing.length - 1) {
-							message = `${message} ${product.name},`;
-						} else {
-							message = `${message} ${product.name}`;
-						}
+			if (missing.length) {
+				let message = 'You are missing the following required components for Titanium development:';
+				for (let i = 0; i < missing.length; i++) {
+					const product = missing[i];
+					if (i < missing.length - 1) {
+						message = `${message} ${product.name},`;
+					} else {
+						message = `${message} ${product.name}`;
 					}
-					message = `${message}. Without these components the extension will be unusable.`;
-					const choices: InteractionChoice[] = [
-						{
-							title: 'Install',
-							run: async () => {
-								const updateInfo = [];
-								progress.report({
-									message: 'Fetching latest component versions'
-								});
-								for (const product of missing) {
-									updateInfo.push(await product.getInstallInfo());
+				}
+				message = `${message}. Without these components the extension will be unusable.`;
+				const choices: InteractionChoice[] = [
+					{
+						title: 'Install',
+						run: async (): Promise<void> => {
+							const updateInfo = [];
+							progress.report({
+								message: 'Fetching latest component versions'
+							});
+							for (const product of missing) {
+								updateInfo.push(await product.getInstallInfo());
 
-								}
-								await installUpdates(updateInfo, progress, false);
 							}
+							await installUpdates(updateInfo, progress, false);
 						}
-					];
-					const installProducts = await vscode.window.showErrorMessage(message, ...choices);
-					if (installProducts) {
-						progress.report({
-							message: 'Installing missing components'
-						});
-
-						await installProducts.run();
-					} else {
-						vscode.window.showErrorMessage('Extension startup cancelled as required components are not installed');
-						return reject();
 					}
+				];
+				const installProducts = await vscode.window.showErrorMessage(message, ...choices);
+				if (installProducts) {
+					progress.report({
+						message: 'Installing missing components'
+					});
+
+					await installProducts.run();
+				} else {
+					vscode.window.showErrorMessage('Extension startup cancelled as required components are not installed');
+					return Promise.reject();
+				}
+			}
+
+			if (ExtensionContainer.context.globalState.get('titanium:liveview')) {
+				vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
+			}
+
+			progress.report({
+				message: 'Fetching environment information'
+			});
+
+			appc.getInfo(error => {
+				if (error) {
+					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+					return Promise.reject();
 				}
 
-				if (ExtensionContainer.context.globalState.get('titanium:liveview')) {
-					vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
+				if (project.isTitaniumApp) {
+					generateCompletions();
 				}
 
-				progress.report({
-					message: 'Fetching environment information'
-				});
+				// Call refresh incase the Titanium Explorer activity pane became active before info
+				vscode.commands.executeCommand(Commands.RefreshExplorer);
 
-				appc.getInfo(error => {
-					if (error) {
-						vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-						return reject();
-					}
+				// Perform the update check if we need to
+				const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
+				const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
 
-					if (project.isTitaniumApp) {
-						generateCompletions();
-					}
+				// If there's no timestamp for when we last checked the updates then set to now
+				if (!lastUpdateCheck) {
+					ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+				}
 
-					// Call refresh incase the Titanium Explorer activity pane became active before info
-					vscode.commands.executeCommand(Commands.RefreshExplorer);
+				const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
+				if (checkUpdates) {
+					ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+					vscode.commands.executeCommand(Commands.CheckForUpdates);
+				} else {
+					vscode.commands.executeCommand(Commands.RefreshUpdates);
+				}
 
-					// Perform the update check if we need to
-					const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
-					const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
-
-					// If there's no timestamp for when we last checked the updates then set to now
-					if (!lastUpdateCheck) {
-						ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
-					}
-
-					const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
-					if (checkUpdates) {
-						ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
-						vscode.commands.executeCommand(Commands.CheckForUpdates);
-					} else {
-						vscode.commands.executeCommand(Commands.RefreshUpdates);
-					}
-
-					resolve();
-				});
-
+				return Promise.resolve();
 			});
 		});
 	}
@@ -507,7 +493,7 @@ async function init () {
 /**
  * Set project name and link to dashboard in status bar
  */
-function setStatusBar () {
+function setStatusBar (): void {
 	if (!project.isValid()) {
 		return;
 	}
@@ -533,10 +519,9 @@ function setStatusBar () {
 /**
  * Generate Alloy and Titanium SDK Completion files
  *
- * @param {Object} opts - Options
- * @param {Object} progress - Progress reporter.
+ * @param {boolean} [force=false] generate the completions even if they exist
  */
-async function generateCompletions (force = false) {
+async function generateCompletions (force = false): Promise<void> {
 	if (!project.isValid()) {
 		return;
 	}
@@ -603,18 +588,16 @@ async function generateCompletions (force = false) {
 			actions.push({
 				title: 'Install',
 				run: () => {
-					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, () => {
-						return new Promise(async (resolve, reject) => {
-							try {
-								await updates.titanium.sdk.installUpdate(sdkVersion as string);
-								appc.getInfo(() => {
-									generateCompletions(force);
-									return resolve();
-								});
-							} catch (error) {
-								return reject(error);
-							}
-						});
+					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, async () => {
+						try {
+							await updates.titanium.sdk.installUpdate(sdkVersion as string);
+							appc.getInfo(() => {
+								generateCompletions(force);
+								return Promise.resolve();
+							});
+						} catch (err) {
+							return Promise.reject(err);
+						}
 					});
 				}
 			});
@@ -626,7 +609,7 @@ async function generateCompletions (force = false) {
 	}
 }
 
-async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progress: vscode.Progress<{}>, incrementProgress = true) {
+async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progress: vscode.Progress<{}>, incrementProgress = true): Promise<void> {
 	const totalUpdates = updateInfo.length;
 	let counter = 1;
 
