@@ -12,7 +12,7 @@ export function run (): Promise<void> {
 		reporterOptions: {
 			reporterEnabled: 'mocha-jenkins-reporter, spec',
 			mochaJenkinsReporterReporterOptions: {
-				junit_report_path: reportPath
+				junit_report_path: reportPath // eslint-disable-line @typescript-eslint/camelcase
 			}
 		}
 	});
@@ -20,10 +20,10 @@ export function run (): Promise<void> {
 
 	const testsRoot = path.resolve(__dirname, '..');
 
-	return new Promise((c, e) => {
-		glob('**/**.test.js', { cwd: testsRoot }, (err, files) => {
-			if (err) {
-				return e(err);
+	return new Promise((resolve, reject) => {
+		glob('**/**.test.js', { cwd: testsRoot }, (error, files) => {
+			if (error) {
+				return reject(error);
 			}
 
 			// Add files to the test suite
@@ -33,13 +33,13 @@ export function run (): Promise<void> {
 				// Run the mocha test
 				mocha.run(failures => {
 					if (failures > 0) {
-						e(new Error(`${failures} tests failed.`));
+						return reject(new Error(`${failures} tests failed.`));
 					} else {
-						c();
+						return resolve();
 					}
 				});
 			} catch (err) {
-				e(err);
+				return reject(err);
 			}
 		});
 	});

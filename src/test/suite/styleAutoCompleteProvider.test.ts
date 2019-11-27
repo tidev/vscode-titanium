@@ -1,3 +1,4 @@
+/* eslint no-template-curly-in-string: off */
 import { expect } from 'chai';
 import * as fs from 'fs';
 import { after, before, describe, it } from 'mocha';
@@ -15,7 +16,7 @@ const uri = vscode.Uri.file(file);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
 const completions = JSON.parse(rawData);
 
-async function testCompletion (position: vscode.Position) {
+async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
 	const text = await vscode.workspace.openTextDocument(uri);
 	const provider = new StyleCompletionItemProvider();
 	const context: vscode.CompletionContext = {
@@ -43,31 +44,32 @@ describe('TSS Suggestions', () => {
 
 	it('Should provide tag suggestions', async () => {
 		const position = new vscode.Position(17, 1); // "W
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(29);
 
 		expect(suggestions[0].label).to.equal('ActionView');
 		expect(suggestions[0].detail).to.equal('_ProxyProperty.ActionView');
-		expect(suggestions[0].insertText.value).to.equal('ActionView": {\n\t${1}\t\n}');
+		expect(suggestions[0].insertText).to.be.an.instanceOf(vscode.SnippetString);
+		expect((suggestions[0].insertText as vscode.SnippetString).value).to.equal('ActionView": {\n\t${1}\t\n}');
 
 		expect(suggestions[1].label).to.equal('AndroidView');
 		expect(suggestions[1].detail).to.equal('Ti.UI.AndroidView');
-		expect(suggestions[1].insertText.value).to.equal('AndroidView": {\n\t${1}\t\n}');
+		expect((suggestions[1].insertText as vscode.SnippetString).value).to.equal('AndroidView": {\n\t${1}\t\n}');
 
 		expect(suggestions[2].label).to.equal('CardView');
 		expect(suggestions[2].detail).to.equal('Ti.UI.Android.CardView');
-		expect(suggestions[2].insertText.value).to.equal('CardView": {\n\t${1}\t\n}');
+		expect((suggestions[2].insertText as vscode.SnippetString).value).to.equal('CardView": {\n\t${1}\t\n}');
 
 		expect(suggestions[3].label).to.equal('CenterView');
 		expect(suggestions[3].detail).to.equal('Ti.UI.Android.DrawerLayout.CenterView');
-		expect(suggestions[3].insertText.value).to.equal('CenterView": {\n\t${1}\t\n}');
+		expect((suggestions[3].insertText as vscode.SnippetString).value).to.equal('CenterView": {\n\t${1}\t\n}');
 
 	});
 
 	it('Should provide property name suggestions', async () => {
 		const position = new vscode.Position(20, 8); // scroll
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(14);
 
@@ -89,9 +91,9 @@ describe('TSS Suggestions', () => {
 
 	});
 
-	it('Should provide property name suggestions', async () => {
-		const position = new vscode.Position(14, 16); // separatorStyle:
-		const suggestions: any = await testCompletion(position);
+	it('Should provide property value suggestions if Position is  at colon', async () => {
+		const position = new vscode.Position(14, 16); // separatorStyle:^
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(2);
 
@@ -103,9 +105,9 @@ describe('TSS Suggestions', () => {
 
 	});
 
-	it('Should provide property name suggestions', async () => {
-		const position = new vscode.Position(14, 15); // separatorStyle:
-		const suggestions: any = await testCompletion(position);
+	it('Should not provide property value suggestions if Position is in property', async () => {
+		const position = new vscode.Position(14, 15); // separatorStyl^e:
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(0);
 
@@ -113,7 +115,7 @@ describe('TSS Suggestions', () => {
 
 	it('should provide color values with quotes', async () => {
 		const position = new vscode.Position(7, 10); // color: "ma"
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(2);
 
@@ -127,7 +129,7 @@ describe('TSS Suggestions', () => {
 
 	it('should provide color values without quotes', async () => {
 		const position = new vscode.Position(1, 19); // backgroundColor: ma
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(2);
 
@@ -141,7 +143,7 @@ describe('TSS Suggestions', () => {
 
 	it('should provide layout values', async () => {
 		const position = new vscode.Position(21, 9); // layout:
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(3);
 
