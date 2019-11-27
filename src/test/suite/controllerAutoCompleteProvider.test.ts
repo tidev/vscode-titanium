@@ -15,7 +15,7 @@ const uri = vscode.Uri.file(file);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
 const completions = JSON.parse(rawData);
 
-async function testCompletion (position: vscode.Position) {
+async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
 	const text = await vscode.workspace.openTextDocument(uri);
 	const provider = new ControllerCompletionItemProvider();
 	const context: vscode.CompletionContext = {
@@ -46,7 +46,7 @@ describe('Controller suggestions', () => {
 
 		it('Should provide tag suggestions', async () => {
 			const position = new vscode.Position(0, 3); // Ti.
-			const suggestions: any = await testCompletion(position);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(202);
 
@@ -70,7 +70,7 @@ describe('Controller suggestions', () => {
 
 		it('Should provide type suggestions', async () => {
 			const position = new vscode.Position(1, 5); // Ti.UI
-			const suggestions: any = await testCompletion(position);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(148);
 
@@ -94,7 +94,7 @@ describe('Controller suggestions', () => {
 
 		it('Should provide property suggestions', async () => {
 			const position = new vscode.Position(2, 28); // Ti.UI.ActivityIndicator.rota
-			const suggestions: any = await testCompletion(position);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(3);
 
@@ -114,7 +114,7 @@ describe('Controller suggestions', () => {
 
 		it('Should provide tag suggestions', async () => {
 			const position = new vscode.Position(3, 6); // Alloy.
-			const suggestions: any = await testCompletion(position);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(16);
 
@@ -138,7 +138,7 @@ describe('Controller suggestions', () => {
 
 		it('Should provide type suggestions', async () => {
 			const position = new vscode.Position(4, 17); // Alloy.Controller.
-			const suggestions: any = await testCompletion(position);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(14);
 
@@ -154,7 +154,7 @@ describe('Controller suggestions', () => {
 
 		it('Should provide property suggestions', async () => {
 			const position = new vscode.Position(5, 20); // Alloy.Controller.add
-			const suggestions: any = await testCompletion(position);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(2);
 

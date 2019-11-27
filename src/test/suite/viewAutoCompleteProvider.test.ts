@@ -15,7 +15,7 @@ const uri = vscode.Uri.file(xmlFile);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
 const completions = JSON.parse(rawData);
 
-async function testCompletion (position: vscode.Position) {
+async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
 	const text = await vscode.workspace.openTextDocument(uri);
 	const provider = new ViewCompletionItemProvider();
 	const context: vscode.CompletionContext = {
@@ -43,7 +43,7 @@ describe('View suggestions', () => {
 
 	it('Should provide tag suggestions', async () => {
 		const position = new vscode.Position(2, 11); // <Wi
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(4);
 
@@ -67,12 +67,12 @@ describe('View suggestions', () => {
 
 	it('Should provide event suggestions for', async () => {
 		const position = new vscode.Position(2, 22); // <Window onOpen
-		const suggestions: any = await testCompletion(position);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(1);
 
 		expect(suggestions[0].label).to.equal('onOpen');
-		expect(suggestions[0].insertText.value).to.equal('onOpen="$1"$0');
+		expect((suggestions[0].insertText as vscode.SnippetString).value).to.equal('onOpen="$1"$0');
 		expect(suggestions[0].kind).to.equal(22);
 
 	});
