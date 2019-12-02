@@ -13,7 +13,7 @@ async function linkToVsix () {
 
 async function main() {
 	await Promise.all([
-		eslint(),
+		eslint(null, [ '.ts' ]),
 		junit({ pathToReport: './junit_report.xml' }),
 		dependencies({ type: 'npm' }),
 		linkToVsix()
