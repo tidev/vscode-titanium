@@ -787,7 +787,7 @@
     "@awam/vscode-chrome-debug-core": "^6.8.5",
     "fs-extra": "^8.1.0",
     "get-port": "^5.0.0",
-    "got": "^9.6.0",
+    "got": "^10.0.3",
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.2",
     "semver": "^6.3.0",
