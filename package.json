@@ -790,7 +790,7 @@
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.2",
     "@awam/vscode-chrome-debug-core": "^6.8.5",
     "fs-extra": "^8.1.0",
-    "get-port": "^5.0.0",
+    "get-port": "^5.1.0",
     "got": "^9.6.0",
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.2",
@@ -799,7 +799,7 @@
     "underscore": "^1.8.3",
     "uuid": "^3.3.2",
     "vscode-debugadapter": "^1.37.1",
-    "which": "^2.0.1",
-    "xml2js": "^0.4.22"
+    "which": "^2.0.2",
+    "xml2js": "^0.4.23"
   }
 }
