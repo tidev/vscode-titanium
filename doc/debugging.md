@@ -18,7 +18,7 @@ To debug Titanium applications from VS Code you must first create a debug config
 
 1. Select the debug icon from the Activity Bar in VS Code
     ![VS Code Debug Icon](./images/DebugIcon.png)
-2. Generate a launch configuration file by clicking the Configure gear icon on the top of the Debug view top bar
+2. Generate a launch configuration file by clicking `create a launch.json` file
 
     ![Debug View Top Bar](./images/ConfigurationIcon.png)
 3. Select `Titanium` from the environment selection list
