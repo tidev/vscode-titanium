@@ -64,14 +64,15 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		} else if (/(?:Alloy)\.?\S+/.test(linePrefix)) {
 			return this.getAlloyApiCompletions(linePrefix);
 		} else {
-			let ruleResult;
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
-					ruleResult = await rule.getCompletions();
+					if (rule.requireRange) {
+						const range = document.getWordRangeAtPosition(position, rule.rangeRegex);
+						return await rule.getCompletions(range);
+					}
+
+					return await rule.getCompletions();
 				}
-			}
-			if (ruleResult) {
-				return ruleResult;
 			}
 		}
 
