@@ -2,13 +2,15 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 
-import { CompletionItem, CompletionItemKind, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, workspace, Range } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { parseXmlString } from '../../common/utils';
 
 interface AlloyAutoCompleteRule {
 	regExp: RegExp;
-	getCompletions: () => Promise<CompletionItem[]>|CompletionItem[];
+	getCompletions: (range?: Range) => Promise<CompletionItem[]>|CompletionItem[];
+	requireRange?: boolean;
+	rangeRegex?: RegExp;
 }
 
 export const cfgAutoComplete: AlloyAutoCompleteRule = {
@@ -68,7 +70,9 @@ export const i18nAutoComplete: AlloyAutoCompleteRule = {
 
 export const imageAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)['"]?$/,
-	getCompletions () {
+	requireRange: true,
+	rangeRegex: /([\w/.$]+)/,
+	getCompletions (range) {
 		const alloyRootPath = utils.getAlloyRootPath();
 		const assetPath = path.join(alloyRootPath, 'assets');
 		const completions: CompletionItem[] = [];
@@ -128,6 +132,7 @@ export const imageAutoComplete: AlloyAutoCompleteRule = {
 				completions.push({
 					label: utils.toUnixPath(`${image.prefix}${image.suffix}`.replace(assetPath, '')).replace(/^\/(iphone|android|windows)/, ''),
 					kind: CompletionItemKind.File,
+					range,
 					detail: scales
 				});
 			}
