@@ -47,15 +47,13 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		} else if (/require\(["']?([^'");]*)["']?\)?$/.test(linePrefix)) {
 			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/)!;
 			const requestedModule = matches[1];
-			// return this.getRequireCompletions(linePrefix, prefix);
-			return this.getFileCompletions('lib', requestedModule);
+			const range = document.getWordRangeAtPosition(position, /([\w/.$]+)/);
+			return this.getFileCompletions('lib', requestedModule, range);
 		// Alloy.createController('')
 		} else if (/Alloy\.(createController|Controllers\.instance)\(["']([-a-zA-Z0-9-_/]*["']?\)?)$/.test(linePrefix)) {
-			// return this.getControllerCompletions(linePrefix, prefix);
 			return this.getFileCompletions('controllers');
 		// Alloy.createModel('')
 		} else if (/Alloy\.(createModel|Models\.instance|createCollection|Collections\.instance)\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
-			// return this.getControllerCompletions(linePrefix, prefix);
 			return this.getFileCompletions('models');
 		// Alloy.createWidget('')
 		} else if (/Alloy\.(createWidget|Widgets\.instance)\(["']([-a-zA-Z0-9-_/.]*)$/.test(linePrefix)) {
@@ -348,7 +346,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable}
 	 */
-	public getFileCompletions (directory: string, moduleName?: string): CompletionItem[] {
+	public getFileCompletions(directory: string, moduleName?: string, range?: Range): CompletionItem[] {
 		const completions: CompletionItem[] = [];
 		const filesPath = path.join(utils.getAlloyRootPath(), directory);
 		if (moduleName && moduleName.startsWith('/')) {
@@ -359,12 +357,15 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 
 			for (const file of files) {
 				const value = `/${path.posix.relative(filesPath, file.path).replace('.js', '')}`;
-				completions.push({
+				const completionItem: CompletionItem = {
 					label: value,
 					kind: CompletionItemKind.Reference
-				});
+				};
+				if (range) {
+					completionItem.range = range;
+				}
+				completions.push(completionItem);
 			}
-
 		}
 		return completions;
 	}
