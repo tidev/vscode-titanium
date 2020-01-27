@@ -2,12 +2,6 @@ import * as glob from 'glob';
 import * as Mocha from 'mocha';
 import * as path from 'path';
 
-declare module 'mocha' {
-	interface MochaOptions {
-		reporterOption?: string;
-	}
-}
-
 export function run (): Promise<void> {
 	// Create the mocha test
 	const reportPath = path.join(__dirname, '..', '..', 'junit_report.xml');
@@ -15,7 +9,7 @@ export function run (): Promise<void> {
 	const mocha = new Mocha({
 		ui: 'tdd',
 		reporter: 'mocha-multi-reporters',
-		reporterOption: {
+		reporterOptions: {
 			reporterEnabled: 'mocha-jenkins-reporter, spec',
 			mochaJenkinsReporterReporterOptions: {
 				junit_report_path: reportPath // eslint-disable-line @typescript-eslint/camelcase
