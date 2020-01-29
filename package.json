@@ -755,7 +755,7 @@
     "@types/fs-extra": "^8.0.1",
     "@types/got": "^9.6.9",
     "@types/klaw-sync": "^6.0.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/ms": "^0.7.31",
     "@types/node": "^8.10.58",
     "@types/semver": "^6.2.0",
