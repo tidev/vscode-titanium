@@ -6,7 +6,8 @@ import { WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import project from '../project';
 import { quickPick, selectDevice, selectiOSCertificate, selectiOSProvisioningProfile, selectPlatform } from '../quickpicks/common';
-import { nameForTarget, targetsForPlatform } from '../utils';
+import { getCorrectCertificateName, nameForTarget, targetsForPlatform } from '../utils';
+import { IosCertificateType } from '../types/common';
 
 export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
@@ -133,7 +134,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 					const certificate = await selectiOSCertificate('run');
 					const provisioning = await selectiOSProvisioningProfile(certificate, ourConfig.target, project.appId()!);
 
-					ourConfig.iOSCertificate = certificate.label;
+					ourConfig.iOSCertificate = getCorrectCertificateName(certificate.label, project.sdk()[0], IosCertificateType.developer);
 					ourConfig.iOSProvisioningProfile = provisioning.uuid;
 				} catch (error) {
 					let message = error.message;
