@@ -782,7 +782,7 @@
     "mocha": "^7.0.1",
     "mocha-jenkins-reporter": "^0.4.2",
     "mocha-multi-reporters": "^1.1.7",
-    "sinon": "^8.1.1",
+    "sinon": "^9.0.0",
     "standard-version": "^7.1.0",
     "typescript": "^3.7.5",
     "vscode-test": "^1.3.0"
