@@ -756,7 +756,7 @@
     "@types/glob": "^7.1.1",
     "@types/got": "^9.6.9",
     "@types/klaw-sync": "^6.0.0",
-    "@types/mocha": "^7.0.1",
+    "@types/mocha": "^7.0.2",
     "@types/ms": "^0.7.31",
     "@types/node": "^8.10.58",
     "@types/semver": "^7.1.0",
