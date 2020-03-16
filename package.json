@@ -760,7 +760,7 @@
     "@types/ms": "^0.7.31",
     "@types/node": "^8.10.58",
     "@types/semver": "^7.1.0",
-    "@types/sinon": "^7.5.1",
+    "@types/sinon": "^7.5.2",
     "@types/underscore": "^1.9.4",
     "@types/uuid": "^3.4.7",
     "@types/vscode": "1.31.0",
