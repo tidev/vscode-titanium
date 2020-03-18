@@ -779,7 +779,7 @@
     "glob": "^7.1.6",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
-    "mocha": "^7.0.1",
+    "mocha": "^7.1.1",
     "mocha-jenkins-reporter": "^0.4.2",
     "mocha-multi-reporters": "^1.1.7",
     "sinon": "^9.0.1",
