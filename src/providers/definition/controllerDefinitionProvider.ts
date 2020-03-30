@@ -19,25 +19,25 @@ const suggestions: ControllerSuggestion[] = [
 	{ // controller name
 		regExp: /Alloy\.createController\(["']([-a-zA-Z0-9-_/]*)$/,
 		files (document: vscode.TextDocument, text: string, value: string): string[] {
-			return [ document.fileName.replace(/app\/(.*)$/, `app/controllers/${value}.js`) ];
+			return [ document.fileName.replace(/\/app\/(.*)$/, `/app/controllers/${value}.js`) ];
 		}
 	},
 	{ // collection / model name (instance)
 		regExp: /Alloy\.(Collections|Models).instance\(["']([-a-zA-Z0-9-_/]*)$/,
 		files (document: vscode.TextDocument, text: string, value: string): string[] {
-			return [ document.fileName.replace(/app\/(.*)$/, `app/models/${value}.js`) ];
+			return [ document.fileName.replace(/\/app\/(.*)$/, `/app/models/${value}.js`) ];
 		}
 	},
 	{ // collection / model name (create)
 		regExp: /Alloy\.create(Collection|Model)\(["']([-a-zA-Z0-9-_/]*)$/,
 		files (document: vscode.TextDocument, text: string, value: string): string[] {
-			return [ document.fileName.replace(/app\/(.*)$/, `app/models/${value}.js`) ];
+			return [ document.fileName.replace(/\/app\/(.*)$/, `/app/models/${value}.js`) ];
 		}
 	},
 	{ // widget name
 		regExp: /Alloy\.createWidget\(["']([-a-zA-Z0-9-_/.]*)$/,
 		files (document: vscode.TextDocument, text: string, value: string): string[] {
-			return [ document.fileName.replace(/app\/(.*)$/, `app/widgets/${value}/controllers/widget.js`) ];
+			return [ document.fileName.replace(/\/app\/(.*)$/, `/app/widgets/${value}/controllers/widget.js`) ];
 		}
 	},
 	{ // controller name
