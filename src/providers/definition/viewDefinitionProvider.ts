@@ -1,4 +1,3 @@
-
 import * as definitionProviderHelper from './definitionProviderHelper';
 
 import { DefinitionProvider, Position, TextDocument, Definition, DefinitionLink } from 'vscode';

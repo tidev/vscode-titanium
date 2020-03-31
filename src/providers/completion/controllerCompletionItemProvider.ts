@@ -1,4 +1,3 @@
-
 import * as path from 'path';
 import { completion } from 'titanium-editor-commons';
 import project from '../../project';
