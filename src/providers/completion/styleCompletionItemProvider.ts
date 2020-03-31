@@ -1,4 +1,3 @@
-
 import { completion } from 'titanium-editor-commons';
 import * as _ from 'underscore';
 import project from '../../project';
