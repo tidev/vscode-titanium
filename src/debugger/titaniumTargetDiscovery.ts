@@ -1,5 +1,5 @@
 import { chromeConnection, chromeTargetDiscoveryStrategy, logger, TargetVersions, telemetry, Version } from '@awam/vscode-chrome-debug-core';
-import * as uuid from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 export class TitaniumTargetDiscovery extends chromeTargetDiscoveryStrategy.ChromeTargetDiscovery {
 	constructor () {
@@ -9,7 +9,7 @@ export class TitaniumTargetDiscovery extends chromeTargetDiscoveryStrategy.Chrom
 		return Promise.resolve({
 			description: 'Titanium Debug Target',
 			devtoolsFrontendUrl: `chrome-devtools://devtools/bundled/inspector.html?experiments=true&ws=${address}:${port}`,
-			id: uuid.v4(),
+			id: uuidv4(),
 			title: 'Titanium Debug Target',
 			type: 'node',
 			version: Promise.resolve(new TargetVersions(Version.unknownVersion(), Version.unknownVersion())),
