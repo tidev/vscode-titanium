@@ -21,8 +21,9 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 
 		if (!ourConfig.port) {
 			ourConfig.port = 9000;
+			ourConfig.debugPort = 9000;
 		} else {
-			config.debugPort = config.port;
+			ourConfig.debugPort = ourConfig.port;
 		}
 
 		try {
