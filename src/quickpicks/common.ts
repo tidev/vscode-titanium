@@ -230,9 +230,9 @@ export async function selectiOSCodeSigning (buildType: string, target: string, a
 	};
 }
 
-export function selectiOSDevice (): Promise<CustomQuickPick> {
+export function selectiOSDevice (): Promise<CustomQuickPick & { udid: string }> {
 	const devices = appc.iOSDevices().map(device => ({ id: device.udid, label: device.name, udid: device.udid }));
-	return quickPick(devices, { placeHolder: 'Select device' });
+	return quickPick(devices, { placeHolder: 'Select device' }) as Promise<CustomQuickPick & { udid: string }>;
 }
 
 export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
@@ -240,12 +240,12 @@ export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
 	return quickPick(versions, { placeHolder: 'Select simulator version' });
 }
 
-export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQuickPick> {
+export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQuickPick & { udid: string }> {
 	if (!iOSVersion) {
 		iOSVersion = (await selectiOSSimulatorVersion()).label; // eslint-disable-line require-atomic-updates
 	}
 	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
-	return quickPick(simulators, { placeHolder: 'Select simulator' });
+	return quickPick(simulators, { placeHolder: 'Select simulator' }) as Promise<CustomQuickPick & { udid: string }>;
 }
 
 export function selectWindowsDevice (): Promise<CustomQuickPick> {

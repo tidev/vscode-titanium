@@ -50,6 +50,8 @@ let projectStatusBarItem: vscode.StatusBarItem;
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConfigurationProvider';
 
+import { registerTaskProviders } from './tasks/tasksHelper';
+
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
 	Configuration.configure(context);
@@ -378,6 +380,8 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.debug.registerDebugConfigurationProvider('titanium', new TitaniumDebugConfigurationProvider())
 
 	);
+
+	registerTaskProviders(context);
 
 	return init();
 }
