@@ -70,9 +70,11 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 				platform = lastBuildState.platform as Platform;
 				target = lastBuildState.target;
 				if (platform === Platform.ios) {
-					iOSCertificate = getCorrectCertificateName((lastBuildState as BuildIosAppOptions).iOSCertificate!, project.sdk()[0], IosCertificateType.developer);
 					osVersion = (lastBuildState as BuildIosAppOptions & { osVersion: string }).osVersion;
-					iOSProvisioningProfile = (lastBuildState as BuildIosAppOptions).iOSProvisioningProfile;
+					if (target === 'device') {
+						iOSCertificate = getCorrectCertificateName((lastBuildState as BuildIosAppOptions).iOSCertificate!, project.sdk()[0], IosCertificateType.developer);
+						iOSProvisioningProfile = (lastBuildState as BuildIosAppOptions).iOSProvisioningProfile;
+					}
 				}
 
 			} else {
