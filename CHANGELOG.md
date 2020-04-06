@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.7.0...v0.7.1) (2020-04-06)
+
+
+### Features
+
+* **definition/controller:** fix lookup when path contains app ([#227](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/227)) ([1072455](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/1072455e9cefd3bf40f9f19ab3c741867870cbc6)), closes [#226](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/226)
+
+
+### Bug Fixes
+
+* **build:** correct logic for prompting ([95a8878](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/95a88789bbdf5b2b584b6d29232e87227b3b4ab4))
+* **commands/run:** only do certificate name check when targeting device ([a1961c7](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a1961c7edc48bcf35fc623b3e7df0c11a4e9e92a))
+* **completion/style:** check length of rule results not existence ([37e2980](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/37e298024054ac75965d2079210e4c80bb52197b))
+* **debug/ios:** obtain correct certificate name ([83844df](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/83844df8a5146cc672ab3e38ce24209a6a6bc894)), closes [#166](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/166)
+* **debugging/android:** correctly assign default port ([0cf2bd7](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0cf2bd79f61fc941bd0a51d75c75b57f526a89b5))
+* **providers:** improve image file path completions ([c02e6cc](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c02e6cc4611942b16936b1bef299e69b73c1bb88)), closes [#176](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/176)
+* **providers:** improve require completions ([1dc2c82](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/1dc2c827c610b672fcf7ffcc47192a70eb466e21))
+
 ## [0.7.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.6.1...v0.7.0) (2019-11-07)
 
 
