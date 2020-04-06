@@ -30,18 +30,15 @@ export interface TaskExecutionContext {
 }
 
 export interface TaskDefinitionBase extends vscode.TaskDefinition {
-	logLevel?: string;
-	projectType?: 'app' | 'module';
-}
-
-export interface BuildTaskDefinitionBase extends TaskDefinitionBase {
 	buildOnly?: boolean;
-	platform?: Platform;
-	projectDir?: string;
+	platform: Platform;
+	projectDir: string;
 	sdkVersion?: string;
+	logLevel: string;
+	projectType: ProjectType;
 }
 
-export interface AppBuildTaskDefinitionBase extends BuildTaskDefinitionBase {
+export interface AppBuildTaskDefinitionBase extends TaskDefinitionBase {
 	deviceId?: string;
-	target?: string;
+	target?: 'emulator' | 'device' | 'simulator';
 }

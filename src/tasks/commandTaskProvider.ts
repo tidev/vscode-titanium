@@ -1,13 +1,31 @@
 import * as vscode from 'vscode';
-import { TaskExecutionContext, Platform } from './tasksHelper';
-import { TaskPseudoTerminal } from './taskPseudoTerminal';
+import { TaskExecutionContext, Platform, AppBuildTaskDefinitionBase } from './tasksHelper';
+import { TaskPseudoTerminal, CommandError } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
+import { UserCancellation, handleInteractionError, InteractionError } from '../commands/common';
 
 /**
  * Base class the provides the base functionality for resolving and running tasks,
  * build/packaging tasks will extend this and implement the command construction
  * called by the task runner... in theory
  */
+
+function getPlatform (task: vscode.Task): Platform {
+	if (task.definition.titaniumBuild.platform === 'android' || task.definition.android !== undefined) {
+		return 'android';
+	} else if (task.definition.titaniumBuild.platform === 'ios' || task.definition.ios !== undefined) {
+		return 'ios';
+	} else if (task.definition.titaniumBuild.platform) {
+		throw new Error(`Unknown platform ${task.definition.titaniumBuild.platform}`);
+	} else {
+		throw new Error('Invalid configuration, please specify a platform');
+	}
+}
+
+export interface TaskBase extends vscode.Task {
+	definition: AppBuildTaskDefinitionBase;
+}
+
 export abstract class CommandTaskProvider implements vscode.TaskProvider {
 
 	protected constructor (private readonly telemetryName: string, private readonly helpers: Helpers) { }
@@ -16,7 +34,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		return [];
 	}
 
-	public async resolveTask (task: vscode.Task): Promise<vscode.Task> {
+	public async resolveTask (task: TaskBase): Promise<vscode.Task> {
 		return new vscode.Task(
 			task.definition,
 			task.scope || vscode.TaskScope.Workspace,
@@ -28,10 +46,33 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 
 	public abstract async resolveTaskInformation (context: TaskExecutionContext, task: vscode.Task): Promise<string>
 
-	public async executeTask (context: TaskExecutionContext, task: vscode.Task): Promise<void> {
+	public async executeTask (context: TaskExecutionContext, task: vscode.Task): Promise<number> {
 		// Use this as a centralized place to do things like login checks, analytics etc.
 
-		this.executeTaskInternal(context, task);
+		try {
+			task.definition.platform = getPlatform(task);
+
+			await this.executeTaskInternal(context, task);
+		} catch (error) {
+			let message = 'Error running task';
+			if (error instanceof CommandError) {
+				message = error.message;
+			} else if (error instanceof InteractionError) {
+				await handleInteractionError(error);
+			} else if (error instanceof UserCancellation) {
+				context.terminal.writeWarningLine('Task cancelled as no selection occurred');
+				return 0;
+			} else {
+				message = `${message}\n${error.message}`;
+			}
+
+			context.terminal.writeErrorLine(message);
+
+			return 1;
+		}
+
+		return 0;
+
 	}
 
 	protected abstract async executeTaskInternal (context: TaskExecutionContext, task: vscode.Task): Promise<void>

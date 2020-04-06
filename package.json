@@ -709,20 +709,53 @@
       {
         "type": "titanium-build",
         "properties": {
-          "platform": {
-            "type": "string",
-            "description": "The platform to build for"
-          },
-          "target": {
-            "type": "string",
-            "description": "The target to build for"
-          },
-          "extraArguments": {
-            "type": "array",
-            "description": "Extra arguments to be used in the build"
+          "titaniumBuild": {
+            "description": "Properties used to configure the build",
+            "properties": {
+              "android": {
+                "description": "Properties used to configure Android builds",
+                "properties": {}
+              },
+              "deployType": {
+                "description": "Deploy Type to be used when building",
+                "type": "string",
+                "enum": [
+                  "test",
+                  "development"
+                ]
+              },
+              "extraArguments": {
+                "type": "array",
+                "description": "Extra arguments to be used in the build"
+              },
+              "ios": {
+                "description": "Properties used to configure iOS builds",
+                "properties": {
+                  "provisioningProfile": {
+                    "description": "Provisioning Profile UUID to be used",
+                    "type": "string"
+                  },
+                  "certificate": {
+                    "description": "Certificate name to be used",
+                    "type": "string"
+                  }
+                }
+              },
+              "platform": {
+                "type": "string",
+                "description": "Platform to build for",
+                "enum": [
+                  "android",
+                  "ios"
+                ]
+              },
+              "target": {
+                "type": "string",
+                "description": "Target to build for"
+              }
+            }
           }
-        },
-        "required": [ "platform" ]
+        }
       },
       {
         "type": "titanium-package",

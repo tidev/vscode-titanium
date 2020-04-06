@@ -112,12 +112,12 @@ export function selectDistributionTarget (platform: string): Promise<CustomQuick
 	return quickPick(targets);
 }
 
-export function selectAndroidDevice (): Promise<CustomQuickPick> {
+export function selectAndroidDevice (): Promise<CustomQuickPick & { udid: string }> {
 	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
-	return quickPick(devices);
+	return quickPick(devices)  as Promise<CustomQuickPick & { udid: string }>;
 }
 
-export function selectAndroidEmulator (): Promise<CustomQuickPick>  {
+export function selectAndroidEmulator (): Promise<CustomQuickPick & { udid: string }>  {
 	const emulators = appc.androidEmulators();
 	const options = [];
 
@@ -137,7 +137,7 @@ export function selectAndroidEmulator (): Promise<CustomQuickPick>  {
 		});
 	}
 
-	return quickPick(options, { placeHolder: 'Select emulator' });
+	return quickPick(options, { placeHolder: 'Select emulator' })  as Promise<CustomQuickPick & { udid: string }>;
 }
 
 export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string): Promise<string|undefined> {
@@ -220,10 +220,10 @@ export function selectiOSProvisioningProfile (certificate: any, target: string, 
 	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
 
-export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick; provisioningProfile: CustomQuickPick }> {
+export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick; provisioningProfile: CustomQuickPick & { uuid: string } }> {
 	const certificate = await selectiOSCertificate(buildType);
 
-	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId);
+	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId) as CustomQuickPick & { uuid: string };
 	return {
 		certificate,
 		provisioningProfile

@@ -1,5 +1,5 @@
-import { BuildTaskDefinitionBase, TaskExecutionContext, AppBuildTaskDefinitionBase } from '../tasksHelper';
-import { selectiOSDevice, selectiOSSimulator, selectiOSCodeSigning, selectBuildTarget } from '../../quickpicks';
+import { TaskDefinitionBase, TaskExecutionContext, AppBuildTaskDefinitionBase } from '../tasksHelper';
+import { selectiOSDevice, selectiOSSimulator, selectiOSCodeSigning } from '../../quickpicks';
 import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
 import { IosCertificateType } from '../../types/common';
@@ -10,7 +10,7 @@ export interface IosAppBuildDefinition extends AppBuildTaskDefinitionBase {
 	certificate?: string;
 	provisioningProfile?: string;
 	target?: 'device' | 'simulator';
-	platform?: 'ios';
+	platform: 'ios';
 }
 
 export class IosHelper extends TaskHelper {
@@ -18,11 +18,7 @@ export class IosHelper extends TaskHelper {
 	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: IosAppBuildDefinition): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
-		this.resolveCommonOptions(context, definition, builder);
-
-		if (!definition.target) {
-			definition.target = (await selectBuildTarget(definition.platform!)).id as 'device' | 'simulator';
-		}
+		this.resolveCommonAppOptions(context, definition, builder);
 
 		let deviceId: string|undefined = definition.deviceId;
 		if (!deviceId) {
@@ -44,12 +40,15 @@ export class IosHelper extends TaskHelper {
 			const codeSigning = await selectiOSCodeSigning('run', definition.target, project.appId()!);
 			definition.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
 			definition.provisioningProfile = codeSigning.provisioningProfile.uuid;
+
+			builder.addQuotedOption('--developer-name', definition.certificate);
+			builder.addOption('--pp-uuid', definition.provisioningProfile);
 		}
 
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskDefinitionBase): Promise<string> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: TaskDefinitionBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonOptions(context, definition, builder);

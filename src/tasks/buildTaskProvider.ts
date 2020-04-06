@@ -1,12 +1,12 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { CommandTaskProvider } from './commandTaskProvider';
-import { selectPlatform } from '../quickpicks/common';
-import { TaskExecutionContext, Platform } from './tasksHelper';
+import { CommandTaskProvider, TaskBase } from './commandTaskProvider';
+import { selectBuildTarget } from '../quickpicks/common';
+import { TaskExecutionContext } from './tasksHelper';
 import { IosAppBuildDefinition, Helpers, AndroidBuildDefinition } from './helpers/';
 
-export interface AppBuildTask extends vscode.Task {
+export interface AppBuildTask extends TaskBase {
 	definition: AndroidBuildDefinition | IosAppBuildDefinition;
 }
 
@@ -39,10 +39,6 @@ export class BuildTaskProvider extends CommandTaskProvider {
 			definition.projectDir = vscode.workspace.rootPath!;
 		}
 
-		if (!definition.platform) {
-			definition.platform = (await selectPlatform()).id as Platform;
-		}
-
 		if (!definition.projectType) {
 			definition.projectType = await determineProjectType(definition.projectDir, definition.platform);
 		}
@@ -50,6 +46,11 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		const helper = this.getHelper(definition.platform);
 
 		if (definition.projectType === 'app') {
+
+			if (!definition.target) {
+				definition.target = (await selectBuildTarget(definition.platform)).id as 'device' | 'emulator' | 'simulator';
+			}
+
 			return helper.resolveAppBuildCommandLine(context, task.definition);
 		} else if (definition.projectType === 'module') {
 			definition.projectDir = path.join(definition.projectDir, definition.platform);
