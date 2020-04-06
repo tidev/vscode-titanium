@@ -1,4 +1,4 @@
-import { TaskExecutionContext, TaskDefinitionBase } from '../tasksHelper';
+import { TaskExecutionContext, TaskDefinitionBase, BuildTaskDefinitionBase } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
 import { selectAndroidDevice, selectAndroidEmulator } from '../../quickpicks/common';
@@ -39,7 +39,7 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: TaskDefinitionBase): Promise<string> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskDefinitionBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonOptions(context, definition, builder);

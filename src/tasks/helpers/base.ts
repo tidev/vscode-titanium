@@ -1,13 +1,13 @@
-import { TaskExecutionContext, TaskDefinitionBase } from '../tasksHelper';
+import { TaskExecutionContext, TaskDefinitionBase, BuildTaskDefinitionBase, AppBuildTaskDefinitionBase } from '../tasksHelper';
 import { CommandBuilder } from '../commandBuilder';
 import { ExtensionContainer } from '../../container';
 
 export abstract class TaskHelper {
 
-	public abstract async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: TaskDefinitionBase): Promise<string>
-	// public abstract async resolveAppPackageCommandLine (context: TaskExecutionContext, definition: PackageTaskDefinitionBase): Promise<string>
+	public abstract async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AppBuildTaskDefinitionBase): Promise<string>
+	// public abstract async resolveAppPackageCommandLine (context: TaskExecutionContext, definition: AppPackageTaskDefinitionBase): Promise<string>
 
-	public abstract async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: TaskDefinitionBase): Promise<string>
+	public abstract async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskDefinitionBase): Promise<string>
 	// public abstract async resolveModulePackageOptions (context: TaskExecutionContext, definition: PackageTaskDefinitionBase): Promise<string>
 
 	public resolveCommonOptions (context: TaskExecutionContext, definition: TaskDefinitionBase, builder: CommandBuilder): void {

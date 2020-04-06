@@ -1,4 +1,4 @@
-import { TaskDefinitionBase, TaskExecutionContext, AppBuildTaskDefinitionBase } from '../tasksHelper';
+import { TaskExecutionContext, AppBuildTaskDefinitionBase, BuildTaskDefinitionBase } from '../tasksHelper';
 import { selectiOSDevice, selectiOSSimulator, selectiOSCodeSigning } from '../../quickpicks';
 import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
@@ -48,7 +48,7 @@ export class IosHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: TaskDefinitionBase): Promise<string> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskDefinitionBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonOptions(context, definition, builder);
