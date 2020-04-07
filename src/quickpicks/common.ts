@@ -37,9 +37,9 @@ export async function enterPassword (options: InputBoxOptions): Promise<string> 
 	return inputBox(options);
 }
 
-export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false): Promise<boolean> {
-	const response = await window.showQuickPick([ 'Yes', 'No' ], options);
-	if (response?.toLowerCase() !== 'yes' || response?.toLowerCase() !== 'y') {
+export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false, itemChoices: string[] = [ 'Yes', 'No' ]): Promise<boolean> {
+	const response = await window.showQuickPick(itemChoices, options);
+	if (response?.toLowerCase() !== 'yes' && response?.toLowerCase() !== 'y') {
 		if (shouldThrow) {
 			throw new UserCancellation();
 		} else {
