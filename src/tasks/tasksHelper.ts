@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { BuildTaskProvider } from './buildTaskProvider';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { androidHelper, iOSHelper, Helpers } from './helpers';
+import { PackageTaskProvider } from './packageTaskProvider';
 
 export type TitaniumTaskNames = 'titanium-build' | 'titanium-package';
 
@@ -19,6 +20,13 @@ export function registerTaskProviders (ctx: vscode.ExtensionContext): void {
 		vscode.tasks.registerTaskProvider(
 			'titanium-build',
 			new BuildTaskProvider(helpers)
+		)
+	);
+
+	ctx.subscriptions.push(
+		vscode.tasks.registerTaskProvider(
+			'titanium-package',
+			new PackageTaskProvider(helpers)
 		)
 	);
 }
@@ -44,4 +52,12 @@ export interface BuildTaskDefinitionBase extends TaskDefinitionBase {
 export interface AppBuildTaskDefinitionBase extends BuildTaskDefinitionBase {
 	deviceId?: string;
 	target?: 'emulator' | 'device' | 'simulator';
+}
+
+export interface PackageTaskDefinitionBase extends TaskDefinitionBase {
+	outputDirectory?: string;
+}
+
+export interface AppPackageTaskDefinitionBase extends PackageTaskDefinitionBase {
+	target?: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
 }

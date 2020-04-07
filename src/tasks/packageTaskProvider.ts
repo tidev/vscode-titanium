@@ -1,21 +1,21 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { CommandTaskProvider, TaskBase } from './commandTaskProvider';
-import { selectBuildTarget } from '../quickpicks/common';
-import { TaskExecutionContext, AppBuildTaskDefinitionBase } from './tasksHelper';
-import { Helpers } from './helpers/';
+import { Helpers } from './helpers';
+import { TaskExecutionContext, PackageTaskDefinitionBase } from './tasksHelper';
+import { selectDistributionTarget } from '../quickpicks';
 
-export interface AppBuildTask extends TaskBase {
-	definition: AppBuildTaskDefinitionBase;
+export interface PackageBuildTask extends TaskBase {
+	definition: PackageTaskDefinitionBase;
 }
 
-export class BuildTaskProvider extends CommandTaskProvider {
+export class PackageTaskProvider extends CommandTaskProvider {
 
 	public constructor (helpers: Helpers) {
-		super('titanium-build', helpers);
+		super('titanium-package', helpers);
 	}
 
-	public async resolveTaskInformation (context: TaskExecutionContext, task: AppBuildTask): Promise<string> {
+	public async resolveTaskInformation (context: TaskExecutionContext, task: PackageBuildTask): Promise<string> {
 		const { definition } = task;
 
 		if (!definition.projectDir) {
@@ -31,20 +31,19 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		if (definition.projectType === 'app') {
 
 			if (!definition.target) {
-				definition.target = (await selectBuildTarget(definition.platform)).id as 'device' | 'emulator' | 'simulator';
+				definition.target = (await selectDistributionTarget(definition.platform)).id as 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';
 			}
 
-			return helper.resolveAppBuildCommandLine(context, task.definition);
+			return helper.resolveAppPackageCommandLine(context, task.definition);
 		} else if (definition.projectType === 'module') {
 			definition.projectDir = path.join(definition.projectDir, definition.platform);
-			return helper.resolveModuleBuildCommandLine(context, task.definition);
+			return helper.resolveModulePackageCommandLine(context, task.definition);
 		} else {
 			throw new Error(`Unknown project type ${definition.projectType}`);
 		}
-
 	}
 
-	protected async executeTaskInternal (context: TaskExecutionContext, task: AppBuildTask): Promise<void> {
+	protected async executeTaskInternal (context: TaskExecutionContext, task: PackageBuildTask): Promise<void> {
 		const buildInfo = await this.resolveTaskInformation(context, task);
 
 		await context.terminal.executeCommand(buildInfo, context.folder, context.cancellationToken);

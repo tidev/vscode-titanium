@@ -749,6 +749,14 @@
                   "ios"
                 ]
               },
+              "projectType": {
+                "type": "string",
+                "description": "Project type to be built",
+                "enum": [
+                  "app",
+                  "module"
+                ]
+              },
               "target": {
                 "type": "string",
                 "description": "Target to build for"
@@ -760,17 +768,69 @@
       {
         "type": "titanium-package",
         "properties": {
-          "platform": {
-            "type": "string",
-            "description": "The platform to build for"
-          },
-          "target": {
-            "type": "string",
-            "description": "The target to build for"
-          },
-          "extraArguments": {
-            "type": "array",
-            "description": "Extra arguments to be used in the build"
+          "titaniumBuild": {
+            "description": "Properties used to configure the build",
+            "properties": {
+              "android": {
+                "description": "Properties used to configure Android builds",
+                "properties": {
+                  "keystore": {
+                    "description": "Keystore configuration",
+                    "properties": {
+                      "alias": {
+                        "description": "Alias for the keystore",
+                        "type": "string"
+                      },
+                      "location": {
+                        "description": "Path of the keystore to be used, must be a full path",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "extraArguments": {
+                "type": "array",
+                "description": "Extra arguments to be used in the build"
+              },
+              "ios": {
+                "description": "Properties used to configure iOS builds",
+                "properties": {
+                  "provisioningProfile": {
+                    "description": "Provisioning Profile UUID to be used",
+                    "type": "string"
+                  },
+                  "certificate": {
+                    "description": "Certificate name to be used",
+                    "type": "string"
+                  }
+                }
+              },
+              "outputDirectory": {
+                "type": "string",
+                "description": "Output directory for the built application"
+              },
+              "platform": {
+                "type": "string",
+                "description": "Platform to build for",
+                "enum": [
+                  "android",
+                  "ios"
+                ]
+              },
+              "target": {
+                "type": "string",
+                "description": "Target to build for"
+              },
+              "projectType": {
+                "type": "string",
+                "description": "Project type to be built",
+                "enum": [
+                  "app",
+                  "module"
+                ]
+              }
+            }
           }
         },
         "required": [ "platform" ]

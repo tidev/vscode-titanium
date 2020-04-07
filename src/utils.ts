@@ -474,9 +474,13 @@ export function isValidPlatform (targetPlatform: string): boolean {
 export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType): string {
 	const certificate = appc.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
 
+	if (!certificate) {
+		throw new Error(`Failed to lookup certificate ${certificateName}`);
+	}
+
 	if (semver.gte(semver.coerce(sdkVersion)!, '8.2.0')) {
-		return certificate!.fullname;
+		return certificate.fullname;
 	} else {
-		return certificate!.name;
+		return certificate.name;
 	}
 }

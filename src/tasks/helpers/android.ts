@@ -1,12 +1,30 @@
-import { TaskExecutionContext, TaskDefinitionBase, BuildTaskDefinitionBase } from '../tasksHelper';
+import { TaskExecutionContext, BuildTaskDefinitionBase, AppBuildTaskDefinitionBase, AppPackageTaskDefinitionBase, PackageTaskDefinitionBase } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
-import { selectAndroidDevice, selectAndroidEmulator } from '../../quickpicks/common';
+import { selectAndroidDevice, selectAndroidEmulator, selectAndroidKeystore, inputBox, enterPassword } from '../../quickpicks/common';
+import { KeystoreInfo } from '../../types/common';
+import * as fs from 'fs-extra';
 
-export interface AndroidBuildDefinition extends TaskDefinitionBase {
+export interface AndroidBuildDefinition extends AppBuildTaskDefinitionBase {
 	keystore?: string;
 	platform: 'android';
 	target?	: 'device' | 'emulator';
+}
+
+export interface AndroidAppPackageDefinition extends AppPackageTaskDefinitionBase {
+	keystore: KeystoreInfo;
+}
+
+async function verifyKeystorePath (keystorePath: string|undefined): Promise<string> {
+	if (!keystorePath) {
+		throw new Error('Expected a value for keystorePath');
+	}
+
+	if (!await fs.pathExists(keystorePath)) {
+		throw new Error(`Provided keystorePath value "${keystorePath} does not exist`);
+	}
+
+	return keystorePath;
 }
 
 export class AndroidHelper extends TaskHelper {
@@ -29,7 +47,6 @@ export class AndroidHelper extends TaskHelper {
 			}
 		}
 
-		builder.addOption('--target', definition.target as string);
 		builder.addOption('--device-id', deviceId);
 
 		if (definition.debugPort) {
@@ -39,7 +56,40 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
+	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: AndroidAppPackageDefinition): Promise<string> {
+		const builder = CommandBuilder.create('appc', 'run');
+
+		await this.resolveCommonPackagingOptions(context, definition, builder);
+
+		const keystore = definition.titaniumBuild.android.keystore || {};
+
+		if (!keystore.location) {
+			keystore.location = await verifyKeystorePath(await selectAndroidKeystore());
+		} else {
+			await verifyKeystorePath(keystore.location);
+		}
+
+		if (!keystore.alias) {
+			keystore.alias = await inputBox({ placeHolder: 'Enter your Keystore alias' });
+		}
+
+		builder
+			.addQuotedOption('--keystore', keystore.location)
+			.addOption('--alias', keystore.alias)
+			.addQuotedOption('--store-password', await enterPassword({  placeHolder: 'Enter your Keystore password' }));
+
+		return builder.resolve();
+	}
+
 	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskDefinitionBase): Promise<string> {
+		const builder = CommandBuilder.create('appc', 'run');
+
+		this.resolveCommonOptions(context, definition, builder);
+
+		return builder.resolve();
+	}
+
+	public async resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskDefinitionBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonOptions(context, definition, builder);
@@ -48,7 +98,6 @@ export class AndroidHelper extends TaskHelper {
 
 		return builder.resolve();
 	}
-
 }
 
 export const androidHelper = new AndroidHelper();
