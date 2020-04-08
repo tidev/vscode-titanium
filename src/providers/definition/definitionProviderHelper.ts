@@ -3,7 +3,7 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 
-import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, CodeAction } from 'vscode';
+import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, CodeAction, commands, ExtensionContext } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { DefinitionSuggestion } from './common';
 
@@ -28,16 +28,6 @@ const i18nSuggestions: Array<DefinitionSuggestion & { i18nString: true }> = [
 		i18nString: true
 	}
 ];
-
-// 	/**
-// 	 * Register insert text command
-// 	 *
-// 	 * @param {Array} subscriptions disposables
-// 	 */
-// exportactivate (subscriptions) {
-// 		subscriptions.push(commands.registerCommand(this.insertCommandId, this.insert, this));
-// 		subscriptions.push(commands.registerCommand(this.insertI18nStringCommandId, this.insertI18nString, this));
-// 	},
 
 /**
  * Provide hover
@@ -282,4 +272,15 @@ export function insertI18nString (text: string): void {
 			workspace.applyEdit(edit);
 		}
 	});
+}
+
+/**
+ * Register insert text command
+ *
+ * @param {Array} subscriptions disposables
+ */
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export function activate(context: ExtensionContext) {
+	context.subscriptions.push(commands.registerCommand(insertCommandId, insert));
+	context.subscriptions.push(commands.registerCommand(insertI18nStringCommandId, insertI18nString));
 }

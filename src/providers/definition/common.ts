@@ -15,9 +15,9 @@ export interface DefinitionSuggestion {
 	insertText? (text: string): string|undefined;
 }
 
-function getRelatedFiles (fileType: string): string[] {
+function getRelatedFiles(fileType: string, addAppTss = true): string[] {
 	const relatedFiles: string[] = [];
-	if (fileType === 'tss') {
+	if (fileType === 'tss' && addAppTss) {
 		relatedFiles.push(path.join(workspace.rootPath!, 'app', 'styles', 'app.tss'));
 	}
 	const relatedFile = related.getTargetPath(fileType);
@@ -48,7 +48,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // id
 		regExp: /id=["'][\s0-9a-zA-Z-_^]*$/,
 		files (): string[] {
-			return getRelatedFiles('tss');
+			return getRelatedFiles('tss', false);
 		},
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`["']#${text}["'[]`, 'g');
