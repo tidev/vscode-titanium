@@ -780,7 +780,7 @@
     "husky": "^4.2.3",
     "lint-staged": "^10.1.2",
     "mocha": "^7.1.1",
-    "mocha-jenkins-reporter": "^0.4.2",
+    "mocha-jenkins-reporter": "^0.4.3",
     "mocha-multi-reporters": "^1.1.7",
     "sinon": "^9.0.1",
     "standard-version": "^7.1.0",
