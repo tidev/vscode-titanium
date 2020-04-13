@@ -795,7 +795,7 @@
     "got": "^9.6.0",
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.2",
-    "semver": "^7.2.1",
+    "semver": "^7.2.2",
     "titanium-editor-commons": "^0.5.0",
     "underscore": "^1.10.2",
     "uuid": "^7.0.3",
