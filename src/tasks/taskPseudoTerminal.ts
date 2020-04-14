@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CommandTaskProvider, TaskBase } from './commandTaskProvider';
+import { CommandTaskProvider, TitaniumTaskBase } from './commandTaskProvider';
 import { TaskExecutionContext } from './tasksHelper';
 import * as cp from 'child_process';
 
@@ -68,14 +68,14 @@ async function spawnCommand (command: string, options: cp.SpawnOptions, onStdout
 export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 	private readonly closeEmitter: vscode.EventEmitter<number> = new vscode.EventEmitter<number>();
 	private readonly cts: vscode.CancellationTokenSource = new vscode.CancellationTokenSource();
-	private readonly task: TaskBase;
+	private readonly task: TitaniumTaskBase;
 	private readonly taskProvider: CommandTaskProvider;
 	private readonly writeEmitter: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
 
 	public readonly onDidWrite: vscode.Event<string> = this.writeEmitter.event;
 	public readonly onDidClose: vscode.Event<number> = this.closeEmitter.event;
 
-	public constructor (taskProvider: CommandTaskProvider, task: TaskBase) {
+	public constructor (taskProvider: CommandTaskProvider, task: TitaniumTaskBase) {
 		this.taskProvider = taskProvider;
 		this.task = task;
 	}

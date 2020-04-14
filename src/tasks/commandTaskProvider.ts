@@ -1,14 +1,9 @@
 import * as vscode from 'vscode';
-import { TaskExecutionContext, Platform, AppBuildTaskDefinitionBase } from './tasksHelper';
+import { TaskExecutionContext, Platform, ProjectType } from './tasksHelper';
 import { TaskPseudoTerminal, CommandError } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
 import { UserCancellation, handleInteractionError, InteractionError } from '../commands/common';
-
-/**
- * Base class the provides the base functionality for resolving and running tasks,
- * build/packaging tasks will extend this and implement the command construction
- * called by the task runner... in theory
- */
+import { LogLevel } from 'src/types/common';
 
 function getPlatform (task: vscode.Task): Platform {
 	if (task.definition.titaniumBuild.platform === 'android' || task.definition.android !== undefined) {
@@ -22,8 +17,20 @@ function getPlatform (task: vscode.Task): Platform {
 	}
 }
 
-export interface TaskBase extends vscode.Task {
-	definition: AppBuildTaskDefinitionBase;
+export interface TitaniumTaskBase extends vscode.Task {
+	definition: TitaniumTaskDefinitionBase;
+}
+
+export interface TitaniumTaskDefinitionBase extends vscode.TaskDefinition {
+	titaniumBuild: TitaniumBuildBase;
+}
+
+export interface TitaniumBuildBase {
+	platform: Platform;
+	projectDir: string;
+	sdkVersion?: string;
+	logLevel?: LogLevel;
+	projectType?: ProjectType;
 }
 
 export abstract class CommandTaskProvider implements vscode.TaskProvider {
@@ -34,7 +41,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		return [];
 	}
 
-	public async resolveTask (task: TaskBase): Promise<vscode.Task> {
+	public async resolveTask (task: TitaniumTaskBase): Promise<vscode.Task> {
 		return new vscode.Task(
 			task.definition,
 			task.scope || vscode.TaskScope.Workspace,
@@ -44,9 +51,9 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		);
 	}
 
-	public abstract async resolveTaskInformation (context: TaskExecutionContext, task: vscode.Task): Promise<string>
+	public abstract async resolveTaskInformation (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<string>
 
-	public async executeTask (context: TaskExecutionContext, task: vscode.Task): Promise<number> {
+	public async executeTask (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<number> {
 		// Use this as a centralized place to do things like login checks, analytics etc.
 
 		try {
@@ -75,7 +82,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 
 	}
 
-	protected abstract async executeTaskInternal (context: TaskExecutionContext, task: vscode.Task): Promise<void>
+	protected abstract async executeTaskInternal (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<void>
 
 	public getHelper (platform: Platform): TaskHelper {
 		return this.helpers[platform];

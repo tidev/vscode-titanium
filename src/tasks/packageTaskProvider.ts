@@ -1,12 +1,29 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { CommandTaskProvider, TaskBase } from './commandTaskProvider';
+import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { Helpers } from './helpers';
-import { TaskExecutionContext, PackageTaskDefinitionBase } from './tasksHelper';
+import { TaskExecutionContext } from './tasksHelper';
 import { selectDistributionTarget } from '../quickpicks';
 
-export interface PackageBuildTask extends TaskBase {
+export interface PackageTask extends TitaniumTaskBase {
 	definition: PackageTaskDefinitionBase;
+}
+
+export interface PackageTaskDefinitionBase extends TitaniumTaskDefinitionBase {
+	titaniumBuild: AppPackageTaskTitaniumBuildBase | ModulePackageTaskTitaniumBuildBase;
+}
+
+export interface PackageTaskTitaniumBuildBase extends TitaniumBuildBase {
+	outputDirectory: string;
+}
+
+export interface ModulePackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
+	projectType: 'module';
+}
+
+export interface AppPackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
+	target: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
+	projectType: 'app';
 }
 
 export class PackageTaskProvider extends CommandTaskProvider {
@@ -15,7 +32,7 @@ export class PackageTaskProvider extends CommandTaskProvider {
 		super('titanium-package', helpers);
 	}
 
-	public async resolveTaskInformation (context: TaskExecutionContext, task: PackageBuildTask): Promise<string> {
+	public async resolveTaskInformation (context: TaskExecutionContext, task: PackageTask): Promise<string> {
 		const { definition } = task;
 
 		if (!definition.projectDir) {
@@ -28,22 +45,22 @@ export class PackageTaskProvider extends CommandTaskProvider {
 			definition.projectType = await helper.determineProjectType(definition.projectDir, definition.platform);
 		}
 
-		if (definition.projectType === 'app') {
+		if (definition.titaniumBuild.projectType === 'app') {
 
 			if (!definition.target) {
 				definition.target = (await selectDistributionTarget(definition.platform)).id as 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';
 			}
 
-			return helper.resolveAppPackageCommandLine(context, task.definition);
-		} else if (definition.projectType === 'module') {
-			definition.projectDir = path.join(definition.projectDir, definition.platform);
-			return helper.resolveModulePackageCommandLine(context, task.definition);
+			return helper.resolveAppPackageCommandLine(context, definition.titaniumBuild);
+		} else if (definition.titaniumBuild.projectType === 'module') {
+			definition.projectDir = path.join(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
+			return helper.resolveModulePackageCommandLine(context, definition.titaniumBuild);
 		} else {
 			throw new Error(`Unknown project type ${definition.projectType}`);
 		}
 	}
 
-	protected async executeTaskInternal (context: TaskExecutionContext, task: PackageBuildTask): Promise<void> {
+	protected async executeTaskInternal (context: TaskExecutionContext, task: PackageTask): Promise<void> {
 		const buildInfo = await this.resolveTaskInformation(context, task);
 
 		await context.terminal.executeCommand(buildInfo, context.folder, context.cancellationToken);

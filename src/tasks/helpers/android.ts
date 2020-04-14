@@ -1,18 +1,31 @@
-import { TaskExecutionContext, BuildTaskDefinitionBase, AppBuildTaskDefinitionBase, AppPackageTaskDefinitionBase, PackageTaskDefinitionBase } from '../tasksHelper';
+import { TaskExecutionContext } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
 import { selectAndroidDevice, selectAndroidEmulator, selectAndroidKeystore, inputBox, enterPassword } from '../../quickpicks/common';
 import { KeystoreInfo } from '../../types/common';
 import * as fs from 'fs-extra';
+import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
+import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 
-export interface AndroidBuildDefinition extends AppBuildTaskDefinitionBase {
-	keystore?: string;
-	platform: 'android';
-	target?	: 'device' | 'emulator';
+export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
+	titaniumBuild: AndroidBuildTaskTitaniumBuildBase;
 }
 
-export interface AndroidAppPackageDefinition extends AppPackageTaskDefinitionBase {
-	keystore: KeystoreInfo;
+export interface AndroidBuildTaskTitaniumBuildBase extends AppBuildTaskTitaniumBuildBase {
+	platform: 'android';
+	target: 'device' | 'emulator';
+	debugPort?: number;
+}
+
+export interface AndroidTitanumPackageDefiniton extends PackageTaskDefinitionBase {
+	titaniumBuild: AndroidPackageTaskTitaniumBuildBase;
+}
+
+export interface AndroidPackageTaskTitaniumBuildBase extends AppPackageTaskTitaniumBuildBase {
+	android: {
+		keystore: KeystoreInfo;
+	};
+	target: 'dist-playstore';
 }
 
 async function verifyKeystorePath (keystorePath: string|undefined): Promise<string> {
@@ -29,7 +42,7 @@ async function verifyKeystorePath (keystorePath: string|undefined): Promise<stri
 
 export class AndroidHelper extends TaskHelper {
 
-	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildDefinition): Promise<string> {
+	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildTaskTitaniumBuildBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonAppOptions(context, definition, builder);
@@ -56,12 +69,12 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: AndroidAppPackageDefinition): Promise<string> {
+	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: AndroidPackageTaskTitaniumBuildBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
-		const keystore = definition.titaniumBuild.android.keystore || {};
+		const keystore = definition.android.keystore || {};
 
 		if (!keystore.location) {
 			keystore.location = await verifyKeystorePath(await selectAndroidKeystore());
@@ -81,7 +94,7 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskDefinitionBase): Promise<string> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonOptions(context, definition, builder);
@@ -89,7 +102,7 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskDefinitionBase): Promise<string> {
+	public async resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
 		this.resolveCommonOptions(context, definition, builder);

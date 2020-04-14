@@ -37,27 +37,3 @@ export interface TaskExecutionContext {
 	terminal: TaskPseudoTerminal;
 }
 
-export interface TaskDefinitionBase extends vscode.TaskDefinition {
-	platform: Platform;
-	projectDir: string;
-	sdkVersion?: string;
-	logLevel: string;
-	projectType: ProjectType;
-}
-
-export interface BuildTaskDefinitionBase extends TaskDefinitionBase {
-	buildOnly?: boolean;
-}
-
-export interface AppBuildTaskDefinitionBase extends BuildTaskDefinitionBase {
-	deviceId?: string;
-	target?: 'emulator' | 'device' | 'simulator';
-}
-
-export interface PackageTaskDefinitionBase extends TaskDefinitionBase {
-	outputDirectory?: string;
-}
-
-export interface AppPackageTaskDefinitionBase extends PackageTaskDefinitionBase {
-	target?: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
-}
