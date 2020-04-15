@@ -56,9 +56,16 @@ export class IosHelper extends TaskHelper {
 		builder.addOption('--device-id', deviceId);
 
 		if (definition.target === 'device') {
+			const iosInfo = definition.ios || {};
+
 			const codeSigning = await selectiOSCodeSigning('run', definition.target, project.appId()!);
-			definition.ios.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
-			definition.ios.provisioningProfile = codeSigning.provisioningProfile.uuid;
+			iosInfo.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
+			iosInfo.provisioningProfile = codeSigning.provisioningProfile.uuid;
+
+			definition.ios = iosInfo;
+
+			builder.addQuotedOption('--developer-name', iosInfo.certificate);
+			builder.addOption('--pp-uuid', iosInfo.provisioningProfile);
 
 			builder.addQuotedOption('--developer-name', definition.ios.certificate);
 			builder.addOption('--pp-uuid', definition.ios.provisioningProfile);
@@ -72,9 +79,13 @@ export class IosHelper extends TaskHelper {
 
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
+		const iosInfo = definition.ios || {};
+
 		const codeSigning = await selectiOSCodeSigning('dist', definition.target, project.appId()!);
-		definition.ios.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
-		definition.ios.provisioningProfile = codeSigning.provisioningProfile.uuid;
+		iosInfo.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
+		iosInfo.provisioningProfile = codeSigning.provisioningProfile.uuid;
+
+		definition.ios = iosInfo;
 
 		builder.addQuotedOption('--distribution-name', definition.ios.certificate);
 		builder.addOption('--pp-uuid', definition.ios.provisioningProfile);
