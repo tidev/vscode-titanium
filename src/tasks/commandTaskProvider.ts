@@ -3,9 +3,9 @@ import { TaskExecutionContext, Platform, ProjectType } from './tasksHelper';
 import { TaskPseudoTerminal, CommandError } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
 import { UserCancellation, handleInteractionError, InteractionError } from '../commands/common';
-import { LogLevel } from 'src/types/common';
+import { LogLevel } from '../types/common';
 
-function getPlatform (task: vscode.Task): Platform {
+function getPlatform (task: TitaniumTaskBase): Platform {
 	if (task.definition.titaniumBuild.platform === 'android' || task.definition.android !== undefined) {
 		return 'android';
 	} else if (task.definition.titaniumBuild.platform === 'ios' || task.definition.ios !== undefined) {
@@ -23,6 +23,7 @@ export interface TitaniumTaskBase extends vscode.Task {
 
 export interface TitaniumTaskDefinitionBase extends vscode.TaskDefinition {
 	titaniumBuild: TitaniumBuildBase;
+	type: 'titanium-build' | 'titanium-package';
 }
 
 export interface TitaniumBuildBase {

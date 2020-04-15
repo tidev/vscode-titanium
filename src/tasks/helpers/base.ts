@@ -9,6 +9,8 @@ import { UserCancellation } from '../../commands/common';
 import { BuildTaskTitaniumBuildBase, AppBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { TitaniumBuildBase } from '../commandTaskProvider';
+import project from '../../project';
+import { WorkspaceState } from '../../constants';
 
 export abstract class TaskHelper {
 
@@ -50,6 +52,8 @@ export abstract class TaskHelper {
 		}
 
 		builder.addOption('--target', definition.target as string);
+
+		builder.addQuotedOption('--sdk', project.sdk()[0]);
 	}
 
 	public async resolveCommonPackagingOptions (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
@@ -86,5 +90,9 @@ export abstract class TaskHelper {
 		} else {
 			throw new Error(`Unable to determine project type from ${directory}`);
 		}
+	}
+
+	public storeLastState (type: WorkspaceState, buildOptions: TitaniumBuildBase): void {
+		ExtensionContainer.context.workspaceState.update(type, buildOptions);
 	}
 }

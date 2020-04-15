@@ -14,7 +14,7 @@ export interface PackageTaskDefinitionBase extends TitaniumTaskDefinitionBase {
 }
 
 export interface PackageTaskTitaniumBuildBase extends TitaniumBuildBase {
-	outputDirectory: string;
+	outputDirectory?: string;
 }
 
 export interface ModulePackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
@@ -22,7 +22,7 @@ export interface ModulePackageTaskTitaniumBuildBase extends PackageTaskTitaniumB
 }
 
 export interface AppPackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
-	target: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
+	target?: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
 	projectType: 'app';
 }
 
@@ -47,8 +47,8 @@ export class PackageTaskProvider extends CommandTaskProvider {
 
 		if (definition.titaniumBuild.projectType === 'app') {
 
-			if (!definition.target) {
-				definition.target = (await selectDistributionTarget(definition.platform)).id as 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';
+			if (!definition.titaniumBuild.target) {
+				definition.titaniumBuild.target = (await selectDistributionTarget(definition.platform)).id as 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';
 			}
 
 			return helper.resolveAppPackageCommandLine(context, definition.titaniumBuild);

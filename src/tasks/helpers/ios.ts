@@ -7,6 +7,7 @@ import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
 import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
+import { WorkspaceState } from '../..//constants';
 
 export interface IosTitaniumBuildDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: IosBuildTaskTitaniumBuildBase;
@@ -40,20 +41,19 @@ export class IosHelper extends TaskHelper {
 
 		this.resolveCommonAppOptions(context, definition, builder);
 
-		let deviceId: string|undefined = definition.deviceId;
-		if (!deviceId) {
+		if (!definition.deviceId) {
 			if (definition.target === 'device') {
 				const deviceInfo = await selectiOSDevice();
-				deviceId = deviceInfo.udid;
+				definition.deviceId = deviceInfo.udid;
 			} else if (definition.target === 'simulator') {
 				const simulatorInfo = await selectiOSSimulator();
-				deviceId = simulatorInfo.udid;
+				definition.deviceId = simulatorInfo.udid;
 			} else {
 				throw new Error(`Invalid build target ${definition.target}`);
 			}
 		}
 
-		builder.addOption('--device-id', deviceId);
+		builder.addOption('--device-id', definition.deviceId);
 
 		if (definition.target === 'device') {
 			const iosInfo = definition.ios || {};
@@ -67,9 +67,9 @@ export class IosHelper extends TaskHelper {
 			builder.addQuotedOption('--developer-name', iosInfo.certificate);
 			builder.addOption('--pp-uuid', iosInfo.provisioningProfile);
 
-			builder.addQuotedOption('--developer-name', definition.ios.certificate);
-			builder.addOption('--pp-uuid', definition.ios.provisioningProfile);
 		}
+
+		this.storeLastState(WorkspaceState.LastBuildState, definition);
 
 		return builder.resolve();
 	}
@@ -89,6 +89,8 @@ export class IosHelper extends TaskHelper {
 
 		builder.addQuotedOption('--distribution-name', definition.ios.certificate);
 		builder.addOption('--pp-uuid', definition.ios.provisioningProfile);
+
+		this.storeLastState(WorkspaceState.LastPackageState, definition);
 
 		return builder.resolve();
 	}

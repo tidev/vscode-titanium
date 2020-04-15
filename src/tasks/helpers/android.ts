@@ -6,6 +6,7 @@ import { KeystoreInfo } from '../../types/common';
 import * as fs from 'fs-extra';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
+import { WorkspaceState } from '../../constants';
 
 export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: AndroidBuildTaskTitaniumBuildBase;
@@ -34,7 +35,7 @@ async function verifyKeystorePath (keystorePath: string|undefined): Promise<stri
 	}
 
 	if (!await fs.pathExists(keystorePath)) {
-		throw new Error(`Provided keystorePath value "${keystorePath} does not exist`);
+		throw new Error(`Provided keystorePath value "${keystorePath}" does not exist`);
 	}
 
 	return keystorePath;
@@ -47,24 +48,25 @@ export class AndroidHelper extends TaskHelper {
 
 		this.resolveCommonAppOptions(context, definition, builder);
 
-		let deviceId: string|undefined = definition.deviceId;
-		if (!deviceId) {
+		if (!definition.deviceId) {
 			if (definition.target === 'device') {
 				const deviceInfo = await selectAndroidDevice();
-				deviceId = deviceInfo.udid;
+				definition.deviceId = deviceInfo.udid;
 			} else if (definition.target === 'emulator') {
 				const emulatorInfo = await selectAndroidEmulator();
-				deviceId = emulatorInfo.udid;
+				definition.deviceId = emulatorInfo.udid;
 			} else {
 				throw new Error(`Invalid build target ${definition.target}`);
 			}
 		}
 
-		builder.addOption('--device-id', deviceId);
+		builder.addOption('--device-id', definition.deviceId);
 
 		if (definition.debugPort) {
 			builder.addOption('--debug-host', `/localhost:${definition.debugPort}`);
 		}
+
+		this.storeLastState(WorkspaceState.LastBuildState, definition);
 
 		return builder.resolve();
 	}
@@ -90,6 +92,10 @@ export class AndroidHelper extends TaskHelper {
 			.addQuotedOption('--keystore', keystore.location)
 			.addOption('--alias', keystore.alias)
 			.addQuotedOption('--store-password', await enterPassword({  placeHolder: 'Enter your Keystore password' }));
+
+		definition.android.keystore = keystore;
+
+		this.storeLastState(WorkspaceState.LastPackageState, definition);
 
 		return builder.resolve();
 	}

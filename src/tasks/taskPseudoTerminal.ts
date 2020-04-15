@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import { CommandTaskProvider, TitaniumTaskBase } from './commandTaskProvider';
 import { TaskExecutionContext } from './tasksHelper';
 import * as cp from 'child_process';
+import { ExtensionContainer } from '../container';
+import { GlobalState } from '../constants';
 
 type StdListeners = (content: string) => void;
 
@@ -91,12 +93,18 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 			terminal: this,
 		};
 
+		ExtensionContainer.context.globalState.update(GlobalState.Running, true);
+		vscode.commands.executeCommand('setContext', GlobalState.Running, true);
+
 		this.taskProvider.executeTask(executionContext, this.task).then((result) => this.close(result));
 	}
 
 	public close (code?: number): void {
 		this.cts.cancel();
 		this.closeEmitter.fire(code || 0);
+
+		ExtensionContainer.context.globalState.update(GlobalState.Running, false);
+		vscode.commands.executeCommand('setContext', GlobalState.Running, false);
 	}
 
 	public async executeCommand (command: string, folder: vscode.WorkspaceFolder, token?: vscode.CancellationToken): Promise<void> {

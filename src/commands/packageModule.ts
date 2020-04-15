@@ -4,14 +4,15 @@ import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
 import { getBuildTask, Platform } from '../tasks/tasksHelper';
-import { BuildTask } from '../tasks/buildTaskProvider';
+import { PackageTask } from '../tasks/packageTaskProvider';
 
-export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
+export async function packageModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
+
 		const platform = node?.platform as Platform || (await selectPlatform()).id as Platform;
 
-		const taskDefinition: BuildTask = {
+		const taskDefinition: PackageTask = {
 			definition: {
 				titaniumBuild: {
 					projectType: 'module',

@@ -11,6 +11,14 @@ export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
 }
 
+export interface AppBuildTask extends BuildTask {
+	definition: AppBuildTaskDefinitionBase;
+}
+
+export interface AppBuildTaskDefinitionBase extends TitaniumTaskDefinitionBase {
+	titaniumBuild: AppBuildTaskTitaniumBuildBase;
+}
+
 export interface BuildTaskDefinitionBase extends TitaniumTaskDefinitionBase {
 	titaniumBuild: AppBuildTaskTitaniumBuildBase | ModuleBuildTaskTitaniumBuildBase;
 }
@@ -90,7 +98,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		if (!projectType) {
 			return tasks;
 		}
-
+		// FIXME: should only be for active platforms
 		for (const platform of [ 'android', 'ios' ]) {
 			const task: BuildTask = {
 				definition: {
