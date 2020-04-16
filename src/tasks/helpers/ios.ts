@@ -1,13 +1,16 @@
 import { TaskExecutionContext } from '../tasksHelper';
-import { selectiOSDevice, selectiOSSimulator, selectiOSCodeSigning } from '../../quickpicks';
+import { selectiOSDevice, selectiOSSimulator, selectiOSCodeSigning, selectiOSCertificate } from '../../quickpicks';
 import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
-import { IosCertificateType } from '../../types/common';
+import { IosCertificateType, IosCert } from '../../types/common';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
 import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
-import { WorkspaceState } from '../..//constants';
+import { WorkspaceState } from '../../constants';
+
+import appc from '../../appc';
+import { selectiOSProvisioningProfile } from '../../quickpicks/common';
 
 export interface IosTitaniumBuildDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: IosBuildTaskTitaniumBuildBase;
@@ -57,10 +60,28 @@ export class IosHelper extends TaskHelper {
 
 		if (definition.target === 'device') {
 			const iosInfo = definition.ios || {};
+			let certificate: IosCert|undefined;
 
-			const codeSigning = await selectiOSCodeSigning('run', definition.target, project.appId()!);
-			iosInfo.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
-			iosInfo.provisioningProfile = codeSigning.provisioningProfile.uuid;
+			if (!iosInfo.certificate) {
+				iosInfo.certificate = (await selectiOSCertificate('run')).id;
+				certificate = appc.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
+			} else {
+				certificate = appc.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
+			}
+
+			if (!certificate) {
+				throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
+			}
+
+			iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], IosCertificateType.developer);
+
+			if (!iosInfo.provisioningProfile) {
+				iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, 'run', project.appId()!)).uuid;
+			}
+
+			if (!iosInfo.provisioningProfile) {
+				throw new Error(`Unable to find valid provisioning profile for ${iosInfo.certificate}`);
+			}
 
 			definition.ios = iosInfo;
 
@@ -80,10 +101,28 @@ export class IosHelper extends TaskHelper {
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
 		const iosInfo = definition.ios || {};
+		let certificate: IosCert|undefined;
 
-		const codeSigning = await selectiOSCodeSigning('dist', definition.target, project.appId()!);
-		iosInfo.certificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.distribution);
-		iosInfo.provisioningProfile = codeSigning.provisioningProfile.uuid;
+		if (!iosInfo.certificate) {
+			iosInfo.certificate = (await selectiOSCertificate('distribute')).id;
+			certificate = appc.iOSCertificates(IosCertificateType.distribution).find(cert => cert.fullname === iosInfo.certificate);
+		} else {
+			certificate = appc.iOSCertificates(IosCertificateType.distribution).find(cert => cert.fullname === iosInfo.certificate);
+		}
+
+		if (!certificate) {
+			throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
+		}
+
+		iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], IosCertificateType.distribution);
+
+		if (!iosInfo.provisioningProfile) {
+			iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId()!)).uuid!;
+		}
+
+		if (!iosInfo.provisioningProfile) {
+			throw new Error(`Unable to find valid provisioning profile for ${iosInfo.certificate}`);
+		}
 
 		definition.ios = iosInfo;
 
