@@ -883,9 +883,9 @@
     "compile": "tsc -p ./",
     "lint": "eslint --ext .ts src/",
     "release": "node ./scripts/generate-settings-table.js &&  standard-version && npx vsce package",
-    "test": "node ./out/test/runTest.js",
+    "test": "COLLECT_COVERAGE=1 node ./out/test/runTest.js",
     "vscode:prepublish": "npm run compile",
-    "pretest": "npm run compile",
+    "pretest": "npm run compile && nyc instrument out/ --in-place",
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
@@ -925,6 +925,7 @@
     "mocha": "^7.2.0",
     "mocha-jenkins-reporter": "^0.4.3",
     "mocha-multi-reporters": "^1.1.7",
+    "nyc": "^15.0.1",
     "sinon": "^9.0.2",
     "standard-version": "^8.0.0",
     "typescript": "^3.9.3",
