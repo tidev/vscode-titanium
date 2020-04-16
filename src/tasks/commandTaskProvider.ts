@@ -6,9 +6,9 @@ import { UserCancellation, handleInteractionError, InteractionError } from '../c
 import { LogLevel } from '../types/common';
 
 function getPlatform (task: TitaniumTaskBase): Platform {
-	if (task.definition.titaniumBuild.platform === 'android' || task.definition.android !== undefined) {
+	if (task.definition.titaniumBuild.platform === 'android' || task.definition.titaniumBuild.android !== undefined) {
 		return 'android';
-	} else if (task.definition.titaniumBuild.platform === 'ios' || task.definition.ios !== undefined) {
+	} else if (task.definition.titaniumBuild.platform === 'ios' || task.definition.titaniumBuild.ios !== undefined) {
 		return 'ios';
 	} else if (task.definition.titaniumBuild.platform) {
 		throw new Error(`Unknown platform ${task.definition.titaniumBuild.platform}`);
@@ -32,6 +32,8 @@ export interface TitaniumBuildBase {
 	sdkVersion?: string;
 	logLevel?: LogLevel;
 	projectType?: ProjectType;
+	android?: Record<string, unknown>;
+	ios?: Record<string, unknown>;
 }
 
 export abstract class CommandTaskProvider implements vscode.TaskProvider {

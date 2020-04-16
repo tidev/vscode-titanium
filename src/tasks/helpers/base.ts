@@ -7,10 +7,24 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { UserCancellation } from '../../commands/common';
 import { BuildTaskTitaniumBuildBase, AppBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
-import { PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
-import { TitaniumBuildBase } from '../commandTaskProvider';
+import { PackageTaskTitaniumBuildBase, AppPackageTaskTitaniumBuildBase } from '../packageTaskProvider';
+import { TitaniumBuildBase, TitaniumTaskDefinitionBase } from '../commandTaskProvider';
 import project from '../../project';
 import { WorkspaceState } from '../../constants';
+
+function isDistributionBuild (definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase): definition is AppPackageTaskTitaniumBuildBase {
+	if (definition.target?.startsWith('dist')) {
+		return true;
+	}
+	return false;
+}
+
+function isAppBuild<T extends PackageTaskTitaniumBuildBase>(definition: PackageTaskTitaniumBuildBase): definition is T {
+	if (definition.projectType) {
+		return true;
+	}
+	return false;
+}
 
 export abstract class TaskHelper {
 
@@ -30,14 +44,15 @@ export abstract class TaskHelper {
 			.addFlag('--no-prompt');
 	}
 
-	public resolveCommonAppOptions (context: TaskExecutionContext, definition: AppBuildTaskTitaniumBuildBase, builder: CommandBuilder): void {
+	public resolveCommonAppOptions (context: TaskExecutionContext, definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase, builder: CommandBuilder): void {
 		this.resolveCommonOptions(context, definition, builder);
 
 		if (definition.projectType !== 'app') {
 			return;
 		}
 
-		if (!definition.target?.startsWith('dist')) {
+		if (!isDistributionBuild(definition)) {
+
 			if (definition.liveview) {
 				builder.addFlag('--liveview');
 			}
@@ -57,7 +72,11 @@ export abstract class TaskHelper {
 	}
 
 	public async resolveCommonPackagingOptions (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
-		this.resolveCommonOptions(context, definition, builder);
+		if (isAppBuild<AppPackageTaskTitaniumBuildBase>(definition)) {
+			this.resolveCommonAppOptions(context, definition, builder);
+		} else {
+			this.resolveCommonOptions(context, definition, builder);
+		}
 
 		if (!definition.outputDirectory) {
 			const defaultOutput = path.join(definition.projectDir, 'dist');
@@ -72,7 +91,7 @@ export abstract class TaskHelper {
 				definition.outputDirectory = customDirectory[0].fsPath;
 			}
 		} else if (!await fs.pathExists(definition.outputDirectory)) {
-			throw new Error(`Provided output directory ${definition.outputDirectory}`);
+			throw new Error(`Provided output directory ${definition.outputDirectory} cannot be found`);
 		}
 
 		builder.addQuotedOption('--output-dir', definition.outputDirectory);

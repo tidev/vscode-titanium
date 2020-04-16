@@ -18,12 +18,12 @@ export interface PackageTaskTitaniumBuildBase extends TitaniumBuildBase {
 }
 
 export interface ModulePackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
-	projectType: 'module';
+	projectType?: 'module';
 }
 
 export interface AppPackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
 	target?: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
-	projectType: 'app';
+	projectType?: 'app';
 }
 
 export class PackageTaskProvider extends CommandTaskProvider {
@@ -35,14 +35,14 @@ export class PackageTaskProvider extends CommandTaskProvider {
 	public async resolveTaskInformation (context: TaskExecutionContext, task: PackageTask): Promise<string> {
 		const { definition } = task;
 
-		if (!definition.projectDir) {
-			definition.projectDir = vscode.workspace.rootPath!;
+		if (!definition.titaniumBuild.projectDir) {
+			definition.titaniumBuild.projectDir = vscode.workspace.rootPath!;
 		}
 
-		const helper = this.getHelper(definition.platform);
+		const helper = this.getHelper(definition.titaniumBuild.platform);
 
-		if (!definition.projectType) {
-			definition.projectType = await helper.determineProjectType(definition.projectDir, definition.platform);
+		if (!definition.titaniumBuild.projectType) {
+			definition.titaniumBuild.projectType = await helper.determineProjectType(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
 		}
 
 		if (definition.titaniumBuild.projectType === 'app') {
