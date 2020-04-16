@@ -47,7 +47,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 	}
 
 	public provideTasks (): vscode.Task[] {
-		return this.getTasks();
+		return [];
 	}
 
 	public async resolveTaskInformation (context: TaskExecutionContext, task: BuildTask): Promise<string> {
@@ -83,51 +83,5 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		const buildInfo = await this.resolveTaskInformation(context, task);
 
 		await context.terminal.executeCommand(buildInfo, context.folder, context.cancellationToken);
-	}
-
-	private getTasks(): vscode.Task[] {
-		const tasks: vscode.Task[] = [];
-		let projectType: ProjectType|undefined;
-
-		if (project.isTitaniumApp) {
-			projectType = 'app';
-		} else if (project.isTitaniumModule) {
-			projectType = 'module';
-		}
-
-		if (!projectType) {
-			return tasks;
-		}
-		// FIXME: should only be for active platforms
-		for (const platform of [ 'android', 'ios' ]) {
-			const task: BuildTask = {
-				definition: {
-					titaniumBuild: {
-						platform: platform as Platform,
-						projectDir: vscode.workspace.rootPath!,
-						projectType
-					},
-					type: 'titanium-build',
-					name: `Generated - Build ${platform}`,
-				},
-				name: `Build ${platform}`,
-				isBackground: false,
-				source: 'Titanium',
-				presentationOptions: {},
-				problemMatchers: [],
-				runOptions: {},
-				scope: vscode.TaskScope.Workspace
-			};
-			tasks.push(
-				new vscode.Task(
-					task.definition,
-					vscode.TaskScope.Workspace,
-					`Generated - Build ${platform}`,
-					'Titanium',
-					new vscode.CustomExecution(() => Promise.resolve(new TaskPseudoTerminal(this, task)))
-				)
-			);
-		}
-		return tasks;
 	}
 }
