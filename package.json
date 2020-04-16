@@ -724,6 +724,10 @@
                   "development"
                 ]
               },
+              "deviceId": {
+                "description": "ID or UDID for the device or simulator",
+                "type": "string"
+              },
               "extraArguments": {
                 "type": "array",
                 "description": "Extra arguments to be used in the build"
@@ -832,8 +836,7 @@
               }
             }
           }
-        },
-        "required": [ "platform" ]
+        }
       }
     ]
   },
