@@ -18,7 +18,8 @@ import {
 	createModule,
 	generateComponent,
 	generateModel,
-	packageApplication
+	packageApplication,
+	packageModule
 } from './commands';
 import { GlobalState, VSCodeCommands } from './constants';
 import { ExtensionContainer } from './container';
@@ -49,6 +50,8 @@ let projectStatusBarItem: vscode.StatusBarItem;
 
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConfigurationProvider';
+
+import { registerTaskProviders } from './tasks/tasksHelper';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -104,7 +107,6 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 
 		// register run command
 		vscode.commands.registerCommand(Commands.BuildApp, node => {
-
 			if (project.isTitaniumApp) {
 				return buildApplication(node);
 			} else if (project.isTitaniumModule) {
@@ -113,14 +115,18 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand(Commands.PackageApp, packageApplication),
+		vscode.commands.registerCommand(Commands.PackageApp, node => {
+			if (project.isTitaniumApp) {
+				return packageApplication(node);
+			} else if (project.isTitaniumModule) {
+				return packageModule(node);
+			}
+		}),
 
 		// register stop command
 		vscode.commands.registerCommand(Commands.StopBuild, () => {
-			if (ExtensionContainer.config.general.useTerminalForBuild) {
-				ExtensionContainer.terminal.clear();
-			} else {
-				ExtensionContainer.terminal.stop();
+			if (ExtensionContainer.runningTask) {
+				ExtensionContainer.runningTask.terminate();
 			}
 		}),
 
@@ -378,6 +384,8 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.debug.registerDebugConfigurationProvider('titanium', new TitaniumDebugConfigurationProvider())
 
 	);
+
+	registerTaskProviders(context);
 
 	return init();
 }

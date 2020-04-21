@@ -31,7 +31,7 @@
     "url": "git+https://github.com/appcelerator/vscode-appcelerator-titanium.git"
   },
   "engines": {
-    "vscode": "^1.31.0"
+    "vscode": "^1.41.0"
   },
   "activationEvents": [
     "onDebug",
@@ -704,7 +704,141 @@
           "when": "view == titanium.view.updateExplorer && viewItem == UpdateNode"
         }
       ]
-    }
+    },
+    "taskDefinitions": [
+      {
+        "type": "titanium-build",
+        "properties": {
+          "titaniumBuild": {
+            "description": "Properties used to configure the build",
+            "properties": {
+              "android": {
+                "description": "Properties used to configure Android builds",
+                "properties": {}
+              },
+              "deployType": {
+                "description": "Deploy Type to be used when building",
+                "type": "string",
+                "enum": [
+                  "test",
+                  "development"
+                ]
+              },
+              "deviceId": {
+                "description": "ID or UDID for the device or simulator",
+                "type": "string"
+              },
+              "extraArguments": {
+                "type": "array",
+                "description": "Extra arguments to be used in the build"
+              },
+              "ios": {
+                "description": "Properties used to configure iOS builds",
+                "properties": {
+                  "provisioningProfile": {
+                    "description": "Provisioning Profile UUID to be used",
+                    "type": "string"
+                  },
+                  "certificate": {
+                    "description": "Certificate name to be used",
+                    "type": "string"
+                  }
+                }
+              },
+              "platform": {
+                "type": "string",
+                "description": "Platform to build for",
+                "enum": [
+                  "android",
+                  "ios"
+                ]
+              },
+              "projectType": {
+                "type": "string",
+                "description": "Project type to be built",
+                "enum": [
+                  "app",
+                  "module"
+                ]
+              },
+              "target": {
+                "type": "string",
+                "description": "Target to build for"
+              }
+            }
+          }
+        }
+      },
+      {
+        "type": "titanium-package",
+        "properties": {
+          "titaniumBuild": {
+            "description": "Properties used to configure the build",
+            "properties": {
+              "android": {
+                "description": "Properties used to configure Android builds",
+                "properties": {
+                  "keystore": {
+                    "description": "Keystore configuration",
+                    "properties": {
+                      "alias": {
+                        "description": "Alias for the keystore",
+                        "type": "string"
+                      },
+                      "location": {
+                        "description": "Path of the keystore to be used, must be a full path",
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "extraArguments": {
+                "type": "array",
+                "description": "Extra arguments to be used in the build"
+              },
+              "ios": {
+                "description": "Properties used to configure iOS builds",
+                "properties": {
+                  "provisioningProfile": {
+                    "description": "Provisioning Profile UUID to be used",
+                    "type": "string"
+                  },
+                  "certificate": {
+                    "description": "Certificate name to be used",
+                    "type": "string"
+                  }
+                }
+              },
+              "outputDirectory": {
+                "type": "string",
+                "description": "Output directory for the built application"
+              },
+              "platform": {
+                "type": "string",
+                "description": "Platform to build for",
+                "enum": [
+                  "android",
+                  "ios"
+                ]
+              },
+              "target": {
+                "type": "string",
+                "description": "Target to build for"
+              },
+              "projectType": {
+                "type": "string",
+                "description": "Project type to be built",
+                "enum": [
+                  "app",
+                  "module"
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
   },
   "husky": {
     "hooks": {
@@ -763,7 +897,7 @@
     "@types/sinon": "^9.0.0",
     "@types/underscore": "^1.9.4",
     "@types/uuid": "^3.4.7",
-    "@types/vscode": "1.31.0",
+    "@types/vscode": "1.41.0",
     "@types/which": "^1.3.2",
     "@types/xml2js": "^0.4.5",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
