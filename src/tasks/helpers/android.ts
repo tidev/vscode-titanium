@@ -76,24 +76,28 @@ export class AndroidHelper extends TaskHelper {
 
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
-		const keystore = definition.android.keystore || {};
+		const androidInfo = definition.android || {
+			keystore: {
 
-		if (!keystore.location) {
-			keystore.location = await verifyKeystorePath(await selectAndroidKeystore());
+			}
+		};
+
+		if (!androidInfo.keystore.location) {
+			androidInfo.keystore.location = await verifyKeystorePath(await selectAndroidKeystore());
 		} else {
-			await verifyKeystorePath(keystore.location);
+			await verifyKeystorePath(androidInfo.keystore.location);
 		}
 
-		if (!keystore.alias) {
-			keystore.alias = await inputBox({ placeHolder: 'Enter your Keystore alias' });
+		if (!androidInfo.keystore.alias) {
+			androidInfo.keystore.alias = await inputBox({ placeHolder: 'Enter your Keystore alias' });
 		}
 
 		builder
-			.addQuotedOption('--keystore', keystore.location)
-			.addOption('--alias', keystore.alias)
+			.addQuotedOption('--keystore', androidInfo.keystore.location)
+			.addOption('--alias', androidInfo.keystore.alias)
 			.addQuotedOption('--store-password', await enterPassword({  placeHolder: 'Enter your Keystore password' }));
 
-		definition.android.keystore = keystore;
+		definition.android = androidInfo;
 
 		this.storeLastState(WorkspaceState.LastPackageState, definition);
 
