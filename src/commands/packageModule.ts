@@ -3,7 +3,7 @@ import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nod
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
-import { getBuildTask, Platform } from '../tasks/tasksHelper';
+import { Platform, getPackageTask } from '../tasks/tasksHelper';
 import { PackageTask } from '../tasks/packageTaskProvider';
 
 export async function packageModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
@@ -31,7 +31,7 @@ export async function packageModule (node: DeviceNode | OSVerNode | PlatformNode
 			scope: vscode.TaskScope.Workspace
 		};
 
-		const task = await getBuildTask(taskDefinition);
+		const task = await getPackageTask(taskDefinition);
 		await vscode.tasks.executeTask(task);
 	} catch (error) {
 		if (error instanceof InteractionError) {
