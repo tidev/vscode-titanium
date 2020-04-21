@@ -20,7 +20,7 @@ export class OSVerNode extends BaseNode {
 	) {
 		super(label);
 		this.version = label;
-		this.targetId = targetForName(this.target, this.platform);
+		this.targetId = targetForName(this.target);
 	}
 
 	public getChildren (): DeviceNode[] {
@@ -29,14 +29,6 @@ export class OSVerNode extends BaseNode {
 			const sims = appc.iOSSimulators();
 			for (const sim of sims[this.version]) {
 				simulators.push(new DeviceNode(sim.name, this.platform, this.target, sim.udid, this.targetId, this.version));
-			}
-		} else if (this.platform === 'windows') {
-			for (const emulator of appc.windowsEmulators()['10.0']) {
-				if (emulator.uapVersion !== this.version) {
-					continue;
-				}
-				const label = emulator.name.replace('Mobile Emulator ', '');
-				simulators.push(new DeviceNode(label, this.platform, 'wp-emulator', emulator.udid, this.targetId));
 			}
 		}
 		return simulators;

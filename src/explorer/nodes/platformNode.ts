@@ -31,11 +31,6 @@ export class PlatformNode extends BaseNode {
 					new TargetNode('Device', this.platform),
 					new TargetNode('Simulator', this.platform)
 				];
-			case 'windows':
-				return [
-					new TargetNode('Device', this.platform),
-					new TargetNode('Emulator', this.platform)
-				];
 			default:
 				return [];
 		}

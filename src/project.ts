@@ -234,7 +234,6 @@ export class Project {
 			path.join(rootPath, 'android'),
 			path.join(rootPath, 'ios'),
 			path.join(rootPath, 'iphone'),
-			path.join(rootPath, 'windows'),
 		];
 		for (let i = 0, numPaths = paths.length; i < numPaths; i++) {
 			this.loadModuleAt(paths[i]);

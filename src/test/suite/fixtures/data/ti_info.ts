@@ -4913,11 +4913,5 @@ export default
 			crashDir: '/Users/user/Library/Logs/DiagnosticReports'
 		},
 		tisdk: '6.1.2.GA'
-	},
-	windows: {
-		devices: [],
-		emulators: {
-
-		}
 	}
 };

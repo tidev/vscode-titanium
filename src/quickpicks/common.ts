@@ -248,16 +248,6 @@ export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQu
 	return quickPick(simulators, { placeHolder: 'Select simulator' }) as Promise<CustomQuickPick & { udid: string }>;
 }
 
-export function selectWindowsDevice (): Promise<CustomQuickPick> {
-	const devices = appc.windowsDevices().map(({ name, udid }) => ({ id: udid, label: name, udid }));
-	return quickPick(devices, { placeHolder: 'Select device' });
-}
-
-export function selectWindowsEmulator (): Promise<CustomQuickPick> {
-	const emulators = appc.windowsEmulators()['10.0'].map(({ name, udid }) => ({ id: udid, label: name, udid }));
-	return quickPick(emulators, { placeHolder: 'Select emulator' });
-}
-
 export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateChoice[]> {
 	const choices: UpdateChoice[] = updates
 		.map(update => ({
@@ -299,60 +289,4 @@ export async function selectDevice (platform: string, target: string): Promise<C
 	} else {
 		throw new Error(`Unsupported platform and combination target ${platform} + ${target}`);
 	}
-}
-
-export async function selectWindowsCertificate (lastUsed?: string, savedCertPath?: string): Promise<string|undefined> {
-	const items = [
-		{
-			label: 'Browse for certificate',
-			id: 'browse'
-		},
-		{
-			label: 'Create certificate',
-			id: 'create'
-		}
-	];
-	if (lastUsed) {
-		items.push({
-			label: `Last used ${lastUsed}`,
-			id: 'last'
-		});
-	}
-	if (savedCertPath) {
-		items.push({
-			label: `Saved ${savedCertPath}`,
-			id: 'saved'
-		});
-	}
-	const certificateAction = await quickPick(items, { placeHolder: 'Browse for certificate or use last certificate' });
-	if (certificateAction.id === 'browse') {
-		const uri = await window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
-		if (!uri) {
-			throw new UserCancellation();
-		}
-		return uri[0].path;
-	} else if (certificateAction.id === 'create') {
-		return undefined;
-	} else if (savedCertPath && certificateAction.id === 'saved') {
-		if (!path.isAbsolute(savedCertPath)) {
-			savedCertPath = path.resolve(workspace.rootPath!, savedCertPath);
-		}
-		return savedCertPath;
-	} else if (certificateAction.id === 'last' && lastUsed) {
-		return lastUsed;
-	}
-}
-
-export async function enterWindowsSigningInfo (lastUsed?: string, savedCertPath?: string): Promise<{ location: string|undefined; password: string }> {
-	const location = await selectWindowsCertificate(lastUsed, savedCertPath);
-
-	if (location && !await pathExists(location)) {
-		throw new InteractionError(`The certificate file ${location} does not exist`);
-	}
-	const password = await enterPassword({ placeHolder: 'Enter the certificate password' });
-
-	return {
-		location,
-		password
-	};
 }

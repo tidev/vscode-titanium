@@ -23,7 +23,5 @@ export enum WorkspaceState {
 	LastKeystorePath = 'lastKeystorePath',
 	LastCreationPath = 'lastCreationPath',
 	LastAndroidDebug = 'lastAndroidDebugOptions',
-	LastiOSDebug = 'lastiOSDebugOptions',
-	LastPublisherID = 'lastWindowsPublisherID',
-	LastWindowsCertPath = 'lastWindowsCertPath'
+	LastiOSDebug = 'lastiOSDebugOptions'
 }
