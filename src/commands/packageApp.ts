@@ -36,10 +36,10 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 					platform,
 					projectDir: vscode.workspace.rootPath!
 				},
-				type: 'titanium-build',
-				name: `Build ${platform}`
+				type: 'titanium-package',
+				name: `Package ${platform}`
 			},
-			name: `Build ${platform}`,
+			name: `Package ${platform}`,
 			isBackground: false,
 			source: 'Titanium',
 			presentationOptions: {},

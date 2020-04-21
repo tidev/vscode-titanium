@@ -19,10 +19,10 @@ export async function packageModule (node: DeviceNode | OSVerNode | PlatformNode
 					platform,
 					projectDir: vscode.workspace.rootPath!
 				},
-				type: 'titanium-build',
-				name: `Build ${platform}`
+				type: 'titanium-package',
+				name: `Package ${platform}`
 			},
-			name: `Build ${platform}`,
+			name: `Package ${platform}`,
 			isBackground: false,
 			source: 'Titanium',
 			presentationOptions: {},
