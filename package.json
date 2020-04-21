@@ -31,7 +31,8 @@
     "url": "git+https://github.com/appcelerator/vscode-appcelerator-titanium.git"
   },
   "engines": {
-    "vscode": "^1.41.0"
+    "vscode": "^1.41.0",
+    "node": ">=12.4.0"
   },
   "activationEvents": [
     "onDebug",
@@ -451,11 +452,6 @@
           "type": "string",
           "default": "en",
           "description": "Default language to use for i18n autocomplete."
-        },
-        "titanium.windows.publisherID": {
-          "type": "string",
-          "description": "Publisher ID",
-          "default": null
         }
       }
     },
