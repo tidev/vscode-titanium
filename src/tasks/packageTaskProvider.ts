@@ -53,7 +53,7 @@ export class PackageTaskProvider extends CommandTaskProvider {
 
 			return helper.resolveAppPackageCommandLine(context, definition.titaniumBuild);
 		} else if (definition.titaniumBuild.projectType === 'module') {
-			definition.projectDir = path.join(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
+			definition.titaniumBuild.projectDir = path.join(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
 			return helper.resolveModulePackageCommandLine(context, definition.titaniumBuild);
 		} else {
 			throw new Error(`Unknown project type ${definition.projectType}`);
