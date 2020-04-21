@@ -43,7 +43,7 @@ export function platforms (): string[] {
 		case 'darwin':
 			return [ 'ios', 'android' ];
 		case 'win32':
-			return [ 'android', 'windows' ];
+			return [ 'android' ];
 		case 'linux':
 			return [ 'android' ];
 		default:
@@ -64,8 +64,6 @@ export function nameForPlatform (targetPlatform: string): PlatformPretty|undefin
 			return PlatformPretty.android;
 		case 'ios':
 			return PlatformPretty.ios;
-		case 'windows':
-			return PlatformPretty.windows;
 	}
 }
 
@@ -98,7 +96,7 @@ export function nameForTarget (target: string): string {
  * @param {String} targetPlatform - platform to get target for.
  * @returns {String}
  */
-export function targetForName (name: string, targetPlatform: string): string {
+export function targetForName (name: string): string {
 	name = name.toLowerCase();
 	switch (name) {
 		case 'Ad-Hoc':
@@ -108,9 +106,7 @@ export function targetForName (name: string, targetPlatform: string): string {
 		case 'Play Store':
 			return 'dist-playstore';
 		case 'device':
-			return targetPlatform === 'windows' ? 'wp-device' : name;
 		case 'emulator':
-			return targetPlatform === 'windows' ? 'wp-emulator' : name;
 		case 'simulator':
 		default:
 			return name;
@@ -124,8 +120,6 @@ export function targetsForPlatform (platformName: string): string[] {
 			return [ 'emulator', 'device', 'dist-playstore' ];
 		case 'ios':
 			return [ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ];
-		case 'windows':
-			return [ 'dist-phonestore', 'dist-winstore', 'wp-emulator', 'wp-device', 'ws-local' ];
 		default:
 			return [];
 	}

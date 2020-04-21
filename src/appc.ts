@@ -7,7 +7,7 @@ import { homedir } from 'os';
 import { window } from 'vscode';
 import { ExtensionContainer } from './container';
 import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common';
-import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, WindowsEmulator, TitaniumSDK, AndroidDevice, WindowsDevice } from './types/environment-info';
+import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 
 export interface AlloyGenerateOptions {
@@ -244,42 +244,6 @@ export class Appc {
 		return {
 			devices: this.androidDevices(),
 			emulators: this.androidEmulators()
-		};
-	}
-
-	/**
-	 * Windows devices
-	 *
-	 * @returns {Array}
-	 */
-	public windowsDevices (): WindowsDevice[] {
-		if (this.info.windows && this.info.windows.devices) {
-			return this.info.windows.devices;
-		}
-		return [];
-	}
-
-	/**
-	 * Windows emulators
-	 *
-	 * @returns {Object}
-	 */
-	public windowsEmulators (): { [key: string]: WindowsEmulator[] } {
-		if (this.info.windows && this.info.windows.emulators) {
-			return this.info.windows.emulators;
-		}
-		return {};
-	}
-
-	/**
-	 * Windows targets
-	 *
-	 * @returns {Object}
-	 */
-	public windowsTargets (): { devices: WindowsDevice[]; emulators:  { [key: string]: WindowsEmulator[] } } {
-		return {
-			devices: this.windowsDevices(),
-			emulators: this.windowsEmulators()
 		};
 	}
 

@@ -33,11 +33,6 @@ export interface ProvisioningProfile {
 	uuid: string;
 }
 
-export interface WindowsCertInfo {
-	location: string|undefined;
-	password: string;
-}
-
 export enum LogLevel {
 	Debug = 'debug',
 	Error = 'error',
@@ -53,14 +48,12 @@ export enum IosCertificateType {
 
 export enum PlatformPretty {
 	android = 'Android',
-	ios = 'iOS',
-	windows = 'Windows'
+	ios = 'iOS'
 }
 
 export enum Platform {
 	android = 'android',
-	ios = 'ios',
-	windows = 'windows'
+	ios = 'ios'
 }
 
 export interface UpdateChoice extends Omit<UpdateInfo, 'hasUpdate' | 'releaseNotes'> {

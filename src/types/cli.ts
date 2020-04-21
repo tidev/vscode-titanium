@@ -1,4 +1,4 @@
-import { KeystoreInfo, LogLevel, Platform as PlatformEnum, WindowsCertInfo } from './common';
+import { KeystoreInfo, LogLevel, Platform as PlatformEnum,  } from './common';
 import { Platform } from '../tasks/tasksHelper';
 
 export interface BaseCLIOptions {
@@ -34,12 +34,7 @@ export interface BuildIosAppOptions extends BuildAppBase {
 	iOSProvisioningProfile?: string;
 }
 
-export interface BuildWindowsAppOptions extends BuildAppBase {
-	windowsCertInfo?: WindowsCertInfo;
-	windowsPublisherID?: string;
-}
-
-export type BuildAppOptions = BuildAndroidAppOptions | BuildIosAppOptions | BuildWindowsAppOptions;
+export type BuildAppOptions = BuildAndroidAppOptions | BuildIosAppOptions;
 
 export interface BuildModuleOptions extends BaseBuildOptions {
 	outputDirectory?: string;
@@ -61,12 +56,7 @@ export interface IosPackageOptions extends BasePackageOptions {
 	iOSProvisioningProfile: string;
 }
 
-export interface WindowsPackageOptions extends BasePackageOptions {
-	windowsCertInfo: WindowsCertInfo;
-	windowsPublisherID?: string;
-}
-
-export type PackageAppOptions = AndroidPackageOptions | IosPackageOptions | WindowsPackageOptions;
+export type PackageAppOptions = AndroidPackageOptions | IosPackageOptions;
 
 export interface CreateOptions extends BaseCLIOptions {
 	id: string;

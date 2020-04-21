@@ -27,8 +27,4 @@ export interface Config {
 	project: {
 		defaultI18nLanguage: string;
 	};
-	windows: {
-		signingCertPath: string;
-		publisherID: string;
-	};
 }

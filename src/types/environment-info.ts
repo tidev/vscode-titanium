@@ -41,17 +41,6 @@ export interface TitaniumSDK {
 	fullversion?: string;
 }
 
-export interface WindowsEmulator {
-	udid: string;
-	name: string;
-	uapVersion: string;
-}
-
-export interface WindowsDevice {
-	udid: string;
-	name: string;
-}
-
 export interface AppcInfo {
 	android: {
 		devices: AndroidDevice[];
@@ -90,11 +79,5 @@ export interface AppcInfo {
 	titaniumCLI: {
 		version: string;
 		selectedSDK: string;
-	};
-	windows: {
-		devices: WindowsDevice[];
-		emulators: {
-			[key: string]: WindowsEmulator[];
-		};
 	};
 }
