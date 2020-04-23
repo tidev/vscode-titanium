@@ -2,10 +2,8 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { selectBuildTarget } from '../quickpicks/common';
-import { TaskExecutionContext, Platform, ProjectType } from './tasksHelper';
+import { TaskExecutionContext } from './tasksHelper';
 import { Helpers } from './helpers/';
-import { TaskPseudoTerminal } from './taskPseudoTerminal';
-import project from '../project';
 
 export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
@@ -34,6 +32,7 @@ export interface AppBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBas
 	projectType?: 'app';
 	liveview?: boolean;
 	deployType?: 'development' | 'test';
+	debugPort?: number;
 }
 
 export interface ModuleBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBase {

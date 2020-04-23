@@ -1,4 +1,4 @@
-import { TaskExecutionContext } from '../tasksHelper';
+import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
 import { selectAndroidDevice, selectAndroidEmulator, selectAndroidKeystore, inputBox, enterPassword } from '../../quickpicks/common';
@@ -67,6 +67,7 @@ export class AndroidHelper extends TaskHelper {
 		}
 
 		this.storeLastState(WorkspaceState.LastBuildState, definition);
+		runningTasks.set(context.label, { buildOptions: definition });
 
 		return builder.resolve();
 	}

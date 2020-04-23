@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { CommandTaskProvider, TitaniumTaskBase } from './commandTaskProvider';
-import { TaskExecutionContext } from './tasksHelper';
+import { TaskExecutionContext, runningTasks } from './tasksHelper';
 import * as cp from 'child_process';
 import { ExtensionContainer } from '../container';
 import { GlobalState } from '../constants';
@@ -91,6 +91,7 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 			cancellationToken: this.cts.token,
 			folder,
 			terminal: this,
+			label: this.task.name
 		};
 
 		ExtensionContainer.context.globalState.update(GlobalState.Running, true);
@@ -102,9 +103,11 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 	public close (code?: number): void {
 		this.cts.cancel();
 		this.closeEmitter.fire(code || 0);
-
 		ExtensionContainer.context.globalState.update(GlobalState.Running, false);
 		vscode.commands.executeCommand('setContext', GlobalState.Running, false);
+		if (runningTasks.has(this.task.name)) {
+			runningTasks.delete(this.task.name);
+		}
 	}
 
 	public async executeCommand (command: string, folder: vscode.WorkspaceFolder, token?: vscode.CancellationToken): Promise<void> {
