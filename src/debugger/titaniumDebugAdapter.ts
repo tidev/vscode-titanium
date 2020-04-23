@@ -5,8 +5,6 @@ import { URL } from 'url';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request, Response, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
-import { BuildAppOptions } from '../types/cli';
-import { LogLevel } from '../types/common';
 
 export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
@@ -28,15 +26,24 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		super.commonArgs(args);
 	}
 
-	public launch (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
-		const { platform } = launchArgs;
-		if (platform === 'android') {
-			return this.launchAndroid(launchArgs);
-		} else if (platform === 'ios') {
-			return this.launchIOS(launchArgs);
-		} else {
-			throw new Error(`Unknown platform ${platform}`);
+	public async launch (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
+		const info: any = await this.sendRequest('BUILD', launchArgs);
+
+		if (info.isError) {
+			await this.disconnect({});
+			throw new Error(info.message);
 		}
+
+		// Copy over the arguments we need to connect to the debugger
+		if (!launchArgs.target) {
+			launchArgs.target = info.buildInfo.target;
+		}
+
+		if (!launchArgs.deviceId) {
+			launchArgs.deviceId = info.buildInfo.deviceId;
+		}
+
+		return this.attach(launchArgs);
 	}
 
 	public attach (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
@@ -65,53 +72,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return super.globalEvaluate(args);
 	}
 
-	private async launchAndroid (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
-		const args: BuildAppOptions & TitaniumLaunchRequestArgs = {
-			buildOnly: false,
-			projectType: 'app',
-			logLevel: LogLevel.Trace,
-			buildType: 'run',
-			skipJsMinify: true,
-			deployType: 'development',
-			liveview: false,
-			...launchArgs
-		};
-
-		const info: any = await this.sendRequest('BUILD', args);
-
-		if (info.isError) {
-			await this.disconnect({});
-			throw new Error(info.message);
-		}
-
-		return this.attach(args);
-	}
-
 	private attachAndroid (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
 		return super.attach(attachArgs);
-	}
-
-	private async launchIOS (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
-		const args: BuildAppOptions & TitaniumLaunchRequestArgs = {
-			buildOnly: false,
-			projectType: 'app',
-			logLevel: LogLevel.Trace,
-			buildType: 'run',
-			skipJsMinify: true,
-			sourceMaps: true,
-			deployType: 'development',
-			liveview: false,
-			...launchArgs
-		};
-
-		const info: any = await this.sendRequest('BUILD', args);
-
-		if (info.isError) {
-			await this.disconnect({});
-			throw new Error(info.message);
-		}
-
-		return this.attach(args);
 	}
 
 	private async attachIOS (attachArgs: TitaniumAttachRequestArgs): Promise<void> {

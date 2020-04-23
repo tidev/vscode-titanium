@@ -29,16 +29,13 @@ import { StyleCompletionItemProvider } from './providers/completion/styleComplet
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
 
-import { FeedbackOptions, MESSAGE_STRING, Request, Response, TitaniumLaunchRequestArgs } from './common/extensionProtocol';
 import { Config, Configuration, configuration } from './configuration';
 import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
 import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
-import { BuildAppOptions } from './types/cli';
 import { LogLevel, UpdateChoice } from './types/common';
-import { buildArguments } from './utils';
 
 import ms = require('ms');
 import { completion, environment, updates } from 'titanium-editor-commons';
@@ -49,9 +46,9 @@ import { quickPick, selectUpdates } from './quickpicks/common';
 let projectStatusBarItem: vscode.StatusBarItem;
 
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { TitaniumDebugConfigurationProvider } from './debugger/titaniumDebugConfigurationProvider';
 
 import { registerTaskProviders } from './tasks/tasksHelper';
+import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -285,107 +282,13 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 				// TODO: add some sort of error reporting
 			}
 		}),
-		vscode.commands.registerCommand(Commands.Clean, cleanApplication),
 
-		vscode.debug.onDidReceiveDebugSessionCustomEvent(async event => {
-			if (event.event === MESSAGE_STRING) {
-				const request: Request = event.body;
-
-				if (request.code === 'BUILD') {
-					const providedArgs = request.args as BuildAppOptions & TitaniumLaunchRequestArgs;
-					const response: Response = {
-						id: request.id,
-						result: {
-							isError: false
-						}
-					};
-
-					const buildArgs = buildArguments(providedArgs);
-					const build = ExtensionContainer.terminal.runCommandInOutput(buildArgs, providedArgs.projectDir);
-					if (!build) {
-						return;
-					}
-					build.stdout.on('data', data => {
-						data = data.toString();
-
-						if (providedArgs.platform === 'ios' && /Start (application|simulator) log/.test(data)) {
-							event.session.customRequest('extensionResponse', response);
-						}
-					});
-
-					build.stderr.on('data', data => {
-						data = data.toString();
-						if (providedArgs.platform === 'android' && /To connect Chrome DevTools/.test(data)) {
-							event.session.customRequest('extensionResponse', response);
-						}
-					});
-
-					build.on('exit', code => {
-						if (code) {
-							const message = 'Failed to start debug sessions, please see the output for more information';
-							vscode.window.showErrorMessage(message);
-							ExtensionContainer.terminal.showOutput();
-							response.result = {
-								isError: true,
-								message
-							};
-							event.session.customRequest('extensionResponse', response);
-						}
-					});
-				} else if (request.code === 'FEEDBACK') {
-					const feedback = request.args as FeedbackOptions;
-					switch (feedback.type) {
-						case 'error':
-							await vscode.window.showErrorMessage(feedback.message);
-							break;
-						case 'info':
-						default:
-							await vscode.window.showInformationMessage(feedback.message);
-							break;
-					}
-				} else if (request.code === 'END') {
-					const providedArgs = request.args as BuildAppOptions & TitaniumLaunchRequestArgs;
-					ExtensionContainer.terminal.stop();
-					if (providedArgs.platform !== 'android') {
-						return;
-					}
-					const adbPath = appc.getAdbPath();
-					if (!adbPath) {
-						return;
-					}
-					const tcpPort = `tcp:${providedArgs.port}`;
-
-					if (providedArgs.target === 'emulator') {
-						const { stdout } = await ExtensionContainer.terminal.runInBackground(adbPath, [ 'forward', '--list' ]);
-
-						for (const line of stdout.split('\n')) {
-							if (!line.includes(tcpPort)) {
-								continue;
-							}
-							const emulatorId = line.match(/emulator-\d+/);
-							if (emulatorId) {
-								providedArgs.deviceId = emulatorId[0];
-								break;
-							}
-						}
-					}
-					if (!providedArgs.deviceId) {
-						return;
-					}
-					try {
-						ExtensionContainer.terminal.runInBackground(adbPath, [ '-s', providedArgs.deviceId, 'forward', '--remove', tcpPort ]);
-					} catch (error) {
-						// squash
-					}
-				}
-			}
-		}),
-
-		vscode.debug.registerDebugConfigurationProvider('titanium', new TitaniumDebugConfigurationProvider())
-
+		vscode.commands.registerCommand(Commands.Clean, cleanApplication)
 	);
 
 	registerTaskProviders(context);
+
+	registerDebugProvider(context);
 
 	return init();
 }

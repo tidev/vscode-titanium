@@ -1,12 +1,10 @@
 import * as vscode from 'vscode';
-import { BuildTaskProvider } from './buildTaskProvider';
+import { BuildTaskProvider, AppBuildTaskTitaniumBuildBase } from './buildTaskProvider';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { androidHelper, iOSHelper, Helpers } from './helpers';
 import { PackageTaskProvider } from './packageTaskProvider';
-import { quickPick } from '../quickpicks';
-import { InteractionError } from '../commands';
 import { ExtensionContainer } from '../container';
-import { TitaniumTaskBase } from './commandTaskProvider';
+import { TitaniumTaskBase, TitaniumTaskDefinitionBase } from './commandTaskProvider';
 
 export type TitaniumTaskTypes = 'titanium-build' | 'titanium-package';
 
@@ -77,4 +75,35 @@ export async function getBuildTask(task: TitaniumTaskBase): Promise<vscode.Task>
 
 export async function getPackageTask(task: TitaniumTaskBase): Promise<vscode.Task> {
 	return packageTaskProvider.resolveTask(task);
+}
+
+/**
+ * Adds a task to the workspace tasks.json file.
+ *
+ * @param {TitaniumTaskDefinitionBase} task - Task definition to add.
+ * @param {string} folder - Workspace folder to add to.
+ * @returns {void}
+ */
+export async function addTask(task: TitaniumTaskDefinitionBase, folder: string): Promise<void> {
+	const workspaceTasks = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(folder));
+	const allTasks = workspaceTasks && workspaceTasks.tasks as TitaniumTaskDefinitionBase[] || [];
+
+	allTasks.push(task);
+
+	await workspaceTasks.update('tasks', allTasks, vscode.ConfigurationTarget.WorkspaceFolder);
+}
+
+/**
+ * Gets the active tasks for the workspace, you should generally use `vscode.tasks.fetchTasks`
+ * but this is useful for when you need to fetch information that isn't available from that API
+ * such as the problem matchers associated with at ask
+ *
+ * @param {string} folder - Workspace folder to get tasks for.
+ * @returns {TitaniumTaskDefinitionBase[]}
+ */
+export function getTasks (folder: string): TitaniumTaskDefinitionBase[] {
+	const workspaceTasks = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(folder));
+	const allTasks = workspaceTasks && workspaceTasks.tasks as TitaniumTaskDefinitionBase[] || [];
+
+	return allTasks;
 }

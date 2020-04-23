@@ -1,4 +1,5 @@
-import { KeystoreInfo, LogLevel, Platform, WindowsCertInfo } from './common';
+import { KeystoreInfo, LogLevel, Platform as PlatformEnum, WindowsCertInfo } from './common';
+import { Platform } from '../tasks/tasksHelper';
 
 export interface BaseCLIOptions {
 	logLevel: LogLevel;
@@ -46,7 +47,7 @@ export interface BuildModuleOptions extends BaseBuildOptions {
 
 export interface BasePackageOptions extends BaseCLIOptions {
 	outputDirectory: string;
-	platform: Platform;
+	platform: PlatformEnum;
 	projectDir: string;
 	target: string;
 }
