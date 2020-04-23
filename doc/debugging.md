@@ -24,28 +24,20 @@ To debug Titanium applications from VS Code you must first create a debug config
 3. Select `Titanium` from the environment selection list
     ![Debug Environment Selection](./images/EnvironmentSelect.png)
 
-This will automatically generate two debug configurations in `.vscode/launch.json` file, one to debug on Android, one to debug on iOS. You can customise these files using the following properties
+This will automatically generate two debug configurations in `.vscode/launch.json` file, one to debug on Android, one to debug on iOS. You can customise these files using the following properties.
 
 | Property name | Description | Default value |
 | ------------- | ------------| ------------- |
-| deviceId | Device ID of the device to debug to | No Default |
 | platform | Platform to debug | No Default |
-| projectDir | Directory of the Titanium project being debugged | [${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables) |
+| projectDir | Directory of the Titanium project to debug | [${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables) |
 | port | Port number to use for the debugger | 9000 |
-| target | Build target to debug on | No Default |
+| preLaunchTask | Name of the task to use to build the application | No Default |
 
-For example if you commonly debug on the same iOS device you could create a debug configuration like below in your `launch.json` file:
+## Specifying a prelaunch task
 
-```json
-    {
-        "name": "Launch on iOS device - my iPhone",
-        "type": "titanium",
-        "request": "launch",
-        "platform": "ios",
-        "target": "device",
-        "deviceId": "<device ID from info>"
-    }
-```
+The `preLaunchTask` property allows setting a task from the `.vscode/tasks.json` file to be used to build the application. This allows you to declare the target and device ID for your build so you won't be prompted for these every build. For documentation on configuring tasks see the [tasks documentation](./tasks.md).
+
+If no `preLaunchTask` is specified, then a default task is created and added to the `.vscode/tasks.json` file for you which is then reused when debugging in future. When using these tasks you will be prompted for the target and device ID every build.
 
 ## Debugging an application
 
