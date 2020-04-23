@@ -8,7 +8,7 @@ import * as vscode from 'vscode';
 import { UserCancellation } from '../../commands/common';
 import { BuildTaskTitaniumBuildBase, AppBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { PackageTaskTitaniumBuildBase, AppPackageTaskTitaniumBuildBase } from '../packageTaskProvider';
-import { TitaniumBuildBase, TitaniumTaskDefinitionBase } from '../commandTaskProvider';
+import { TitaniumBuildBase } from '../commandTaskProvider';
 import project from '../../project';
 import { WorkspaceState } from '../../constants';
 

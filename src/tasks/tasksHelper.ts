@@ -13,6 +13,12 @@ export type TitaniumTaskTypes = 'titanium-build' | 'titanium-package';
 export type Platform = 'android' | 'ios';
 export type ProjectType = 'app' | 'module';
 
+export interface RunningTask {
+	buildOptions: AppBuildTaskTitaniumBuildBase;
+}
+
+export const runningTasks: Map<string, RunningTask> = new Map();
+
 const helpers: Helpers = {
 	android: androidHelper,
 	ios: iOSHelper
@@ -20,6 +26,7 @@ const helpers: Helpers = {
 
 const buildTaskProvider = new BuildTaskProvider(helpers);
 const packageTaskProvider = new PackageTaskProvider(helpers);
+
 export function registerTaskProviders (ctx: vscode.ExtensionContext): void {
 
 	ctx.subscriptions.push(
@@ -61,6 +68,7 @@ export interface TaskExecutionContext {
 	cancellationToken: vscode.CancellationToken;
 	folder: vscode.WorkspaceFolder;
 	terminal: TaskPseudoTerminal;
+	label: string;
 }
 
 export async function getBuildTask(task: TitaniumTaskBase): Promise<vscode.Task> {

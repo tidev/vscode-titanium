@@ -1,5 +1,5 @@
-import { TaskExecutionContext } from '../tasksHelper';
-import { selectiOSDevice, selectiOSSimulator, selectiOSCodeSigning, selectiOSCertificate } from '../../quickpicks';
+import { TaskExecutionContext, runningTasks } from '../tasksHelper';
+import { selectiOSDevice, selectiOSSimulator, selectiOSCertificate } from '../../quickpicks';
 import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
 import { IosCertificateType, IosCert } from '../../types/common';
@@ -91,6 +91,7 @@ export class IosHelper extends TaskHelper {
 		}
 
 		this.storeLastState(WorkspaceState.LastBuildState, definition);
+		runningTasks.set(context.label, { buildOptions: definition });
 
 		return builder.resolve();
 	}
