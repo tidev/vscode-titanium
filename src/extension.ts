@@ -98,7 +98,6 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerDefinitionProvider()),
 
 		// register code action providers
-		// Disable for now - https://github.com/appcelerator/vscode-appcelerator-titanium/issues/162
 		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider()),
 
 		// register init command

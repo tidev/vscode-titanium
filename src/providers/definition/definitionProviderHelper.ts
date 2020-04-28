@@ -3,7 +3,7 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 
-import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, CodeAction, commands, ExtensionContext } from 'vscode';
+import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, commands, ExtensionContext, Command } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { DefinitionSuggestion } from './common';
 
@@ -15,19 +15,6 @@ import { DefinitionSuggestion } from './common';
 
 export const insertCommandId = 'titanium.insertCodeAction';
 export const insertI18nStringCommandId = 'titanium.insertI18nStringCodeAction';
-
-const i18nSuggestions: Array<DefinitionSuggestion & { i18nString: true }> = [
-	{ // i18n
-		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*$/,
-		definitionRegExp (text: string): RegExp {
-			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
-		},
-		files (): string[] {
-			return [ path.join(utils.getI18nPath()!, ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
-		},
-		i18nString: true
-	}
-];
 
 /**
  * Provide hover
@@ -183,48 +170,46 @@ export async function provideDefinition (document: TextDocument, position: Posit
  *
  * @returns {Thenable}
  */
-export async function provideCodeActions (document: TextDocument, range: Range|Selection, suggestions: DefinitionSuggestion[]): Promise<CodeAction[]> {
+export async function provideCodeActions(document: TextDocument, range: Range | Selection, suggestions: DefinitionSuggestion[]): Promise<Command[]> {
 	const linePrefix = document.getText(new Range(range.end.line, 0, range.end.line, range.end.character));
 	const wordRange = document.getWordRangeAtPosition(range.end);
 	const word = wordRange ? document.getText(wordRange) : null;
-	// const word = range ? document.getText(range) : null;
-	// console.log(linePrefix + ' ' + word);
-	const codeActions: CodeAction[] = [];
-	// Code commented out for now to disable pending review in https://github.com/appcelerator/vscode-appcelerator-titanium/issues/162
+	const codeActions: Command[] = [];
 
-	// if (!word || word.length === 0) {
-	// 	return codeActions;
-	// }
+	if (!word || word.length === 0) {
+		return codeActions;
+	}
 
-	// for (const suggestion of suggestions) {
-	// 	if (suggestion.regExp.test(linePrefix)) {
-	// 		const suggestionsRegex = suggestion.definitionRegExp!(word);
-	// 		const definitions = await getReferences<{}>(suggestion.files!(document, word), suggestionsRegex, () => {
-	// 			return {};
-	// 		});
-	// 		if ((!definitions || definitions.length === 0) && suggestion.insertText) {
-	// 			const insertText = suggestion.insertText(word);
-	// 			if (insertText) {
-	// 				suggestion.files(document, word).forEach(file => {
-	// 					codeActions.push({
-	// 						title: suggestion.title?.(path.parse(file).name)!,
-	// 						command: {
-	// 							title: suggestion.title?.(path.parse(file).name)!,
+	for (const suggestion of suggestions) {
+		if (suggestion.regExp.test(linePrefix)) {
+			const suggestionFiles = suggestion.files(document, word);
+			const index = suggestionFiles.indexOf(path.join(workspace.rootPath!, 'app', 'styles', 'app.tss'));
+			suggestionFiles.splice(index, 1);
 
-	// 						},
-	// 						arguments: [ insertText, file ]
-	// 					});
-	// 				});
-	// 			}
-	// 		} else if ((!definitions || definitions.length === 0) && suggestion.i18nString) {
-	// 			codeActions.push({
-	// 				title: 'Generate i18n string',
-	// 				command: insertI18nStringCommandId,
-	// 				arguments: [ word ]
-	// 			});
-	// 		}
-	// 	}
-	// }
+			const definitionRegexp = suggestion.definitionRegExp!(word);
+			const definitions: any = await getReferences(suggestionFiles, definitionRegexp, () => {
+				return {};
+			});
+			if (!definitions && suggestion.insertText) {
+				const insertText = suggestion.insertText(word);
+				if (insertText) {
+					suggestionFiles.forEach((file: string) => {
+						codeActions.push({
+							title: suggestion.title!(path.parse(file).name),
+							command: insertCommandId,
+							arguments: [ insertText, file ]
+						});
+					});
+				}
+			} else if (!definitions && suggestion.i18nString) {
+				codeActions.push({
+					title: 'Generate i18n string',
+					command: insertI18nStringCommandId,
+					arguments: [ word ]
+				});
+			}
+		}
+	}
 	return codeActions;
 }
 
