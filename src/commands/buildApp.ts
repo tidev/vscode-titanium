@@ -1,171 +1,99 @@
-import project from '../project';
-
-import { workspace } from 'vscode';
-import { WorkspaceState } from '../constants';
-import { ExtensionContainer } from '../container';
+import * as vscode from 'vscode';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
-import { buildArguments, getCorrectCertificateName, nameForPlatform, nameForTarget } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { selectPlatform } from '../quickpicks';
+import { getBuildTask, Platform } from '../tasks/tasksHelper';
+import { AppBuildTask, AppBuildTaskTitaniumBuildBase } from '../tasks/buildTaskProvider';
+import { ExtensionContainer } from '../container';
+import { WorkspaceState } from '../constants';
+import { nameForPlatform, nameForTarget } from '../utils';
+import appc from '../appc';
 
-import {
-	selectAndroidDevice,
-	selectAndroidEmulator,
-	selectBuildTarget,
-	selectiOSCodeSigning,
-	selectiOSDevice,
-	selectiOSSimulator,
-	selectPlatform,
-	selectWindowsDevice,
-	selectWindowsEmulator
-} from '../quickpicks/common';
-import { BuildAndroidAppOptions, BuildAppBase, BuildAppOptions, BuildWindowsAppOptions, BuildIosAppOptions } from '../types/cli';
-import { IosCertificateType, Platform } from '../types/common';
+function getDeviceNameFromId (deviceID: string, platform: Platform, target: string): string {
+	let deviceName: string|undefined;
+	if (platform === 'android' && target === 'device') {
+		deviceName = (appc.androidDevices().find(device => device.id === deviceID))?.name;
+	} else if (platform === 'android' && target === 'emulator') {
+		deviceName = (appc.androidEmulators().AVDs.find(emulator => emulator.id === deviceID))?.name;
+	} else if (platform === 'ios' && target === 'device') {
+		deviceName = (appc.iOSDevices().find(device => device.udid === deviceID))?.name;
+	} else if (platform === 'ios' && target === 'simulator') {
+		for (const simVer of appc.iOSSimulatorVersions()) {
+			deviceName = (appc.iOSSimulators()[simVer].find(simulator => simulator.udid === deviceID))?.name;
+			if (deviceName) {
+				deviceName = `${deviceName} (${simVer})`;
+				break;
+			}
+		}
+	}
 
-function runBuild (options: BuildAppOptions): void {
-	const args = buildArguments(options);
-	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, options);
-	ExtensionContainer.terminal.runCommand(args);
+	if (!deviceName) {
+		throw new Error(`Unable to find a name for ${deviceID}`);
+	}
+
+	return deviceName;
 }
 
 export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
-		// TODO: Handle a build in progress
-		const buildType = 'run';
-		const liveview = ExtensionContainer.config.build.liveview;
-		const lastBuildState = ExtensionContainer.context.workspaceState.get<BuildAppOptions>(WorkspaceState.LastBuildState); // TODO type this
-		const logLevel = ExtensionContainer.config.general.logLevel;
-		const projectDir = workspace.rootPath!;
 
-		let deviceId;
-		let deviceLabel;
-		let iOSCertificate;
-		let lastBuildDescription;
-		let osVersion;
-		let platform;
-		let iOSProvisioningProfile;
-		let target;
-
-		if (node) {
-			deviceId = node.deviceId;
-			deviceLabel = node.label;
-			osVersion = node?.version;
-			platform = node.platform;
-			target = node.targetId;
-		}
+		const lastBuildState = ExtensionContainer.context.workspaceState.get<AppBuildTaskTitaniumBuildBase>(WorkspaceState.LastBuildState);
+		let lastBuildDescription: string|undefined;
 
 		if (lastBuildState) {
 			try {
-				lastBuildDescription = `${nameForPlatform(lastBuildState.platform)} ${nameForTarget(lastBuildState.target!)} ${lastBuildState.deviceLabel}`;
+				// TODO: map the device ID back based off the info output, this also allows us to ignore invalid build states for example by a device being disconnected
+				const deviceName = getDeviceNameFromId(lastBuildState.deviceId!, lastBuildState.platform, lastBuildState.target!);
+				lastBuildDescription = `${nameForPlatform(lastBuildState.platform)} ${nameForTarget(lastBuildState.target!)} ${deviceName}`;
 			} catch (error) {
-				// Squash in case we had an incompatible build state
+				console.log(error);
+				// Ignore and clear the state, we don't want to error due to a bad state
+				ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, undefined);
 			}
 		}
 
-		if (!platform) {
-			const platformInfo = await selectPlatform(lastBuildDescription);
-			if (lastBuildState && platformInfo.id === 'last') {
-				deviceId = lastBuildState.deviceId;
-				deviceLabel = lastBuildState.deviceLabel;
-				platform = lastBuildState.platform as Platform;
-				target = lastBuildState.target;
-				if (platform === Platform.ios) {
-					osVersion = (lastBuildState as BuildIosAppOptions & { osVersion: string }).osVersion;
-					if (target === 'device') {
-						iOSCertificate = getCorrectCertificateName((lastBuildState as BuildIosAppOptions).iOSCertificate!, project.sdk()[0], IosCertificateType.developer);
-						iOSProvisioningProfile = (lastBuildState as BuildIosAppOptions).iOSProvisioningProfile;
-					}
-				}
+		const buildChoice = node?.platform as string || (await selectPlatform(lastBuildDescription)).id;
 
-			} else {
-				platform = platformInfo.id as Platform;
-			}
-		}
+		const platform = buildChoice === 'last' ? lastBuildState?.platform as Platform : buildChoice as Platform;
 
-		if (!target) {
-			const targetInfo = await selectBuildTarget(platform);
-			target = targetInfo.id;
-		}
-
-		const baseOptions: BuildAppBase = {
-			platform,
-			buildOnly: false,
-			buildType,
-			projectDir,
-			logLevel,
-			projectType: 'app',
-			liveview,
-			target
+		const taskDefinition: AppBuildTask = {
+			definition: {
+				titaniumBuild: {
+					projectType: 'app',
+					platform,
+					projectDir: vscode.workspace.rootPath!
+				},
+				type: 'titanium-build',
+				name: `Build ${platform}`
+			},
+			name: `Build ${platform}`,
+			isBackground: false,
+			source: 'Titanium',
+			presentationOptions: {},
+			problemMatchers: [],
+			runOptions: {},
+			scope: vscode.TaskScope.Workspace
 		};
 
-		if (platform === Platform.android) {
-			if (!deviceId) {
-				if (target === 'device') {
-					const deviceInfo = await selectAndroidDevice();
-					deviceId = deviceInfo.udid;
-					deviceLabel = deviceInfo.label;
-				} else if (target === 'emulator') {
-					const emulatorInfo = await selectAndroidEmulator();
-					deviceId = emulatorInfo.udid;
-					deviceLabel = emulatorInfo.label;
-				}
+		if (buildChoice === 'last') {
+			Object.assign(taskDefinition.definition.titaniumBuild, lastBuildState);
+		} else {
+			if (node?.targetId) {
+				taskDefinition.definition.titaniumBuild.target = node.targetId as 'device' | 'emulator' | 'simulator';
 			}
 
-			const androidOptions: BuildAndroidAppOptions = {
-				...baseOptions,
-				deviceId,
-				deviceLabel
-			};
-			return runBuild(androidOptions);
-		} else if (platform === Platform.ios) {
-			if (!deviceId) {
-				if (target === 'device') {
-					const deviceInfo = await selectiOSDevice();
-					deviceId = deviceInfo.udid;
-					deviceLabel = deviceInfo.label;
-				} else if (target === 'simulator') {
-					const simulatorInfo = await selectiOSSimulator(osVersion);
-					deviceId = simulatorInfo.udid;
-					osVersion = simulatorInfo.version;
-					deviceLabel = simulatorInfo.label;
-				}
+			if (node?.version) {
+				// TODO need to copy across the iOS simulator version
 			}
 
-			if (platform === Platform.ios && target === 'device' && (!iOSCertificate || !iOSProvisioningProfile)) {
-				const codeSigning = await selectiOSCodeSigning(buildType, target, project.appId()!);
-				iOSCertificate =  getCorrectCertificateName(codeSigning.certificate.label, project.sdk()[0], IosCertificateType.developer);
-				iOSProvisioningProfile = codeSigning.provisioningProfile.uuid;
+			if (node?.deviceId) {
+				taskDefinition.definition.titaniumBuild.deviceId = node.deviceId;
 			}
-
-			const iosOptions: BuildIosAppOptions = {
-				...baseOptions,
-				deviceId,
-				deviceLabel,
-				iOSCertificate,
-				iOSProvisioningProfile
-			};
-
-			return runBuild(iosOptions);
-		} else if (platform === Platform.windows) {
-			if (!deviceId) {
-				if (target === 'wp-device') {
-					const deviceInfo = await selectWindowsDevice();
-					deviceId = deviceInfo.udid;
-					deviceLabel = deviceInfo.label;
-				} else if (target === 'wp-emulator') {
-					const emulatorInfo = await selectWindowsEmulator();
-					deviceId = emulatorInfo.udid;
-					deviceLabel = emulatorInfo.label;
-				}
-			}
-
-			const windowsOptions: BuildWindowsAppOptions = {
-				...baseOptions
-			};
-
-			return runBuild(windowsOptions);
 		}
 
+		const task = await getBuildTask(taskDefinition);
+		await vscode.tasks.executeTask(task);
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);

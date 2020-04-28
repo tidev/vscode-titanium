@@ -1,4 +1,4 @@
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, TaskExecution } from 'vscode';
 import appc, { Appc } from './appc';
 import { Config, configuration } from './configuration';
 import Terminal from './terminal';
@@ -8,6 +8,7 @@ export class ExtensionContainer {
 	private static _config: Config | undefined;
 	private static _context: ExtensionContext;
 	private static _terminal: Terminal;
+	private static _runningTask: TaskExecution|undefined;
 
 	public static inititalize (context: ExtensionContext, config: Config): void {
 		this._appc = appc;
@@ -39,5 +40,13 @@ export class ExtensionContainer {
 
 	public static resetConfig (): void {
 		this._config = undefined;
+	}
+
+	static set runningTask (task: TaskExecution|undefined) {
+		this._runningTask = task;
+	}
+
+	static get runningTask (): TaskExecution|undefined {
+		return this._runningTask;
 	}
 }

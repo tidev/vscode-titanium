@@ -37,9 +37,9 @@ export async function enterPassword (options: InputBoxOptions): Promise<string> 
 	return inputBox(options);
 }
 
-export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false): Promise<boolean> {
-	const response = await window.showQuickPick([ 'Yes', 'No' ], options);
-	if (response?.toLowerCase() !== 'yes' || response?.toLowerCase() !== 'y') {
+export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = false, itemChoices: string[] = [ 'Yes', 'No' ]): Promise<boolean> {
+	const response = await window.showQuickPick(itemChoices, options);
+	if (response?.toLowerCase() !== 'yes' && response?.toLowerCase() !== 'y') {
 		if (shouldThrow) {
 			throw new UserCancellation();
 		} else {
@@ -112,12 +112,12 @@ export function selectDistributionTarget (platform: string): Promise<CustomQuick
 	return quickPick(targets);
 }
 
-export function selectAndroidDevice (): Promise<CustomQuickPick> {
+export function selectAndroidDevice (): Promise<CustomQuickPick & { udid: string }> {
 	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
-	return quickPick(devices);
+	return quickPick(devices)  as Promise<CustomQuickPick & { udid: string }>;
 }
 
-export function selectAndroidEmulator (): Promise<CustomQuickPick>  {
+export function selectAndroidEmulator (): Promise<CustomQuickPick & { udid: string }>  {
 	const emulators = appc.androidEmulators();
 	const options = [];
 
@@ -137,7 +137,7 @@ export function selectAndroidEmulator (): Promise<CustomQuickPick>  {
 		});
 	}
 
-	return quickPick(options, { placeHolder: 'Select emulator' });
+	return quickPick(options, { placeHolder: 'Select emulator' })  as Promise<CustomQuickPick & { udid: string }>;
 }
 
 export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string): Promise<string|undefined> {
@@ -220,19 +220,19 @@ export function selectiOSProvisioningProfile (certificate: any, target: string, 
 	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
 }
 
-export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick; provisioningProfile: CustomQuickPick }> {
+export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick; provisioningProfile: CustomQuickPick & { uuid: string } }> {
 	const certificate = await selectiOSCertificate(buildType);
 
-	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId);
+	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId) as CustomQuickPick & { uuid: string };
 	return {
 		certificate,
 		provisioningProfile
 	};
 }
 
-export function selectiOSDevice (): Promise<CustomQuickPick> {
+export function selectiOSDevice (): Promise<CustomQuickPick & { udid: string }> {
 	const devices = appc.iOSDevices().map(device => ({ id: device.udid, label: device.name, udid: device.udid }));
-	return quickPick(devices, { placeHolder: 'Select device' });
+	return quickPick(devices, { placeHolder: 'Select device' }) as Promise<CustomQuickPick & { udid: string }>;
 }
 
 export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
@@ -240,12 +240,12 @@ export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
 	return quickPick(versions, { placeHolder: 'Select simulator version' });
 }
 
-export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQuickPick> {
+export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQuickPick & { udid: string }> {
 	if (!iOSVersion) {
 		iOSVersion = (await selectiOSSimulatorVersion()).label; // eslint-disable-line require-atomic-updates
 	}
 	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
-	return quickPick(simulators, { placeHolder: 'Select simulator' });
+	return quickPick(simulators, { placeHolder: 'Select simulator' }) as Promise<CustomQuickPick & { udid: string }>;
 }
 
 export function selectWindowsDevice (): Promise<CustomQuickPick> {

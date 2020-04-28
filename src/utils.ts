@@ -7,7 +7,7 @@ import appc from './appc';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
-import { AndroidPackageOptions, BuildAppOptions, BuildIosAppOptions, BuildModuleOptions, CleanAppOptions, CreateAppOptions, CreateModuleOptions, IosPackageOptions, PackageAppOptions, WindowsPackageOptions } from './types/cli';
+import { CleanAppOptions, CreateAppOptions, CreateModuleOptions } from './types/cli';
 import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
 
 /**
@@ -283,106 +283,6 @@ function quoteArgument (arg: string): string {
 	return `"${arg}"`;
 }
 
-function isAppBuild (options: BuildAppOptions | BuildModuleOptions): options is BuildAppOptions {
-	return (options as BuildAppOptions).projectType === 'app';
-}
-
-export function buildArguments (options: BuildAppOptions | BuildModuleOptions): string[] {
-
-	const args = [
-		'run',
-		'--platform', options.platform,
-		'--log-level', options.logLevel,
-		'--project-dir', normalizeDriveLetter(options.projectDir)
-	];
-
-	if (options.buildOnly) {
-		args.push('--build-only');
-	}
-
-	if (isAppBuild(options)) {
-		args.push('--target', options.target!);
-
-		if (options.target !== 'ws-local') {
-			args.push('--device-id', options.deviceId!);
-		}
-
-		if (options.target === 'device' && options.platform === 'ios') {
-			args.push(
-				'--developer-name', (options as BuildIosAppOptions).iOSCertificate!,
-				'--pp-uuid', (options as BuildIosAppOptions).iOSProvisioningProfile!
-			);
-		}
-
-		if (options.liveview) {
-			args.push('--liveview');
-		}
-
-		if (options.debugPort && options.platform === 'android') {
-			args.push(
-				'--debug-host',
-				`/localhost:${options.debugPort}`
-			);
-		}
-
-		if (options.skipJsMinify) {
-			args.push('--skip-js-minify');
-		}
-
-		if (options.sourceMaps) {
-			args.push('--source-maps');
-		}
-
-		if (options.deployType) {
-			args.push(
-				'--deploy-type',
-				options.deployType
-			);
-		}
-	}
-
-	return args.map(arg => quoteArgument(arg));
-}
-
-export function packageArguments (options: PackageAppOptions): string[] {
-	const args = [
-		'run',
-		'--platform', options.platform,
-		'--target', options.target,
-		'--log-level', options.logLevel,
-		'--project-dir', normalizeDriveLetter(options.projectDir)
-	];
-
-	if (options.target !== 'dist-appstore') {
-		args.push('--output-dir', options.outputDirectory);
-	}
-
-	if (options.platform === 'android') {
-		args.push(
-			'--keystore', (options as AndroidPackageOptions).keystoreInfo.location,
-			'--alias', (options as AndroidPackageOptions).keystoreInfo.alias,
-			'--store-password', (options as AndroidPackageOptions).keystoreInfo.password
-		);
-		if ((options as AndroidPackageOptions).keystoreInfo.privateKeyPassword) {
-			args.push('--key-password', (options as AndroidPackageOptions).keystoreInfo.privateKeyPassword!);
-		}
-	} else if (options.platform === 'ios') {
-		args.push(
-			'--distribution-name', (options as IosPackageOptions).iOSCertificate!,
-			'--pp-uuid', (options as IosPackageOptions).iOSProvisioningProfile!
-		);
-	} else if (options.platform === 'windows') {
-		if ((options as WindowsPackageOptions).windowsCertInfo.location) {
-			args.push('--win-cert', (options as WindowsPackageOptions).windowsCertInfo.location!);
-		} else {
-			args.push('--win-cert');
-		}
-		args.push('--pfx-password', (options as WindowsPackageOptions).windowsCertInfo.password);
-		args.push('--win-publisher-id', (options as WindowsPackageOptions).windowsPublisherID!);
-	}
-	return args.map(arg => quoteArgument(arg));
-}
-
 export function createAppArguments (options: CreateAppOptions): string[] {
 	const args = [
 		'new',
@@ -474,9 +374,13 @@ export function isValidPlatform (targetPlatform: string): boolean {
 export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType): string {
 	const certificate = appc.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
 
+	if (!certificate) {
+		throw new Error(`Failed to lookup certificate ${certificateName}`);
+	}
+
 	if (semver.gte(semver.coerce(sdkVersion)!, '8.2.0')) {
-		return certificate!.fullname;
+		return certificate.fullname;
 	} else {
-		return certificate!.name;
+		return certificate.name;
 	}
 }

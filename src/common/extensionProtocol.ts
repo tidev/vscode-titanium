@@ -1,5 +1,6 @@
 import { IAttachRequestArgs, ILaunchRequestArgs } from '@awam/vscode-chrome-debug-core';
-import { LogLevel, Platform } from '../types/common';
+import { LogLevel } from '../types/common';
+import { Platform } from '../tasks/tasksHelper';
 
 export interface Request {
 	id: string;
@@ -27,6 +28,7 @@ export interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
 	cwd: string;
 	appName: string;
 	logLevel: LogLevel;
+	preLaunchTask: string;
 }
 
 export interface TitaniumAttachRequestArgs extends IAttachRequestArgs {
