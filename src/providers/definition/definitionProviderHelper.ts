@@ -187,10 +187,10 @@ export async function provideCodeActions(document: TextDocument, range: Range | 
 			suggestionFiles.splice(index, 1);
 
 			const definitionRegexp = suggestion.definitionRegExp!(word);
-			const definitions: any = await getReferences(suggestionFiles, definitionRegexp, () => {
+			const definitions = await getReferences(suggestionFiles, definitionRegexp, () => {
 				return {};
 			});
-			if (!definitions && suggestion.insertText) {
+			if (!definitions?.length && suggestion.insertText) {
 				const insertText = suggestion.insertText(word);
 				if (insertText) {
 					suggestionFiles.forEach((file: string) => {
@@ -201,7 +201,7 @@ export async function provideCodeActions(document: TextDocument, range: Range | 
 						});
 					});
 				}
-			} else if (!definitions && suggestion.i18nString) {
+			} else if (!definitions?.length && suggestion.i18nString) {
 				codeActions.push({
 					title: 'Generate i18n string',
 					command: insertI18nStringCommandId,
