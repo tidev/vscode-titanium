@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as related from '../../related';
+import * as utils from '../../utils';
 
 import { TextDocument, workspace } from 'vscode';
 import { ExtensionContainer } from '../../container';
@@ -15,7 +16,7 @@ export interface DefinitionSuggestion {
 	insertText? (text: string): string|undefined;
 }
 
-function getRelatedFiles (fileType: string): string[] {
+function getRelatedFiles(fileType: string): string[] {
 	const relatedFiles: string[] = [];
 	if (fileType === 'tss') {
 		relatedFiles.push(path.join(workspace.rootPath!, 'app', 'styles', 'app.tss'));
@@ -111,5 +112,15 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		files (document: TextDocument, text: string): string[] {
 			return [ document.fileName.replace(/app\/(.*)$/, `app/controllers/${text}.js`) ];
 		}
+	},
+	{ // i18n
+		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*$/,
+		definitionRegExp(text: string): RegExp {
+			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
+		},
+		files(): string[] {
+			return [ path.join(utils.getI18nPath()!, ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
+		},
+		i18nString: true
 	}
 ];

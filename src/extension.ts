@@ -35,6 +35,9 @@ import { StyleDefinitionProvider } from './providers/definition/styleDefinitionP
 import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
+
+import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
+
 import { LogLevel, UpdateChoice } from './types/common';
 
 import ms = require('ms');
@@ -58,7 +61,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 
 	ExtensionContainer.inititalize(context, config);
 	project.load();
-	// definitionProviderHelper.activate(context.subscriptions);
+	definitionProviderHelper.activate(context);
 
 	if (!project.isTitaniumProject()) {
 		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, false);
@@ -96,8 +99,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerDefinitionProvider()),
 
 		// register code action providers
-		// Disable for now - https://github.com/appcelerator/vscode-appcelerator-titanium/issues/162
-		// vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider()),
+		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider()),
 
 		// register init command
 		vscode.commands.registerCommand('titanium.init', init),
