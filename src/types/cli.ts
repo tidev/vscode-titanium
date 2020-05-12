@@ -1,4 +1,4 @@
-import { KeystoreInfo, LogLevel, Platform as PlatformEnum,  } from './common';
+import { KeystoreInfo, LogLevel, Platform as PlatformEnum  } from './common';
 import { Platform } from '../tasks/tasksHelper';
 
 export interface BaseCLIOptions {
