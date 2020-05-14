@@ -4,10 +4,9 @@ import * as which from 'which';
 import { UserCancellation } from '../commands';
 import { selectPlatform } from '../quickpicks/common';
 import { AppBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';
-import { addTask, getTasks } from '../tasks/tasksHelper';
-import { TitaniumTaskDefinitionBase } from '../tasks/commandTaskProvider';
+import { getTasks } from '../tasks/tasksHelper';
 
-function validateTask (task: TitaniumTaskDefinitionBase, ourConfig: vscode.DebugConfiguration): void {
+function validateTask (task: AppBuildTaskDefinitionBase, ourConfig: vscode.DebugConfiguration): void {
 	// TODO: investigate whether it is possible to update the task
 	if (ourConfig.platform && ourConfig.platform !== task.titaniumBuild.platform) {
 		throw new Error('Debug configuration platform and preLaunchTask platform do not match');
@@ -15,6 +14,8 @@ function validateTask (task: TitaniumTaskDefinitionBase, ourConfig: vscode.Debug
 		throw new Error(`Pre-launch task "${task.label}" requires the "$ti-app-launch" problem matcher to be set`);
 	} else if (!task.isBackground) {
 		throw new Error(`Pre-launch task "${task.label}" requires "isBackground" to be set to true`);
+	} else if (!task.titaniumBuild.debug) {
+		throw new Error(`Pre-launch task "${task.label}" requires "debug" to be set to true`);
 	}
 }
 
@@ -46,7 +47,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 		}
 
 		if (config.preLaunchTask) {
-			const preLaunchTask = getTasks(vscode.workspace.rootPath!).find(task => task.label === config.preLaunchTask);
+			const preLaunchTask = getTasks(vscode.workspace.rootPath!).find(task => task.label === config.preLaunchTask) as AppBuildTaskDefinitionBase;
 
 			if (!preLaunchTask) {
 				throw new Error(`Unable to find a preLaunchTask named ${config.preLaunchTask}`);
@@ -57,6 +58,11 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			if (!ourConfig.platform) {
 				// If no platform is set then inherit from the task
 				ourConfig.platform = preLaunchTask.definition.titaniumBuild.platform;
+			}
+
+			if (ourConfig.port !== preLaunchTask.titaniumBuild.debugPort) {
+				ourConfig.port = preLaunchTask.titaniumBuild.debugPort;
+				ourConfig.debugPort = preLaunchTask.titaniumBuild.debugPort;
 			}
 		}
 
@@ -93,29 +99,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 		}
 
 		if (!ourConfig.preLaunchTask) {
-			const taskName = `Titanium Debug - ${ourConfig.platform}`;
-			const existingTask = getTasks(vscode.workspace.rootPath!).find(task => task.label === taskName);
-
-			if (!existingTask) {
-				const task: AppBuildTaskDefinitionBase = {
-					type: 'titanium-build',
-					label: taskName,
-					titaniumBuild: {
-						projectType: 'app',
-						platform: ourConfig.platform,
-						projectDir: vscode.workspace.rootPath!,
-						debugPort: ourConfig.debugPort
-					},
-					problemMatcher: [ '$ti-app-launch' ],
-					isBackground: true
-				};
-
-				await addTask(task, vscode.workspace.rootPath!);
-				ourConfig.preLaunchTask = task.label;
-			} else {
-				validateTask(existingTask, ourConfig);
-				ourConfig.preLaunchTask = existingTask.label;
-			}
+			ourConfig.preLaunchTask = `Titanium: Debug ${ourConfig.platform}`;
 		}
 
 		return ourConfig;

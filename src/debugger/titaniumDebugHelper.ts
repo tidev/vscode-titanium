@@ -20,7 +20,12 @@ async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise
 				}
 			};
 
-			const runningTask = runningTasks.get(providedArgs.preLaunchTask);
+			// When using a provided task for debugging the name will be prefixed
+			// with "Titanium:" internally by vscode, but it's not available to us
+			// on the label, so we need remove that to lookup the task
+			const taskLabel = providedArgs.preLaunchTask.replace('Titanium:', '').trim();
+
+			const runningTask = runningTasks.get(taskLabel);
 
 			if (!runningTask) {
 				response.result.isError = true;

@@ -2,8 +2,10 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { selectBuildTarget } from '../quickpicks/common';
-import { TaskExecutionContext } from './tasksHelper';
+import { TaskExecutionContext, Platform } from './tasksHelper';
 import { Helpers } from './helpers/';
+import { platforms } from '../utils';
+import { TaskPseudoTerminal } from './taskPseudoTerminal';
 
 export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
@@ -33,6 +35,7 @@ export interface AppBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBas
 	liveview?: boolean;
 	deployType?: 'development' | 'test';
 	debugPort?: number;
+	debug?: boolean;
 }
 
 export interface ModuleBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBase {
@@ -45,8 +48,42 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		super('titanium-build', helpers);
 	}
 
-	public provideTasks (): vscode.Task[] {
-		return [];
+	public provideTasks(): vscode.Task[] {
+		const tasks: vscode.Task[] = [];
+
+		for (const platform of platforms()) {
+			const name = `Debug ${platform}`;
+			const definition: BuildTaskDefinitionBase = {
+				type: 'titanium-build',
+				titaniumBuild: {
+					platform: platform as Platform,
+					projectType: 'app',
+					projectDir: vscode.workspace.rootPath!,
+					liveview: false,
+					debugPort: 9000
+				},
+				label: name,
+				name,
+				isBackground: true
+			};
+
+			tasks.push(this.createTask(
+				name,
+				vscode.TaskScope.Workspace,
+				definition
+			));
+		}
+
+		return tasks;
+	}
+
+	public async resolveTask (task: TitaniumTaskBase): Promise<vscode.Task> {
+		// Run through create task
+		return this.createTask(
+			task.name,
+			task.scope || vscode.TaskScope.Workspace,
+			task.definition
+		);
 	}
 
 	public async resolveTaskInformation (context: TaskExecutionContext, task: BuildTask): Promise<string> {
@@ -82,5 +119,28 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		const buildInfo = await this.resolveTaskInformation(context, task);
 
 		await context.terminal.executeCommand(buildInfo, context.folder, context.cancellationToken);
+	}
+
+	private createTask(name: string, folder: vscode.WorkspaceFolder|vscode.TaskScope, definition: BuildTaskDefinitionBase): vscode.Task {
+
+		if (definition.titaniumBuild.projectType === 'app' && name.toLowerCase().includes('debug')) {
+			definition.titaniumBuild.liveview = false;
+			definition.isBackground = true;
+			definition.problemMatchers = '$ti-app-launch';
+		}
+
+		const task = new vscode.Task(definition, folder, name, 'Titanium');
+
+		if (definition.titaniumBuild.projectType === 'app' && name.toLowerCase().includes('debug')) {
+			// When we're using the task for debugging, we require "$ti-app-launch"
+			// problem matcher to notify when the app has launched (and the task has completed),
+			// that problem matcher only works if the task is a background task
+			task.problemMatchers.push('$ti-app-launch');
+			task.isBackground = true;
+		}
+
+		task.execution = new vscode.CustomExecution(() => Promise.resolve(new TaskPseudoTerminal(this, task as TitaniumTaskBase)));
+
+		return task;
 	}
 }
