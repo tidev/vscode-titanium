@@ -91,7 +91,8 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 			cancellationToken: this.cts.token,
 			folder,
 			terminal: this,
-			label: this.task.name
+			label: this.task.name,
+			task: this.task
 		};
 
 		ExtensionContainer.context.globalState.update(GlobalState.Running, true);

@@ -67,6 +67,7 @@ export interface TaskExecutionContext {
 	folder: vscode.WorkspaceFolder;
 	terminal: TaskPseudoTerminal;
 	label: string;
+	task: TitaniumTaskBase;
 }
 
 export async function getBuildTask(task: TitaniumTaskBase): Promise<vscode.Task> {
@@ -75,22 +76,6 @@ export async function getBuildTask(task: TitaniumTaskBase): Promise<vscode.Task>
 
 export async function getPackageTask(task: TitaniumTaskBase): Promise<vscode.Task> {
 	return packageTaskProvider.resolveTask(task);
-}
-
-/**
- * Adds a task to the workspace tasks.json file.
- *
- * @param {TitaniumTaskDefinitionBase} task - Task definition to add.
- * @param {string} folder - Workspace folder to add to.
- * @returns {void}
- */
-export async function addTask(task: TitaniumTaskDefinitionBase, folder: string): Promise<void> {
-	const workspaceTasks = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(folder));
-	const allTasks = workspaceTasks && workspaceTasks.tasks as TitaniumTaskDefinitionBase[] || [];
-
-	allTasks.push(task);
-
-	await workspaceTasks.update('tasks', allTasks, vscode.ConfigurationTarget.WorkspaceFolder);
 }
 
 /**
