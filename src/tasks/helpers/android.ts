@@ -15,7 +15,6 @@ export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
 export interface AndroidBuildTaskTitaniumBuildBase extends AppBuildTaskTitaniumBuildBase {
 	platform: 'android';
 	target: 'device' | 'emulator';
-	debugPort?: number;
 }
 
 export interface AndroidTitanumPackageDefiniton extends PackageTaskDefinitionBase {
@@ -62,8 +61,8 @@ export class AndroidHelper extends TaskHelper {
 
 		builder.addOption('--device-id', definition.deviceId);
 
-		if (definition.debugPort) {
-			builder.addOption('--debug-host', `/localhost:${definition.debugPort}`);
+		if (definition.debugPort || definition.debug) {
+			builder.addOption('--debug-host', `/localhost:${definition.debugPort || '9000'}`);
 		}
 
 		this.storeLastState(WorkspaceState.LastBuildState, definition);
