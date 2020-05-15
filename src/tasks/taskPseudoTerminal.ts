@@ -144,4 +144,11 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 		message = message.replace(/\r?\n/g, '\r\n');
 		this.writeEmitter.fire(`\x1b[${color}${message}\x1b[0m`);
 	}
+
+	public handleInput(data: string): void {
+		// Char code 3 is ctrl+c, so kill the task
+		if (data === String.fromCharCode(3)) {
+			this.close();
+		}
+	}
 }
