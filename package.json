@@ -897,7 +897,7 @@
     "@types/chai": "^4.2.11",
     "@types/fs-extra": "^8.1.0",
     "@types/glob": "^7.1.1",
-    "@types/got": "^9.6.10",
+    "@types/got": "^9.6.11",
     "@types/klaw-sync": "^6.0.0",
     "@types/mocha": "^7.0.2",
     "@types/ms": "^0.7.31",
