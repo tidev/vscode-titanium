@@ -1,3 +1,7 @@
 {
 	"extends": ["axway/+mocha", "axway/+chai"],
+	"rules": {
+		"@typescript-eslint/no-unused-expressions": "off",
+		"chai-friendly/no-unused-expressions": "warn"
+	}
 }
