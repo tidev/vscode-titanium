@@ -325,13 +325,13 @@ export class Appc {
 		}
 		this.killed = false;
 		this.proc = spawn(cmd, [ 'run' ].concat(opts.args));
-		this.proc.stdout.on('data', data => {
+		this.proc.stdout?.on('data', data => {
 			if (!this.killed) {
 				const message = data.toString();
 				channel.append(message);
 			}
 		});
-		this.proc.stderr.on('data', data  => {
+		this.proc.stderr?.on('data', data  => {
 			if (this.killed) {
 				const message = data.toString();
 				channel.append(message);
@@ -345,7 +345,7 @@ export class Appc {
 		});
 		this.proc.on('exit', code => {
 			// console.log(`Exited with code ${code}`);
-			opts.exit(code);
+			opts.exit(code as number);
 			this.proc = undefined;
 		});
 

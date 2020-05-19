@@ -35,11 +35,11 @@ async function spawnCommand (command: string, options: cp.SpawnOptions, onStdout
 
 		const process = cp.spawn(command, [], options);
 
-		process.stdout.on('data', (data: Buffer) => {
+		process.stdout?.on('data', (data: Buffer) => {
 			onStdout(data.toString());
 		});
 
-		process.stderr.on('data', (data: Buffer) => {
+		process.stderr?.on('data', (data: Buffer) => {
 			onStderr(data.toString());
 		});
 
