@@ -75,11 +75,11 @@ export default class Terminal {
 				this.channel.append(`${this.command} ${args.join(' ')}\n\n`);
 				const proc = spawn(this.command, args, spawnOptions);
 
-				proc.stdout.on('data', data => {
+				proc.stdout?.on('data', data => {
 					const message = data.toString();
 					this.channel!.append(message);
 				});
-				proc.stderr.on('data', data => {
+				proc.stderr?.on('data', data => {
 					const message = data.toString();
 					this.channel!.append(message);
 				});
@@ -103,11 +103,11 @@ export default class Terminal {
 			let stdout = '';
 			let stderr = '';
 
-			proc.stdout.on('data', data => {
+			proc.stdout?.on('data', data => {
 				stdout += data.toString();
 			});
 
-			proc.stderr.on('data', data => {
+			proc.stderr?.on('data', data => {
 				stderr += data.toString();
 			});
 
@@ -135,13 +135,13 @@ export default class Terminal {
 		this.channel.clear();
 		this.channel.append(`${this.command} ${args.join(' ')}\n\n`);
 		this.proc = spawn(this.command, args, { shell: true, cwd  });
-		this.proc.stdout.on('data', data => {
+		this.proc.stdout?.on('data', data => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 			commands.executeCommand('setContext', GlobalState.Running, true);
 			const message = data.toString();
 			this.channel!.append(message);
 		});
-		this.proc.stderr.on('data', data => {
+		this.proc.stderr?.on('data', data => {
 			const message = data.toString();
 			this.channel!.append(message);
 		});

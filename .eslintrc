@@ -1,5 +1,5 @@
 {
-	"extends": [ "axway/env-node", "axway/+mocha", "axway/+typescript", "axway/+chai"],
+	"extends": [ "axway/env-node", "axway/+typescript" ],
 	"parserOptions": {
 		"project": "./tsconfig.json"
 	},
