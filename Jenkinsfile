@@ -2,7 +2,7 @@
 library 'pipeline-library'
 
 timestamps {
-  def nodeVersion = '8.11.4'
+  def nodeVersion = '10.17.0'
   def npmVersion = 'latest'
 
   node('osx') {
