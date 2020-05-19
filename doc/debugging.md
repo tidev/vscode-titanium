@@ -37,7 +37,15 @@ This will automatically generate two debug configurations in `.vscode/launch.jso
 
 The `preLaunchTask` property allows setting a task from the `.vscode/tasks.json` file to be used to build the application. This allows you to declare the target and device ID for your build so you won't be prompted for these every build. For documentation on configuring tasks see the [tasks documentation](./tasks.md).
 
-If no `preLaunchTask` is specified, then a default task is created and added to the `.vscode/tasks.json` file for you which is then reused when debugging in future. When using these tasks you will be prompted for the target and device ID every build.
+If no `preLaunchTask` is specified, then the default Titanium Debug task will be used. This task will prompt for the target and device ID every build.
+
+When creating a `preLaunchTask` for debugging a Titanium application, the following properties are required to be set on the task:
+
+* `isBackground` must be set to `true`
+* `problemMatcher` must include `"$ti-app-launch"`
+* `titaniumBuild.debug` must be set to `true`
+
+These properties will be enforced at the start of the debug session and the debug session will error out if they are not set.
 
 ## Debugging an application
 
