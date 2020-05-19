@@ -26,7 +26,7 @@ function isAppBuild<T extends PackageTaskTitaniumBuildBase>(definition: PackageT
 	return false;
 }
 
-function shouldEnableLiveview (definition: AppBuildTaskTitaniumBuildBase, context: TaskExecutionContext): boolean {
+function shouldEnableLiveview (definition: AppBuildTaskTitaniumBuildBase): boolean {
 	const globalSetting = ExtensionContainer.config.build.liveview;
 
 	if (!definition.debug && (definition.liveview === true || globalSetting)) {
@@ -62,7 +62,7 @@ export abstract class TaskHelper {
 
 		if (!isDistributionBuild(definition)) {
 
-			if (shouldEnableLiveview(definition, context)) {
+			if (shouldEnableLiveview(definition)) {
 				builder.addFlag('--liveview');
 			}
 
