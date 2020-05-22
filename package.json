@@ -921,7 +921,7 @@
     "eslint-plugin-mocha": "^7.0.0",
     "glob": "^7.1.6",
     "husky": "^4.2.5",
-    "lint-staged": "^10.2.4",
+    "lint-staged": "^10.2.6",
     "mocha": "^7.1.2",
     "mocha-jenkins-reporter": "^0.4.3",
     "mocha-multi-reporters": "^1.1.7",
