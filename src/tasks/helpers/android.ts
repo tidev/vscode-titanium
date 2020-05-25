@@ -7,6 +7,8 @@ import * as fs from 'fs-extra';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
+import { WorkspaceFolder } from 'vscode';
+import * as path from 'path';
 
 export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: AndroidBuildTaskTitaniumBuildBase;
@@ -28,16 +30,28 @@ export interface AndroidPackageTaskTitaniumBuildBase extends AppPackageTaskTitan
 	target: 'dist-playstore';
 }
 
-async function verifyKeystorePath (keystorePath: string|undefined): Promise<string> {
+async function resolveKeystorePath (keystorePath: string, folder: WorkspaceFolder): Promise<string> {
+	if (path.isAbsolute(keystorePath) && await fs.pathExists(keystorePath)) {
+		return keystorePath;
+	}
+
+	const resolvedPath = path.resolve(folder.uri.fsPath, keystorePath);
+
+	if (await fs.pathExists(resolvedPath)) {
+		return resolvedPath;
+	}
+
+	throw new Error(`Provided keystorePath value "${keystorePath}" does not exist`);
+}
+
+async function verifyKeystorePath (keystorePath: string|undefined, folder: WorkspaceFolder): Promise<string> {
 	if (!keystorePath) {
 		throw new Error('Expected a value for keystorePath');
 	}
 
-	if (!await fs.pathExists(keystorePath)) {
-		throw new Error(`Provided keystorePath value "${keystorePath}" does not exist`);
-	}
+	const resolvedPath = await resolveKeystorePath(keystorePath, folder);
 
-	return keystorePath;
+	return resolvedPath;
 }
 
 export class AndroidHelper extends TaskHelper {
@@ -77,15 +91,13 @@ export class AndroidHelper extends TaskHelper {
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
 		const androidInfo = definition.android || {
-			keystore: {
-
-			}
+			keystore: { }
 		};
 
 		if (!androidInfo.keystore.location) {
-			androidInfo.keystore.location = await verifyKeystorePath(await selectAndroidKeystore());
+			androidInfo.keystore.location = await verifyKeystorePath(await selectAndroidKeystore(), context.folder);
 		} else {
-			await verifyKeystorePath(androidInfo.keystore.location);
+			androidInfo.keystore.location = await verifyKeystorePath(androidInfo.keystore.location, context.folder);
 		}
 
 		if (!androidInfo.keystore.alias) {
