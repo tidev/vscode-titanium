@@ -6,20 +6,10 @@ function setupCoverage () {
 
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const NYC = require('nyc');
-
-	const reporters = [ 'text' ];
-
-	// Add cobertura if we're running in CI, or html if ran by a human
-	if (process.env.CI) {
-		reporters.push('cobertura');
-	} else {
-		reporters.push('html');
-	}
-
 	const nyc = new NYC({
 		cwd: path.join(__dirname, '..', '..'),
 		exclude: [ '.vscode-test/**', '**/test/**' ],
-		reporter: reporters,
+		reporter: [ 'cobertura', 'html', 'text' ],
 		all: true,
 		instrument: true,
 		hookRequire: true,
