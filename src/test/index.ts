@@ -2,11 +2,40 @@ import * as glob from 'glob';
 import * as Mocha from 'mocha';
 import * as path from 'path';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-// @ts-ignore
-import NYC = require('nyc');
+function setupCoverage () {
+
+	// eslint-disable-next-line @typescript-eslint/no-var-requires
+	const NYC = require('nyc');
+
+	const reporters = [ 'text' ];
+
+	// Add cobertura if we're running in CI, or html if ran by a human
+	if (process.env.CI) {
+		reporters.push('cobertura');
+	} else {
+		reporters.push('html');
+	}
+
+	const nyc = new NYC({
+		cwd: path.join(__dirname, '..', '..'),
+		exclude: [ '.vscode-test/**', '**/test/**' ],
+		reporter: reporters,
+		all: true,
+		instrument: true,
+		hookRequire: true,
+		hookRunInContext: true,
+		hookRunInThisContext: true
+	});
+
+	nyc.reset();
+	nyc.wrap();
+
+	return nyc;
+}
 
 export async function run (): Promise<void> {
+	const nyc = process.env.COVERAGE ? setupCoverage() : null;
+
 	const reportPath = path.join(__dirname, '..', '..', 'junit_report.xml');
 
 	const mocha = new Mocha({
@@ -20,22 +49,6 @@ export async function run (): Promise<void> {
 		}
 	});
 	mocha.useColors(true);
-
-	const nyc = new NYC({
-		cwd: path.join(__dirname, '..', '..'),
-		exclude: [ '.vscode-test/**', '**/test/**' ],
-		reporter: [ 'text', 'html' ],
-		all: true,
-		instrument: true,
-		hookRequire: true,
-		hookRunInContext: true,
-		hookRunInThisContext: true
-	});
-
-	nyc.reset();
-	nyc.wrap();
-
-	await nyc.createTempDirectory();
 
 	const testsRoot = path.resolve(__dirname, '..');
 
@@ -56,7 +69,9 @@ export async function run (): Promise<void> {
 			});
 		});
 	} finally {
-		nyc.writeCoverageFile();
-		nyc.report();
+		if (nyc) {
+			nyc.writeCoverageFile();
+			nyc.report();
+		}
 	}
 }
