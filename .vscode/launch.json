@@ -15,21 +15,11 @@
             "preLaunchTask": "npm: watch",
             "skipFiles": [
                 "<node_internals>/**/*.js"
-            ]
-        },
-        {
-            "name": "Extension Tests",
-            "type": "extensionHost",
-            "request": "launch",
-            "runtimeExecutable": "${execPath}",
-            "args": [
-                "--extensionDevelopmentPath=${workspaceFolder}",
-                "--extensionTestsPath=${workspaceFolder}/out/test/"
             ],
-            "outFiles": [
-                "${workspaceFolder}/out/test/**/*.js"
-            ],
-            "preLaunchTask": "npm: watch"
+            "presentation": {
+                "group": "1_launch",
+                "order": 1
+            }
         },
         {
             "name": "Debugger",
@@ -45,13 +35,60 @@
             ],
             "skipFiles": [
                 "<node_internals>/**/*.js"
-            ]
-        }
+            ],
+            "presentation": {
+                "group": "1_launch",
+                "order": 2
+            }
+        },
+        {
+            "name": "Extension Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionTestsPath=${workspaceFolder}/out/test/"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/test/**/*.js"
+            ],
+            "preLaunchTask": "npm: watch",
+            "presentation": {
+                "group": "2_tests",
+                "order": 1
+            }
+        },
+        {
+            "name": "Extension Tests - Coverage",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "args": [
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionTestsPath=${workspaceFolder}/out/test/"
+            ],
+            "outFiles": [
+                "${workspaceFolder}/out/test/**/*.js"
+            ],
+            "preLaunchTask": "npm: watch",
+            "env": {
+                "COVERAGE": "true"
+            },
+            "presentation": {
+                "group": "2_tests",
+                "order": 1
+            }
+        },
     ],
     "compounds": [
         {
             "name": "Extension + Debugger",
-            "configurations": [ "Extension", "Debugger" ]
+            "configurations": [ "Extension", "Debugger" ],
+            "presentation": {
+                "group": "1_launch",
+                "order": 3
+            }
         }
     ]
 }
