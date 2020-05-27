@@ -180,55 +180,37 @@
         "command": "titanium.explorer.refresh",
         "title": "Refresh Devices",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/refresh.svg",
-          "dark": "images/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "titanium.build.setLiveViewEnabled",
         "title": "Enable LiveView",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/eye-closed.svg",
-          "dark": "images/dark/eye-closed.svg"
-        }
+        "icon": "$(sync-ignored)"
       },
       {
         "command": "titanium.build.setLiveViewDisabled",
         "title": "Disable LiveView",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/eye.svg",
-          "dark": "images/dark/eye.svg"
-        }
+        "icon": "$(sync)"
       },
       {
         "command": "titanium.build.run",
         "title": "Run",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/run.svg",
-          "dark": "images/dark/run.svg"
-        }
+        "icon": "$(play)"
       },
       {
         "command": "titanium.package.run",
         "title": "Distribute",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/package.svg",
-          "dark": "images/dark/package.svg"
-        }
+        "icon": "$(package)"
       },
       {
         "command": "titanium.build.stop",
         "title": "Stop",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/square.svg",
-          "dark": "images/dark/square.svg"
-        }
+        "icon": "$(debug-stop)"
       },
       {
         "command": "titanium.build.setLogLevel",
@@ -294,19 +276,13 @@
         "command": "titanium.updates.openReleaseNotes",
         "title": "Open release notes",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/link-external.svg",
-          "dark": "images/dark/link-external.svg"
-        }
+        "icon": "$(link-external)"
       },
       {
         "command": "titanium.updates.checkAll",
         "title": "Check For Updates",
         "category": "Titanium",
-        "icon": {
-          "light": "images/light/refresh.svg",
-          "dark": "images/dark/refresh.svg"
-        }
+        "icon": "$(refresh)"
       },
       {
         "command": "titanium.updates.installAll",
