@@ -929,7 +929,7 @@
     "sinon": "^9.0.2",
     "standard-version": "^8.0.0",
     "typescript": "^3.9.3",
-    "vscode-test": "^1.3.0"
+    "vscode-test": "^1.4.0"
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.2",
