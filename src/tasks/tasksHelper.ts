@@ -5,6 +5,7 @@ import { androidHelper, iOSHelper, Helpers } from './helpers';
 import { PackageTaskProvider } from './packageTaskProvider';
 import { ExtensionContainer } from '../container';
 import { TitaniumTaskBase, TitaniumTaskDefinitionBase } from './commandTaskProvider';
+import { DeviceNode } from '../explorer/nodes';
 
 export type TitaniumTaskTypes = 'titanium-build' | 'titanium-package';
 
@@ -16,6 +17,8 @@ export interface RunningTask {
 }
 
 export const runningTasks: Map<string, RunningTask> = new Map();
+export const debugSessionInformation: Map<string, DeviceNode> = new Map();
+export const DEBUG_SESSION_VALUE = 'DEBUG_SESSION_VALUE';
 
 const helpers: Helpers = {
 	android: androidHelper,
@@ -86,9 +89,9 @@ export async function getPackageTask(task: TitaniumTaskBase): Promise<vscode.Tas
  * @param {string} folder - Workspace folder to get tasks for.
  * @returns {TitaniumTaskDefinitionBase[]}
  */
-export function getTasks (folder: string): TitaniumTaskDefinitionBase[] {
+export function getTasks <T extends TitaniumTaskDefinitionBase> (folder: string): T[] {
 	const workspaceTasks = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(folder));
-	const allTasks = workspaceTasks && workspaceTasks.tasks as TitaniumTaskDefinitionBase[] || [];
+	const allTasks = workspaceTasks && workspaceTasks.tasks as T[] || [];
 
 	return allTasks;
 }

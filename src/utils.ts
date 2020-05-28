@@ -7,7 +7,7 @@ import appc from './appc';
 
 import { platform } from 'os';
 import { workspace } from 'vscode';
-import { CleanAppOptions, CreateAppOptions, CreateModuleOptions } from './types/cli';
+import { CleanAppOptions, CreateAppOptions, CreateModuleOptions, Target } from './types/cli';
 import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
 
 /**
@@ -96,7 +96,7 @@ export function nameForTarget (target: string): string {
  * @param {String} targetPlatform - platform to get target for.
  * @returns {String}
  */
-export function targetForName (name: string): string {
+export function targetForName (name: string): Target {
 	name = name.toLowerCase();
 	switch (name) {
 		case 'Ad-Hoc':
@@ -109,7 +109,7 @@ export function targetForName (name: string): string {
 		case 'emulator':
 		case 'simulator':
 		default:
-			return name;
+			return name as Target;
 	}
 }
 

@@ -5,12 +5,13 @@ import { DeviceNode } from './deviceNode';
 import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
+import { DevelopmentTarget } from '../../types/cli';
 
 export class OSVerNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Collapsed;
 	public readonly contextValue: string = 'OSVerNode';
-	public readonly targetId: string;
+	public readonly targetId: DevelopmentTarget;
 	public readonly version: string;
 
 	constructor (
@@ -20,7 +21,7 @@ export class OSVerNode extends BaseNode {
 	) {
 		super(label);
 		this.version = label;
-		this.targetId = targetForName(this.target);
+		this.targetId = targetForName(this.target) as DevelopmentTarget;
 	}
 
 	public getChildren (): DeviceNode[] {
@@ -28,7 +29,7 @@ export class OSVerNode extends BaseNode {
 		if (this.platform === 'ios') {
 			const sims = appc.iOSSimulators();
 			for (const sim of sims[this.version]) {
-				simulators.push(new DeviceNode(sim.name, this.platform, this.target, sim.udid, this.targetId, this.version));
+				simulators.push(new DeviceNode(sim.name, this.platform, this.targetId, sim.udid, this.targetId, this.version));
 			}
 		}
 		return simulators;

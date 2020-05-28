@@ -43,14 +43,14 @@ import { LogLevel, UpdateChoice } from './types/common';
 import ms = require('ms');
 import { completion, environment, updates } from 'titanium-editor-commons';
 import { handleInteractionError, InteractionChoice, InteractionError  } from './commands/common';
-import { UpdateNode } from './explorer/nodes';
+import { UpdateNode, DeviceNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
 import { quickPick, selectUpdates } from './quickpicks/common';
 let projectStatusBarItem: vscode.StatusBarItem;
 
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 
-import { registerTaskProviders } from './tasks/tasksHelper';
+import { registerTaskProviders, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasks/tasksHelper';
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
@@ -105,7 +105,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.commands.registerCommand('titanium.init', init),
 
 		// register run command
-		vscode.commands.registerCommand(Commands.BuildApp, node => {
+		vscode.commands.registerCommand(Commands.Build, node => {
 			if (project.isTitaniumApp) {
 				return buildApplication(node);
 			} else if (project.isTitaniumModule) {
@@ -114,7 +114,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		}),
 
 		// register distribute command
-		vscode.commands.registerCommand(Commands.PackageApp, node => {
+		vscode.commands.registerCommand(Commands.Package, node => {
 			if (project.isTitaniumApp) {
 				return packageApplication(node);
 			} else if (project.isTitaniumModule) {
@@ -285,7 +285,20 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 			}
 		}),
 
-		vscode.commands.registerCommand(Commands.Clean, cleanApplication)
+		vscode.commands.registerCommand(Commands.Clean, cleanApplication),
+
+		vscode.commands.registerCommand(Commands.Debug, async (node: DeviceNode) => {
+			const debugConfig: vscode.DebugConfiguration = {
+				type: 'titanium',
+				name: 'Debug Titanium App',
+				request: 'launch',
+				platform: node.platform
+			};
+
+			debugSessionInformation.set(DEBUG_SESSION_VALUE, node);
+
+			await vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], debugConfig);
+		})
 	);
 
 	registerTaskProviders(context);

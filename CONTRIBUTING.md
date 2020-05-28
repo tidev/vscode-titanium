@@ -32,6 +32,8 @@ For any contribution we first ask that you [file an issue](https://github.com/ap
 
 You're now up and running with the extension running in another workspace. When you make changes to the TypeScript the watch task will automatically compile then for you, and you just need to reload the extension yourself using the green restart button on the main window, or by click `Cmd+R` (Windows: `Ctrl+R`) in the extension window. If you're debugging the debugger and the extension make sure to select the correct target in the Debug Toolbar when reloading.
 
+If you want to test debugging from the build tree view, then you will need to set the `debugServer` property in the debug configuration passed to the `vscode.debug.startDebugging` call in the Debug command
+
 ## Sending in a PR
 
 When sending in a PR please make sure you do the following:

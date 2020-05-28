@@ -213,6 +213,12 @@
         }
       },
       {
+        "command": "titanium.build.debug",
+        "title": "Debug",
+        "category": "Titanium",
+        "icon": "$(debug)"
+      },
+      {
         "command": "titanium.package.run",
         "title": "Distribute",
         "category": "Titanium",
@@ -569,6 +575,10 @@
         {
           "command": "titanium.clean",
           "when": "titanium:enabled"
+        },
+        {
+          "command": "titanium.build.debug",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -679,8 +689,17 @@
           "group": "inline"
         },
         {
+          "command": "titanium.build.debug",
+          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode",
+          "group": "inline"
+        },
+        {
           "command": "titanium.build.run",
           "when": "view == titanium.view.buildExplorer"
+        },
+        {
+          "command": "titanium.build.debug",
+          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode"
         },
         {
           "command": "titanium.updates.openReleaseNotes",
