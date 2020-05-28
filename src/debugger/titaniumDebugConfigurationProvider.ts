@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import * as which from 'which';
 import { UserCancellation } from '../commands';
 import { selectPlatform } from '../quickpicks/common';
-import { AppBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';
+import { AppBuildTaskDefinitionBase, AppBuildTask } from '../tasks/buildTaskProvider';
 import { getTasks } from '../tasks/tasksHelper';
 
 function validateTask (task: AppBuildTaskDefinitionBase, ourConfig: vscode.DebugConfiguration): void {
@@ -41,13 +41,14 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			const port = await getPort({ port: ourConfig.port });
 			if (port !== ourConfig.port) {
 				ourConfig.port = port;
+				ourConfig.debugPort = ourConfig.port;
 			}
 		} catch (error) {
 			throw new Error('Failed to start debug session as could not find a free port. Please set a "port" value in your debug configuration.');
 		}
 
 		if (config.preLaunchTask) {
-			const preLaunchTask = getTasks(vscode.workspace.rootPath!).find(task => task.label === config.preLaunchTask) as AppBuildTaskDefinitionBase;
+			const preLaunchTask = getTasks<AppBuildTaskDefinitionBase>(vscode.workspace.rootPath!).find(task => task.label === config.preLaunchTask);
 
 			if (!preLaunchTask) {
 				throw new Error(`Unable to find a preLaunchTask named ${config.preLaunchTask}`);

@@ -6,19 +6,20 @@ import { OSVerNode } from './osVerNode';
 import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
+import { DevelopmentTarget } from '../../types/cli';
 
 export class TargetNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Collapsed;
 	public readonly contextValue: string = 'TargetNode';
-	public readonly targetId: string;
+	public readonly targetId: DevelopmentTarget;
 
 	constructor (
 		public readonly label: string,
 		public readonly platform: Platform
 	) {
 		super(label);
-		this.targetId = targetForName(this.label);
+		this.targetId = targetForName(this.label) as DevelopmentTarget;
 	}
 
 	public getChildren (): Array<OSVerNode|DeviceNode> {

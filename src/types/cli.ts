@@ -77,3 +77,9 @@ export interface CreateModuleOptions extends CreateOptions {
 export interface CleanAppOptions extends BaseCLIOptions {
 	projectDir: string;
 }
+
+export type Target = DevelopmentTarget | DeploymenTarget;
+
+export type DevelopmentTarget = 'device' | 'emulator' | 'simulator';
+
+export type DeploymenTarget = 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';

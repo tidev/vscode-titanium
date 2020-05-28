@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { selectBuildTarget } from '../quickpicks/common';
-import { TaskExecutionContext, Platform } from './tasksHelper';
+import { TaskExecutionContext, Platform, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasksHelper';
 import { Helpers } from './helpers/';
 import { platforms } from '../utils';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
@@ -101,6 +101,14 @@ export class BuildTaskProvider extends CommandTaskProvider {
 
 		if (definition.titaniumBuild.projectType === 'app') {
 
+			if (definition.titaniumBuild.debug) {
+				const buildData = debugSessionInformation.get(DEBUG_SESSION_VALUE);
+				if (buildData) {
+					definition.titaniumBuild.target = buildData.targetId;
+					definition.titaniumBuild.deviceId = buildData.deviceId;
+				}
+			}
+
 			if (!definition.titaniumBuild.target) {
 				definition.titaniumBuild.target = (await selectBuildTarget(definition.titaniumBuild.platform)).id as 'device' | 'emulator' | 'simulator';
 			}
@@ -125,6 +133,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 
 		if (definition.titaniumBuild.projectType === 'app' && name.toLowerCase().includes('debug')) {
 			definition.titaniumBuild.liveview = false;
+			definition.titaniumBuild.debug = true;
 			definition.isBackground = true;
 			definition.problemMatchers = '$ti-app-launch';
 		}
