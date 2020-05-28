@@ -591,27 +591,27 @@
         {
           "command": "titanium.build.run",
           "when": "view == titanium.view.buildExplorer && !titanium:build:running",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "command": "titanium.build.stop",
           "when": "view == titanium.view.buildExplorer && titanium:build:running",
-          "group": "navigation"
+          "group": "navigation@2"
         },
         {
           "command": "titanium.build.setLiveViewEnabled",
           "when": "view == titanium.view.buildExplorer && !config.titanium.build.liveview",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
           "command": "titanium.build.setLiveViewDisabled",
           "when": "view == titanium.view.buildExplorer && config.titanium.build.liveview",
-          "group": "navigation"
+          "group": "navigation@3"
         },
         {
           "command": "titanium.explorer.refresh",
           "when": "view == titanium.view.buildExplorer",
-          "group": "navigation"
+          "group": "navigation@1"
         },
         {
           "command": "titanium.build.setLogLevel",
