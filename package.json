@@ -656,7 +656,7 @@
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.buildExplorer"
+          "when": "view == titanium.view.buildExplorer && viewItem =~ /PlatformNode|TargetNode|OSVerNode|DeviceNode/"
         },
         {
           "command": "titanium.updates.openReleaseNotes",
