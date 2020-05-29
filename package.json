@@ -178,7 +178,7 @@
       },
       {
         "command": "titanium.explorer.refresh",
-        "title": "Refresh Devices",
+        "title": "Refresh devices",
         "category": "Titanium",
         "icon": "$(refresh)"
       },
@@ -611,7 +611,7 @@
         {
           "command": "titanium.explorer.refresh",
           "when": "view == titanium.view.buildExplorer",
-          "group": "navigation@1"
+          "group": "2_workspace"
         },
         {
           "command": "titanium.build.setLogLevel",
