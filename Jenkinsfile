@@ -31,7 +31,14 @@ timestamps {
             sh 'npm run test'
           } finally {
             junit 'junit_report.xml'
-            step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+            if (fileExists('coverage/cobertura-coverage.xml')) {
+              step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+            } else {
+              def coverageContents = sh(returnStdout: true, script: 'ls coverage/').trim()
+              def warningMessage = "Failed to collect coverage, coverage folder contents was ${coverageContents}"
+              echo warningMessage
+              manager.addWarningBadge(warningMessage)
+            }
           }
         } // stage lint and test
 
