@@ -925,7 +925,7 @@
     "mocha": "^7.2.0",
     "mocha-jenkins-reporter": "^0.4.3",
     "mocha-multi-reporters": "^1.1.7",
-    "nyc": "^15.0.1",
+    "nyc": "^15.1.0",
     "sinon": "^9.0.2",
     "standard-version": "^8.0.0",
     "typescript": "^3.9.3",
