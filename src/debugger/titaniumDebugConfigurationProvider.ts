@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import * as which from 'which';
 import { UserCancellation } from '../commands';
 import { selectPlatform } from '../quickpicks/common';
-import { AppBuildTaskDefinitionBase, AppBuildTask } from '../tasks/buildTaskProvider';
+import { AppBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';
 import { getTasks } from '../tasks/tasksHelper';
 
 function validateTask (task: AppBuildTaskDefinitionBase, ourConfig: vscode.DebugConfiguration): void {
