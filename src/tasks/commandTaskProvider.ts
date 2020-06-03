@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TaskExecutionContext, Platform, ProjectType } from './tasksHelper';
 import { TaskPseudoTerminal, CommandError } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
-import { UserCancellation, handleInteractionError, InteractionError } from '../commands/common';
+import { UserCancellation, handleInteractionError, InteractionError, checkLogin } from '../commands/common';
 import { LogLevel } from '../types/common';
 
 function getPlatform (task: TitaniumTaskBase): Platform {
@@ -60,6 +60,8 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		// Use this as a centralized place to do things like login checks, analytics etc.
 
 		try {
+			checkLogin();
+
 			task.definition.platform = getPlatform(task);
 
 			await this.executeTaskInternal(context, task);
