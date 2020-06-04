@@ -21,7 +21,7 @@ function validateTask (task: AppBuildTaskDefinitionBase, ourConfig: vscode.Debug
 
 export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
-	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
+	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration): Promise<vscode.DebugConfiguration> {
 		if (!config.projectDir) {
 			config.projectDir = '${workspaceFolder}'; // eslint-disable-line no-template-curly-in-string
 		}
@@ -87,14 +87,12 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			try {
 				await which('ios_webkit_debug_proxy');
 			} catch (error) {
-				vscode.window.showErrorMessage('Unable to find ios-webkit-debug-proxy. Please ensure it is installed', {
+				const action = await vscode.window.showErrorMessage('Unable to find ios-webkit-debug-proxy. Please ensure it is installed', {
 					title: 'Open docs'
-				}).then(action => {
-					if (action) {
-						vscode.env.openExternal(vscode.Uri.parse('https://github.com/appcelerator/vscode-appcelerator-titanium/blob/master/doc/debugging.md'));
-					}
-					return;
 				});
+				if (action) {
+					vscode.env.openExternal(vscode.Uri.parse('https://github.com/appcelerator/vscode-appcelerator-titanium/blob/master/doc/debugging.md'));
+				}
 				throw new Error('Unable to start debugger as ios_webkit_debug_proxy is not installed.');
 			}
 		}

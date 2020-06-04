@@ -5,7 +5,7 @@ export class TitaniumTargetDiscovery extends chromeTargetDiscoveryStrategy.Chrom
 	constructor () {
 		super(logger, new telemetry.TelemetryReporter());
 	}
-	public getTarget (address: string, port: number, targetFilter?: chromeConnection.ITargetFilter, targetUrl?: string): Promise<chromeConnection.ITarget> {
+	public getTarget (address: string, port: number): Promise<chromeConnection.ITarget> {
 		return Promise.resolve({
 			description: 'Titanium Debug Target',
 			devtoolsFrontendUrl: `chrome-devtools://devtools/bundled/inspector.html?experiments=true&ws=${address}:${port}`,
@@ -17,7 +17,7 @@ export class TitaniumTargetDiscovery extends chromeTargetDiscoveryStrategy.Chrom
 		});
 	}
 
-	public async getAllTargets (address: string, port: number, targetFilter?: chromeConnection.ITargetFilter, targetUrl?: string): Promise<chromeConnection.ITarget[]> {
+	public async getAllTargets (address: string, port: number): Promise<chromeConnection.ITarget[]> {
 		const target = await this.getTarget(address, port);
 		return Promise.resolve([ target ]);
 	}
