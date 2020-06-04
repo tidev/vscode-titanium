@@ -118,7 +118,7 @@ export class Project {
 	 * @returns {String}
 	 */
 	public pathForPlatform (platform: Platform): string|undefined {
-		const moduleInfo: any = this.modules.find((mod) => utils.normalisedPlatform(mod.platform) === platform);
+		const moduleInfo = this.modules.find((mod) => utils.normalisedPlatform(mod.platform) === platform);
 		if (moduleInfo) {
 			return moduleInfo.path;
 		}

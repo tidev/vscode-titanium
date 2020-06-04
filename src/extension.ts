@@ -158,7 +158,12 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		}),
 
 		vscode.commands.registerCommand(Commands.OpenAppOnDashboard, () => {
-			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(project.dashboardUrl()!));
+			const dashboardUrl = project.dashboardUrl();
+			if (dashboardUrl) {
+				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(dashboardUrl));
+			} else {
+				vscode.window.showErrorMessage('Unable to open project on dashboard');
+			}
 		}),
 
 		vscode.window.registerTreeDataProvider('titanium.view.buildExplorer', deviceExplorer),
