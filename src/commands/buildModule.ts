@@ -34,16 +34,11 @@ export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode |
 		await vscode.tasks.executeTask(task);
 	} catch (error) {
 		if (error instanceof InteractionError) {
-			await handleInteractionError(error)
-				.then(async function () {
-					const choice = await vscode.window.showErrorMessage('Build Module failed.', { title: 'Rerun' });
-					if (!choice) {
-						return;
-					}
-					if (choice.title === 'Rerun') {
-						buildModule(node);
-					}
-				});
+			await handleInteractionError(error);
+			const choice = await vscode.window.showErrorMessage('Build Module failed.', { title: 'Rerun' });
+			if (choice?.title === 'Rerun') {
+				buildModule(node);
+			}
 		}
 	}
 }
