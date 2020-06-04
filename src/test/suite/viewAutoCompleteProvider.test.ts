@@ -18,11 +18,7 @@ const completions = JSON.parse(rawData);
 async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
 	const text = await vscode.workspace.openTextDocument(uri);
 	const provider = new ViewCompletionItemProvider();
-	const context: vscode.CompletionContext = {
-		triggerKind: vscode.CompletionTriggerKind.Invoke,
-	};
-	const cancellationToken = new vscode.CancellationTokenSource();
-	return provider.provideCompletionItems(text, position, cancellationToken.token, context);
+	return provider.provideCompletionItems(text, position);
 }
 let sandbox: sinon.SinonSandbox;
 

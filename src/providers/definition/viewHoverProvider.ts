@@ -4,7 +4,7 @@ import { CancellationToken, HoverProvider, Position, TextDocument, Hover } from 
 
 export class ViewHoverProvider implements HoverProvider {
 
-	public provideHover (document: TextDocument, position: Position, token: CancellationToken): Hover|undefined {
+	public provideHover (document: TextDocument, position: Position): Hover|undefined {
 		return definitionProviderHelper.provideHover(document, position);
 	}
 }

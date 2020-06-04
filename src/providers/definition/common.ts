@@ -19,7 +19,7 @@ export interface DefinitionSuggestion {
 function getRelatedFiles(fileType: string): string[] {
 	const relatedFiles: string[] = [];
 	if (fileType === 'tss') {
-		relatedFiles.push(path.join(workspace.rootPath!, 'app', 'styles', 'app.tss'));
+		relatedFiles.push(path.join(utils.getAlloyRootPath(), 'styles', 'app.tss'));
 	}
 	const relatedFile = related.getTargetPath(fileType);
 	if (relatedFile) {
@@ -119,7 +119,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
 		},
 		files(): string[] {
-			return [ path.join(utils.getI18nPath()!, ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
+			return [ path.join(utils.getI18nPath(), ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
 		},
 		i18nString: true
 	}
