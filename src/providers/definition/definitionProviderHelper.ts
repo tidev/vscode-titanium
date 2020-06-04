@@ -183,22 +183,27 @@ export async function provideCodeActions(document: TextDocument, range: Range | 
 	for (const suggestion of suggestions) {
 		if (suggestion.regExp.test(linePrefix)) {
 			const suggestionFiles = suggestion.files(document, word);
-			const index = suggestionFiles.indexOf(path.join(workspace.rootPath!, 'app', 'styles', 'app.tss'));
+			const index = suggestionFiles.indexOf(path.join(utils.getAlloyRootPath(), 'styles', 'app.tss'));
 			suggestionFiles.splice(index, 1);
 
-			const definitionRegexp = suggestion.definitionRegExp!(word);
+			if (!suggestion.definitionRegExp || !suggestion.title) {
+				continue;
+			}
+
+			const definitionRegexp = suggestion.definitionRegExp(word);
 			const definitions = await getReferences(suggestionFiles, definitionRegexp, () => {
 				return {};
 			});
 			if (!definitions?.length && suggestion.insertText) {
 				const insertText = suggestion.insertText(word);
-				if (insertText) {
-					suggestionFiles.forEach((file: string) => {
-						codeActions.push({
-							title: suggestion.title!(path.parse(file).name),
-							command: insertCommandId,
-							arguments: [ insertText, file ]
-						});
+				if (!insertText) {
+					continue;
+				}
+				for (const file of suggestionFiles) {
+					codeActions.push({
+						title: suggestion.title(path.parse(file).name),
+						command: insertCommandId,
+						arguments: [ insertText, file ]
 					});
 				}
 			} else if (!definitions?.length && suggestion.i18nString) {
@@ -219,16 +224,15 @@ export async function provideCodeActions(document: TextDocument, range: Range | 
  * @param {String} text text to insert
  * @param {String} filePath file in which to insert text
  */
-export function insert (text: string, filePath: string): void {
-	workspace.openTextDocument(filePath).then(document => {
-		const position = new Position(document.lineCount, 0);
-		if (document.lineAt(position.line - 1).text.trim().length) {
-			text = `\n${text}`;
-		}
-		const edit = new WorkspaceEdit();
-		edit.insert(Uri.file(filePath), position, text);
-		workspace.applyEdit(edit);
-	});
+export async function insert (text: string, filePath: string): Promise<void> {
+	const document = await workspace.openTextDocument(filePath);
+	const position = new Position(document.lineCount, 0);
+	if (document.lineAt(position.line - 1).text.trim().length) {
+		text = `\n${text}`;
+	}
+	const edit = new WorkspaceEdit();
+	edit.insert(Uri.file(filePath), position, text);
+	workspace.applyEdit(edit);
 }
 
 /**
@@ -236,7 +240,7 @@ export function insert (text: string, filePath: string): void {
  *
  * @param {String} text text to insert
  */
-export function insertI18nString (text: string): void {
+export async function insertI18nString (text: string): Promise<void> {
 	const defaultLang =  ExtensionContainer.config.project.defaultI18nLanguage;
 	const i18nPath = utils.getI18nPath();
 	if (!i18nPath) {
@@ -247,16 +251,15 @@ export function insertI18nString (text: string): void {
 		fs.ensureDirSync(path.join(i18nPath, defaultLang));
 		fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
 	}
-	workspace.openTextDocument(i18nStringPath).then(document => {
-		const insertText = `\t<string name="${text}"></string>\n`;
-		const index = document.getText().indexOf('<\/resources>'); // eslint-disable-line no-useless-escape
-		if (index !== -1) {
-			const position = document.positionAt(index);
-			const edit = new WorkspaceEdit();
-			edit.insert(Uri.file(i18nStringPath), position, insertText);
-			workspace.applyEdit(edit);
-		}
-	});
+	const document = await workspace.openTextDocument(i18nStringPath);
+	const insertText = `\t<string name="${text}"></string>\n`;
+	const index = document.getText().indexOf('<\/resources>'); // eslint-disable-line no-useless-escape
+	if (index !== -1) {
+		const position = document.positionAt(index);
+		const edit = new WorkspaceEdit();
+		edit.insert(Uri.file(i18nStringPath), position, insertText);
+		workspace.applyEdit(edit);
+	}
 }
 
 /**

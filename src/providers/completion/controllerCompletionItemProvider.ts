@@ -5,7 +5,7 @@ import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 
 /**
  * Alloy Controller completion provider
@@ -23,7 +23,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async provideCompletionItems (document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[]> {
+	public async provideCompletionItems (document: TextDocument, position: Position): Promise<CompletionItem[]> {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 
 		if (!this.completions) {
@@ -44,7 +44,10 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 			return this.getEventNameCompletions(linePrefix);
 		// require('')
 		} else if (/require\(["']?([^'");]*)["']?\)?$/.test(linePrefix)) {
-			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/)!;
+			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/);
+			if (!matches) {
+				return [];
+			}
 			const requestedModule = matches[1];
 			const range = document.getWordRangeAtPosition(position, /([\w/.$]+)/);
 			return this.getFileCompletions('lib', requestedModule, range);
@@ -116,7 +119,14 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 		const { tags } = this.completions.alloy;
 		const { types } = this.completions.titanium;
 
-		const id = linePrefix.match(/\$\.([-a-zA-Z0-9-_]*)\.?$/)![1];
+		const matches = linePrefix.match(/\$\.([-a-zA-Z0-9-_]*)\.?$/);
+
+		if (!matches) {
+			return [];
+		}
+
+		const id = matches[1];
+
 		const completions: CompletionItem[] = [];
 		const relatedFile = related.getTargetPath('xml');
 		if (!relatedFile) {
@@ -342,6 +352,7 @@ export class ControllerCompletionItemProvider implements CompletionItemProvider 
 	 *
 	 * @param {String} directory alloy directory
 	 * @param {String} moduleName name of the module
+	 * @param {Range} range the range of text to be replaced by the completion
 	 *
 	 * @returns {Thenable}
 	 */

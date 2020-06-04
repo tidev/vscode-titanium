@@ -5,7 +5,7 @@ import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CancellationToken, CompletionContext, CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 /**
  * Alloy View completion provider
  */
@@ -22,7 +22,7 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async provideCompletionItems (document: TextDocument, position: Position, token: CancellationToken, context: CompletionContext): Promise<CompletionItem[]> {
+	public async provideCompletionItems (document: TextDocument, position: Position): Promise<CompletionItem[]> {
 		const line = document.lineAt(position).text;
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);

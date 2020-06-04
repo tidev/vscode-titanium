@@ -46,7 +46,7 @@ export const i18nAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*["']?)$/,
 	async getCompletions () {
 		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
-		const i18nPath = utils.getI18nPath()!;
+		const i18nPath = utils.getI18nPath();
 		const completions: CompletionItem[] = [];
 		if (utils.directoryExists(i18nPath)) {
 			const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
