@@ -1,6 +1,7 @@
 import { IAttachRequestArgs, ILaunchRequestArgs } from '@awam/vscode-chrome-debug-core';
 import { LogLevel } from '../types/common';
 import { Platform } from '../tasks/tasksHelper';
+import { AppBuildTaskTitaniumBuildBase } from '../tasks/buildTaskProvider';
 
 export interface Request {
 	id: string;
@@ -10,7 +11,11 @@ export interface Request {
 
 export interface Response {
 	id: string;
-	result: any;
+	result: {
+		isError: boolean;
+		message?: string;
+		buildInfo?: AppBuildTaskTitaniumBuildBase;
+	};
 }
 
 export interface FeedbackOptions {
