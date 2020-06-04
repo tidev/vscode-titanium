@@ -95,7 +95,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 
 		if (this.projectType === 'alloy') {
 			searchFolders.push(path.join(appRoot, 'lib'));
-			searchFolders.push(path.join(appRoot, 'controllers', this.platform!));
+			searchFolders.push(path.join(appRoot, 'controllers', this.platform));
 		}
 
 		for (const folder of searchFolders) {
