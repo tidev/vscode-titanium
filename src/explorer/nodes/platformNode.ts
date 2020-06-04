@@ -14,7 +14,7 @@ export class PlatformNode extends BaseNode {
 
 	constructor (platform: Platform) {
 		super(platform);
-		this.label = nameForPlatform(platform)!;
+		this.label = nameForPlatform(platform);
 		this.platform = platform;
 		this.contextValue = 'PlatformNode';
 	}
