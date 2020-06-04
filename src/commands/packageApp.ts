@@ -9,16 +9,20 @@ import { WorkspaceState } from '../constants';
 import { nameForPlatform, nameForTarget } from '../utils';
 import { PackageTask, AppPackageTaskTitaniumBuildBase } from '../tasks/packageTaskProvider';
 
+interface LastState extends AppPackageTaskTitaniumBuildBase {
+	target: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
+}
+
 export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 
-		const lastState = ExtensionContainer.context.workspaceState.get<AppPackageTaskTitaniumBuildBase>(WorkspaceState.LastPackageState);
+		const lastState = ExtensionContainer.context.workspaceState.get<LastState>(WorkspaceState.LastPackageState);
 		let lastDescription: string|undefined;
 
 		if (lastState) {
 			try {
-				lastDescription = `${nameForPlatform(lastState.platform)} ${nameForTarget(lastState.target!)}`;
+				lastDescription = `${nameForPlatform(lastState.platform)} ${nameForTarget(lastState.target)}`;
 			} catch (error) {
 				console.log(error);
 				// Ignore and clear the state, we don't want to error due to a bad state
