@@ -77,17 +77,17 @@ export default class Terminal {
 
 				proc.stdout?.on('data', data => {
 					const message = data.toString();
-					this.channel!.append(message);
+					this.channel?.append(message);
 				});
 				proc.stderr?.on('data', data => {
 					const message = data.toString();
-					this.channel!.append(message);
+					this.channel?.append(message);
 				});
 
 				proc.on('close', code => {
 					if (code) {
 						window.showErrorMessage('Failed to create the application, please check the output.');
-						this.channel!.show();
+						this.channel?.show();
 						return reject();
 					}
 					return resolve();
@@ -139,16 +139,16 @@ export default class Terminal {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 			commands.executeCommand('setContext', GlobalState.Running, true);
 			const message = data.toString();
-			this.channel!.append(message);
+			this.channel?.append(message);
 		});
 		this.proc.stderr?.on('data', data => {
 			const message = data.toString();
-			this.channel!.append(message);
+			this.channel?.append(message);
 		});
-		this.proc.on('close', data => {
+		this.proc.on('close', () => {
 			this.proc = undefined;
 		});
-		this.proc.on('exit', data => {
+		this.proc.on('exit', () => {
 			ExtensionContainer.context.globalState.update(GlobalState.Running, false);
 			commands.executeCommand('setContext', GlobalState.Running, false);
 			this.proc = undefined;
