@@ -97,6 +97,10 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
+			const choice = await vscode.window.showErrorMessage('Build App failed', { title: 'Rerun' });
+			if (choice?.title === 'Rerun') {
+				buildApplication(node);
+			}
 		}
 	}
 }

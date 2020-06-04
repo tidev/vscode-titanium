@@ -57,6 +57,10 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
+			const choice = await vscode.window.showErrorMessage('Package App failed', { title: 'Rerun' });
+			if (choice?.title === 'Rerun') {
+				packageApplication(node);
+			}
 		}
 	}
 }

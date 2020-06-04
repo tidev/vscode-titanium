@@ -36,6 +36,10 @@ export async function packageModule (node: DeviceNode | OSVerNode | PlatformNode
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
+			const choice = await vscode.window.showErrorMessage('Package Module failed', { title: 'Rerun' });
+			if (choice?.title === 'Rerun') {
+				packageModule(node);
+			}
 		}
 	}
 }
