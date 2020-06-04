@@ -98,6 +98,8 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 		ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 		vscode.commands.executeCommand('setContext', GlobalState.Running, true);
 
+		// We don't want to catch here so that any errors are thrown back to the TaskProvider and handled correctly there
+		// eslint-disable-next-line promise/catch-or-return
 		this.taskProvider.executeTask(executionContext, this.task).then((result) => this.close(result));
 	}
 

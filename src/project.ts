@@ -73,10 +73,11 @@ export class Project {
 	 *
 	 * @returns {String}
 	 */
-	public appId (): string|undefined {
+	public appId (): string {
 		if (this.isTitaniumApp) {
 			return String(this.tiapp.id);
 		}
+		throw new Error('Project is not a Titanium application');
 	}
 
 	/**
