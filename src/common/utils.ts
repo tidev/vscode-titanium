@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as xml2js from 'xml2js';
 
-export async function determineProjectType (projectDirectory: string) {
+export async function determineProjectType (projectDirectory: string): Promise<'alloy' | 'classic'> {
 	if (await fs.pathExists(path.join(projectDirectory, 'app'))) {
 		return 'alloy';
 	} else {
