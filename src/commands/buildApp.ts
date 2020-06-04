@@ -34,18 +34,23 @@ function getDeviceNameFromId (deviceID: string, platform: Platform, target: stri
 	return deviceName;
 }
 
+interface LastBuildState extends AppBuildTaskTitaniumBuildBase {
+	deviceId: string;
+	target: 'device' | 'emulator' | 'simulator';
+}
+
 export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 
-		const lastBuildState = ExtensionContainer.context.workspaceState.get<AppBuildTaskTitaniumBuildBase>(WorkspaceState.LastBuildState);
+		const lastBuildState = ExtensionContainer.context.workspaceState.get<LastBuildState>(WorkspaceState.LastBuildState);
 		let lastBuildDescription: string|undefined;
 
 		if (lastBuildState) {
 			try {
 				// TODO: map the device ID back based off the info output, this also allows us to ignore invalid build states for example by a device being disconnected
-				const deviceName = getDeviceNameFromId(lastBuildState.deviceId!, lastBuildState.platform, lastBuildState.target!);
-				lastBuildDescription = `${nameForPlatform(lastBuildState.platform)} ${nameForTarget(lastBuildState.target!)} ${deviceName}`;
+				const deviceName = getDeviceNameFromId(lastBuildState.deviceId, lastBuildState.platform, lastBuildState.target);
+				lastBuildDescription = `${nameForPlatform(lastBuildState.platform)} ${nameForTarget(lastBuildState.target)} ${deviceName}`;
 			} catch (error) {
 				console.log(error);
 				// Ignore and clear the state, we don't want to error due to a bad state
