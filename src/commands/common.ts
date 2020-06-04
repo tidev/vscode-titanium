@@ -70,7 +70,7 @@ export function checkLogin (): void {
 }
 
 export async function handleInteractionError (error: InteractionError): Promise<void> {
-	const actionToTake: any = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
+	const actionToTake = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
 	if (actionToTake) {
 		actionToTake.run();
 	}
