@@ -57,13 +57,15 @@ export function platforms (): string[] {
  * @param {String} targetPlatform - target platform.
  * @returns {String}
  */
-export function nameForPlatform (targetPlatform: string): PlatformPretty|undefined {
+export function nameForPlatform (targetPlatform: string): PlatformPretty {
 	targetPlatform =  normalisedPlatform(targetPlatform);
 	switch (targetPlatform) {
 		case 'android':
 			return PlatformPretty.android;
 		case 'ios':
 			return PlatformPretty.ios;
+		default:
+			throw new Error(`Unknown platform ${targetPlatform}`);
 	}
 }
 
