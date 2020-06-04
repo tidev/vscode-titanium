@@ -28,8 +28,8 @@ export async function createApplication (): Promise<void> {
 		const platforms = await selectPlatforms();
 		const enableServices = await yesNoQuestion({ placeHolder: 'Enable services?' });
 		const workspaceDir = await selectCreationLocation(lastCreationPath);
-		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir!.fsPath);
-		if (await fs.pathExists(path.join(workspaceDir!.fsPath, name))) {
+		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir.fsPath);
+		if (await fs.pathExists(path.join(workspaceDir.fsPath, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That app already exists. Would you like to overwrite?' }, true);
 		}
 
@@ -40,13 +40,13 @@ export async function createApplication (): Promise<void> {
 			logLevel,
 			name,
 			platforms,
-			workspaceDir: workspaceDir!.fsPath,
+			workspaceDir: workspaceDir.fsPath,
 		});
 		await ExtensionContainer.terminal.runCommandInBackground(args, { cancellable: false, location: ProgressLocation.Notification, title: 'Creating application' });
 		// TODO: Once workspace support is figured out, add an "add to workspace command"
 		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { modal: true }, { title: 'Open Project' });
 		if (dialog) {
-			const projectDir = Uri.file(path.join(workspaceDir!.fsPath, name));
+			const projectDir = Uri.file(path.join(workspaceDir.fsPath, name));
 			await commands.executeCommand(VSCodeCommands.OpenFolder, projectDir, true);
 		}
 	} catch (error) {
