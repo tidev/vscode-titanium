@@ -75,7 +75,7 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 	return quickPick(platforms);
 }
 
-export async function selectCreationLocation (lastUsed?: string): Promise<Uri|undefined> {
+export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
 	const items = [ {
 		label: 'Browse for directory',
 		id: 'browse'
@@ -95,6 +95,8 @@ export async function selectCreationLocation (lastUsed?: string): Promise<Uri|un
 		return filePath[0];
 	} else if (lastUsed && directory.id === 'last') {
 		return Uri.file(lastUsed);
+	} else {
+		throw new Error('No directory was selected');
 	}
 }
 
