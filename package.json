@@ -923,7 +923,7 @@
     "nyc": "^15.1.0",
     "sinon": "^9.0.2",
     "standard-version": "^8.0.0",
-    "typescript": "^3.9.3",
+    "typescript": "^3.9.5",
     "vscode-test": "^1.4.0"
   },
   "dependencies": {
