@@ -78,6 +78,16 @@ export abstract class TaskHelper {
 		builder.addOption('--target', definition.target as string);
 
 		builder.addQuotedOption('--sdk', project.sdk()[0]);
+
+		if (definition.extraArguments) {
+			for (const key in definition.extraArguments) {
+				if (definition.extraArguments[key] === '') {
+					builder.addFlag(key);
+				} else {
+					builder.addOption(key, definition.extraArguments[key] as string);
+				}
+			}
+		}
 	}
 
 	public async resolveCommonPackagingOptions (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
