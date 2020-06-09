@@ -712,53 +712,8 @@
                 "type": "string"
               },
               "extraArguments": {
-                "description": "Extra arguments to be used in the build",
-                "properties": {
-                  "--liveview-eport": {
-                    "description": "LiveView event server port",
-                    "type": "string"
-                  },
-                  "--liveview-fport": {
-                    "description": "LiveView file server port",
-                    "type": "string"
-                  },
-                  "--liveview-ip": {
-                    "description": "LiveView Server IP address",
-                    "type": "string"
-                  },
-                  "--launch-bundle-id": {
-                    "description": "after installing the app, launch an different app instead; only used when target is simulator",
-                    "type": "string"
-                  },
-                  "--watch-app-name": {
-                    "description": "when building an app with multiple watch app, the name of the watch app to launch; only used when target is simulator",
-                    "type": "string"
-                  },
-                  "--watch-device-id": {
-                    "description": "the watch simulator UDID to launch when building an app with awatch app; only used when target is simulator",
-                    "type": "string"
-                  },
-                  "--sigalg": {
-                    "description": "the type of a digital signature algorithm. only used when overriding keystore signing algorithm  [MD5withRSA, SHA1withRSA, SHA256withRSA]",
-                    "type": "string"
-                  },
-                  "--force-copy": {
-                    "description": "forces files to be copied instead of symlinked for simulator builds only",
-                    "type": "string"
-                  },
-                  "--launch-watch-app": {
-                    "description": "for simulator builds, after installing an app with a watch extention, launch the watch app and the main app",
-                    "type": "string"
-                  },
-                  "--launch-watch-app-only": {
-                    "description": "for simulator builds, after installing an app with a watch extention, launch the watch app instead of the main app",
-                    "type": "string"
-                  },
-                  "--sim-focus": {
-                    "description": "focus the iOS Simulator  [default: true]",
-                    "type": "string"
-                  }
-                }
+                "type": "array",
+                "description": "Extra arguments to be used in the build"
               },
               "ios": {
                 "description": "Properties used to configure iOS builds",

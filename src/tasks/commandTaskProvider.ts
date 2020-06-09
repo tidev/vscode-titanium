@@ -34,7 +34,7 @@ export interface TitaniumBuildBase {
 	projectType?: ProjectType;
 	android?: Record<string, unknown>;
 	ios?: Record<string, unknown>;
-	extraArguments?: any;
+	extraArguments?: Array<string>;
 }
 
 export abstract class CommandTaskProvider implements vscode.TaskProvider {
