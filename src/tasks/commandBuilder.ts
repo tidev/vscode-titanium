@@ -52,7 +52,7 @@ export class CommandBuilder {
 		return this;
 	}
 	public addArgs (args: Array<string>): CommandBuilder {
-		for (const arg in args) {
+		for (const arg of args) {
 			this.addArg(arg);
 		}
 		return this;
