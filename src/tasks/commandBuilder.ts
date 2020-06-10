@@ -51,6 +51,12 @@ export class CommandBuilder {
 		this.addArg(flag);
 		return this;
 	}
+	public addArgs (args: Array<string>): CommandBuilder {
+		for (const arg of args) {
+			this.addArg(arg);
+		}
+		return this;
+	}
 
 	public resolve (): string {
 		return this.args.map(arg => {

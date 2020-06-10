@@ -51,6 +51,10 @@ export abstract class TaskHelper {
 			.addOption('--platform', definition.platform)
 			.addFlag('--color') // We need this flag to force the colorization of output as using a pseudoterminal means we don't detect having a TTY
 			.addFlag('--no-prompt');
+
+		if (definition.extraArguments) {
+			builder.addArgs(definition.extraArguments);
+		}
 	}
 
 	public resolveCommonAppOptions (context: TaskExecutionContext, definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase, builder: CommandBuilder): void {
@@ -78,6 +82,7 @@ export abstract class TaskHelper {
 		builder.addOption('--target', definition.target as string);
 
 		builder.addQuotedOption('--sdk', project.sdk()[0]);
+
 	}
 
 	public async resolveCommonPackagingOptions (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
