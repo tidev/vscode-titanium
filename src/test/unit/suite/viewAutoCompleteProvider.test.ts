@@ -5,11 +5,11 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import * as tce from 'titanium-editor-commons';
 import * as vscode from 'vscode';
-import project from '../../project';
+import project from '../../../project';
 
-import { ViewCompletionItemProvider } from '../../providers/completion/viewCompletionItemProvider';
+import { ViewCompletionItemProvider } from '../../../providers/completion/viewCompletionItemProvider';
 
-const fixturesPath = path.join(__dirname, '../../..', 'src', 'test', 'suite', 'fixtures');
+const fixturesPath = path.join(__dirname, '../../../..', 'src', 'test', 'unit', 'suite', 'fixtures');
 const xmlFile = path.join(fixturesPath, 'sample.xml');
 const uri = vscode.Uri.file(xmlFile);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');

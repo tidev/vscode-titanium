@@ -48,10 +48,10 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}",
-                "--extensionTestsPath=${workspaceFolder}/out/test/"
+                "--extensionTestsPath=${workspaceFolder}/out/test/unit"
             ],
             "outFiles": [
-                "${workspaceFolder}/out/test/**/*.js"
+                "${workspaceFolder}/out/test/unit/**/*.js"
             ],
             "preLaunchTask": "npm: watch",
             "presentation": {
@@ -66,10 +66,10 @@
             "runtimeExecutable": "${execPath}",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}",
-                "--extensionTestsPath=${workspaceFolder}/out/test/"
+                "--extensionTestsPath=${workspaceFolder}/out/test/unit"
             ],
             "outFiles": [
-                "${workspaceFolder}/out/test/**/*.js"
+                "${workspaceFolder}/out/test/unit/**/*.js"
             ],
             "preLaunchTask": "npm: watch",
             "env": {

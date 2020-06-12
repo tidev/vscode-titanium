@@ -2,8 +2,8 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { IosCertificateType } from '../../types/common';
-import { getCorrectCertificateName, iOSProvisioningProfileMatchesAppId } from '../../utils';
+import { IosCertificateType } from '../../../types/common';
+import { getCorrectCertificateName, iOSProvisioningProfileMatchesAppId } from '../../../utils';
 
 describe('iOS provisioning profile matches app ID', () => {
 
