@@ -882,7 +882,7 @@
     "compile": "tsc -p ./",
     "lint": "eslint --ext .ts src/",
     "release": "node ./scripts/generate-settings-table.js &&  standard-version && npx vsce package",
-    "test": "COVERAGE=1 node ./out/test/runTest.js",
+    "test": "COVERAGE=1 node ./out/test/unit/runTest.js",
     "vscode:prepublish": "npm run compile",
     "pretest": "npm run compile",
     "watch": "tsc -watch -p ./"

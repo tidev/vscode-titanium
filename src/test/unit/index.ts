@@ -41,7 +41,7 @@ export async function run (): Promise<void> {
 	});
 	mocha.useColors(true);
 
-	const testsRoot = path.resolve(__dirname, '..');
+	const testsRoot = path.resolve(__dirname);
 
 	const files = glob.sync('**/**.test.js', { cwd: testsRoot });
 

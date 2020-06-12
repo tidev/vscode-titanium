@@ -5,11 +5,11 @@ import * as path from 'path';
 import * as sinon from 'sinon';
 import * as tce from 'titanium-editor-commons';
 import * as vscode from 'vscode';
-import project from '../../project';
+import project from '../../../project';
 
-import { ControllerCompletionItemProvider } from '../../providers/completion/controllerCompletionItemProvider';
+import { ControllerCompletionItemProvider } from '../../../providers/completion/controllerCompletionItemProvider';
 
-const fixturesPath = path.join(__dirname, '../../..', 'src', 'test', 'suite', 'fixtures');
+const fixturesPath = path.join(__dirname, '../../../..', 'src', 'test', 'unit', 'suite', 'fixtures');
 const file = path.join(fixturesPath, 'sample.js');
 const uri = vscode.Uri.file(file);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
