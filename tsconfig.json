@@ -20,6 +20,7 @@
         "node_modules",
         ".vscode-test",
         "out",
-        "scripts"
+        "scripts",
+        "test-resources"
     ]
 }

@@ -8,3 +8,4 @@ out.json
 junit_report.xml
 coverage/
 .nyc_output/
+test-resources/

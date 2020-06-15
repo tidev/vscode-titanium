@@ -35,6 +35,7 @@
     "node": ">=12.4.0"
   },
   "activationEvents": [
+    "*",
     "onDebug",
     "onCommand:titanium.create.application",
     "onCommand:titanium.create.module",
@@ -883,6 +884,7 @@
     "lint": "eslint --ext .ts src/",
     "release": "node ./scripts/generate-settings-table.js &&  standard-version && npx vsce package",
     "test": "COVERAGE=1 node ./out/test/unit/runTest.js",
+    "test:integration": "node ./out/test/integration/runTests.js",
     "vscode:prepublish": "npm run compile",
     "pretest": "npm run compile",
     "watch": "tsc -watch -p ./"
@@ -928,6 +930,8 @@
     "sinon": "^9.0.2",
     "standard-version": "^8.0.1",
     "typescript": "^3.9.6",
+    "vscode-extension-tester": "^3.0.2",
+    "vscode-extension-tester-native": "^3.0.0",
     "vscode-test": "^1.4.0"
   },
   "dependencies": {
