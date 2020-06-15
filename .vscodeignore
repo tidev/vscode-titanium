@@ -13,3 +13,4 @@ vsc-extension-quickstart.md
 Jenkinsfile
 scripts/
 junit_report.xml
+test-resources/
