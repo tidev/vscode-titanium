@@ -1,4 +1,4 @@
-import { WebDriver, Workbench, InputBox } from 'vscode-extension-tester';
+import { WebDriver, Workbench, InputBox, BottomBarPanel } from 'vscode-extension-tester';
 import { DialogHandler } from 'vscode-extension-tester-native';
 import { notificationExists } from './common';
 
@@ -29,7 +29,16 @@ export class ProjectCreator {
 		await this.setEnableServices(options.enableServices);
 		await this.setFolder(options.folder);
 
-		await this.driver.wait(() => notificationExists('Creating application'), 1000);
+		try {
+			await this.driver.wait(() => notificationExists('Creating application'), 1000);
+		} catch (error) {
+			// If this notification doesn't show then it's due to the command failing,
+			// so lets scoop the output from the output view
+			const outputView = await new BottomBarPanel().openOutputView();
+			// await outputView.selectChannel('Appcelerator');
+			const text = await outputView.getText();
+			throw new Error(`Failed to create application. Output error was ${text}`);
+		}
 
 		await this.driver.wait(async () => {
 			// We need to sleep here as there are times when the 'Creating application' notification
@@ -48,7 +57,16 @@ export class ProjectCreator {
 		await this.setPlatforms(options.platforms);
 		await this.setFolder(options.folder);
 
-		await this.driver.wait(() => notificationExists('Creating module'), 1000);
+		try {
+			await this.driver.wait(() => notificationExists('Creating module'), 1000);
+		} catch (error) {
+			// If this notification doesn't show then it's due to the command failing,
+			// so lets scoop the output from the output view
+			const outputView = await new BottomBarPanel().openOutputView();
+			// await outputView.selectChannel('Appcelerator');
+			const text = await outputView.getText();
+			throw new Error(`Failed to create module. Output error was ${text}`);
+		}
 
 		await this.driver.wait(async () => {
 			// We need to sleep here as there are times when the 'Creating module' notification

@@ -7,7 +7,7 @@ timestamps {
   def nodeVersion = '10.17.0'
   def npmVersion = 'latest'
 
-  node('osx') {
+  node('sakai-macos') {
     stage('Checkout') {
       checkout([
         $class: 'GitSCM',

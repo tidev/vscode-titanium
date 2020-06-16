@@ -8,7 +8,7 @@ function setupCoverage () {
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const NYC = require('nyc');
 	const nyc = new NYC({
-		cwd: path.join(__dirname, '..', '..'),
+		cwd: path.join(__dirname, '..', '..', '..'),
 		exclude: [ '.vscode-test/**', '**/test/**' ],
 		reporter: [ 'cobertura', 'html', 'text' ],
 		all: true,
@@ -27,7 +27,7 @@ function setupCoverage () {
 export async function run (): Promise<void> {
 	const nyc = process.env.COVERAGE ? setupCoverage() : null;
 
-	const reportPath = path.join(__dirname, '..', '..', 'junit_report.xml');
+	const reportPath = path.join(__dirname, '..', '..', '..', 'junit_report.xml');
 
 	const mocha = new Mocha({
 		ui: 'tdd',
@@ -62,7 +62,7 @@ export async function run (): Promise<void> {
 	} finally {
 		if (nyc) {
 			nyc.writeCoverageFile();
-			nyc.report();
+			await nyc.report();
 		}
 	}
 }
