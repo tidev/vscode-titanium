@@ -28,7 +28,7 @@ describe('Application creation', function () {
 		await fs.remove(tempDirectory.name);
 	});
 
-	it('should be able to create a project', async function () {
+	it.only('should be able to create a project', async function () {
 		this.timeout(60000);
 		const name = 'vscode-e2e-test-app';
 		const creator = new ProjectCreator(driver);
