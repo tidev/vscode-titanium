@@ -42,7 +42,7 @@ export async function createModule (): Promise<void> {
 		});
 		await ExtensionContainer.terminal.runCommandInBackground(args, { cancellable: false, location: ProgressLocation.Notification, title: 'Creating module' });
 		// TODO: Once workspace support is figured out, add an "add to workspace command"
-		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { modal: true }, { title: 'Open Project' });
+		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { title: 'Open Project' });
 		if (dialog) {
 			const projectDir = Uri.file(path.join(workspaceDir.fsPath, name));
 			await commands.executeCommand(VSCodeCommands.OpenFolder, projectDir, true);
