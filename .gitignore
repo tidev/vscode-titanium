@@ -9,3 +9,4 @@ junit_report.xml
 coverage/
 .nyc_output/
 test-resources/
+junit_report-ui.xml

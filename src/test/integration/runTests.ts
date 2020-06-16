@@ -10,7 +10,7 @@ async function main (): Promise<void> {
 	try {
 		await testSetup();
 		const tester = new ExTester(undefined, undefined, tempDirectory.name);
-		tester.setupAndRunTests(undefined, 'out/test/integration/suite/**/*.test.js');
+		tester.setupAndRunTests(undefined, 'out/test/integration/suite/**/*.test.js', undefined, false, true, '/Users/awam/git/editors/vscode-appcelerator-titanium/src/test/integration/.mocharc.js');
 	} finally {
 		fs.removeSync(tempDirectory.name);
 	}
