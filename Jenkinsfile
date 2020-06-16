@@ -1,6 +1,8 @@
 #! groovy
-library 'pipeline-library'
+@Library('pipeline-library')
+import com.axway.AppcCLI;
 
+def appc = new AppcCLI(steps)
 timestamps {
   def nodeVersion = '10.17.0'
   def npmVersion = 'latest'
@@ -27,6 +29,8 @@ timestamps {
 
         stage('Lint and Test') {
           sh 'npm run lint'
+
+          // Run unit tests
           try {
             sh 'npm run test'
           } finally {
@@ -38,6 +42,14 @@ timestamps {
               def warningMessage = "Failed to collect coverage, coverage folder contents was ${coverageContents}"
               echo warningMessage
               manager.addWarningBadge(warningMessage)
+            }
+          }
+          appc.loggedIn {
+            // Run ui/e2e tests
+            try {
+              sh './runUITests.sh'
+            } finally {
+              junit 'junit_report-ui.xml'
             }
           }
         } // stage lint and test
