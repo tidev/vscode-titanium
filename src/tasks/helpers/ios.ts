@@ -20,6 +20,7 @@ export interface IosBuildTaskTitaniumBuildBase extends AppBuildTaskTitaniumBuild
 	ios: {
 		certificate?: string;
 		provisioningProfile?: string;
+		simulatorVersion?: string;
 	};
 	target?: 'device' | 'simulator';
 	platform: 'ios';
@@ -49,7 +50,7 @@ export class IosHelper extends TaskHelper {
 				const deviceInfo = await selectiOSDevice();
 				definition.deviceId = deviceInfo.udid;
 			} else if (definition.target === 'simulator') {
-				const simulatorInfo = await selectiOSSimulator();
+				const simulatorInfo = await selectiOSSimulator(definition.ios?.simulatorVersion);
 				definition.deviceId = simulatorInfo.udid;
 			} else {
 				throw new Error(`Invalid build target ${definition.target}`);
