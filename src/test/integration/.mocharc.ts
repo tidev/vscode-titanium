@@ -1,4 +1,4 @@
-const path = require('path');
+import * as path from 'path';
 const reportPath = path.join(__dirname, '..', '..', '..', 'junit_report-ui.xml');
 
 module.exports = {
