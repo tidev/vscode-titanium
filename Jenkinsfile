@@ -4,10 +4,10 @@ import com.axway.AppcCLI;
 
 def appc = new AppcCLI(steps)
 timestamps {
-  def nodeVersion = '10.17.0'
+  def nodeVersion = '12.18.0'
   def npmVersion = 'latest'
 
-  node('sakai-macos') {
+  node('osx') {
     stage('Checkout') {
       checkout([
         $class: 'GitSCM',
@@ -47,7 +47,12 @@ timestamps {
           appc.loggedIn {
             // Run ui/e2e tests
             try {
-              sh './runUITests.sh'
+              def nodePath = tool name: "node ${nodeVersion}"
+              withEnv(["PATH+NODEJS=${nodePath}"]) {
+                echo "PATH is: $PATH"
+                sh './runUITests.sh'
+              }
+
             } finally {
               sh 'ls'
               junit 'junit_report-ui.xml'

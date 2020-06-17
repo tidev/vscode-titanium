@@ -22,5 +22,9 @@
         "out",
         "scripts",
         "test-resources"
+    ],
+    "include": [
+        "src/**/*.ts",
+        "src/**/.*.ts"
     ]
 }
