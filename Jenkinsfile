@@ -49,6 +49,7 @@ timestamps {
             try {
               sh './runUITests.sh'
             } finally {
+              sh 'ls'
               junit 'junit_report-ui.xml'
             }
           }

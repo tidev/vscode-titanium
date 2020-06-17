@@ -46,7 +46,7 @@ export class ProjectCreator {
 			// causes errors to be thrown that can't be handled
 			await this.driver.sleep(500);
 			return notificationExists('Project created');
-		}, 25000);
+		}, 45000);
 	}
 
 	public async createModule (options: ModuleCreateOptions): Promise<void> {
@@ -74,7 +74,7 @@ export class ProjectCreator {
 			// causes errors to be thrown that can't be handled
 			await this.driver.sleep(500);
 			return notificationExists('Project created');
-		}, 25000);
+		}, 45000);
 	}
 
 	public async setEnableServices(enableServices: boolean): Promise<void> {
@@ -87,10 +87,11 @@ export class ProjectCreator {
 
 	public async setFolder(folder: string): Promise<void> {
 		const input = await InputBox.create();
+		await input.setText('Enter');
 		await input.confirm();
-		const dialog = await DialogHandler.getOpenDialog();
-		await dialog.selectPath(folder);
-		await dialog.confirm();
+
+		await input.setText(folder);
+		await input.confirm();
 	}
 
 	public async setId(id: string): Promise<void> {
