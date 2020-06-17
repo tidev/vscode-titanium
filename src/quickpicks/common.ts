@@ -76,10 +76,16 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 }
 
 export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
-	const items = [ {
-		label: 'Browse for directory',
-		id: 'browse'
-	} ];
+	const items = [
+		{
+			label: 'Browse for directory',
+			id: 'browse'
+		},
+		{
+			label: 'Enter path',
+			id: 'enter'
+		}
+	];
 	if (lastUsed) {
 		items.push({
 			label: `Last used ${lastUsed}`,
@@ -95,6 +101,12 @@ export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
 		return filePath[0];
 	} else if (lastUsed && directory.id === 'last') {
 		return Uri.file(lastUsed);
+	} else if (directory.id === 'enter') {
+		const directory = await inputBox({ placeHolder: 'Enter your path' });
+		if (!await pathExists(directory)) {
+			throw new Error(`${directory} does not exist`);
+		}
+		return Uri.file(directory);
 	} else {
 		throw new Error('No directory was selected');
 	}
