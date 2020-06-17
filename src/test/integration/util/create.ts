@@ -40,13 +40,22 @@ export class ProjectCreator {
 			throw new Error(`Failed to create application. Output error was ${text}`);
 		}
 
-		await this.driver.wait(async () => {
-			// We need to sleep here as there are times when the 'Creating application' notification
-			// is still shown but is dismissed by the time we get the text in notificationExists and
-			// causes errors to be thrown that can't be handled
-			await this.driver.sleep(500);
-			return notificationExists('Project created');
-		}, 45000);
+		try {
+			await this.driver.wait(async () => {
+				// We need to sleep here as there are times when the 'Creating application' notification
+				// is still shown but is dismissed by the time we get the text in notificationExists and
+				// causes errors to be thrown that can't be handled
+				await this.driver.sleep(500);
+				return notificationExists('Project created');
+			}, 45000);
+		} catch (error) {
+			// If this notification doesn't show then it's due to the command failing,
+			// so lets scoop the output from the output view
+			const outputView = await new BottomBarPanel().openOutputView();
+			// await outputView.selectChannel('Appcelerator');
+			const text = await outputView.getText();
+			throw new Error(`Failed to create application. Output error was ${text}`);
+		}
 	}
 
 	public async createModule (options: ModuleCreateOptions): Promise<void> {
@@ -68,13 +77,23 @@ export class ProjectCreator {
 			throw new Error(`Failed to create module. Output error was ${text}`);
 		}
 
-		await this.driver.wait(async () => {
-			// We need to sleep here as there are times when the 'Creating module' notification
-			// is still shown but is dismissed by the time we get the text in notificationExists and
-			// causes errors to be thrown that can't be handled
-			await this.driver.sleep(500);
-			return notificationExists('Project created');
-		}, 45000);
+		try {
+			await this.driver.wait(async () => {
+				// We need to sleep here as there are times when the 'Creating module' notification
+				// is still shown but is dismissed by the time we get the text in notificationExists and
+				// causes errors to be thrown that can't be handled
+				await this.driver.sleep(500);
+				return notificationExists('Project created');
+			}, 45000);
+		} catch (error) {
+			// If this notification doesn't show then it's due to the command failing,
+			// so lets scoop the output from the output view
+			const outputView = await new BottomBarPanel().openOutputView();
+			// await outputView.selectChannel('Appcelerator');
+			const text = await outputView.getText();
+			throw new Error(`Failed to create module. Output error was ${text}`);
+		}
+
 	}
 
 	public async setEnableServices(enableServices: boolean): Promise<void> {
