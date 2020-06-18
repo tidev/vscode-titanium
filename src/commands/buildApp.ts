@@ -89,7 +89,7 @@ export async function buildApplication (node: DeviceNode | OSVerNode | PlatformN
 			}
 
 			if (node?.version) {
-				// TODO need to copy across the iOS simulator version
+				taskDefinition.definition.titaniumBuild.ios = { simulatorVersion: node.version };
 			}
 
 			if (node?.deviceId) {

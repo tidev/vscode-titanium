@@ -246,6 +246,9 @@ export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQu
 	if (!iOSVersion) {
 		iOSVersion = (await selectiOSSimulatorVersion()).label; // eslint-disable-line require-atomic-updates
 	}
+	if (!appc.iOSSimulatorVersions().includes(iOSVersion)) {
+		throw new Error(`iOS Version ${iOSVersion} does not exist`);
+	}
 	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
 	return quickPick(simulators, { placeHolder: 'Select simulator' }) as Promise<CustomQuickPick & { udid: string }>;
 }

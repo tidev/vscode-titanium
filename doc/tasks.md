@@ -26,6 +26,7 @@ There are no Android specific configuration options for the build task.
 | -------- | ----------- | ------------- | ----------- |
 | `ios.certificate` | Certificate name to use when signing device builds | None, prompted for on device builds | N/A |
 | `ios.provisioningProfile` | Provisioning Profile UUID to use when signing device builds | None, prompted for on device builds | N/A |
+| `ios.simulatorVersion` | Simulator Version to use when running Simulator builds | None, prompted for on simulator builds | N/A |
 
 ### Sample Build Task Configurations
 

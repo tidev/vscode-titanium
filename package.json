@@ -725,6 +725,10 @@
                   "certificate": {
                     "description": "Certificate name to be used",
                     "type": "string"
+                  },
+                  "simulatorVersion": {
+                    "description": "Simulator version to be used",
+                    "type": "string"
                   }
                 }
               },
