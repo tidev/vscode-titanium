@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.7.1...v0.8.0) (2020-06-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* **build explorer:** Windows devices and emulators will no longer be detected
+* **debugger:** Setting deviceId and target in a launch configurations is no longer supported. Use the preLaunchTask to set targets and device details or use the prompting flow
+
+### Features
+
+* **commands:** add option to rerun build and package commands on error ([#314](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/314)) ([6d80c19](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/6d80c197f7c456df5b99b2cc1cbc442123c6a63d))
+* **debugging:** allow starting a debug session from build explorer ([4905f78](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/4905f7859a901fd9a978ddbca2d57ed65bc232c3))
+* **tasks:** resolve keystore relative to task folder ([1949670](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/1949670ab8a69598c7306cf63155fd83c5139a98))
+* added extra arguments functionality and definitions ([#322](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/322)) ([6640eff](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/6640effedccf5156d524eabd897dcdf2b8ddcaa4))
+* contribute task providers ([#257](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/257)) ([4921d29](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/4921d29c159b4ff987cb9731bca9aefffe868a1e))
+
+
+### Bug Fixes
+
+* **action-provider:** re-enable view code action provider ([#247](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/247)) ([207b952](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/207b9522141cff7e68f167c4cb19a2060c801d33)), closes [#162](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/162)
+* **generate:** fixed typo in alloy generate components ([#265](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/265)) ([e4e8822](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/e4e8822cd4a1b4c0753f9226b38fce43be4f4955))
+* **tasks:** allow cancelling task using ctrl+c ([cd0352f](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/cd0352f85c41a3e81c901c97b45e64d3a55e4671))
+* **tasks:** respect global liveview setting ([172ec8c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/172ec8c5bda67caa039073923a73d92fd122d5d3))
+* **build explorer:** only show right click build on nodes ([faccb35](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/faccb35a892d4d08442e88dbaf355645ba5de7e5))
+
 ### [0.7.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.7.0...v0.7.1) (2020-04-06)
 
 
