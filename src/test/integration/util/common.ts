@@ -34,6 +34,7 @@ export async function notificationExists(text: string): Promise<Notification | u
  * @param {Object} tiapp - A tiapp representation from xml2js
  * @returns {String[]} Array of platforms
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function parsePlatformsFromTiapp (tiapp: any): string[] {
 	return tiapp['deployment-targets'][0].target
 		.filter((target: Target) => target._ === 'true')

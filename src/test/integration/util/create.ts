@@ -1,5 +1,4 @@
 import { WebDriver, Workbench, InputBox, BottomBarPanel } from 'vscode-extension-tester';
-import { DialogHandler } from 'vscode-extension-tester-native';
 import { notificationExists } from './common';
 
 /**
