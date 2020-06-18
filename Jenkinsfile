@@ -6,6 +6,7 @@ def appc = new AppcCLI(steps)
 timestamps {
   def nodeVersion = '12.18.0'
   def npmVersion = 'latest'
+  def sdkVersion = '9.0.3.GA'
 
   node('osx') {
     stage('Checkout') {
@@ -27,10 +28,11 @@ timestamps {
           } // timeout
         } // stage install
 
-        stage('Lint and Test') {
+        stage('Lint') {
           sh 'npm run lint'
+        } // stage lint
 
-          // Run unit tests
+        stage('Unit Test') {
           try {
             sh 'npm run test'
           } finally {
@@ -44,21 +46,21 @@ timestamps {
               manager.addWarningBadge(warningMessage)
             }
           }
+        } // stage unit test
+
+        stage('Integration Test') {
+          appc.install()
+          appc.installAndSelectSDK(sdkVersion)
           appc.loggedIn {
             // Run ui/e2e tests
             try {
-              def nodePath = tool name: "node ${nodeVersion}"
-              withEnv(["PATH+NODEJS=${nodePath}"]) {
-                echo "PATH is: $PATH"
-                sh './runUITests.sh'
-              }
-
+              sh './runUITests.sh'
             } finally {
               sh 'ls'
               junit 'junit_report-ui.xml'
             }
           }
-        } // stage lint and test
+        } // stage integration
 
         stage('Build vsix') {
           // Create the vsix package
