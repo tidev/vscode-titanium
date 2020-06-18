@@ -34,6 +34,20 @@ You're now up and running with the extension running in another workspace. When 
 
 If you want to test debugging from the build tree view, then you will need to set the `debugServer` property in the debug configuration passed to the `vscode.debug.startDebugging` call in the Debug command
 
+## Writing tests
+
+There are two type of tests in the extension, unit tests and integration tests. Unit tests focus on testing the smaller utilities function that are used in the code, whereas the integration tests focus on testing the areas where we depend on interaction with tooling.
+
+All tests are written using [mocha](https://mochajs.org/) and [chai expect](https://www.chaijs.com/api/bdd/).
+
+### Unit tests
+
+Unit tests live under the `src/test/unit` folder, you can run these tests using the `npm run test` command or one of the `Extension Tests` launch configurations.
+
+### Integration tests
+
+Integration tests live under the `src/test/integration` folder, you can run these tests using the `runUITest.sh` script in the root of the project. The automation is written using [vscode-extension-tester](https://github.com/redhat-developer/vscode-extension-tester), you can find a guide to using the automation package in their [wiki](https://github.com/redhat-developer/vscode-extension-tester/wiki)
+
 ## Sending in a PR
 
 When sending in a PR please make sure you do the following:
