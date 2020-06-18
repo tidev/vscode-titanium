@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EditorView, VSBrowser, WebDriver, Workbench } from 'vscode-extension-tester';
+import { EditorView, VSBrowser, WebDriver } from 'vscode-extension-tester';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
