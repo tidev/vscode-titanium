@@ -26,9 +26,7 @@ There are no prerequisites for debugging an application on Android.
 
 - To debug an application on iOS you must install [ios-webkit-debug-proxy](https://github.com/google/ios-webkit-debug-proxy). The latest versions of `usbmuxd` and `libimobiledevice` are required to ensure compatability with the latest iOS versions.
   1. Firstly ensure you have [brew](https://brew.sh/) installed.
-  2. Install the latest `usbmuxd` using `brew install --HEAD usbmuxd`
-  3. Install the latest `libimobiledevice` using `brew install --HEAD libimobiledevice`
-  4. Install `ios_webkit_debug_proxy` `brew install ios-webkit-debug-proxy`
+  2. Install `ios_webkit_debug_proxy` `brew install ios-webkit-debug-proxy`
 - To debug on an iOS device, you must enable the [web inspector in safari](https://developer.apple.com/library/archive/documentation/AppleApplications/Conceptual/Safari_Developer_Guide/GettingStarted/GettingStarted.html#//apple_ref/doc/uid/TP40007874-CH2-SW8)
 
 ## Debugging from the Build Explorer
