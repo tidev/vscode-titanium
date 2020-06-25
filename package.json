@@ -901,7 +901,7 @@
     "@types/mocha": "^7.0.2",
     "@types/ms": "^0.7.31",
     "@types/node": "12.12.0",
-    "@types/semver": "^7.2.0",
+    "@types/semver": "^7.3.1",
     "@types/sinon": "^9.0.4",
     "@types/underscore": "^1.10.1",
     "@types/uuid": "^3.4.7",
