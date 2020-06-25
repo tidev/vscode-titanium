@@ -98,7 +98,7 @@ export abstract class TaskHelper {
 			if (useDefaultOutputChoice) {
 				definition.outputDirectory = defaultOutput;
 			} else {
-				const customDirectory = await vscode.window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
+				const customDirectory = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false });
 				if (!customDirectory) {
 					throw new UserCancellation();
 				}
