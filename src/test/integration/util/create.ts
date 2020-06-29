@@ -1,23 +1,10 @@
-import { WebDriver, Workbench, InputBox, BottomBarPanel } from 'vscode-extension-tester';
-import { notificationExists } from './common';
+import { InputBox } from 'vscode-extension-tester';
+import { notificationExists, CommonUICreator } from './common';
 
 /**
  * Wrapper around the project creation flow to make it slightly easier to test
  */
-export class ProjectCreator {
-
-	private driver: WebDriver;
-	private workbench: Workbench;
-
-	/**
-	 * Creates a ProjectCreator
-	 * @param {WebDriver} driver - Webdriver instance
-	 * @param {Workbench} workbench - Workbench instance
-	 */
-	constructor(driver: WebDriver) {
-		this.driver = driver;
-		this.workbench = new Workbench();
-	}
+export class ProjectCreator extends CommonUICreator {
 
 	public async createApp(options: AppCreateOptions): Promise<void> {
 		await this.workbench.executeCommand('Titanium: Create Titanium application');
@@ -33,9 +20,7 @@ export class ProjectCreator {
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
-			const outputView = await new BottomBarPanel().openOutputView();
-			// await outputView.selectChannel('Appcelerator');
-			const text = await outputView.getText();
+			const text = await this.getErrorOutput();
 			throw new Error(`Failed to create application. Output error was ${text}`);
 		}
 
@@ -50,9 +35,7 @@ export class ProjectCreator {
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
-			const outputView = await new BottomBarPanel().openOutputView();
-			// await outputView.selectChannel('Appcelerator');
-			const text = await outputView.getText();
+			const text = await this.getErrorOutput();
 			throw new Error(`Failed to create application. Output error was ${text}`);
 		}
 	}
@@ -70,9 +53,7 @@ export class ProjectCreator {
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
-			const outputView = await new BottomBarPanel().openOutputView();
-			// await outputView.selectChannel('Appcelerator');
-			const text = await outputView.getText();
+			const text = await this.getErrorOutput();
 			throw new Error(`Failed to create module. Output error was ${text}`);
 		}
 
@@ -87,9 +68,7 @@ export class ProjectCreator {
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
-			const outputView = await new BottomBarPanel().openOutputView();
-			// await outputView.selectChannel('Appcelerator');
-			const text = await outputView.getText();
+			const text = await this.getErrorOutput();
 			throw new Error(`Failed to create module. Output error was ${text}`);
 		}
 

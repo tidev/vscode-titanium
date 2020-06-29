@@ -1,4 +1,4 @@
-import { Notification, Workbench } from 'vscode-extension-tester';
+import { Notification, Workbench, WebDriver, BottomBarPanel } from 'vscode-extension-tester';
 import  * as cp from 'child_process';
 import { promisify } from 'util';
 
@@ -49,5 +49,24 @@ export async function dismissNotifications(): Promise<void> {
 	for (const notification of notifications) {
 		await notification.dismiss();
 		await notification.getDriver().sleep(100);
+	}
+}
+
+/**
+ * Common class for classes that wrap UI functionality to extend
+ */
+export class CommonUICreator {
+	protected driver: WebDriver;
+	protected workbench: Workbench;
+
+	constructor(driver: WebDriver) {
+		this.driver = driver;
+		this.workbench = new Workbench();
+	}
+
+	public async getErrorOutput (): Promise<string> {
+		const outputView = await new BottomBarPanel().openOutputView();
+		// TODO: do we need to make sure it's highlighted await outputView.selectChannel('Appcelerator');
+		return await outputView.getText();
 	}
 }
