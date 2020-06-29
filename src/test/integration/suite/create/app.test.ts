@@ -4,8 +4,8 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
 import * as xml2js from 'xml2js';
-import { parsePlatformsFromTiapp, dismissNotifications } from '../util/common';
-import { ProjectCreator } from '../util/create';
+import { parsePlatformsFromTiapp, dismissNotifications } from '../../util/common';
+import { ProjectCreator } from '../../util/create';
 
 describe('Application creation', function () {
 	this.timeout(30000);

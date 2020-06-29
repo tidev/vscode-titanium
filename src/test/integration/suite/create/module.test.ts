@@ -3,8 +3,8 @@ import { EditorView, VSBrowser, WebDriver } from 'vscode-extension-tester';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
-import { ProjectCreator } from '../util/create';
-import { dismissNotifications } from '../util/common';
+import { ProjectCreator } from '../../util/create';
+import { dismissNotifications } from '../../util/common';
 
 describe('Module creation', function () {
 	this.timeout(30000);
