@@ -1,6 +1,7 @@
-import { Notification, Workbench, WebDriver, BottomBarPanel } from 'vscode-extension-tester';
-import  * as cp from 'child_process';
+import { BottomBarPanel, InputBox, Notification, Workbench, WebDriver } from 'vscode-extension-tester';
 import { promisify } from 'util';
+import  * as cp from 'child_process';
+import * as path from 'path';
 
 const exec = promisify(cp.exec);
 
@@ -69,4 +70,36 @@ export class CommonUICreator {
 		// TODO: do we need to make sure it's highlighted await outputView.selectChannel('Appcelerator');
 		return await outputView.getText();
 	}
+
+	public async openFolder (folder: string): Promise<void> {
+		await this.workbench.executeCommand('extest open folder');
+		const input = await InputBox.create();
+		await input.setText(folder);
+		await input.confirm();
+
+		await new Promise((resolve) => {
+			setTimeout(resolve, 2000);
+		});
+	}
+}
+
+/**
+ * Returns the path to the fixtures directory
+ *
+ * @returns {String}
+ */
+export function getFixturesDirectory (): string {
+	return path.join(__dirname, '../../../..', 'src', 'test', 'integration', 'fixtures');
+}
+
+/**
+ * Returns string with capitalized first letter
+ * This should eventually be replaced with the one used from `src/utils.ts` but as that references
+ * the `vscode` package we can't do that.
+ *
+ * @param {String} s - string.
+ * @returns {String}
+ */
+export function  capitalizeFirstLetter (s: string): string {
+	return s.charAt(0).toUpperCase() + s.slice(1);
 }
