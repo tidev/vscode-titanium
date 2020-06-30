@@ -1,7 +1,7 @@
 import { TaskExecutionContext, ProjectType } from '../tasksHelper';
 import { CommandBuilder } from '../commandBuilder';
 import { ExtensionContainer } from '../../container';
-import { yesNoQuestion } from '../../quickpicks';
+import { quickPick } from '../../quickpicks';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -94,21 +94,38 @@ export abstract class TaskHelper {
 
 		if (!definition.outputDirectory) {
 			const defaultOutput = path.join(definition.projectDir, 'dist');
-			const useDefaultOutputChoice = await yesNoQuestion({ placeHolder: `Use default output directory ${defaultOutput}?` }, false, [ 'Yes', 'Choose custom output directory' ]);
-			if (useDefaultOutputChoice) {
-				definition.outputDirectory = defaultOutput;
-			} else {
+
+			const options = [ `Defualt: ${defaultOutput}`, 'Browse' ];
+
+			if ((definition as AppPackageTaskTitaniumBuildBase).target === 'dist-appstore') {
+				options.push('Output Into Xcode');
+			}
+
+			const selected = await quickPick(options, {
+				canPickMany: false,
+				placeHolder: 'Choose output location'
+			}, {
+				forceShow: true
+			});
+
+			if (selected === 'Output Into Xcode') {
+				return;
+			} else if (selected === 'Browse') {
 				const customDirectory = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false });
 				if (!customDirectory) {
 					throw new UserCancellation();
 				}
 				definition.outputDirectory = customDirectory[0].fsPath;
+				builder.addQuotedOption('--output-dir', definition.outputDirectory);
+			} else {
+				definition.outputDirectory = defaultOutput;
+				builder.addQuotedOption('--output-dir', definition.outputDirectory);
+
 			}
 		} else if (!await fs.pathExists(definition.outputDirectory)) {
 			throw new Error(`Provided output directory ${definition.outputDirectory} cannot be found`);
 		}
 
-		builder.addQuotedOption('--output-dir', definition.outputDirectory);
 	}
 
 	public async determineProjectType (directory: string, platform: string): Promise<ProjectType> {
