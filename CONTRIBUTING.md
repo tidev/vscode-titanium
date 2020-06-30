@@ -46,7 +46,9 @@ Unit tests live under the `src/test/unit` folder, you can run these tests using 
 
 ### Integration tests
 
-Integration tests live under the `src/test/integration` folder, you can run these tests using the `runUITest.sh` script in the root of the project. The automation is written using [vscode-extension-tester](https://github.com/redhat-developer/vscode-extension-tester), you can find a guide to using the automation package in their [wiki](https://github.com/redhat-developer/vscode-extension-tester/wiki)
+Integration tests live under the `src/test/integration` folder, you can run these tests using the `runUITest.sh` script in the root of the project. The automation is written using [vscode-extension-tester](https://github.com/redhat-developer/vscode-extension-tester), you can find a guide to using the automation package in their [wiki](https://github.com/redhat-developer/vscode-extension-tester/wiki).
+
+The tests run outside of VS Code in a node process, so you are unable to use any code that references the `vscode` package.
 
 ## Sending in a PR
 
