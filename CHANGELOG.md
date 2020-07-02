@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.9.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.8.0...v0.9.0) (2020-07-02)
+
+
+### Features
+
+* added ability to output iOS App Store builds to Xcode ([#341](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/341)) ([4d1b9fe](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/4d1b9fe8061a96a9cb97e3e797534e8d47e19fca)), closes [#338](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/338)
+* allowed simulatorVersion to be set on iOS tasks ([#327](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/327)) ([ffbb617](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ffbb617ae4934011210135eac43f28e3ca721f70))
+
+
+### Bug Fixes
+
+* **packaging:** allow selecting folders during packaging ([c28a02b](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c28a02b9bc99ce891bbe95ae415a13a996aa8661)), closes [#337](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/337)
+
 ## [0.8.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.7.1...v0.8.0) (2020-06-18)
 
 
