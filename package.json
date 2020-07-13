@@ -889,7 +889,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^9.0.1",
-    "@commitlint/config-conventional": "^9.0.1",
+    "@commitlint/config-conventional": "^9.1.1",
     "@seadub/danger-plugin-dependencies": "^0.1.0",
     "@seadub/danger-plugin-eslint": "^1.0.1",
     "@seadub/danger-plugin-junit": "^0.1.2",
