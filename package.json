@@ -888,7 +888,7 @@
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@commitlint/cli": "^9.0.1",
+    "@commitlint/cli": "^9.1.1",
     "@commitlint/config-conventional": "^9.1.1",
     "@seadub/danger-plugin-dependencies": "^0.1.0",
     "@seadub/danger-plugin-eslint": "^1.0.1",
