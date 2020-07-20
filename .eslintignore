@@ -1,2 +1,2 @@
 dangerfile.js
-src/test/**/suite/fixtures/**/*
+src/test/**/fixtures/**/*

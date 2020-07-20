@@ -15,11 +15,10 @@ const contents = ejs.render(template, renderObject);
 
 fs.writeFileSync(path.join(__dirname, '..', 'test-output.md'), contents);
 
-
 function generateCommands() {
 	const { contributes: { commands, keybindings, menus } } = packageJson;
-	const keyBindingsMap = keybindings.reduce((o, keybinding) => ({ ...o, [keybinding.command]: { mac: keybinding.mac, other: keybinding.key }}), {});
-	const commandPaletteMap = menus.commandPalette.reduce((o, command) => ({...o, [command.command]: { when: command.when }}), {});
+	const keyBindingsMap = keybindings.reduce((o, keybinding) => ({ ...o, [keybinding.command]: { mac: keybinding.mac, other: keybinding.key } }), {});
+	const commandPaletteMap = menus.commandPalette.reduce((o, command) => ({ ...o, [command.command]: { when: command.when } }), {});
 	const commandInformation = [];
 	for (const { category, command, description, title } of commands) {
 		const activeInCommandPalette = commandPaletteMap[command];
@@ -56,7 +55,7 @@ function generateSettings() {
 }
 
 function buildKeybindingString (keybinding) {
-	let string = ``;
+	let string = '';
 	if (!keybinding) {
 		return '-';
 	}
@@ -65,19 +64,19 @@ function buildKeybindingString (keybinding) {
 	string = `${string} Mac: `;
 	for (let i = 0; i < splitMac.length; i++) {
 		const part = splitMac[i];
-		if (i < splitMac.length-1) {
-			string = `${string}<kbd>${part}</kbd>+`
+		if (i < splitMac.length - 1) {
+			string = `${string}<kbd>${part}</kbd>+`;
 		} else {
-			string = `${string}<kbd>${part}</kbd>`
+			string = `${string}<kbd>${part}</kbd>`;
 		}
 	}
 	string = `${string} <br> Windows/Linux: `;
 	for (let i = 0; i < splitOther.length; i++) {
 		const part = splitOther[i];
-		if (i < splitOther.length-1) {
-			string = `${string}<kbd>${part}</kbd>+`
+		if (i < splitOther.length - 1) {
+			string = `${string}<kbd>${part}</kbd>+`;
 		} else {
-			string = `${string}<kbd>${part}</kbd>`
+			string = `${string}<kbd>${part}</kbd>`;
 		}
 	}
 	return string;

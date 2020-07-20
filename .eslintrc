@@ -1,13 +1,19 @@
 {
-	"extends": [ "axway/env-node", "axway/+typescript" ],
-	"parserOptions": {
-		"project": "./tsconfig.json"
-	},
-	"rules": {
-		"node/no-unsupported-features/es-syntax": ["warn", {
-			"ignores": [
-				"modules"
-			]
-		}]
-	}
+	"extends": [ "axway/env-node" ],
+	"overrides": [
+		{
+			"extends": [ "axway/+typescript" ],
+			"files": [ "**/*.ts" ],
+			"parserOptions": {
+				"project": "./tsconfig.json"
+			},
+			"rules": {
+				"node/no-unsupported-features/es-syntax": ["warn", {
+					"ignores": [
+						"modules"
+					]
+				}]
+			}
+		}
+	]
 }
