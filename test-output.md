@@ -2,7 +2,6 @@
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/axway.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
 [![Version](https://vsmarketplacebadge.apphb.com/downloads-short/axway.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
-[![Greenkeeper badge](https://badges.greenkeeper.io/appcelerator/vscode-appcelerator-titanium.svg)](https://greenkeeper.io/)
 
 Appcelerator Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
 
@@ -49,6 +48,9 @@ This extension makes the following commands available in the Command Palette to 
 | `Titanium: Open related controller` | Open related controller |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> |
 | `Titanium: Open related files` | Open related files |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> |
 | `Titanium: Generate autocomplete list` | Generate autocomplete list | - |
+| `Titanium: Check For Updates` | Check For Updates | - |
+| `Titanium: Install All Updates` | Install All Updates | - |
+| `Titanium: Select Updates` | Select Updates | - |
 | `Titanium: Clean project` | Clean project | - |
 
 ### Titanium View
@@ -81,7 +83,6 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.general.useTerminalForBuild` | When true build/package commands will be run using the integrated terminal as opposed to using an output channel. | `true` |
 | `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
 | `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
-| `titanium.windows.publisherID` | Publisher ID | `No Default` |
 
 ## Snippet definitions
 
@@ -124,10 +125,6 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 ## Contributing
 
 See the [contributing guide](./CONTRIBUTING.md) for info
-
-## Credits
-
-Various icons used throughout the extension are sourced from the awesome [octicons project](https://octicons.github.com/).
 
 ## License
 

@@ -572,6 +572,15 @@
         {
           "command": "titanium.explorer.refresh",
           "when": "false"
+        },
+        {
+          "command": "titanium.updates.checkAll"
+        },
+        {
+          "command": "titanium.updates.installAll"
+        },
+        {
+          "command": "titanium.updates.select"
         }
       ],
       "editor/context": [
