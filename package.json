@@ -872,7 +872,8 @@
     }
   },
   "lint-staged": {
-    "*.ts": "npm run lint"
+    "*.ts": "npm run lint",
+    "*.js": "npm run lint"
   },
   "config": {
     "commitizen": {
@@ -897,8 +898,8 @@
   "scripts": {
     "commit": "git-cz",
     "compile": "tsc -p ./",
-    "generate-readme": "node ./scripts/readme/generate.js",
-    "lint": "eslint --ext .ts src/",
+    "generate-readme": "node ./scripts/render.js",
+    "lint": "eslint src/ scripts/",
     "release": "npm run generate-readme && standard-version && npx vsce package",
     "test": "COVERAGE=1 node ./out/test/unit/runTest.js",
     "test:integration": "node -e \"console.log('Hey there! You want to run the UI tests, but you cant do that via npm run. So you want to run ./runUITests.sh')\"",
