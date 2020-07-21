@@ -10,23 +10,26 @@ The `titanium-build` task is for building applications and modules during develo
 
 | Property | Description | Default Value | Valid Values|
 | -------- | ----------- | ------------- | ----------- |
-| `titaniumBuild.deployType` | The `--deploy-type` flag value | None | `deployment` or `test` |
-| `titaniumBuild.platform` | The platform to build for | None, prompted for on build | `android` or `ios` |
-| `titaniumBuild.projectType` | The project type | None, detected on build | `app` or `module` |
-| `titaniumBuild.target` | The target to build for | None, prompted for on build | Android: `emulator` or `device` <br>iOS: `device` or `simulator` |
-| `titaniumBuild.ios` | iOS configuration options | None | See [iOS Build Task Configuration](#ios-build-task-configuration) |
+| `titaniumBuild.deployType` | Deploy Type to be used when building | No Default | `test`, `development` |
+| `titaniumBuild.deviceId` | ID or UDID for the device or simulator | No Default | N/A |
+| `titaniumBuild.extraArguments` | Extra arguments to be used in the build | No Default | N/A |
+| `titaniumBuild.platform` | Platform to build for | No Default | `android`, `ios` |
+| `titaniumBuild.projectType` | Project type to be built | No Default | `app`, `module` |
+| `titaniumBuild.target` | Target to build for | No Default | N/A |
+| titaniumBuild.android | Android configuration options | No Default | See [Android build Task Configuration](#android-build-task-configuration) |
+| titaniumBuild.ios | iOS configuration options | No Default | See [iOS build Task Configuration](#ios-build-task-configuration) |
 
 ### Android Build Task Configuration
 
-There are no Android specific configuration options for the build task.
+There are no Android specific configuration properties for the build task.
 
 ### iOS Build Task Configuration
 
 | Property | Description | Default Value | Valid Values|
 | -------- | ----------- | ------------- | ----------- |
-| `ios.certificate` | Certificate name to use when signing device builds | None, prompted for on device builds | N/A |
-| `ios.provisioningProfile` | Provisioning Profile UUID to use when signing device builds | None, prompted for on device builds | N/A |
-| `ios.simulatorVersion` | Simulator Version to use when running Simulator builds | None, prompted for on simulator builds | N/A |
+| `titaniumBuild.ios.provisioningProfile` | Provisioning Profile UUID to use when signing device build | No Default | N/A |
+| `titaniumBuild.ios.certificate` | Certificate name to use when signing device builds | No Default | N/A |
+| `titaniumBuild.ios.simulatorVersion` | Simulator version use when performing a simulator build | No Default | N/A |
 
 ### Sample Build Task Configurations
 
@@ -70,26 +73,27 @@ The `titanium-package` task is for building distribution versions of application
 
 | Property | Description | Default Value | Valid Values|
 | -------- | ----------- | ------------- | ----------- |
-| `titaniumBuild.platform` | The platform to build for | None, prompted for on build | `android` or `ios` |
-| `titaniumBuild.projectType` | The project type | None, detected on build | `app` or `module` |
-| `titaniumBuild.outputDirectory` | Full path to the output directory | None, prompted for if not provided | None |
-| `titaniumBuild.target` | The target to build for | None, prompted for on build | Android: `dist-playstore` <br> iOS: `dist-adhoc` or `dist-appstore` |
-| `titaniumBuild.android` | iOS configuration options | None | See [Android Package Task Configuration](#android-package-task-configuration) |
-| `titaniumBuild.ios` | iOS configuration options | None | See [iOS Package Task Configuration](#ios-package-task-configuration) |
+| `titaniumBuild.extraArguments` | Extra arguments to be used in the build | No Default | N/A |
+| `titaniumBuild.outputDirectory` | Output directory for the built application | No Default | N/A |
+| `titaniumBuild.platform` | Platform to build for | No Default | `android`, `ios` |
+| `titaniumBuild.target` | Target to build for | No Default | N/A |
+| `titaniumBuild.projectType` | Project type to be built | No Default | `app`, `module` |
+| titaniumBuild.android | Android configuration options | No Default | See [Android package Task Configuration](#android-package-task-configuration) |
+| titaniumBuild.ios | iOS configuration options | No Default | See [iOS package Task Configuration](#ios-package-task-configuration) |
 
 ### Android Package Task Configuration
 
 | Property | Description | Default Value | Valid Values|
 | -------- | ----------- | ------------- | ----------- |
-| `android.keystore.location` | Path to the keystore to use | None, prompted for if not provided | N/A |
-| `android.keystore.alias` | Alias for the keystore | None, prompted for if not provided | N/A |
+| `titaniumBuild.android.keystore.alias` | Alias for the keystore | No Default | N/A |
+| `titaniumBuild.android.keystore.location` | Path of the keystore to be used, must be a full path | No Default | N/A |
 
 ### iOS Package Task Configuration
 
 | Property | Description | Default Value | Valid Values|
 | -------- | ----------- | ------------- | ----------- |
-| `ios.certificate` | Certificate name to use when signing device builds | None, prompted for on device builds | N/A |
-| `ios.provisioningProfile` | Provisioning Profile UUID to use when signing device builds | None, prompted for on device builds | N/A |
+| `titaniumBuild.ios.provisioningProfile` | Provisioning Profile UUID to be used | No Default | N/A |
+| `titaniumBuild.ios.certificate` | Certificate name to be used | No Default | N/A |
 
 ### Sample Package Task Configurations
 
@@ -160,7 +164,6 @@ Visual Studio Code allows tasks to declare dependencies to create what is known 
 	]
 }
 ```
-
 
 ## Current Limitations
 
