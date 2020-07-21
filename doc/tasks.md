@@ -27,7 +27,7 @@ There are no Android specific configuration properties for the build task.
 
 | Property | Description | Default Value | Valid Values|
 | -------- | ----------- | ------------- | ----------- |
-| `titaniumBuild.ios.provisioningProfile` | Provisioning Profile UUID to use when signing device build | No Default | N/A |
+| `titaniumBuild.ios.provisioningProfile` | Provisioning Profile UUID to use when signing device builds | No Default | N/A |
 | `titaniumBuild.ios.certificate` | Certificate name to use when signing device builds | No Default | N/A |
 | `titaniumBuild.ios.simulatorVersion` | Simulator version use when performing a simulator build | No Default | N/A |
 

@@ -58,7 +58,7 @@ This will automatically generate two debug configurations in `.vscode/launch.jso
 | Property name | Description | Default value | Required |
 | ------------- | ------------| ------------- | ---------- |
 | platform | Platform to debug | No Default | true |
-| projectDir | Directory of the Titanium project to debug | [${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_`pre`defined-variables) | false |
+| projectDir | Directory of the Titanium project to debug | [${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables) | false |
 | port | Port number to use for the debugger | 9000 | false |
 | preLaunchTask | Name of the task to build the application | No Default | false |
 

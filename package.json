@@ -132,7 +132,7 @@
               "projectDir": {
                 "type": "string",
                 "description": "Directory of the Titanium project to debug",
-                "defaultValue": "[${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_`pre`defined-variables)"
+                "defaultValue": "[${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables)"
               },
               "port": {
                 "type": "number",
