@@ -131,11 +131,17 @@
               },
               "projectDir": {
                 "type": "string",
-                "description": "Directory of the Titanium project being debugged"
+                "description": "Directory of the Titanium project to debug",
+                "defaultValue": "[${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_`pre`defined-variables)"
               },
               "port": {
                 "type": "number",
-                "description": "Port number to use for the debugger"
+                "description": "Port number to use for the debugger",
+                "defaultValue": 9000
+              },
+              "preLaunchTask": {
+                "type": "string",
+                "description": "Name of the task to build the application"
               }
             }
           }
@@ -745,15 +751,15 @@
                 "description": "Properties used to configure iOS builds",
                 "properties": {
                   "provisioningProfile": {
-                    "description": "Provisioning Profile UUID to be used",
+                    "description": "Provisioning Profile UUID to use when signing device builds",
                     "type": "string"
                   },
                   "certificate": {
-                    "description": "Certificate name to be used",
+                    "description": "Certificate name to use when signing device builds",
                     "type": "string"
                   },
                   "simulatorVersion": {
-                    "description": "Simulator version to be used",
+                    "description": "Simulator version use when performing a simulator build",
                     "type": "string"
                   }
                 }
@@ -907,9 +913,9 @@
   "scripts": {
     "commit": "git-cz",
     "compile": "tsc -p ./",
-    "generate-readme": "node ./scripts/render.js",
+    "generate-docs": "node ./scripts/render.js",
     "lint": "eslint src/ scripts/",
-    "release": "npm run generate-readme && standard-version && npx vsce package",
+    "release": "npm run generate-docs && standard-version && npx vsce package",
     "test": "COVERAGE=1 node ./out/test/unit/runTest.js",
     "test:integration": "node -e \"console.log('Hey there! You want to run the UI tests, but you cant do that via npm run. So you want to run ./runUITests.sh')\"",
     "vscode:prepublish": "npm run compile",
