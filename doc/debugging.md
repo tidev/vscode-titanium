@@ -55,12 +55,12 @@ First, you must create a debug configuration. To do that:
 
 This will automatically generate two debug configurations in `.vscode/launch.json` file, one to debug on Android, one to debug on iOS. You can customise these files using the following properties.
 
-| Property name | Description | Default value |
-| ------------- | ------------| ------------- |
-| platform | Platform to debug | No Default |
-| projectDir | Directory of the Titanium project to debug | [${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables) |
-| port | Port number to use for the debugger | 9000 |
-| preLaunchTask | Name of the task to use to build the application | No Default |
+| Property name | Description | Default value | Required |
+| ------------- | ------------| ------------- | ---------- |
+| platform | Platform to debug | No Default | true |
+| projectDir | Directory of the Titanium project to debug | [${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_`pre`defined-variables) | false |
+| port | Port number to use for the debugger | 9000 | false |
+| preLaunchTask | Name of the task to build the application | No Default | false |
 
 ### Specifying a pre-launch task
 
