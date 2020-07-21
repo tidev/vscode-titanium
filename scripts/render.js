@@ -169,10 +169,10 @@ function generateTaskProperties () {
 
 	const { contributes: { taskDefinitions } } = packageJson;
 	const buildTask = taskDefinitions.find(definition => definition.type === 'titanium-build');
-	taskInformation.build = buildPropertiesObject(buildTask.properties.titaniumBuild.properties, 'build');
+	taskInformation.build = buildPropertiesObject(buildTask.properties.titaniumBuild.properties, 'Build');
 
 	const packageTask = taskDefinitions.find(definition => definition.type === 'titanium-package');
-	taskInformation.package = buildPropertiesObject(packageTask.properties.titaniumBuild.properties, 'package');
+	taskInformation.package = buildPropertiesObject(packageTask.properties.titaniumBuild.properties, 'Package');
 
 	return taskInformation;
 }

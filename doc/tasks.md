@@ -16,12 +16,12 @@ The `titanium-build` task is for building applications and modules during develo
 | `titaniumBuild.platform` | Platform to build for | No Default | `android`, `ios` |
 | `titaniumBuild.projectType` | Project type to be built | No Default | `app`, `module` |
 | `titaniumBuild.target` | Target to build for | No Default | N/A |
-| titaniumBuild.android | Android configuration options | No Default | See [Android build Task Configuration](#android-build-task-configuration) |
-| titaniumBuild.ios | iOS configuration options | No Default | See [iOS build Task Configuration](#ios-build-task-configuration) |
+| titaniumBuild.android | Android configuration options | No Default | See [Android Build Task Configuration](#android-Build-task-configuration) |
+| titaniumBuild.ios | iOS configuration options | No Default | See [iOS Build Task Configuration](#ios-Build-task-configuration) |
 
 ### Android Build Task Configuration
 
-There are no Android specific configuration properties for the build task.
+There are no Android specific configuration properties for the Build task.
 
 ### iOS Build Task Configuration
 
@@ -78,8 +78,8 @@ The `titanium-package` task is for building distribution versions of application
 | `titaniumBuild.platform` | Platform to build for | No Default | `android`, `ios` |
 | `titaniumBuild.target` | Target to build for | No Default | N/A |
 | `titaniumBuild.projectType` | Project type to be built | No Default | `app`, `module` |
-| titaniumBuild.android | Android configuration options | No Default | See [Android package Task Configuration](#android-package-task-configuration) |
-| titaniumBuild.ios | iOS configuration options | No Default | See [iOS package Task Configuration](#ios-package-task-configuration) |
+| titaniumBuild.android | Android configuration options | No Default | See [Android Package Task Configuration](#android-Package-task-configuration) |
+| titaniumBuild.ios | iOS configuration options | No Default | See [iOS Package Task Configuration](#ios-Package-task-configuration) |
 
 ### Android Package Task Configuration
 
