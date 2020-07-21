@@ -5,15 +5,24 @@ const path = require('path');
 
 const renderObject = {
 	commands: generateCommands(),
+	debugProperties: generateDebugProperties(),
 	settings: generateSettings(),
-	snippets: generateSnippets()
+	snippets: generateSnippets(),
+	taskProperties: generateTaskProperties()
 };
 
-const template = fs.readFileSync(path.join(__dirname, 'templates', 'README.md.ejs'), 'utf8');
+const readmeTemplate = fs.readFileSync(path.join(__dirname, 'templates', 'README.md.ejs'), 'utf8');
 
-const contents = ejs.render(template, renderObject);
-
+const contents = ejs.render(readmeTemplate, renderObject);
 fs.writeFileSync(path.join(__dirname, '..', 'test-output.md'), contents);
+
+const debuggingTemplate = fs.readFileSync(path.join(__dirname, 'templates', 'debugging.md.ejs'), 'utf8');
+const debugContents = ejs.render(debuggingTemplate, renderObject);
+fs.writeFileSync(path.join(__dirname, '..', 'doc', 'debugging.md'), debugContents);
+
+const taskTemplate = fs.readFileSync(path.join(__dirname, 'templates', 'tasks.md.ejs'), 'utf8');
+const taskContents = ejs.render(taskTemplate, renderObject);
+fs.writeFileSync(path.join(__dirname, '..', 'doc', 'tasks.md'), taskContents);
 
 function generateCommands() {
 	const { contributes: { commands, keybindings, menus } } = packageJson;
@@ -106,4 +115,84 @@ function generateSnippets() {
 	}
 
 	return snippetInformation;
+}
+
+function generateDebugProperties () {
+	const debuggingInformation = {
+		launch: []
+	};
+
+	const { contributes: { debuggers } } = packageJson;
+	const { required, properties } = debuggers[0].configurationAttributes.launch;
+	for (const [ name, information ] of Object.entries(properties)) {
+		debuggingInformation.launch.push({
+			name,
+			description: information.description,
+			defaultValue: information.defaultValue,
+			required: required.includes(name)
+		});
+	}
+	return debuggingInformation;
+}
+
+function generateTaskProperties () {
+	const taskInformation = { };
+
+	function buildPropertiesObject (properties, taskType) {
+		const propertiesObject = {
+			android: [],
+			common: [],
+			ios: []
+		};
+
+		const androidProperties = Object.entries(properties).find(([ name ]) => name === 'android');
+		const iOSProperties = Object.entries(properties).find(([ name ]) => name === 'ios');
+		const commonProperties = Object.entries(properties).filter(([ name ]) => name !== 'android' && name !== 'ios');
+
+		propertiesObject.android = recurseProperties(Object.entries(androidProperties[1].properties), 'Android', taskType, 'titaniumBuild.android');
+		propertiesObject.common = recurseProperties(commonProperties);
+		propertiesObject.ios = recurseProperties(Object.entries(iOSProperties[1].properties), 'iOS', taskType, 'titaniumBuild.ios');
+
+		propertiesObject.common.push({
+			name: 'titaniumBuild.android',
+			description: 'Android configuration options',
+			validValues: `See [Android ${taskType} Task Configuration](#android-${taskType}-task-configuration)`
+		});
+
+		propertiesObject.common.push({
+			name: 'titaniumBuild.ios',
+			description: 'iOS configuration options',
+			validValues: `See [iOS ${taskType} Task Configuration](#ios-${taskType}-task-configuration)`
+		});
+		return propertiesObject;
+	}
+
+	const { contributes: { taskDefinitions } } = packageJson;
+	const buildTask = taskDefinitions.find(definition => definition.type === 'titanium-build');
+	taskInformation.build = buildPropertiesObject(buildTask.properties.titaniumBuild.properties, 'build');
+
+	const packageTask = taskDefinitions.find(definition => definition.type === 'titanium-package');
+	taskInformation.package = buildPropertiesObject(packageTask.properties.titaniumBuild.properties, 'package');
+
+	return taskInformation;
+}
+
+function recurseProperties(properties, platform, taskType, propertyPrefix = 'titaniumBuild') {
+	const propertyData = [];
+	for (const [ name, information ] of properties) {
+		if (information.properties) {
+			propertyData.push(...recurseProperties(Object.entries(information.properties), platform, taskType, `${propertyPrefix}.${name}`));
+			continue;
+		}
+		propertyData.push({
+			name: `\`${propertyPrefix}.${name}\``,
+			description: information.description,
+			defaultValue: information.defaultValue,
+			validValues: information.enum ? information.enum.map(value => `\`${value}\``).join(', ') : 'N/A'
+		});
+	}
+	if (!propertyData.length) {
+		return `There are no ${platform} specific configuration properties for the ${taskType} task.`;
+	}
+	return propertyData;
 }
