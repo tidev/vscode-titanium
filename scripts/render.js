@@ -14,7 +14,7 @@ const renderObject = {
 const readmeTemplate = fs.readFileSync(path.join(__dirname, 'templates', 'README.md.ejs'), 'utf8');
 
 const contents = ejs.render(readmeTemplate, renderObject);
-fs.writeFileSync(path.join(__dirname, '..', 'test-output.md'), contents);
+fs.writeFileSync(path.join(__dirname, '..', 'README.md'), contents);
 
 const debuggingTemplate = fs.readFileSync(path.join(__dirname, 'templates', 'debugging.md.ejs'), 'utf8');
 const debugContents = ejs.render(debuggingTemplate, renderObject);
