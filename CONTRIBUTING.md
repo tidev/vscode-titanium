@@ -50,6 +50,12 @@ Integration tests live under the `src/test/integration` folder, you can run thes
 
 The tests run outside of VS Code in a node process, so you are unable to use any code that references the `vscode` package.
 
+## Documentation
+
+A lot of features in VS Code are statically defined in the package.json. For example, task definitions, debug configurations, commands etc. To ensure that our documentation is always correct, and to remove the maintenance burden we generate the specific parts of the documentation from this content.
+
+Because of this, the markdown files in `docs` should not be edited directly. Instead edit the files in `scripts/templates` and then run the `npm run generate-docs` script to update the content in `docs`.
+
 ## Sending in a PR
 
 When sending in a PR please make sure you do the following:
