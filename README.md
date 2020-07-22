@@ -2,11 +2,10 @@
 
 [![Version](https://vsmarketplacebadge.apphb.com/version-short/axway.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
 [![Version](https://vsmarketplacebadge.apphb.com/downloads-short/axway.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
-[![Greenkeeper badge](https://badges.greenkeeper.io/appcelerator/vscode-appcelerator-titanium.svg)](https://greenkeeper.io/)
 
 Appcelerator Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
 
-<img width="900" alt="Appcelerator Titanium extension for VS Code" src="https://user-images.githubusercontent.com/2697821/37837371-f0fc7bd6-2eac-11e8-822d-049cce038d15.png">
+![Appcelerator Titanium extension for VS Code](https://user-images.githubusercontent.com/2697821/37837371-f0fc7bd6-2eac-11e8-822d-049cce038d15.png)
 
 ## Installation
 
@@ -22,151 +21,118 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 3. Click "Install"
 4. Reload VS Code
 
-## Prerequisites
-
-To use this extension you'll need to have the Appcelerator CLI, and Titanium SDK setup. [Follow this guide for info](https://platform.axway.com/#/product/cli).
-
-## Open a Titanium project
-
-File > Open... > Browse to Titanium project
-
-From the CLI:
-
-`code /path/to/titanium/project`
-
 ## Features
 
 ### Commands
 
-Command                           | Keymap                | Description
----                               | ---                   | ---
-Run                               | `cmd/ctrl-alt-enter`  | Build and run on simulator/emulator or device
-Package                           | -                     | Build project for Ad-Hoc or App Store distribution
-Stop                              | `cmd/ctrl-alt-.`      | Stop the current build
-Set log level                     | -                     | Set the output log level
-Init                              | -                     | Reload Appcelerator environment information
-Generate autocomplete suggestions | -                     | Build autocomplete database for current default SDK version
-Open related view                 | `cmd/ctrl-alt-v`      | Open the related Alloy XML file
-Open related style                | `cmd/ctrl-alt-s`      | Open the related Alloy TSS file
-Open related controller           | `cmd/ctrl-alt-x`      | Open the related JavaScript file
-Toggle related files              | `cmd/ctrl-alt-a`      | Toggle the related Alloy XML, TSS and Javascript files
+This extension makes the following commands available in the Command Palette to enhance your development experience.
 
-### Build tools
+| Command | Description | Keybinding |
+| ------- | ----------- | ---------- |
+| `Titanium: Create application` | Create a new Titanium application project | - |
+| `Titanium: Create module` | Create a new Titanium module project | - |
+| `Titanium: Enable LiveView` | Enable LiveView | - |
+| `Titanium: Disable LiveView` | Disable LiveView | - |
+| `Titanium: Build` | Build a Titanium project |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>enter</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>enter</kbd> |
+| `Titanium: Package` | Package a Titanium project | - |
+| `Titanium: Stop` | Stop a running build or package process |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>.</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>.</kbd> |
+| `Titanium: Set log level` | Set log level | - |
+| `Titanium: Generate Alloy controller` | Generate Alloy controller | - |
+| `Titanium: Generate Alloy migration` | Generate Alloy migration | - |
+| `Titanium: Generate Alloy model` | Generate Alloy model | - |
+| `Titanium: Generate Alloy style` | Generate Alloy style | - |
+| `Titanium: Generate Alloy view` | Generate Alloy view | - |
+| `Titanium: Generate Alloy widget` | Generate Alloy widget | - |
+| `Titanium: Open related view` | Open related view |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>v</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>v</kbd> |
+| `Titanium: Open related style` | Open related style |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>s</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>s</kbd> |
+| `Titanium: Open related controller` | Open related controller |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> |
+| `Titanium: Open related files` | Open related files |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> |
+| `Titanium: Generate autocomplete list` | Generate autocomplete list | - |
+| `Titanium: Check For Updates` | Check For Updates | - |
+| `Titanium: Install All Updates` | Install All Updates | - |
+| `Titanium: Select Updates` | Select Updates | - |
+| `Titanium: Clean project` | Clean project | - |
 
-Use the command palette and commands listed above to build and run your Appcelerator project. Follow instructions to select platform, target and (if appropriate) code signing. The last build destination is saved for quick recall.
+### Titanium View
 
-By default the integrated terminal is used to execute the build command.
+This extension provides a `Titanium` view to the Activity Bar in VS Code. With this view, you can view your available build platform and their targets.
 
-### Autocompletion
+Access to the same commands provided by the Command Palette are available inline on device and platform targets, as well as in the right click context menu
 
-Autocompletion support is provided to help speed up development by providing quick references to Titanium APIs and Alloy markup as well as references to modules, widgets and assets within your project.
+![Titanium Activity Pane](images/activity-pane.png)
 
-#### Generation
+### Debugging
 
-On initial launch, autocomplete suggestions are generated for the active Titanium SDK in your project and the Alloy version in your active CLI.
+This extension allows you to debug Titanium applications using the debugger in VS Code. For more information view the [debugging documentation](./doc/debugging.md).
 
-Autocomplete suggestions can be regenerated by running the `Generate autocomplete suggestions` command from the command palette.
+### Tasks
 
-#### Titanium and Alloy
+This extension contributes [tasks](https://code.visualstudio.com/docs/editor/tasks#_custom-tasks) allowing you to customize and orchestrate your own builds. View the [task documentation](./doc/tasks.md) for more information.
 
-Titanium APIs and Alloy markup suggestions are provided in Titanium JavaScript and Alloy XML and TSS files. This includes classes, properties, methods and events.
+## Configuration Settings
 
-<img width="504" alt="Autocomplete" src="https://user-images.githubusercontent.com/2697821/37837374-f156c12c-2eac-11e8-955f-04a030984cfe.png">
+There are a variety of settings that you can use to customize this extension to your needs. You can find them listed below.
 
-<img width="473" alt="Autocomplete Titanium APIs" src="https://user-images.githubusercontent.com/2697821/37837372-f1130590-2eac-11e8-90e1-86c2033098c7.png">
+You can learn more about User and Workspace settings in the [VS Code documentation](https://code.visualstudio.com/docs/getstarted/settings).
 
-#### Project references
+| Setting name | Description | Default Value |
+| -------------| ------------| ------------- |
+| `titanium.android.keystoreAlias` | Keystore alias used for packaging Android applications | `No Default` |
+| `titanium.android.keystorePath` | Path to keystore used for packaging Android applications | `No Default` |
+| `titanium.build.liveview` | Whether to enable LiveView when building applications | `true` |
+| `titanium.codeTemplates.jsFunction` | Event handler function template | `\nfunction ${text}(e){\n}\n` |
+| `titanium.codeTemplates.tssClass` | Style class (.) template | `\n'.${text}': {\n}\n` |
+| `titanium.codeTemplates.tssId` | Style ID (#) template | `\n'#${text}': {\n}\n` |
+| `titanium.codeTemplates.tssTag` | Style tag template | `\n'${text}': {\n}\n` |
+| `titanium.general.appcCommandPath` | Set the full path to the `appc` command if VS Code is unable to locate it. | `appc` |
+| `titanium.general.displayBuildCommandInConsole` | The executed build command is written to the output channel to aid debugging. This will include password arguments. | `true` |
+| `titanium.general.logLevel` | Logging level for commands being run | `info` |
+| `titanium.general.updateFrequency` | Controls the frequency for how often to show an alert if there are updates available. Updates can always be viewed in the Titanium activity pane. Accepts values in time formats like 60 minutes, 12 hours, 7 days etc. | `1 day` |
+| `titanium.general.useTerminalForBuild` | When true build/package commands will be run using the integrated terminal as opposed to using an output channel. | `true` |
+| `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
+| `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
 
-Suggestions for other controllers, modules and widgets are presented when referencing through a Titanium function or Alloy markup.
+## Snippet definitions
 
-<img width="463" alt="Autocomplete project reference" src="https://user-images.githubusercontent.com/2697821/37837373-f12f6abe-2eac-11e8-9f00-dd78e2e7f583.png">
+### Snippets for Titanium development
 
-#### Class and ID references
+| Prefix | Description |
+| ------ | ----------- |
+| `tidebug` | Debug log function |
+| `tiinfo` | Info log function |
+| `titrace` | Trace log function |
+| `tiwarn` | Warn log function |
+| `tierror` | Error log function |
+| `tiaddevent` | Add event listener function |
+| `tiremevent` | Remove event listener function |
+| `tifireevent` | Fire event function |
+| `tialert` | Create alert dialog |
+| `tiopt` | Create option dialog |
+| `tianim` | Create animation |
+| `tifile` | Get file |
+| `tisound` | Create sound |
+| `tiaudio` | Create audio player |
+| `tivideo` | Create video player |
+| `ticamera` | Show camera |
 
-Suggestions for classes and IDs declared or defined in related Alloy XML and TSS files are presented.
+### Snippets for Alloy development
 
-<img width="479" alt="Autocomplete style" src="https://user-images.githubusercontent.com/2697821/37837378-f1a6c050-2eac-11e8-8ade-b384fa13bafa.png">
-
-#### Images
-
-Image suggestions are presented where appropriate.
-
-### Open related files
-
-Opening related Alloy files is supported (see above commands list). This can also be by right clicking in an active editor.
-
-* From View, open related Style and/or Controller
-* From Style, open related View and/or Controller
-* From Controller, open related View and/or Style
-
-### Jump-to-definition
-
-Jump-to-definition support is provided for quickly accessing the definition or usage of Alloy markup and to easily generate new definitions. Images can be previewed inline.
-
-#### Alloy
-
-From Views, click through to style definitions for tags, classes and IDs, in related or global TSS. Click through to event definitions in the related controller. Definitions can also be presented inline.
-
-<img width="510" alt="Style definition" src="https://user-images.githubusercontent.com/2697821/37837380-f1cf3102-2eac-11e8-8685-f96d07f37e9e.png">
-
-A prompt is displayed to generate undefined styles or functions.
-
-<img width="357" alt="Generate style" src="https://user-images.githubusercontent.com/2697821/37837375-f171cce2-2eac-11e8-85ac-553fdfc06d11.png">
-
-#### Strings
-
-Click on localized string references to jump to their definition. The option to generate undefined strings is provided.
-
-#### Images
-
-Click on an image path to open a preview. For iOS, where multiple scaled images exist with the same name the first is opened (e.g. @2x).
-
-### Snippets
-
-Code snippets for common Alloy and Titanium APIs are provided for use in Alloy controllers and modules. A description of the snippet and link to documentation are provided where appropriate. Type the prefix and the autocomplete overlay will be displayed with matching snippets.
-
-<img width="714" alt="Snippets" src="https://user-images.githubusercontent.com/2697821/37837377-f189fae2-2eac-11e8-8376-ac333a07a894.png">
-
-Prefix          | Description
----             | ---
-`tidebug`       | Debug log message
-`tierror`       | Error log message
-`tiinfo`        | Info log message
-`tiwarn`        | Warn log message
-`titrace`       | Trace log message
-`tiaddevent`    | Add event listener
-`tiremevent`    | Remove event listener
-`tifireevent`   | Fire event
-`tialert`       | Show alert dialog
-`tiopt`         | Show option dialog
-`tianim`        | View animation
-`tifile`        | Open file
-`tisound`       | Play sound
-`tiaudio`       | Play local or remote audio
-`tivideo`       | Play local or remove video
-`ticamera`      | Open camera
-`alglo`         | Alloy Globals object
-`alcfg`         | Alloy CFG object
-`alargs`        | Arguments available in an Alloy controller
-`alcon`         | Alloy create controller function
-`alcol`         | Alloy create collection function
-`almod`         | Alloy create model function
-`alwid`         | Alloy create widget function
-`ifios`         | iOS conditional statement
-`ifand`         | Android conditional statement
-`ifwin`         | Windows conditional statement
-
-## Configuration
-
-Check out the [configuration settings document](./configuration.md) for configuration settings.
+| Prefix | Description |
+| ------ | ----------- |
+| `alglo` | Alloy Globals object |
+| `alcfg` | Alloy CFG object |
+| `alargs` | Arguments available in an Alloy controller  |
+| `alcon` | Alloy create controller function |
+| `alcol` | Alloy create collection function |
+| `almod` | Alloy create model function |
+| `alwid` | Alloy create widget function |
+| `ifios` | Alloy iOS conditional statement |
+| `ifand` | Alloy Android conditional statement |
+| `ifwin` | Alloy Windows conditional statement |
 
 ## Contributing
 
 See the [contributing guide](./CONTRIBUTING.md) for info
-
-## Credits
-
-Various icons used throughout the extension are sourced from the awesome [octicons project](https://octicons.github.com/).
 
 ## License
 
