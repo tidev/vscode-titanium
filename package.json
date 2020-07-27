@@ -959,7 +959,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "mocha": "^7.2.0",
-    "mocha-jenkins-reporter": "^0.4.3",
+    "mocha-jenkins-reporter": "^0.4.4",
     "mocha-multi-reporters": "^1.1.7",
     "nyc": "^15.1.0",
     "sinon": "^9.0.2",
