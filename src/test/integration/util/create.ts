@@ -1,5 +1,6 @@
 import { InputBox } from 'vscode-extension-tester';
 import { notificationExists, CommonUICreator } from './common';
+import { expect } from 'chai';
 
 /**
  * Wrapper around the project creation flow to make it slightly easier to test
@@ -77,6 +78,10 @@ export class ProjectCreator extends CommonUICreator {
 	public async setEnableServices(enableServices: boolean): Promise<void> {
 		const servicesText = enableServices ? 'Yes' : 'No';
 		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+		expect(placeHolderText).to.equal('Enable services?', 'Did not show enable services prompt');
+
 		await input.setText(servicesText);
 		await input.confirm();
 		await this.driver.sleep(100);
@@ -84,6 +89,10 @@ export class ProjectCreator extends CommonUICreator {
 
 	public async setFolder(folder: string): Promise<void> {
 		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+		expect(placeHolderText).to.equal('Browse for directory or use last directory', 'Did not show folder selection');
+
 		await input.setText('Enter');
 		await input.confirm();
 
@@ -93,18 +102,30 @@ export class ProjectCreator extends CommonUICreator {
 
 	public async setId(id: string): Promise<void> {
 		const input = await InputBox.create();
+
+		const message = await input.getMessage();
+		expect(message).to.match(/Enter your (application|module) ID/, 'Did not show ID input');
+
 		await input.setText(id);
 		await input.confirm();
 	}
 
 	public async setName (name: string): Promise<void> {
 		const input = await InputBox.create();
+
+		const message = await input.getMessage();
+		expect(message).to.match(/Enter your (application|module) name/, 'Did not show name input');
+
 		await input.setText(name);
 		await input.confirm();
 	}
 
 	public async setPlatforms(platforms: string[]): Promise<void> {
 		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+		expect(placeHolderText).to.equal('Choose platforms', 'Did not show platform selection');
+
 		const choices = await input.getQuickPicks();
 		for (const choice of choices) {
 			const text = await choice.getText();

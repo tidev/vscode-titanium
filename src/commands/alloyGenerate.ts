@@ -55,7 +55,7 @@ Promise<{ cwd: string; filePaths: string[]; name: string; type: AlloyComponentTy
 		filePaths.push(mainFile);
 	}
 	if (await fs.pathExists(mainFile)) {
-		const shouldDelete = await quickPick([ { id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' } ], { placeHolder: ` ${name} already exists. Overwrite it?` });
+		const shouldDelete = await quickPick([ { id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' } ], { placeHolder: `${name} already exists. Overwrite it?` });
 		if (shouldDelete.id === 'no') {
 			throw new UserCancellation();
 		}
