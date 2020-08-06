@@ -8,7 +8,7 @@ import { expect } from 'chai';
 export class ProjectCreator extends CommonUICreator {
 
 	public async createApp(options: AppCreateOptions): Promise<void> {
-		await this.workbench.executeCommand('Titanium: Create Titanium application');
+		await this.workbench.executeCommand('Titanium: Create application');
 
 		await this.setName(options.name);
 		await this.setId(options.id);
@@ -42,7 +42,7 @@ export class ProjectCreator extends CommonUICreator {
 	}
 
 	public async createModule (options: ModuleCreateOptions): Promise<void> {
-		await this.workbench.executeCommand('Titanium: Create Titanium module');
+		await this.workbench.executeCommand('Titanium: Create module');
 
 		await this.setName(options.name);
 		await this.setId(options.id);
