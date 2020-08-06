@@ -80,6 +80,18 @@
                 "order": 1
             }
         },
+        {
+            "name": "Extension UI Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/test/integration/runTests.js",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "presentation": {
+                "group": "2_tests",
+                "order": 1
+            }
+        }
     ],
     "compounds": [
         {
