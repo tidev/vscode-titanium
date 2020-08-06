@@ -64,10 +64,13 @@ describe('Alloy component generation', function () {
 	it('should prompt if already exists', async function () {
 		const workbench = new Workbench();
 		await workbench.executeCommand('Titanium: Generate Alloy controller');
-		await generator.setName('existing-file');
+		await generator.setName('existing-file', 'controller');
 
 		const input = await InputBox.create();
-		console.log(input.getMessage());
+
+		const placeHolderText = await input.getPlaceHolder();
+		expect(placeHolderText).to.include('existing-file already exists. Overwrite it?', 'Did not prompt to force creation');
+
 		await input.setText('No');
 		await input.confirm();
 
