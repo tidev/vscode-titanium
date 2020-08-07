@@ -408,6 +408,10 @@
           "default": "\\n'${text}': {\\n}\\n",
           "description": "Style tag template"
         },
+        "titanium.general.defaultCreationDirectory": {
+          "type": "string",
+          "description": "Default directory to use when creating projects"
+        },
         "titanium.general.appcCommandPath": {
           "type": "string",
           "default": "appc",

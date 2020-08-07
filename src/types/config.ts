@@ -16,6 +16,7 @@ export interface Config {
 	};
 	general: {
 		appcCommandPath: string;
+		defaultCreationDirectory?: string;
 		displayBuildCommandInConsole: boolean;
 		logLevel: LogLevel;
 		useTerminalForBuild: boolean;

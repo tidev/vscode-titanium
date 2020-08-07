@@ -8,13 +8,16 @@ import { expect } from 'chai';
 export class ProjectCreator extends CommonUICreator {
 
 	public async createApp(options: AppCreateOptions): Promise<void> {
+		// We need to configure the setting for the creation directory before running any commands
+		await this.configureSetting('General', 'Default Creation Directory', options.folder);
+
 		await this.workbench.executeCommand('Titanium: Create application');
 
 		await this.setName(options.name);
 		await this.setId(options.id);
 		await this.setPlatforms(options.platforms);
 		await this.setEnableServices(options.enableServices);
-		await this.setFolder(options.folder);
+		await this.setFolder();
 
 		try {
 			await this.driver.wait(() => notificationExists('Creating application'), 1000);
@@ -42,12 +45,15 @@ export class ProjectCreator extends CommonUICreator {
 	}
 
 	public async createModule (options: ModuleCreateOptions): Promise<void> {
+		// We need to configure the setting for the creation directory before running any commands
+		await this.configureSetting('General', 'Default Creation Directory', options.folder);
+
 		await this.workbench.executeCommand('Titanium: Create module');
 
 		await this.setName(options.name);
 		await this.setId(options.id);
 		await this.setPlatforms(options.platforms);
-		await this.setFolder(options.folder);
+		await this.setFolder();
 
 		try {
 			await this.driver.wait(() => notificationExists('Creating module'), 1000);
@@ -87,16 +93,13 @@ export class ProjectCreator extends CommonUICreator {
 		await this.driver.sleep(100);
 	}
 
-	public async setFolder(folder: string): Promise<void> {
+	public async setFolder(): Promise<void> {
 		const input = await InputBox.create();
 
 		const placeHolderText = await input.getPlaceHolder();
-		expect(placeHolderText).to.equal('Browse for directory or use last directory', 'Did not show folder selection');
+		expect(placeHolderText).to.equal('Select where to create your project', 'Did not show folder selection');
 
-		await input.setText('Enter');
-		await input.confirm();
-
-		await input.setText(folder);
+		await input.setText('Default');
 		await input.confirm();
 	}
 
