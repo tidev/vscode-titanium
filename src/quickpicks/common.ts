@@ -2,7 +2,7 @@ import * as path from 'path';
 import appc from '../appc';
 import * as utils from '../utils';
 
-import { pathExists } from 'fs-extra';
+import { pathExists, ensureDir } from 'fs-extra';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace } from 'vscode';
 import { InteractionError, UserCancellation } from '../commands/common';
@@ -76,23 +76,30 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 }
 
 export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
+	const defaultPath = await ExtensionContainer.config.general.defaultCreationDirectory;
 	const items = [
 		{
 			label: 'Browse for directory',
 			id: 'browse'
-		},
-		{
-			label: 'Enter path',
-			id: 'enter'
 		}
 	];
-	if (lastUsed) {
+
+	if (defaultPath) {
+		items.push({
+			label: `Use default ${defaultPath}`,
+			id: 'default'
+		});
+	}
+
+	if (lastUsed && lastUsed !== defaultPath) {
 		items.push({
 			label: `Last used ${lastUsed}`,
 			id: 'last'
 		});
 	}
-	const directory = await quickPick(items, { placeHolder: 'Browse for directory or use last directory' }, { forceShow: true });
+
+	const directory = await quickPick(items, { placeHolder: 'Select where to create your project' }, { forceShow: true });
+
 	if (directory.id === 'browse') {
 		const filePath = await window.showOpenDialog({ canSelectMany: false, canSelectFolders: true });
 		if (!filePath) {
@@ -101,6 +108,11 @@ export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
 		return filePath[0];
 	} else if (lastUsed && directory.id === 'last') {
 		return Uri.file(lastUsed);
+	} else if (defaultPath && directory.id === 'default') {
+		if (!await pathExists(defaultPath)) {
+			await ensureDir(defaultPath);
+		}
+		return Uri.file(defaultPath);
 	} else if (directory.id === 'enter') {
 		const directory = await inputBox({ placeHolder: 'Enter your path' });
 		if (!await pathExists(directory)) {

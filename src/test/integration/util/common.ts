@@ -1,4 +1,4 @@
-import { BottomBarPanel, InputBox, Notification, Workbench, WebDriver } from 'vscode-extension-tester';
+import { BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -81,6 +81,13 @@ export class CommonUICreator {
 			setTimeout(resolve, 2000);
 		});
 	}
+
+	public async configureSetting(section: string, settingName: string, value: string): Promise<void> {
+		const editor = await this.workbench.openSettings();
+
+		const setting = await editor.findSetting(settingName, `Titanium › ${section}`) as TextSetting;
+		await setting.setValue(value);
+	}
 }
 
 /**
@@ -100,6 +107,6 @@ export function getFixturesDirectory (): string {
  * @param {String} s - string.
  * @returns {String}
  */
-export function  capitalizeFirstLetter (s: string): string {
+export function capitalizeFirstLetter (s: string): string {
 	return s.charAt(0).toUpperCase() + s.slice(1);
 }
