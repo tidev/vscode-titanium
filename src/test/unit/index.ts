@@ -37,9 +37,9 @@ export async function run (): Promise<void> {
 			mochaJenkinsReporterReporterOptions: {
 				junit_report_path: reportPath // eslint-disable-line @typescript-eslint/camelcase
 			}
-		}
+		},
+		color: true
 	});
-	mocha.useColors(true);
 
 	const testsRoot = path.resolve(__dirname);
 
