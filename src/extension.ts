@@ -52,6 +52,7 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 
 import { registerTaskProviders, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasks/tasksHelper';
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
+import { executeAsTask } from './commands/updateComponents';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -573,15 +574,16 @@ async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progre
 			}
 			if (error.metadata) {
 				const { metadata } = error;
-				if (update.productName === updates.ProductNames.AppcInstaller && metadata.errorCode === 'EACCES') {
+				if (update.productName === updates.ProductNames.AppcInstaller || updates.ProductNames.Node && metadata.errorCode === 'EACCES') {
 					const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${label} as it must be ran with sudo`, {
 						title: 'Install with Sudo',
 						run: () => {
 							ExtensionContainer.terminal.executeCommand(`sudo ${metadata.command}`);
 						}
 					});
+					// eslint-disable-next-line max-depth
 					if (runWithSudo) {
-						runWithSudo.run();
+						await executeAsTask(metadata.command, update.productName);
 					}
 				}
 			} else {
