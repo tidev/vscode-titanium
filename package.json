@@ -948,7 +948,7 @@
     "@typescript-eslint/parser": "^2.34.0",
     "chai": "^4.2.0",
     "commitizen": "^4.2.1",
-    "cz-conventional-changelog": "^3.2.1",
+    "cz-conventional-changelog": "^3.3.0",
     "danger": "^10.4.0",
     "eslint": "^7.7.0",
     "eslint-config-axway": "^4.7.2",
