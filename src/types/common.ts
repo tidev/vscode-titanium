@@ -23,7 +23,7 @@ export interface ProvisioningProfile {
 	certs: string[];
 	creationDate: string;
 	devices: string[]|null;
-	entitlements: object;
+	entitlements: Record<string, unknown>;
 	expirationDate: string;
 	file: string;
 	getTaskAllow: boolean;

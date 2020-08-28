@@ -6,7 +6,7 @@ import { AppBuildTaskTitaniumBuildBase } from '../tasks/buildTaskProvider';
 export interface Request {
 	id: string;
 	code: string;
-	args?: object;
+	args?: Record<string, unknown>;
 }
 
 export interface Response {
@@ -19,11 +19,13 @@ export interface Response {
 }
 
 export interface FeedbackOptions {
+	[ key: string ]: unknown;
 	type: 'info' | 'error';
 	message: string;
 }
 
 export interface TitaniumLaunchRequestArgs extends ILaunchRequestArgs {
+	[ key: string ]: unknown;
 	request: string;
 	projectDir: string;
 	platform: Platform;

@@ -35,7 +35,7 @@ export async function run (): Promise<void> {
 		reporterOptions: {
 			reporterEnabled: 'mocha-jenkins-reporter, spec',
 			mochaJenkinsReporterReporterOptions: {
-				junit_report_path: reportPath // eslint-disable-line @typescript-eslint/camelcase
+				junit_report_path: reportPath
 			}
 		},
 		color: true
