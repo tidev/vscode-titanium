@@ -157,7 +157,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 	}
 
-	private sendRequest (code: string, args?: object): Promise<void> {
+	private sendRequest (code: string, args?: Record<string, unknown>): Promise<void> {
 		const request: Request = {
 			id: `request-${++this.idCount}`,
 			code,

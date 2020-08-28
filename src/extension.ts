@@ -540,7 +540,7 @@ async function generateCompletions (force = false): Promise<void> {
 	}
 }
 
-async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progress: vscode.Progress<{}>, incrementProgress = true): Promise<void> {
+async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progress: vscode.Progress<{ message?: string, increment?: number }>, incrementProgress = true): Promise<void> {
 	const totalUpdates = updateInfo.length;
 	let counter = 1;
 

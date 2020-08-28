@@ -239,7 +239,7 @@ export function toUnixPath (p: string): string { // https://github.com/anodynos/
  * @param {Object} obj 	object to get keys of
  * @returns {Array}
  */
-export function getAllKeys (obj: object): string[] {
+export function getAllKeys (obj: Record<string, unknown>): string[] {
 	if (!_.isObject(obj)) {
 		return [];
 	}

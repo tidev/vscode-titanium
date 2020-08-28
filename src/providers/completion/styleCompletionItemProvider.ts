@@ -144,7 +144,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 	public getPropertyNameCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string): CompletionItem[] {
 		const parentObjName = this.getParentObjectName(position, document);
 		const { properties, types } = this.completions.titanium;
-		const innerProperties: { [key: string]: {  }} = {};
+		const innerProperties: { [key: string]: unknown } = {};
 		const completions: CompletionItem[] = [];
 
 		if (!parentObjName) {
