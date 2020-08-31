@@ -980,7 +980,7 @@
     "ms": "^2.1.2",
     "semver": "^7.3.2",
     "titanium-editor-commons": "^0.5.0",
-    "underscore": "^1.10.2",
+    "underscore": "^1.11.0",
     "uuid": "^8.3.0",
     "vscode-debugadapter": "^1.41.1",
     "which": "^2.0.2",
