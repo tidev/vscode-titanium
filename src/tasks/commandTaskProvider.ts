@@ -51,7 +51,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 			task.scope || vscode.TaskScope.Workspace,
 			task.name,
 			task.source,
-			new vscode.CustomExecution(() => Promise.resolve(new TaskPseudoTerminal(this, task)))
+			new vscode.CustomExecution((resolvedDefinition) => Promise.resolve(new TaskPseudoTerminal(this, task, resolvedDefinition as TitaniumTaskDefinitionBase)))
 		);
 	}
 

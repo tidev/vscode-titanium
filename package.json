@@ -31,7 +31,7 @@
     "url": "https://github.com/appcelerator/vscode-appcelerator-titanium.git"
   },
   "engines": {
-    "vscode": "^1.41.0",
+    "vscode": "^1.49.0",
     "node": ">=12.4.0"
   },
   "activationEvents": [
@@ -945,7 +945,7 @@
     "@types/underscore": "^1.10.24",
     "@types/tmp": "^0.2.0",
     "@types/uuid": "^3.4.7",
-    "@types/vscode": "1.41.0",
+    "@types/vscode": "1.49.0",
     "@types/which": "^1.3.2",
     "@types/xml2js": "^0.4.5",
     "@typescript-eslint/eslint-plugin": "^4.6.0",

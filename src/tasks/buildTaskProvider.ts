@@ -148,7 +148,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 			task.isBackground = true;
 		}
 
-		task.execution = new vscode.CustomExecution(() => Promise.resolve(new TaskPseudoTerminal(this, task as TitaniumTaskBase)));
+		task.execution = new vscode.CustomExecution((resolvedDefinition) => Promise.resolve(new TaskPseudoTerminal(this, task as TitaniumTaskBase, resolvedDefinition as BuildTaskDefinitionBase)));
 
 		return task;
 	}
