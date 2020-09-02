@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CommandTaskProvider, TitaniumTaskBase } from './commandTaskProvider';
+import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase } from './commandTaskProvider';
 import { TaskExecutionContext, runningTasks } from './tasksHelper';
 import * as cp from 'child_process';
 import { ExtensionContainer } from '../container';
@@ -72,14 +72,16 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 	private readonly cts: vscode.CancellationTokenSource = new vscode.CancellationTokenSource();
 	private readonly task: TitaniumTaskBase;
 	private readonly taskProvider: CommandTaskProvider;
+	private readonly resolvedDefinition: TitaniumTaskDefinitionBase;
 	private readonly writeEmitter: vscode.EventEmitter<string> = new vscode.EventEmitter<string>();
 
 	public readonly onDidWrite: vscode.Event<string> = this.writeEmitter.event;
 	public readonly onDidClose: vscode.Event<number> = this.closeEmitter.event;
 
-	public constructor (taskProvider: CommandTaskProvider, task: TitaniumTaskBase) {
+	public constructor (taskProvider: CommandTaskProvider, task: TitaniumTaskBase, resolvedDefinition: TitaniumTaskDefinitionBase) {
 		this.taskProvider = taskProvider;
 		this.task = task;
+		this.resolvedDefinition = resolvedDefinition;
 	}
 
 	public open (): void {
@@ -97,6 +99,8 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 
 		ExtensionContainer.context.globalState.update(GlobalState.Running, true);
 		vscode.commands.executeCommand('setContext', GlobalState.Running, true);
+
+		this.task.definition = this.resolvedDefinition;
 
 		// We don't want to catch here so that any errors are thrown back to the TaskProvider and handled correctly there
 		// eslint-disable-next-line promise/catch-or-return
