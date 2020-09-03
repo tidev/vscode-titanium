@@ -21,7 +21,7 @@ export async function deviceQuickPick (deviceList: DeviceQuickPickItem[], quickP
 		label: 'Refresh Devices',
 		udid: 'refresh'
 	});
-	return quickPick(deviceList, quickPickOptions, { forceShow: true }) as Promise<DeviceQuickPickItem>;
+	return quickPick<DeviceQuickPickItem>(deviceList, quickPickOptions, { forceShow: true });
 }
 
 export async function selectDevice (platform: string, target: string, iOSSimulatorVersion?: string): Promise<DeviceQuickPickItem> {
