@@ -380,3 +380,16 @@ export function getCorrectCertificateName (certificateName: string, sdkVersion: 
 		return certificate.name;
 	}
 }
+
+export async function getNodeSupportedVersion(sdkVersion: string): Promise<string|undefined> {
+
+	const sdkInfo = appc.sdkInfo(sdkVersion);
+	if (!sdkInfo) {
+		return;
+	}
+	const sdkPath = sdkInfo.path;
+
+	const packageJSON = path.join(sdkPath, 'package.json');
+	const { vendorDependencies } = await fs.readJSON(packageJSON);
+	return vendorDependencies.node;
+}
