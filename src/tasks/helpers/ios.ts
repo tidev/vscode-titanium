@@ -1,5 +1,5 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
-import { selectiOSDevice, selectiOSSimulator, selectiOSCertificate } from '../../quickpicks';
+import { selectiOSDevice, selectiOSSimulator, selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
 import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
 import { IosCertificateType, IosCert } from '../../types/common';
@@ -10,7 +10,6 @@ import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTask
 import { WorkspaceState } from '../../constants';
 
 import appc from '../../appc';
-import { selectiOSProvisioningProfile } from '../../quickpicks/common';
 
 export interface IosTitaniumBuildDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: IosBuildTaskTitaniumBuildBase;
