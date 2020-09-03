@@ -1,6 +1,6 @@
-import { QuickPickOptions } from 'vscode';
 import * as utils from '../../utils';
-
+import { Commands } from '../../commands/common';
+import { commands, QuickPickOptions } from 'vscode';
 import { quickPick, CustomQuickPick } from '../common';
 import { selectAndroidDevice, selectAndroidEmulator } from './android';
 import { selectiOSDevice, selectiOSSimulator } from './ios';
@@ -12,21 +12,38 @@ export interface DeviceQuickPickItem extends CustomQuickPick {
 }
 
 export async function deviceQuickPick (deviceList: DeviceQuickPickItem[], quickPickOptions: QuickPickOptions): Promise<DeviceQuickPickItem> {
-	return quickPick(deviceList, quickPickOptions) as Promise<DeviceQuickPickItem>;
+	if (!deviceList.length) {
+		quickPickOptions.placeHolder = `${quickPickOptions.placeHolder}. None detected, refresh device information?`;
+	}
+
+	deviceList.push({
+		id: 'refresh',
+		label: 'Refresh Devices',
+		udid: 'refresh'
+	});
+	return quickPick(deviceList, quickPickOptions, { forceShow: true }) as Promise<DeviceQuickPickItem>;
 }
 
 export async function selectDevice (platform: string, target: string, iOSSimulatorVersion?: string): Promise<DeviceQuickPickItem> {
+	let deviceChoice;
 	if (platform === 'android' && target === 'emulator') {
-		return selectAndroidEmulator();
+		deviceChoice = await selectAndroidEmulator();
 	} else if (platform === 'android' && target === 'device') {
-		return selectAndroidDevice();
+		deviceChoice = await selectAndroidDevice();
 	} else if (platform === 'ios' && target === 'device') {
-		return selectiOSDevice();
+		deviceChoice = await selectiOSDevice();
 	} else if (platform === 'ios' && target === 'simulator') {
-		return selectiOSSimulator(iOSSimulatorVersion);
+		deviceChoice = await selectiOSSimulator(iOSSimulatorVersion);
 	} else {
 		throw new Error(`Unknown platform "${platform}" or target "${target}"`);
 	}
+
+	if (deviceChoice.id === 'refresh') {
+		await commands.executeCommand(Commands.RefreshExplorer);
+		return selectDevice(platform, target, iOSSimulatorVersion);
+	}
+
+	return deviceChoice;
 }
 
 export function selectBuildTarget (platform: string): Promise<CustomQuickPick>  {
