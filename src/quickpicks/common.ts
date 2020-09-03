@@ -15,6 +15,10 @@ export interface CustomQuickPick extends QuickPickItem {
 	uuid?: string;
 }
 
+interface CustomQuickPickOptions {
+	forceShow: boolean;
+}
+
 export async function inputBox (options: InputBoxOptions): Promise<string> {
 	const input = await window.showInputBox(options);
 
@@ -48,9 +52,11 @@ export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = fa
 	}
 }
 
-export async function quickPick (items: CustomQuickPick[], quickPickOptions: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick[]>;
-export async function quickPick (items: CustomQuickPick[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: { forceShow: boolean }): Promise<CustomQuickPick>;
-export async function quickPick (items: string[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: { forceShow: boolean }): Promise<string>;
+export async function quickPick(items: string[], quickPickOptions?: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: CustomQuickPickOptions): Promise<string[]>;
+export async function quickPick(items: CustomQuickPick[], quickPickOptions?: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: CustomQuickPickOptions): Promise<CustomQuickPick[]>;
+export async function quickPick(items: string[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<string>;
+export async function quickPick(items: CustomQuickPick[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<CustomQuickPick>;
+export async function quickPick<T extends CustomQuickPick>(items: T[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<T>;
 export async function quickPick<T extends CustomQuickPick> (items: T[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}): Promise<T> {
 	if (items.length === 1 && !forceShow) {
 		return items[0];
