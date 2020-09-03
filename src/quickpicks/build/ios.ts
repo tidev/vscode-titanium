@@ -1,6 +1,7 @@
 import appc from '../../appc';
 import { IosCertificateType } from '../../types/common';
 import { quickPick, CustomQuickPick } from '../common';
+import { deviceQuickPick, DeviceQuickPickItem } from './common';
 
 export function selectiOSCertificate (buildType: string): Promise<CustomQuickPick> {
 	const certificateType: IosCertificateType = buildType === 'run' ? IosCertificateType.developer : IosCertificateType.distribution;
@@ -40,9 +41,9 @@ export async function selectiOSCodeSigning (buildType: string, target: string, a
 	};
 }
 
-export function selectiOSDevice (): Promise<CustomQuickPick & { udid: string }> {
+export function selectiOSDevice (): Promise<DeviceQuickPickItem> {
 	const devices = appc.iOSDevices().map(device => ({ id: device.udid, label: device.name, udid: device.udid }));
-	return quickPick(devices, { placeHolder: 'Select device' }) as Promise<CustomQuickPick & { udid: string }>;
+	return deviceQuickPick(devices, { placeHolder: 'Select device' });
 }
 
 export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
@@ -50,7 +51,7 @@ export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
 	return quickPick(versions, { placeHolder: 'Select simulator version' });
 }
 
-export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQuickPick & { udid: string }> {
+export async function selectiOSSimulator (iOSVersion?: string): Promise<DeviceQuickPickItem> {
 	if (!iOSVersion) {
 		iOSVersion = (await selectiOSSimulatorVersion()).label; // eslint-disable-line require-atomic-updates
 	}
@@ -58,5 +59,5 @@ export async function selectiOSSimulator (iOSVersion?: string): Promise<CustomQu
 		throw new Error(`iOS Version ${iOSVersion} does not exist`);
 	}
 	const simulators = appc.iOSSimulators()[iOSVersion].map(({ name, udid }) => ({ label: `${name} (${iOSVersion})`, id: udid, udid, version: iOSVersion }));
-	return quickPick(simulators, { placeHolder: 'Select simulator' }) as Promise<CustomQuickPick & { udid: string }>;
+	return deviceQuickPick(simulators, { placeHolder: 'Select simulator' });
 }

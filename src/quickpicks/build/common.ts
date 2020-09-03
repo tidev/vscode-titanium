@@ -1,10 +1,21 @@
+import { QuickPickOptions } from 'vscode';
 import * as utils from '../../utils';
 
 import { quickPick, CustomQuickPick } from '../common';
 import { selectAndroidDevice, selectAndroidEmulator } from './android';
-import { selectiOSDevice, selectiOSSimulator, selectiOSSimulatorVersion } from './ios';
+import { selectiOSDevice, selectiOSSimulator } from './ios';
 
-export async function selectDevice (platform: string, target: string): Promise<CustomQuickPick> {
+export interface DeviceQuickPickItem extends CustomQuickPick {
+	id: string;
+	label: string;
+	udid: string;
+}
+
+export async function deviceQuickPick (deviceList: DeviceQuickPickItem[], quickPickOptions: QuickPickOptions): Promise<DeviceQuickPickItem> {
+	return quickPick(deviceList, quickPickOptions) as Promise<DeviceQuickPickItem>;
+}
+
+export async function selectDevice (platform: string, target: string, iOSSimulatorVersion?: string): Promise<DeviceQuickPickItem> {
 	if (platform === 'android' && target === 'emulator') {
 		return selectAndroidEmulator();
 	} else if (platform === 'android' && target === 'device') {
@@ -12,10 +23,9 @@ export async function selectDevice (platform: string, target: string): Promise<C
 	} else if (platform === 'ios' && target === 'device') {
 		return selectiOSDevice();
 	} else if (platform === 'ios' && target === 'simulator') {
-		const simVersion = await selectiOSSimulatorVersion();
-		return selectiOSSimulator(simVersion.label);
+		return selectiOSSimulator(iOSSimulatorVersion);
 	} else {
-		throw new Error(`Unsupported platform and combination target ${platform} + ${target}`);
+		throw new Error(`Unknown platform "${platform}" or target "${target}"`);
 	}
 }
 

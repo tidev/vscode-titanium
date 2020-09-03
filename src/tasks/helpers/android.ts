@@ -1,7 +1,7 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
-import { selectAndroidDevice, selectAndroidEmulator, selectAndroidKeystore } from '../../quickpicks/build/android';
+import { selectAndroidKeystore } from '../../quickpicks/build/android';
 import { inputBox, enterPassword } from '../../quickpicks/common';
 import { KeystoreInfo } from '../../types/common';
 import * as fs from 'fs-extra';
@@ -60,21 +60,7 @@ export class AndroidHelper extends TaskHelper {
 	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildTaskTitaniumBuildBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
-		this.resolveCommonAppOptions(context, definition, builder);
-
-		if (!definition.deviceId) {
-			if (definition.target === 'device') {
-				const deviceInfo = await selectAndroidDevice();
-				definition.deviceId = deviceInfo.udid;
-			} else if (definition.target === 'emulator') {
-				const emulatorInfo = await selectAndroidEmulator();
-				definition.deviceId = emulatorInfo.udid;
-			} else {
-				throw new Error(`Invalid build target ${definition.target}`);
-			}
-		}
-
-		builder.addOption('--device-id', definition.deviceId);
+		await this.resolveCommonAppOptions(context, definition, builder);
 
 		if (definition.debugPort || definition.debug) {
 			builder.addOption('--debug-host', `/localhost:${definition.debugPort || '9000'}`);
