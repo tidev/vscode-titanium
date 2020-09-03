@@ -1,18 +1,19 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from '../../appc';
-import { enterPassword, inputBox, quickPick, CustomQuickPick } from '../common';
+import { enterPassword, inputBox, quickPick } from '../common';
 import { InteractionError, UserCancellation } from '../../commands';
 import { pathExists } from 'fs-extra';
 import { ExtensionContainer } from '../../container';
 import { KeystoreInfo } from '../../types/common';
+import { deviceQuickPick, DeviceQuickPickItem } from './common';
 
-export function selectAndroidDevice (): Promise<CustomQuickPick & { udid: string }> {
+export function selectAndroidDevice (): Promise<DeviceQuickPickItem> {
 	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
-	return quickPick(devices)  as Promise<CustomQuickPick & { udid: string }>;
+	return deviceQuickPick(devices, { placeHolder: 'Select Android device' });
 }
 
-export function selectAndroidEmulator (): Promise<CustomQuickPick & { udid: string }>  {
+export function selectAndroidEmulator (): Promise<DeviceQuickPickItem>  {
 	const emulators = appc.androidEmulators();
 	const options = [];
 
@@ -32,7 +33,7 @@ export function selectAndroidEmulator (): Promise<CustomQuickPick & { udid: stri
 		});
 	}
 
-	return quickPick(options, { placeHolder: 'Select emulator' })  as Promise<CustomQuickPick & { udid: string }>;
+	return deviceQuickPick(options, { placeHolder: 'Select emulator' });
 }
 
 export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string): Promise<string|undefined> {

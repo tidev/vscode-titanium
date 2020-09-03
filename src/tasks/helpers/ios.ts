@@ -1,5 +1,5 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
-import { selectiOSDevice, selectiOSSimulator, selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
+import { selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
 import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
 import { IosCertificateType, IosCert } from '../../types/common';
@@ -42,21 +42,7 @@ export class IosHelper extends TaskHelper {
 	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: IosBuildTaskTitaniumBuildBase): Promise<string> {
 		const builder = CommandBuilder.create('appc', 'run');
 
-		this.resolveCommonAppOptions(context, definition, builder);
-
-		if (!definition.deviceId) {
-			if (definition.target === 'device') {
-				const deviceInfo = await selectiOSDevice();
-				definition.deviceId = deviceInfo.udid;
-			} else if (definition.target === 'simulator') {
-				const simulatorInfo = await selectiOSSimulator(definition.ios?.simulatorVersion);
-				definition.deviceId = simulatorInfo.udid;
-			} else {
-				throw new Error(`Invalid build target ${definition.target}`);
-			}
-		}
-
-		builder.addOption('--device-id', definition.deviceId);
+		await this.resolveCommonAppOptions(context, definition, builder);
 
 		if (definition.target === 'device') {
 			const iosInfo = definition.ios || {};

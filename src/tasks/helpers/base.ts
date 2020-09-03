@@ -11,6 +11,8 @@ import { PackageTaskTitaniumBuildBase, AppPackageTaskTitaniumBuildBase } from '.
 import { TitaniumBuildBase } from '../commandTaskProvider';
 import project from '../../project';
 import { WorkspaceState } from '../../constants';
+import { selectDevice } from '../../quickpicks/build/common';
+import { IosBuildTaskTitaniumBuildBase } from './ios';
 
 function isDistributionBuild (definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase): definition is AppPackageTaskTitaniumBuildBase {
 	if (definition.target?.startsWith('dist')) {
@@ -57,12 +59,18 @@ export abstract class TaskHelper {
 		}
 	}
 
-	public resolveCommonAppOptions (context: TaskExecutionContext, definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase, builder: CommandBuilder): void {
+	public async resolveCommonAppOptions (context: TaskExecutionContext, definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
 		this.resolveCommonOptions(context, definition, builder);
 
 		if (definition.projectType !== 'app') {
 			return;
 		}
+
+		if (!definition.target) {
+			throw new Error('No target provided');
+		}
+
+		builder.addOption('--target', definition.target);
 
 		if (!isDistributionBuild(definition)) {
 
@@ -77,9 +85,15 @@ export abstract class TaskHelper {
 			if (definition.buildOnly) {
 				builder.addFlag('--build-only');
 			}
-		}
 
-		builder.addOption('--target', definition.target as string);
+			if (!definition.deviceId) {
+				const simulatorVersion = definition.ios ? (definition as IosBuildTaskTitaniumBuildBase).ios.simulatorVersion : undefined;
+				const deviceInfo = await selectDevice(definition.platform, definition.target, simulatorVersion);
+				definition.deviceId = deviceInfo.udid;
+			}
+
+			builder.addOption('--device-id', definition.deviceId);
+		}
 
 		builder.addQuotedOption('--sdk', project.sdk()[0]);
 
@@ -87,7 +101,7 @@ export abstract class TaskHelper {
 
 	public async resolveCommonPackagingOptions (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
 		if (isAppBuild<AppPackageTaskTitaniumBuildBase>(definition)) {
-			this.resolveCommonAppOptions(context, definition, builder);
+			await this.resolveCommonAppOptions(context, definition, builder);
 		} else {
 			this.resolveCommonOptions(context, definition, builder);
 		}
