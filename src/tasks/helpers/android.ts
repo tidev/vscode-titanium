@@ -1,7 +1,8 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
-import { selectAndroidDevice, selectAndroidEmulator, selectAndroidKeystore, inputBox, enterPassword } from '../../quickpicks/common';
+import { selectAndroidDevice, selectAndroidEmulator, selectAndroidKeystore } from '../../quickpicks/build/android';
+import { inputBox, enterPassword } from '../../quickpicks/common';
 import { KeystoreInfo } from '../../types/common';
 import * as fs from 'fs-extra';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';

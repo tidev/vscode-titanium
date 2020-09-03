@@ -3,7 +3,7 @@ import * as path from 'path';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { Helpers } from './helpers';
 import { TaskExecutionContext } from './tasksHelper';
-import { selectDistributionTarget } from '../quickpicks';
+import { selectDistributionTarget } from '../quickpicks/build/common';
 
 export interface PackageTask extends TitaniumTaskBase {
 	definition: PackageTaskDefinitionBase;
