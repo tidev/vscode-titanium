@@ -14,8 +14,8 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	private platforms: Map<string, PlatformNode> = new Map();
 
-	public refresh (): void {
-		vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, () => {
+	public async refresh (): Promise<void> {
+		return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, () => {
 			return new Promise((resolve, reject) => {
 				appc.getInfo((error, info) => {
 					if (info) {

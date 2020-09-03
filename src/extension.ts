@@ -168,8 +168,8 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 
 		vscode.window.registerTreeDataProvider('titanium.view.buildExplorer', deviceExplorer),
 
-		vscode.commands.registerCommand(Commands.RefreshExplorer, () => {
-			deviceExplorer.refresh();
+		vscode.commands.registerCommand(Commands.RefreshExplorer, async () => {
+			await deviceExplorer.refresh();
 		}),
 
 		vscode.window.registerTreeDataProvider('titanium.view.updateExplorer', updateExplorer),
