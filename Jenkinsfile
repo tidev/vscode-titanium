@@ -9,71 +9,73 @@ timestamps {
   def sdkVersion = '9.0.3.GA'
 
   node('osx') {
-    stage('Checkout') {
-      checkout([
-        $class: 'GitSCM',
-        branches: scm.branches,
-        extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
-        userRemoteConfigs: scm.userRemoteConfigs
-      ])
-    }
-
     nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
       ansiColor('xterm') {
-        stage('Install') {
-          timeout(15) {
-            // Ensure we have npm
-            ensureNPM(npmVersion)
-            sh 'npm ci'
-          } // timeout
-        } // stage install
+        try {
+          stage('Checkout') {
+            checkout([
+              $class: 'GitSCM',
+              branches: scm.branches,
+              extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
+              userRemoteConfigs: scm.userRemoteConfigs
+            ])
+          } // stage('Checkout')
 
-        stage('Lint') {
-          sh 'npm run lint'
-        } // stage lint
+          stage('Install') {
+            timeout(15) {
+              // Ensure we have npm
+              ensureNPM(npmVersion)
+              sh 'npm ci'
+            } // timeout
+          } // stage('Install')
 
-        stage('Unit Test') {
-          try {
-            sh 'npm run test'
-          } finally {
-            junit 'junit_report.xml'
-            if (fileExists('coverage/cobertura-coverage.xml')) {
-              step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-            } else {
-              def coverageContents = sh(returnStdout: true, script: 'ls coverage/').trim()
-              def warningMessage = "Failed to collect coverage, coverage folder contents was ${coverageContents}"
-              echo warningMessage
-              manager.addWarningBadge(warningMessage)
-            }
-          }
-        } // stage unit test
+          stage('Lint') {
+            sh 'npm run lint'
+          } // stage('Lint')
 
-        stage('Integration Test') {
-          appc.install()
-          appc.installAndSelectSDK(sdkVersion)
-          appc.loggedIn {
-            // Run ui/e2e tests
+          stage('Unit Test') {
             try {
-              sh './runUITests.sh'
+              sh 'npm run test'
             } finally {
-              sh 'ls'
-              junit 'junit_report-ui.xml'
+              junit 'junit_report.xml'
+              if (fileExists('coverage/cobertura-coverage.xml')) {
+                step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+              } else {
+                def coverageContents = sh(returnStdout: true, script: 'ls coverage/').trim()
+                def warningMessage = "Failed to collect coverage, coverage folder contents was ${coverageContents}"
+                echo warningMessage
+                manager.addWarningBadge(warningMessage)
+              }
             }
-          }
-        } // stage integration
+          } // stage('Unit Test')
 
-        stage('Build vsix') {
-          // Create the vsix package
-          sh 'npx vsce package'
-          // Archive it
-          archiveArtifacts '*.vsix'
-        }
+          stage('Integration Test') {
+            appc.install()
+            appc.installAndSelectSDK(sdkVersion)
+            appc.loggedIn {
+              // Run ui/e2e tests
+              try {
+                sh './runUITests.sh'
+              } finally {
+                sh 'ls'
+                junit 'junit_report-ui.xml'
+              }
+            }
+          } // stage('Integration Test')
 
-        stage('Danger') {
-          withEnv(["BUILD_STATUS=${currentBuild.currentResult}","DANGER_JS_APP_INSTALL_ID=''"]) {
-            sh returnStatus: true, script: 'npx danger ci --verbose' // Don't fail build if danger fails. We want to retain existing build status.
-          } // withEnv
-        }
+          stage('Build vsix') {
+            // Create the vsix package
+            sh 'npx vsce package'
+            // Archive it
+            archiveArtifacts '*.vsix'
+          } // stage('Build vsix')
+        } finally {
+          stage('Danger') {
+            withEnv(["BUILD_STATUS=${currentBuild.currentResult}","DANGER_JS_APP_INSTALL_ID=''"]) {
+              sh returnStatus: true, script: 'npx danger ci --verbose' // Don't fail build if danger fails. We want to retain existing build status.
+            } // withEnv
+          } // stage('Danger')
+        } // finally
       } // ansiColor
     } // nodejs
   } // node
