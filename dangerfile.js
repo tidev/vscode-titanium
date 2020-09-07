@@ -15,6 +15,7 @@ async function main() {
 	await Promise.all([
 		eslint(null, [ '.ts' ]),
 		junit({ pathToReport: './junit_report.xml' }),
+		junit({ pathToReport: './junit_report-ui.xml' }),
 		dependencies({ type: 'npm' }),
 		linkToVsix()
 	]);
