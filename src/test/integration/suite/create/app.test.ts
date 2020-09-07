@@ -8,8 +8,6 @@ import { parsePlatformsFromTiapp, dismissNotifications } from '../../util/common
 import { ProjectCreator } from '../../util/create';
 
 describe('Application creation', function () {
-	this.timeout(30000);
-
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
@@ -29,7 +27,7 @@ describe('Application creation', function () {
 	});
 
 	it('should be able to create a project', async function () {
-		this.timeout(60000);
+		this.timeout(90000);
 		const name = 'vscode-e2e-test-app';
 		const creator = new ProjectCreator(driver);
 
@@ -53,7 +51,7 @@ describe('Application creation', function () {
 	});
 
 	it('should only enable selected platforms', async function () {
-		this.timeout(60000);
+		this.timeout(90000);
 		const name = 'vscode-e2e-test-app';
 		const creator = new ProjectCreator(driver);
 		await creator.createApp({

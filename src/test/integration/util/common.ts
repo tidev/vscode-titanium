@@ -46,11 +46,10 @@ export function parsePlatformsFromTiapp (tiapp: any): string[] {
  * Dismisses all notifications that are active in VS Code
  */
 export async function dismissNotifications(): Promise<void> {
-	const notifications = await new Workbench().getNotifications();
-	for (const notification of notifications) {
-		await notification.dismiss();
-		await notification.getDriver().sleep(100);
-	}
+	const center = await new Workbench().openNotificationsCenter();
+	await center.clearAllNotifications();
+	await center.getDriver().sleep(250);
+	await center.close();
 }
 
 /**

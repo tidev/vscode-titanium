@@ -7,8 +7,6 @@ import { ProjectCreator } from '../../util/create';
 import { dismissNotifications } from '../../util/common';
 
 describe('Module creation', function () {
-	this.timeout(30000);
-
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
@@ -28,7 +26,7 @@ describe('Module creation', function () {
 	});
 
 	it('should be able to create a module project', async function () {
-		this.timeout(60000);
+		this.timeout(90000);
 
 		const name = 'vscode-e2e-test-module';
 		const creator = new ProjectCreator(driver);
@@ -46,7 +44,7 @@ describe('Module creation', function () {
 	});
 
 	it('should only enable selected platforms', async function () {
-		this.timeout(60000);
+		this.timeout(90000);
 
 		const name = 'vscode-e2e-test-module';
 		const creator = new ProjectCreator(driver);
