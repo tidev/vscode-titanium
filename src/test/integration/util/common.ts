@@ -66,9 +66,13 @@ export class CommonUICreator {
 	}
 
 	public async getErrorOutput (): Promise<string> {
-		const outputView = await new BottomBarPanel().openOutputView();
-		// TODO: do we need to make sure it's highlighted await outputView.selectChannel('Appcelerator');
-		return await outputView.getText();
+		try {
+			const outputView = await new BottomBarPanel().openOutputView();
+			// TODO: do we need to make sure it's highlighted await outputView.selectChannel('Appcelerator');
+			return await outputView.getText();
+		} catch (error) {
+			return 'Failed to obtain error output';
+		}
 	}
 
 	public async openFolder (folder: string): Promise<void> {
