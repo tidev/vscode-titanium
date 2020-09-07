@@ -20,12 +20,15 @@ export class ProjectCreator extends CommonUICreator {
 		await this.setFolder();
 
 		try {
-			await this.driver.wait(() => notificationExists('Creating application'), 1000);
+			await this.driver.wait(async () => {
+				await this.driver.sleep(500);
+				return notificationExists('Creating application');
+			}, 10000);
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
 			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create application. Output error was ${text}`);
+			throw new Error(`Failed to create application, "Creating module" notification did not show. Output error was ${text}`);
 		}
 
 		try {
@@ -35,12 +38,12 @@ export class ProjectCreator extends CommonUICreator {
 				// causes errors to be thrown that can't be handled
 				await this.driver.sleep(500);
 				return notificationExists('Project created');
-			}, 45000);
+			}, 60000);
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
 			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create application. Output error was ${text}`);
+			throw new Error(`Failed to create application, "Project created" notification did not show. Output error was ${text}`);
 		}
 	}
 
@@ -56,12 +59,15 @@ export class ProjectCreator extends CommonUICreator {
 		await this.setFolder();
 
 		try {
-			await this.driver.wait(() => notificationExists('Creating module'), 1000);
+			await this.driver.wait(async () => {
+				await this.driver.sleep(500);
+				return notificationExists('Creating module');
+			}, 10000);
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
 			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create module. Output error was ${text}`);
+			throw new Error(`Failed to create module, "Creating module" notification did not show. Output error was ${text}`);
 		}
 
 		try {
@@ -71,12 +77,12 @@ export class ProjectCreator extends CommonUICreator {
 				// causes errors to be thrown that can't be handled
 				await this.driver.sleep(500);
 				return notificationExists('Project created');
-			}, 45000);
+			}, 60000);
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
 			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create module. Output error was ${text}`);
+			throw new Error(`Failed to create module, "Project created" notification did not show. Output error was ${text}`);
 		}
 
 	}
