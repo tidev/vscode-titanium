@@ -50,15 +50,17 @@ timestamps {
           } // stage('Unit Test')
 
           stage('Integration Test') {
-            appc.install()
-            appc.installAndSelectSDK(sdkVersion)
-            appc.loggedIn {
-              // Run ui/e2e tests
-              try {
-                sh './runUITests.sh'
-              } finally {
-                sh 'ls'
-                junit 'junit_report-ui.xml'
+            wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
+              appc.install()
+              appc.installAndSelectSDK(sdkVersion)
+              appc.loggedIn {
+                // Run ui/e2e tests
+                try {
+                  sh './runUITests.sh'
+                } finally {
+                  sh 'ls'
+                  junit 'junit_report-ui.xml'
+                }
               }
             }
           } // stage('Integration Test')
