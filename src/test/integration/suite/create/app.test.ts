@@ -7,7 +7,7 @@ import * as xml2js from 'xml2js';
 import { parsePlatformsFromTiapp, dismissNotifications } from '../../util/common';
 import { ProjectCreator } from '../../util/create';
 
-describe('Application creation', function () {
+(process.env.JENKINS ? describe.skip : describe)('Application creation', function () {
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;

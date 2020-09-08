@@ -28,7 +28,7 @@ export class ProjectCreator extends CommonUICreator {
 			// If this notification doesn't show then it's due to the command failing,
 			// so lets scoop the output from the output view
 			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create application, "Creating module" notification did not show. Output error was ${text}`);
+			throw new Error(`Failed to create application, "Creating application" notification did not show. Output error was ${text}`);
 		}
 
 		try {
