@@ -6,7 +6,7 @@ import * as tmp from 'tmp';
 import { ProjectCreator } from '../../util/create';
 import { dismissNotifications } from '../../util/common';
 
-describe('Module creation', function () {
+(process.env.JENKINS ? describe.skip : describe)('Module creation', function () {
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
