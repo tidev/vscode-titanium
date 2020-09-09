@@ -59,6 +59,15 @@ export class ProjectCreator extends CommonUICreator {
 		await this.setPlatforms(options.platforms);
 		await this.setFolder();
 
+		// These come alphabetically
+		if (options.platforms.includes('android')) {
+			await this.setCodeBase('Android', options.codeBases.android || 'java');
+		}
+
+		if (options.platforms.includes('ios')) {
+			await this.setCodeBase('iOS', options.codeBases.ios || 'objc');
+		}
+
 		try {
 			await this.driver.wait(async () => {
 				await this.driver.sleep(500);
@@ -145,5 +154,16 @@ export class ProjectCreator extends CommonUICreator {
 			}
 		}
 		await input.confirm();
+	}
+
+	public async setCodeBase(platform: string, codeBase: string): Promise<void> {
+		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+		expect(placeHolderText).to.equal(`Select ${platform} codebase`, `Did not show ${platform} codebase selection`);
+
+		await input.setText(codeBase);
+		await input.confirm();
+		await this.driver.sleep(100);
 	}
 }

@@ -18,4 +18,8 @@ export type ModuleCreateOptions = {
 	folder: string;
 	name: string;
 	platforms: string[];
+	codeBases: {
+		android?: 'java' | 'kotlin';
+		ios?: 'objc' | 'swift';
+	}
 }

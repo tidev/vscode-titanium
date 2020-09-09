@@ -34,7 +34,11 @@ import { dismissNotifications } from '../../util/common';
 			id: 'com.axway.e2e',
 			folder: tempDirectory.name,
 			name,
-			platforms: [ 'android', 'ios' ]
+			platforms: [ 'android', 'ios' ],
+			codeBases: {
+				android: 'kotlin',
+				ios: 'swift'
+			}
 		});
 
 		const projectPath = path.join(tempDirectory.name, name);
@@ -53,7 +57,10 @@ import { dismissNotifications } from '../../util/common';
 			id: 'com.axway.e2e',
 			folder: tempDirectory.name,
 			name,
-			platforms: [ 'android' ]
+			platforms: [ 'android' ],
+			codeBases: {
+				android: 'kotlin'
+			}
 		});
 
 		const projectPath = path.join(tempDirectory.name, name);
