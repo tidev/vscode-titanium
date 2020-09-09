@@ -314,6 +314,14 @@ export function createModuleArguments (options: CreateModuleOptions): string[] {
 		'--log-level', options.logLevel
 	];
 
+	if (options.codeBases?.android) {
+		args.push('--android-code-base', options.codeBases.android);
+	}
+
+	if (options.codeBases?.ios) {
+		args.push('--ios-code-base', options.codeBases.ios);
+	}
+
 	if (options.force) {
 		args.push('--force');
 	}

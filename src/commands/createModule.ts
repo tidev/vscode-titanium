@@ -4,7 +4,7 @@ import * as path from 'path';
 import { commands, ProgressLocation, Uri, window } from 'vscode';
 import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
-import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
+import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createModuleArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
@@ -27,6 +27,7 @@ export async function createModule (): Promise<void> {
 		});
 		const platforms = await selectPlatforms();
 		const workspaceDir = await selectCreationLocation(lastCreationPath);
+		const codeBases = await selectCodeBases(platforms);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir.fsPath);
 		if (await fs.pathExists(path.join(workspaceDir.fsPath, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That module already exists. Would you like to overwrite?' }, true);
@@ -39,6 +40,7 @@ export async function createModule (): Promise<void> {
 			name,
 			platforms,
 			workspaceDir: workspaceDir.fsPath,
+			codeBases
 		});
 		await ExtensionContainer.terminal.runCommandInBackground(args, { cancellable: false, location: ProgressLocation.Notification, title: 'Creating module' });
 		// TODO: Once workspace support is figured out, add an "add to workspace command"

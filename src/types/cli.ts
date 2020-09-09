@@ -1,5 +1,6 @@
 import { KeystoreInfo, LogLevel, Platform as PlatformEnum  } from './common';
 import { Platform } from '../tasks/tasksHelper';
+import { CodeBase } from '../quickpicks/creation';
 
 export interface BaseCLIOptions {
 	logLevel: LogLevel;
@@ -72,6 +73,7 @@ export interface CreateAppOptions extends CreateOptions {
 
 export interface CreateModuleOptions extends CreateOptions {
 	codeBase?: 'swift' | 'objc';
+	codeBases?: CodeBase
 }
 
 export interface CleanAppOptions extends BaseCLIOptions {
