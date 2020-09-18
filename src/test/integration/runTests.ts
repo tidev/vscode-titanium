@@ -12,7 +12,7 @@ async function main (): Promise<void> {
 		await testSetup();
 		const tester = new ExTester(undefined, undefined, tempDirectory.name);
 		const mochaConfig = path.join(__dirname, '.mocharc.js');
-		tester.setupAndRunTests(undefined, 'out/test/integration/suite/**/*.test.js', undefined, false, true, mochaConfig);
+		tester.setupAndRunTests('1.48.0', 'out/test/integration/suite/**/*.test.js', undefined, false, true, mochaConfig);
 	} finally {
 		fs.removeSync(tempDirectory.name);
 	}
