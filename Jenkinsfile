@@ -2,13 +2,7 @@
 @Library('pipeline-library')
 import com.axway.AppcCLI;
 
-def appc = new AppcCLI(steps)
-def nodeVersion = '12.18.0'
-def npmVersion = 'latest'
-def sdkVersion = '9.0.3.GA'
-
-
-def integrationTest(nodeVersion, sdkVersion) {
+def integrationTest(nodeVersion, npmVersion, sdkVersion, appc) {
   return {
     node('vncserver') {
       unstash 'sources'
@@ -33,7 +27,7 @@ def integrationTest(nodeVersion, sdkVersion) {
   }
 }
 
-def unitTest(nodeVersion) {
+def unitTest(nodeVersion, npmVersion) {
   return {
     node('osx || linux') {
       unstash 'sources'
@@ -59,6 +53,11 @@ def unitTest(nodeVersion) {
 }
 
 timestamps {
+  def appc = new AppcCLI(steps)
+  def nodeVersion = '12.18.0'
+  def npmVersion = 'latest'
+  def sdkVersion = '9.0.3.GA'
+
   node('osx') {
     nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
       ansiColor('xterm') {
@@ -87,8 +86,8 @@ timestamps {
 
           stage('Test') {
             parallel(
-              'Integration Test': integrationTest(nodeVersion, sdkVersion),
-              'Unit Test': unitTest(nodeVersion)
+              'Integration Test': integrationTest(nodeVersion, npmVersion, sdkVersion, appc),
+              'Unit Test': unitTest(nodeVersion, npmVersion)
             )
           }
 
