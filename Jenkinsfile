@@ -3,11 +3,62 @@
 import com.axway.AppcCLI;
 
 def appc = new AppcCLI(steps)
-timestamps {
-  def nodeVersion = '12.18.0'
-  def npmVersion = 'latest'
-  def sdkVersion = '9.0.3.GA'
+def nodeVersion = '12.18.0'
+def npmVersion = 'latest'
+def sdkVersion = '9.0.3.GA'
 
+
+def integrationTest() {
+  return {
+    node('vncserver') {
+      unstash 'sources'
+      nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+        ensureNPM(npmVersion)
+        sh 'npm ci'
+        appc.install()
+        appc.installAndSelectSDK(sdkVersion)
+        wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
+          appc.loggedIn {
+            // Run ui/e2e tests
+            try {
+              sh './runUITests.sh'
+            } finally {
+              sh 'ls'
+              junit 'junit_report-ui.xml'
+            }
+          } // appc.loggedin
+        } // xvnc
+      } // nodejs
+    } // node
+  }
+}
+
+def unitTest() {
+  return {
+    node('osx || linux') {
+      unstash 'sources'
+      nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
+        ensureNPM(npmVersion)
+        sh 'npm ci'
+        try {
+          sh 'npm run test'
+        } finally {
+          junit 'junit_report.xml'
+          if (fileExists('coverage/cobertura-coverage.xml')) {
+            step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+          } else {
+            def coverageContents = sh(returnStdout: true, script: 'ls coverage/').trim()
+            def warningMessage = "Failed to collect coverage, coverage folder contents was ${coverageContents}"
+            echo warningMessage
+            manager.addWarningBadge(warningMessage)
+          }
+        }
+      } // nodejs
+    } // node
+  }
+}
+
+timestamps {
   node('osx') {
     nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
       ansiColor('xterm') {
@@ -19,6 +70,7 @@ timestamps {
               extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
               userRemoteConfigs: scm.userRemoteConfigs
             ])
+            stash 'sources'
           } // stage('Checkout')
 
           stage('Install') {
@@ -33,35 +85,12 @@ timestamps {
             sh 'npm run lint'
           } // stage('Lint')
 
-          stage('Unit Test') {
-            try {
-              sh 'npm run test'
-            } finally {
-              junit 'junit_report.xml'
-              if (fileExists('coverage/cobertura-coverage.xml')) {
-                step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-              } else {
-                def coverageContents = sh(returnStdout: true, script: 'ls coverage/').trim()
-                def warningMessage = "Failed to collect coverage, coverage folder contents was ${coverageContents}"
-                echo warningMessage
-                manager.addWarningBadge(warningMessage)
-              }
-            }
-          } // stage('Unit Test')
-
-          stage('Integration Test') {
-            appc.install()
-            appc.installAndSelectSDK(sdkVersion)
-            appc.loggedIn {
-              // Run ui/e2e tests
-              try {
-                sh './runUITests.sh'
-              } finally {
-                sh 'ls'
-                junit 'junit_report-ui.xml'
-              }
-            }
-          } // stage('Integration Test')
+          stage('Test') {
+            parallel(
+              'Integration Test': integrationTest(),
+              'Unit Test': unitTest()
+            )
+          }
 
           stage('Build vsix') {
             // Create the vsix package
