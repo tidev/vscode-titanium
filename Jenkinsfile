@@ -8,7 +8,7 @@ def npmVersion = 'latest'
 def sdkVersion = '9.0.3.GA'
 
 
-def integrationTest() {
+def integrationTest(nodeVersion, sdkVersion) {
   return {
     node('vncserver') {
       unstash 'sources'
@@ -33,7 +33,7 @@ def integrationTest() {
   }
 }
 
-def unitTest() {
+def unitTest(nodeVersion) {
   return {
     node('osx || linux') {
       unstash 'sources'
@@ -87,8 +87,8 @@ timestamps {
 
           stage('Test') {
             parallel(
-              'Integration Test': integrationTest(),
-              'Unit Test': unitTest()
+              'Integration Test': integrationTest(nodeVersion, sdkVersion),
+              'Unit Test': unitTest(nodeVersion)
             )
           }
 
