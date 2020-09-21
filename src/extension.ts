@@ -575,7 +575,12 @@ async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progre
 			if (error.metadata) {
 				const { metadata } = error;
 				if ((update.productName === updates.ProductNames.AppcInstaller || update.productName === updates.ProductNames.Node) && metadata.errorCode === 'EACCES') {
-					await executeAsTask(metadata.command, update.productName);
+					const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${label} as it must be ran with sudo`, {
+						title: 'Install with Sudo'
+					});
+					if (runWithSudo) {
+						await executeAsTask(metadata.command, update.productName);
+					}
 				}
 			} else {
 				// TODO should we show the error that we got passed?
