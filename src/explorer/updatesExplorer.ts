@@ -25,7 +25,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 		this._onDidChangeTreeData.fire();
 		try {
 			const supportedVersions = await getNodeSupportedVersion(project.sdk()[0]);
-			this.updates = await updates.checkAllUpdates(supportedVersions);
+			this.updates = await updates.checkAllUpdates({ nodeJS: supportedVersions });
 		} catch (error) {
 			let message = 'Failed to check for updates';
 			// Need to check in string as titaniumlib currently returns a string as the error
