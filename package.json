@@ -941,7 +941,7 @@
     "@types/ms": "^0.7.31",
     "@types/node": "12.12.0",
     "@types/semver": "^7.3.3",
-    "@types/sinon": "^9.0.5",
+    "@types/sinon": "^9.0.6",
     "@types/underscore": "^1.10.23",
     "@types/tmp": "^0.2.0",
     "@types/uuid": "^3.4.7",
