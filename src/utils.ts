@@ -6,7 +6,7 @@ import * as _ from 'underscore';
 import appc from './appc';
 
 import { platform } from 'os';
-import { workspace } from 'vscode';
+import { workspace, tasks, Task, ShellExecution } from 'vscode';
 import { CleanAppOptions, CreateAppOptions, CreateModuleOptions, Target } from './types/cli';
 import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
 
@@ -379,4 +379,39 @@ export function getCorrectCertificateName (certificateName: string, sdkVersion: 
 	} else {
 		return certificate.name;
 	}
+}
+
+export async function getNodeSupportedVersion(sdkVersion: string): Promise<string|undefined> {
+
+	const sdkInfo = appc.sdkInfo(sdkVersion);
+	if (!sdkInfo) {
+		return;
+	}
+	const sdkPath = sdkInfo.path;
+
+	const packageJSON = path.join(sdkPath, 'package.json');
+	const { vendorDependencies } = await fs.readJSON(packageJSON);
+	return vendorDependencies.node;
+}
+
+export async function executeAsTask(command: string, name: string): Promise<void> {
+
+	const task = new Task(
+		{ type: 'shell' },
+		name,
+		'Updates',
+		new ShellExecution(command)
+	);
+
+	const taskExecution = await tasks.executeTask(task);
+
+	const taskEndPromise = new Promise<void>((resolve) => {
+		const disposable = tasks.onDidEndTaskProcess(e => {
+			if (e.execution === taskExecution) {
+				disposable.dispose();
+				resolve();
+			}
+		});
+	});
+	return taskEndPromise;
 }
