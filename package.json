@@ -966,7 +966,7 @@
     "mocha-jenkins-reporter": "^0.4.5",
     "mocha-multi-reporters": "^1.1.7",
     "nyc": "^15.1.0",
-    "sinon": "^9.0.3",
+    "sinon": "^9.1.0",
     "standard-version": "^9.0.0",
     "typescript": "^4.0.2",
     "tmp": "^0.2.1",
