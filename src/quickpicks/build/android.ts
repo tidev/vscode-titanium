@@ -2,11 +2,12 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from '../../appc';
 import { enterPassword, inputBox, quickPick } from '../common';
-import { InteractionError, UserCancellation } from '../../commands';
+import { UserCancellation } from '../../commands';
 import { pathExists } from 'fs-extra';
 import { ExtensionContainer } from '../../container';
 import { KeystoreInfo } from '../../types/common';
 import { deviceQuickPick, DeviceQuickPickItem } from './common';
+import { WorkspaceState } from '../../constants';
 
 export function selectAndroidDevice (): Promise<DeviceQuickPickItem> {
 	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
@@ -70,20 +71,54 @@ export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePat
 	}
 }
 
-export async function enterAndroidKeystoreInfo (lastUsed?: string, savedKeystorePath?: string): Promise<KeystoreInfo> {
-	const location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
-
-	if (!location || !await pathExists(location)) {
-		throw new InteractionError(`The Keystore file ${location} does not exist`);
+async function resolveKeystorePath (keystorePath: string, folder: vscode.WorkspaceFolder): Promise<string> {
+	if (path.isAbsolute(keystorePath) && await pathExists(keystorePath)) {
+		return keystorePath;
 	}
-	const alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias || '' });
-	const password = await enterPassword({ placeHolder: 'Enter your keystore password' });
-	const privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore private key password (optional)' });
 
-	return {
-		alias,
-		location,
-		password,
-		privateKeyPassword
-	};
+	const resolvedPath = path.resolve(folder.uri.fsPath, keystorePath);
+
+	if (await pathExists(resolvedPath)) {
+		return resolvedPath;
+	}
+
+	throw new Error(`Provided keystorePath value "${keystorePath}" does not exist`);
+}
+
+async function verifyKeystorePath (keystorePath: string|undefined, folder: vscode.WorkspaceFolder): Promise<string> {
+	if (!keystorePath) {
+		throw new Error('Expected a value for keystorePath');
+	}
+
+	const resolvedPath = await resolveKeystorePath(keystorePath, folder);
+
+	return resolvedPath;
+}
+
+export async function enterAndroidKeystoreInfo (workspaceFolder: vscode.WorkspaceFolder, keystoreInfo: Partial<KeystoreInfo> = {}): Promise<KeystoreInfo> {
+
+	const lastUsed = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastKeystorePath);
+	const savedKeystorePath = ExtensionContainer.config.android.keystorePath;
+
+	if (!keystoreInfo?.location) {
+		keystoreInfo.location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
+	}
+
+	await verifyKeystorePath(keystoreInfo.location, workspaceFolder);
+
+	if (!keystoreInfo.alias) {
+		keystoreInfo.alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias || '' });
+	}
+
+	if (!keystoreInfo.password) {
+		keystoreInfo.password = await enterPassword({ placeHolder: 'Enter your keystore password' });
+	}
+
+	if (!keystoreInfo.privateKeyPassword) {
+		keystoreInfo.privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore private key password (optional)' });
+	}
+
+	ExtensionContainer.context.workspaceState.update(WorkspaceState.LastKeystorePath, keystoreInfo.location);
+
+	return keystoreInfo as KeystoreInfo;
 }
