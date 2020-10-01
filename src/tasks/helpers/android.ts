@@ -3,12 +3,9 @@ import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
 import { enterAndroidKeystoreInfo } from '../../quickpicks/build/android';
 import { KeystoreInfo } from '../../types/common';
-import * as fs from 'fs-extra';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
-import { WorkspaceFolder } from 'vscode';
-import * as path from 'path';
 
 export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: AndroidBuildTaskTitaniumBuildBase;
