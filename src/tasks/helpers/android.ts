@@ -1,8 +1,7 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { CommandBuilder } from '../commandBuilder';
-import { selectAndroidKeystore } from '../../quickpicks/build/android';
-import { inputBox, enterPassword } from '../../quickpicks/common';
+import { enterAndroidKeystoreInfo } from '../../quickpicks/build/android';
 import { KeystoreInfo } from '../../types/common';
 import * as fs from 'fs-extra';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
@@ -31,30 +30,6 @@ export interface AndroidPackageTaskTitaniumBuildBase extends AppPackageTaskTitan
 	target: 'dist-playstore';
 }
 
-async function resolveKeystorePath (keystorePath: string, folder: WorkspaceFolder): Promise<string> {
-	if (path.isAbsolute(keystorePath) && await fs.pathExists(keystorePath)) {
-		return keystorePath;
-	}
-
-	const resolvedPath = path.resolve(folder.uri.fsPath, keystorePath);
-
-	if (await fs.pathExists(resolvedPath)) {
-		return resolvedPath;
-	}
-
-	throw new Error(`Provided keystorePath value "${keystorePath}" does not exist`);
-}
-
-async function verifyKeystorePath (keystorePath: string|undefined, folder: WorkspaceFolder): Promise<string> {
-	if (!keystorePath) {
-		throw new Error('Expected a value for keystorePath');
-	}
-
-	const resolvedPath = await resolveKeystorePath(keystorePath, folder);
-
-	return resolvedPath;
-}
-
 export class AndroidHelper extends TaskHelper {
 
 	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildTaskTitaniumBuildBase): Promise<string> {
@@ -81,20 +56,16 @@ export class AndroidHelper extends TaskHelper {
 			keystore: { }
 		};
 
-		if (!androidInfo.keystore.location) {
-			androidInfo.keystore.location = await verifyKeystorePath(await selectAndroidKeystore(), context.folder);
-		} else {
-			androidInfo.keystore.location = await verifyKeystorePath(androidInfo.keystore.location, context.folder);
-		}
-
-		if (!androidInfo.keystore.alias) {
-			androidInfo.keystore.alias = await inputBox({ placeHolder: 'Enter your Keystore alias' });
-		}
+		androidInfo.keystore = await enterAndroidKeystoreInfo(context.folder, androidInfo.keystore);
 
 		builder
 			.addQuotedOption('--keystore', androidInfo.keystore.location)
 			.addOption('--alias', androidInfo.keystore.alias)
-			.addQuotedOption('--store-password', await enterPassword({  placeHolder: 'Enter your Keystore password' }));
+			.addQuotedOption('--store-password', androidInfo.keystore.password);
+
+		if (androidInfo.keystore.privateKeyPassword) {
+			builder.addQuotedOption('--key-password', androidInfo.keystore.privateKeyPassword);
+		}
 
 		definition.android = androidInfo;
 
