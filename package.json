@@ -636,7 +636,7 @@
       "view/title": [
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.buildExplorer && !titanium:build:running",
+          "when": "view == titanium.view.buildExplorer",
           "group": "navigation@2"
         },
         {
