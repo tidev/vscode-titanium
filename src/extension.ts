@@ -579,7 +579,7 @@ async function installUpdates (updateInfo: UpdateChoice[] | UpdateInfo[], progre
 						title: 'Install with Sudo'
 					});
 					if (runWithSudo) {
-						await executeAsTask(metadata.command, update.productName);
+						await executeAsTask(`sudo ${metadata.command}`, update.productName);
 					}
 				}
 			} else {
