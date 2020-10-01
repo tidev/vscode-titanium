@@ -106,7 +106,10 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.commands.registerCommand('titanium.init', init),
 
 		// register run command
-		vscode.commands.registerCommand(Commands.Build, node => {
+		vscode.commands.registerCommand(Commands.Build, async node => {
+			if (await ExtensionContainer.context.globalState.get<boolean>(GlobalState.Running)) {
+				await vscode.commands.executeCommand(Commands.StopBuild);
+			}
 			if (project.isTitaniumApp) {
 				return buildApplication(node);
 			} else if (project.isTitaniumModule) {
