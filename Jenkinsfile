@@ -29,7 +29,7 @@ def integrationTest(nodeVersion, npmVersion, sdkVersion, appc) {
 
 def unitTest(nodeVersion, npmVersion) {
   return {
-    node('linux && !Jenkins') {
+    node('linux && !master') {
       unstash 'sources'
       nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
         ensureNPM(npmVersion)
