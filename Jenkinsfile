@@ -29,13 +29,15 @@ def integrationTest(nodeVersion, npmVersion, sdkVersion, appc) {
 
 def unitTest(nodeVersion, npmVersion) {
   return {
-    node('linux && !master') {
+    node('linux && !master && vncserver') {
       unstash 'sources'
       nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
         ensureNPM(npmVersion)
         sh 'npm ci'
         try {
-          sh 'npm run test'
+          wrap([$class: 'Xvnc', takeScreenshot: false, useXauthority: true]) {
+            sh 'npm run test'
+          }
         } finally {
           junit 'junit_report.xml'
           stash includes: 'junit_report.xml', name: 'unit-tests'
