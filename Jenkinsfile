@@ -17,8 +17,8 @@ def integrationTest(nodeVersion, npmVersion, sdkVersion, appc) {
             try {
               sh './runUITests.sh'
             } finally {
-              sh 'ls'
               junit 'junit_report-ui.xml'
+              stash includes: 'junit_report-ui.xml', name: 'integration-tests'
             }
           } // appc.loggedin
         } // xvnc
@@ -38,6 +38,7 @@ def unitTest(nodeVersion, npmVersion) {
           sh 'npm run test'
         } finally {
           junit 'junit_report.xml'
+          stash includes: 'junit_report.xml', name: 'unit-tests'
           if (fileExists('coverage/cobertura-coverage.xml')) {
             step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
           } else {
@@ -99,6 +100,8 @@ timestamps {
           } // stage('Build vsix')
         } finally {
           stage('Danger') {
+            unstash 'unit-tests'
+            unstash 'integration-tests'
             withEnv(["BUILD_STATUS=${currentBuild.currentResult}","DANGER_JS_APP_INSTALL_ID=''"]) {
               sh returnStatus: true, script: 'npx danger ci --verbose' // Don't fail build if danger fails. We want to retain existing build status.
             } // withEnv
