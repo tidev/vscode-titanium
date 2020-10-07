@@ -2,6 +2,7 @@ import { BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetti
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
+import { Target } from '../types';
 
 const exec = promisify(cp.exec);
 
