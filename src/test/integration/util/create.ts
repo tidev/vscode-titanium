@@ -1,6 +1,7 @@
 import { InputBox } from 'vscode-extension-tester';
 import { notificationExists, CommonUICreator } from './common';
 import { expect } from 'chai';
+import { AppCreateOptions, ModuleCreateOptions } from '../types';
 
 /**
  * Wrapper around the project creation flow to make it slightly easier to test

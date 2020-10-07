@@ -1,11 +1,11 @@
-type Target = {
+export type Target = {
 	_: string;
 	$: {
 		device: string;
 	};
 }
 
-type AppCreateOptions = {
+export type AppCreateOptions = {
 	id: string;
 	enableServices: boolean;
 	folder: string;
@@ -13,7 +13,7 @@ type AppCreateOptions = {
 	platforms: string[];
 }
 
-type ModuleCreateOptions = {
+export type ModuleCreateOptions = {
 	id: string;
 	folder: string;
 	name: string;
