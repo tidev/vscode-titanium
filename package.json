@@ -954,7 +954,7 @@
     "commitizen": "^4.2.1",
     "cz-conventional-changelog": "^3.3.0",
     "danger": "^10.5.0",
-    "eslint": "^7.10.0",
+    "eslint": "^7.11.0",
     "ejs": "^3.1.5",
     "eslint-config-axway": "^4.7.3",
     "eslint-plugin-chai-friendly": "^0.6.0",
