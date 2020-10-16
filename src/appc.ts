@@ -2,9 +2,8 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
 
-import { ChildProcess, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import { homedir } from 'os';
-import { window } from 'vscode';
 import { ExtensionContainer } from './container';
 import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common';
 import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
@@ -22,8 +21,6 @@ export interface AlloyGenerateOptions {
 export class Appc {
 
 	public info: AppcInfo|undefined;
-	private proc!: ChildProcess|undefined;
-	private killed = false;
 
 	/**
 	 * Returns true if user has active session
@@ -315,61 +312,6 @@ export class Appc {
 		return profiles;
 	}
 
-	public buildInProgress (): ChildProcess|undefined {
-		return this.proc;
-	}
-
-	/**
-	 * Run `appc run` command
-	 *
-	 * @param {Object} opts arguments
-	 */
-	public run (opts: { args: string[]; error: (message: string) => void; exit: (code: number) => void }): void {
-		if (this.proc) {
-			return;
-		}
-		const channel = window.createOutputChannel('Appcelerator');
-		const cmd = ExtensionContainer.config.general.appcCommandPath;
-		if (ExtensionContainer.config.general.displayBuildCommandInConsole) {
-			channel.append(`${cmd} run ${opts.args.join(' ')}\n\n`);
-		}
-		this.killed = false;
-		this.proc = spawn(cmd, [ 'run' ].concat(opts.args));
-		this.proc.stdout?.on('data', data => {
-			if (!this.killed) {
-				const message = data.toString();
-				channel.append(message);
-			}
-		});
-		this.proc.stderr?.on('data', data  => {
-			if (this.killed) {
-				const message = data.toString();
-				channel.append(message);
-				opts.error(message);
-			}
-		});
-		this.proc.on('close', code => {
-			// console.log(`Exited with code ${code}`);
-			opts.exit(code);
-			this.proc = undefined;
-		});
-		this.proc.on('exit', code => {
-			// console.log(`Exited with code ${code}`);
-			opts.exit(code as number);
-			this.proc = undefined;
-		});
-
-		channel.show();
-	}
-
-	public stop (): void {
-		if (this.proc) {
-			this.proc.kill('SIGKILL');
-			this.proc = undefined;
-			this.killed = true;
-		}
-	}
-
 	/**
 	 * Run `appc alloy generate` command
 	 *
@@ -400,14 +342,6 @@ export class Appc {
 				return resolve();
 			});
 		});
-	}
-
-	public async getAlloyVersion (): Promise<string> {
-		const appcPath = path.join(homedir(), '.appcelerator', 'install');
-		const appcVersion = await fs.readFile(path.join(appcPath, '.version'), 'utf8');
-		const alloyPath = path.join(appcPath, appcVersion, 'package', 'node_modules', 'alloy');
-		const { version: alloyVersion } = await fs.readJSON(path.join(alloyPath, 'package.json'));
-		return alloyVersion;
 	}
 
 	public getAdbPath (): string|undefined {
