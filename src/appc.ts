@@ -9,6 +9,7 @@ import { ExtensionContainer } from './container';
 import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common';
 import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
+import { GlobalState } from './constants';
 
 export interface AlloyGenerateOptions {
 	adapterType?: string;
@@ -20,7 +21,7 @@ export interface AlloyGenerateOptions {
 
 export class Appc {
 
-	public info!: AppcInfo;
+	public info: AppcInfo|undefined;
 	private proc!: ChildProcess|undefined;
 	private killed = false;
 
@@ -44,10 +45,12 @@ export class Appc {
 	 * @param {Function} callback	callback function
 	 */
 	public getInfo (callback: (error: Error|null, info?: AppcInfo) => void): void {
+		ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, true);
 		let result = '';
 		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
 		proc.stdout.on('data', data => result += data);
 		proc.on('close', () => {
+			ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, false);
 			if (result && result.length) {
 				try {
 					this.info = JSON.parse(result);
@@ -68,49 +71,56 @@ export class Appc {
 	 * @returns {Array}
 	 */
 	public sdks (isGA = false): TitaniumSDK[] {
-		if (this.info.titanium) {
-			let keys = Object.keys(this.info.titanium);
-			for (const key of keys) {
-				this.info.titanium[key].fullversion = key;
-			}
+		const sdks: TitaniumSDK[] = [];
 
-			keys.sort((a, b) => {
-				const aVersion = a.substr(0, a.lastIndexOf('.'));
-				const aSuffix = a.substr(a.lastIndexOf('.') + 1);
-				const bVersion = b.substr(0, b.lastIndexOf('.'));
-				const bSuffix = b.substr(b.lastIndexOf('.') + 1);
-
-				if (aVersion < bVersion) {
-					return 1;
-				} else if (aVersion > bVersion) {
-					return -1;
-				} else {
-					if (aSuffix === bSuffix) {
-						return 0;
-					} else if (aSuffix === 'GA') {
-						return -1;
-					} else if (bSuffix === 'GA') {
-						return 1;
-					} else if (aSuffix === 'RC') {
-						return -1;
-					} else if (bSuffix === 'RC') {
-						return 1;
-					} else if (aSuffix < bSuffix) {
-						return 1;
-					} else if (aSuffix > bSuffix) {
-						return -1;
-					}
-					return 0;
-				}
-			});
-
-			if (isGA) {
-				keys = keys.filter(key => key.indexOf('GA') > 0);
-			}
-
-			return keys.map(key => this.info.titanium[key]);
+		if (!this.info?.titanium) {
+			return sdks;
 		}
-		return [];
+
+		let sdkVersions = Object.keys(this.info.titanium);
+		for (const key of sdkVersions) {
+			this.info.titanium[key].fullversion = key;
+		}
+
+		sdkVersions.sort((a, b) => {
+			const aVersion = a.substr(0, a.lastIndexOf('.'));
+			const aSuffix = a.substr(a.lastIndexOf('.') + 1);
+			const bVersion = b.substr(0, b.lastIndexOf('.'));
+			const bSuffix = b.substr(b.lastIndexOf('.') + 1);
+
+			if (aVersion < bVersion) {
+				return 1;
+			} else if (aVersion > bVersion) {
+				return -1;
+			} else {
+				if (aSuffix === bSuffix) {
+					return 0;
+				} else if (aSuffix === 'GA') {
+					return -1;
+				} else if (bSuffix === 'GA') {
+					return 1;
+				} else if (aSuffix === 'RC') {
+					return -1;
+				} else if (bSuffix === 'RC') {
+					return 1;
+				} else if (aSuffix < bSuffix) {
+					return 1;
+				} else if (aSuffix > bSuffix) {
+					return -1;
+				}
+				return 0;
+			}
+		});
+
+		if (isGA) {
+			sdkVersions = sdkVersions.filter(key => key.indexOf('GA') > 0);
+		}
+
+		for (const key of sdkVersions) {
+			sdks.push(this.info.titanium[key]);
+		}
+
+		return sdks;
 	}
 
 	/**
@@ -133,7 +143,7 @@ export class Appc {
 	 * @returns {Object}
 	 */
 	public selectedSdk (): TitaniumSDK|undefined {
-		if (this.info.titaniumCLI) {
+		if (this.info?.titaniumCLI) {
 			const selectedVersion = this.info.titaniumCLI.selectedSDK;
 			let sdk;
 			if (selectedVersion) {
@@ -151,7 +161,7 @@ export class Appc {
 	}
 
 	public sdkInfo (version: string): TitaniumSDK|undefined {
-		if (this.info.titanium) {
+		if (this.info?.titanium) {
 			return this.info.titanium[version];
 		}
 	}
@@ -162,7 +172,7 @@ export class Appc {
 	 * @returns {Object}
 	 */
 	public iOSSimulators (): { [key: string]: IosSimulator[] } {
-		if (this.info.ios && this.info.ios.simulators) {
+		if (this.info?.ios.simulators) {
 			return this.info.ios.simulators.ios;
 		}
 		return {};
@@ -179,7 +189,7 @@ export class Appc {
 	 * @returns {Array}
 	 */
 	public iOSDevices (): IosDevice[] {
-		if (this.info.ios && this.info.ios.devices) {
+		if (this.info?.ios?.devices) {
 			return this.info.ios.devices;
 		}
 		return [];
@@ -203,7 +213,7 @@ export class Appc {
 	 * @returns {Object}
 	 */
 	public androidEmulators (): { AVDs: AndroidEmulator[]; Genymotion: AndroidEmulator[] } {
-		if (this.info.android && this.info.android.emulators.length) {
+		if (this.info?.android?.emulators?.length) {
 			const emulators: { AVDs: AndroidEmulator[]; Genymotion: AndroidEmulator[] } = {
 				AVDs: [],
 				Genymotion: []
@@ -229,7 +239,7 @@ export class Appc {
 	 * @returns {Array}
 	 */
 	public androidDevices (): AndroidDevice[] {
-		if (this.info.android && this.info.android.devices) {
+		if (this.info?.android?.devices) {
 			return this.info.android.devices;
 		}
 		return [];
@@ -255,7 +265,7 @@ export class Appc {
 	 */
 	public iOSCertificates (type: IosCertificateType = IosCertificateType.developer): IosCert[] {
 		const certificates = [];
-		if (this.info.ios && this.info.ios.certs) {
+		if (this.info?.ios?.certs) {
 			for (const keychain of Object.values(this.info.ios.certs.keychains)) {
 				certificates.push(...keychain[type]);
 			}
@@ -279,7 +289,7 @@ export class Appc {
 			pem = pem.replace(/[\n\r]/g, '');
 		}
 		const profiles = [];
-		if (this.info.ios && this.info.ios.provisioning) {
+		if (this.info?.ios?.provisioning) {
 
 			let deploymentProfiles: ProvisioningProfile[] = [];
 			if (deployment === 'development') {
@@ -401,7 +411,7 @@ export class Appc {
 	}
 
 	public getAdbPath (): string|undefined {
-		if (this.info.android && this.info.android.sdk && this.info.android.sdk.executables) {
+		if (this.info?.android?.sdk?.executables) {
 			return this.info.android.sdk.executables.adb;
 		}
 	}

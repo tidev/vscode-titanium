@@ -7,6 +7,9 @@ import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
 import { DevelopmentTarget } from '../../types/cli';
+import { BlankNode } from '../nodes';
+import { ExtensionContainer } from '../../container';
+import { GlobalState } from '../../constants';
 
 export class TargetNode extends BaseNode {
 
@@ -22,8 +25,16 @@ export class TargetNode extends BaseNode {
 		this.targetId = targetForName(this.label) as DevelopmentTarget;
 	}
 
-	public getChildren (): Array<OSVerNode|DeviceNode> {
+	public getChildren (): Array<OSVerNode|DeviceNode|BlankNode> {
 		const devices = [];
+
+		// Check if we're refreshing the environment information currently and return early so that
+		// the child nodes of each target display the message
+		const refreshingEnvironment = ExtensionContainer.context.globalState.get<boolean>(GlobalState.RefreshEnvironment);
+		if (refreshingEnvironment) {
+			return [ new BlankNode('Refreshing environment') ];
+		}
+
 		if (this.platform === 'ios') {
 			switch (this.label) {
 				case 'Simulator':
@@ -60,6 +71,10 @@ export class TargetNode extends BaseNode {
 					}
 					break;
 			}
+		}
+
+		if (!devices.length) {
+			devices.push(new BlankNode(`No ${this.label.toLowerCase()} detected`));
 		}
 		return devices;
 	}
