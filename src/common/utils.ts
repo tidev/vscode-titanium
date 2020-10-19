@@ -40,3 +40,11 @@ export function parseXmlString (xmlString: string): Promise<unknown> {
 		});
 	});
 }
+
+export function sleep (time: number): Promise<void> {
+	return new Promise(resolve => {
+		setTimeout(() => {
+			resolve();
+		}, time);
+	});
+}

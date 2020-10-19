@@ -1,6 +1,7 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
 import { ChromeDebugAdapter, Crdp } from '@awam/vscode-chrome-debug-core';
 import * as got from 'got';
+import { sleep } from '../common/utils';
 import { URL } from 'url';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
@@ -118,7 +119,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 			throw Error(errorMessage);
 		}
 
-		await this.sleep(250);
+		await sleep(250);
 
 		let body;
 		try {
@@ -134,14 +135,6 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 
 		return this.pollForApp(url, errorMessage, maxRetries, iteration + 1);
-	}
-
-	private sleep (time: number): Promise<void> {
-		return new Promise(resolve => {
-			setTimeout(() => {
-				resolve();
-			}, time);
-		});
 	}
 
 	private cleanup (): void {

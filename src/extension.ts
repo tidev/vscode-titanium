@@ -53,6 +53,7 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { registerTaskProviders, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasks/tasksHelper';
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 import { executeAsTask } from './utils';
+import { sleep } from './common/utils';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -109,6 +110,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.commands.registerCommand(Commands.Build, async node => {
 			if (await ExtensionContainer.context.globalState.get<boolean>(GlobalState.Running)) {
 				await vscode.commands.executeCommand(Commands.StopBuild);
+				await sleep(100);
 			}
 			if (project.isTitaniumApp) {
 				return buildApplication(node);
