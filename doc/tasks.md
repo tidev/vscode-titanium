@@ -164,8 +164,3 @@ Visual Studio Code allows tasks to declare dependencies to create what is known 
 	]
 }
 ```
-
-## Current Limitations
-
-* [Variable substitution](https://code.visualstudio.com/docs/editor/variables-reference) is unsupported.
-* File paths provided in the task configuration have to be full paths.
