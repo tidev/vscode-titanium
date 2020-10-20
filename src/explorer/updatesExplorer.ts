@@ -11,10 +11,10 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	public updates: UpdateInfo[] = [];
 
-	private _onDidChangeTreeData: vscode.EventEmitter<BaseNode> = new vscode.EventEmitter();
+	private _onDidChangeTreeData: vscode.EventEmitter<BaseNode|undefined> = new vscode.EventEmitter();
 
 	// tslint:disable-next-line member-ordering
-	public readonly onDidChangeTreeData: vscode.Event<BaseNode> = this._onDidChangeTreeData.event;
+	public readonly onDidChangeTreeData: vscode.Event<BaseNode|undefined> = this._onDidChangeTreeData.event;
 
 	private updateMap: Map<string, UpdateNode> = new Map();
 
@@ -22,7 +22,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 
 	public async refresh (): Promise<void> {
 		this.checkingForUpdates = true;
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 		try {
 			const supportedVersions = await getNodeSupportedVersion(project.sdk()[0]);
 			this.updates = await updates.checkAllUpdates({ nodeJS: supportedVersions });
@@ -35,7 +35,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 			await vscode.window.showErrorMessage(message);
 		}
 		this.checkingForUpdates = false;
-		this._onDidChangeTreeData.fire();
+		this._onDidChangeTreeData.fire(undefined);
 		if (this.updates.length) {
 			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
 			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
