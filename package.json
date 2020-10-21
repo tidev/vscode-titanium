@@ -951,7 +951,7 @@
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "chai": "^4.2.0",
-    "commitizen": "^4.2.1",
+    "commitizen": "^4.2.2",
     "cz-conventional-changelog": "^3.3.0",
     "danger": "^10.5.0",
     "eslint": "^7.11.0",
