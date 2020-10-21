@@ -3,7 +3,6 @@ import Appc from '../appc';
 import { nameForPlatform, platforms } from '../utils';
 import { CustomQuickPick, quickPick } from './common';
 import { appc } from 'titanium-editor-commons/updates';
-import { promisify } from 'util';
 
 export interface CodeBase {
 	android?: 'java' | 'kotlin'
@@ -29,10 +28,6 @@ export async function selectCodeBases(platforms: string[]): Promise<CodeBase|und
 		android: undefined,
 		ios: undefined
 	};
-
-	if (!Appc.info) {
-		await promisify(Appc.getInfo).bind(Appc)();
-	}
 
 	const selectedSdk = Appc.selectedSdk();
 

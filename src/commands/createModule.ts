@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import Appc from '../appc';
 
 import { commands, ProgressLocation, Uri, window } from 'vscode';
 import { VSCodeCommands, WorkspaceState } from '../constants';
@@ -7,10 +8,16 @@ import { ExtensionContainer } from '../container';
 import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createModuleArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { promisify } from 'util';
 
 export async function createModule (): Promise<void> {
 	try {
 		checkLogin();
+
+		// force a refresh of the environment information to make sure that we have the correct
+		// selected SDK and CLI
+		await promisify(Appc.getInfo).bind(Appc)();
+
 		let force = false;
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
