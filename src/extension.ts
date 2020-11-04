@@ -390,41 +390,44 @@ async function init (): Promise<void> {
 				message: 'Fetching environment information'
 			});
 
-			appc.getInfo(error => {
-				if (error) {
-					vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-					return Promise.reject();
+			try {
+				await appc.getInfo();
+			} catch (error) {
+				if (error instanceof InteractionError) {
+					handleInteractionError(error);
+					return;
 				}
+				vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+				return;
+			}
 
-				if (project.isTitaniumApp) {
-					generateCompletions();
-				}
+			if (project.isTitaniumApp) {
+				generateCompletions();
+			}
 
-				// Call refresh incase the Titanium Explorer activity pane became active before info
-				vscode.commands.executeCommand(Commands.RefreshExplorer);
+			// Call refresh incase the Titanium Explorer activity pane became active before info
+			vscode.commands.executeCommand(Commands.RefreshExplorer);
 
-				// Perform the update check if we need to
-				const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
-				const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
+			// Perform the update check if we need to
+			const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
+			const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
 
-				// If there's no timestamp for when we last checked the updates then set to now
-				if (!lastUpdateCheck) {
-					ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
-				}
+			// If there's no timestamp for when we last checked the updates then set to now
+			if (!lastUpdateCheck) {
+				ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+			}
 
-				const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
-				if (checkUpdates) {
-					ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
-					vscode.commands.executeCommand(Commands.CheckForUpdates);
-				} else {
-					vscode.commands.executeCommand(Commands.RefreshUpdates);
-				}
+			const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
+			if (checkUpdates) {
+				ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+				vscode.commands.executeCommand(Commands.CheckForUpdates);
+			} else {
+				vscode.commands.executeCommand(Commands.RefreshUpdates);
+			}
 
-				return Promise.resolve();
-			});
+			return Promise.resolve();
 		});
 	}
-
 }
 
 /**
@@ -528,10 +531,8 @@ async function generateCompletions (force = false): Promise<void> {
 					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, async () => {
 						try {
 							await updates.titanium.sdk.installUpdate(sdkVersion as string);
-							appc.getInfo(() => {
-								generateCompletions(force);
-								return Promise.resolve();
-							});
+							await appc.getInfo();
+							await generateCompletions(force);
 						} catch (err) {
 							return Promise.reject(err);
 						}

@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
+import * as vscode from 'vscode';
 
 import { spawn } from 'child_process';
 import { homedir } from 'os';
@@ -9,6 +10,7 @@ import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common
 import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 import { GlobalState } from './constants';
+import { InteractionError } from './commands';
 
 export interface AlloyGenerateOptions {
 	adapterType?: string;
@@ -41,23 +43,40 @@ export class Appc {
 	 *
 	 * @param {Function} callback	callback function
 	 */
-	public getInfo (callback: (error: Error|null, info?: AppcInfo) => void): void {
-		ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, true);
-		let result = '';
-		const proc = spawn('appc', [ 'info', '-o', 'json' ], { shell: true });
-		proc.stdout.on('data', data => result += data);
-		proc.on('close', () => {
-			ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, false);
-			if (result && result.length) {
-				try {
-					this.info = JSON.parse(result);
-					return callback(null, this.info);
-				} catch (error) {
-					return callback(error);
+	public async getInfo (): Promise<void> {
+		return new Promise((resolve, reject) => {
+			ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, true);
+			let result = '';
+			let output = '';
+			const proc = spawn('appc', [ 'ti', 'info', '-o', 'json', '--no-prompt' ], { shell: true });
+			proc.stdout.on('data', data => {
+				result += data;
+				output += data;
+			});
+			proc.stderr.on('data', data => output += data);
+			proc.on('close', (code) => {
+				ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, false);
+				if (code) {
+					const error = new InteractionError('Failed to get environment information');
+					error.interactionChoices.push({
+						title: 'View Error',
+						run() {
+							const channel = vscode.window.createOutputChannel('Appcelerator');
+							channel.append(output);
+							channel.show();
+						}
+					});
+					return reject(error);
 				}
-			} else {
-				callback(new Error('Failed to get environment information'));
-			}
+				if (result && result.length) {
+					try {
+						this.info = JSON.parse(result);
+						return resolve();
+					} catch (error) {
+						return reject(error);
+					}
+				}
+			});
 		});
 	}
 
