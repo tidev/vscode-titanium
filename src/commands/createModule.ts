@@ -8,7 +8,6 @@ import { ExtensionContainer } from '../container';
 import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createModuleArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
-import { promisify } from 'util';
 
 export async function createModule (): Promise<void> {
 	try {
@@ -16,7 +15,7 @@ export async function createModule (): Promise<void> {
 
 		// force a refresh of the environment information to make sure that we have the correct
 		// selected SDK and CLI
-		await promisify(Appc.getInfo).bind(Appc)();
+		await Appc.getInfo();
 
 		let force = false;
 		const logLevel = ExtensionContainer.config.general.logLevel;
