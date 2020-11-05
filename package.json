@@ -964,7 +964,7 @@
     "lint-staged": "^10.5.1",
     "mocha": "^8.2.1",
     "mocha-jenkins-reporter": "^0.4.5",
-    "mocha-multi-reporters": "^1.1.7",
+    "mocha-multi-reporters": "^1.5.1",
     "nyc": "^15.1.0",
     "sinon": "^9.2.1",
     "standard-version": "^9.0.0",
