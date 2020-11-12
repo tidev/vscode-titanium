@@ -54,6 +54,10 @@ export class ProjectCreator extends CommonUICreator {
 
 		await this.workbench.executeCommand('Titanium: Create module');
 
+		// HACK: Need to figure out a better way to wait for the environment detection to finish,
+		// maybe we should just have a notification for it?
+		await this.driver.sleep(10000);
+
 		await this.setName(options.name);
 		await this.setId(options.id);
 		await this.setPlatforms(options.platforms);
