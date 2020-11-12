@@ -31,7 +31,9 @@ describe('Alloy component generation', function () {
 	});
 
 	afterEach(async function () {
-		await remove(tempDirectory.name);
+		if (tempDirectory) {
+			await remove(tempDirectory.name);
+		}
 	});
 
 	// alloy generate controller creates all 3 files

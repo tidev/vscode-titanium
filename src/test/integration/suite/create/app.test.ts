@@ -28,7 +28,9 @@ import { ProjectCreator } from '../../util/create';
 	});
 
 	afterEach(async function () {
-		await fs.remove(tempDirectory.name);
+		if (tempDirectory) {
+			await fs.remove(tempDirectory.name);
+		}
 	});
 
 	it('should be able to create a project', async function () {
