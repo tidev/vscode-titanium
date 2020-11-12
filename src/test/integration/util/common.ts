@@ -92,6 +92,21 @@ export class CommonUICreator {
 		const setting = await editor.findSetting(settingName, `Titanium › ${section}`) as TextSetting;
 		await setting.setValue(value);
 	}
+
+	public async waitForEnvironmentDetectionCompletion(): Promise<void> {
+		let exists = true;
+		while (exists) {
+			// do nothing
+			const notification = await notificationExists('Validating Environment');
+			if (!notification) {
+				exists = false;
+			} else {
+				console.log('notification exists');
+				console.log(notification);
+			}
+		}
+		return;
+	}
 }
 
 /**

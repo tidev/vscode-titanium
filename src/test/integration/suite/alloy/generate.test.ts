@@ -27,6 +27,7 @@ describe('Alloy component generation', function () {
 		tempDirectory = tmp.dirSync();
 		await copy(projectDirectory, tempDirectory.name);
 		await generator.openFolder(tempDirectory.name);
+		await generator.waitForEnvironmentDetectionCompletion();
 	});
 
 	afterEach(async function () {
