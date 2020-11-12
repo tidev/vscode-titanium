@@ -8,9 +8,12 @@ import { parsePlatformsFromTiapp, dismissNotifications } from '../../util/common
 import { ProjectCreator } from '../../util/create';
 
 (process.env.JENKINS ? describe.skip : describe)('Application creation', function () {
+	this.timeout(30000);
+
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
+	let creator: ProjectCreator;
 
 	beforeEach(async function () {
 		browser = VSBrowser.instance;
@@ -20,6 +23,8 @@ import { ProjectCreator } from '../../util/create';
 		await browser.waitForWorkbench();
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
+		creator = new ProjectCreator(driver);
+		await creator.waitForEnvironmentDetectionCompletion();
 	});
 
 	afterEach(async function () {
@@ -29,7 +34,6 @@ import { ProjectCreator } from '../../util/create';
 	it('should be able to create a project', async function () {
 		this.timeout(90000);
 		const name = 'vscode-e2e-test-app';
-		const creator = new ProjectCreator(driver);
 
 		await creator.createApp({
 			id: 'com.axway.e2e',
@@ -53,7 +57,7 @@ import { ProjectCreator } from '../../util/create';
 	it('should only enable selected platforms', async function () {
 		this.timeout(90000);
 		const name = 'vscode-e2e-test-app';
-		const creator = new ProjectCreator(driver);
+
 		await creator.createApp({
 			id: 'com.axway.e2e',
 			enableServices: false,

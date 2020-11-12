@@ -7,7 +7,10 @@ import { ProjectCreator } from '../../util/create';
 import { dismissNotifications } from '../../util/common';
 
 (process.env.JENKINS ? describe.skip : describe)('Module creation', function () {
+	this.timeout(30000);
+
 	let browser: VSBrowser;
+	let creator: ProjectCreator;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
 
@@ -19,6 +22,8 @@ import { dismissNotifications } from '../../util/common';
 		await browser.waitForWorkbench();
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
+		creator = new ProjectCreator(driver);
+		await creator.waitForEnvironmentDetectionCompletion();
 	});
 
 	afterEach(async function () {
@@ -29,7 +34,7 @@ import { dismissNotifications } from '../../util/common';
 		this.timeout(90000);
 
 		const name = 'vscode-e2e-test-module';
-		const creator = new ProjectCreator(driver);
+
 		await creator.createModule({
 			id: 'com.axway.e2e',
 			folder: tempDirectory.name,
@@ -51,7 +56,6 @@ import { dismissNotifications } from '../../util/common';
 		this.timeout(90000);
 
 		const name = 'vscode-e2e-test-module';
-		const creator = new ProjectCreator(driver);
 
 		await creator.createModule({
 			id: 'com.axway.e2e',
