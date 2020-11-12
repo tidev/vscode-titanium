@@ -27,7 +27,9 @@ import { dismissNotifications } from '../../util/common';
 	});
 
 	afterEach(async function () {
-		await fs.remove(tempDirectory.name);
+		if (tempDirectory) {
+			await fs.remove(tempDirectory.name);
+		}
 	});
 
 	it('should be able to create a module project', async function () {
