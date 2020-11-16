@@ -108,6 +108,9 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 	}
 
 	public close (code?: number): void {
+		if (this.cts.token.isCancellationRequested) {
+			return;
+		}
 		this.cts.cancel();
 		this.closeEmitter.fire(code || 0);
 		ExtensionContainer.context.globalState.update(GlobalState.Running, false);
