@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.10.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.9.0...v0.10.0) (2020-11-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* **tasks:** Minimum VS Code version is now 1.49.0
+
+Closes EDITOR-48
+
+### Features
+
+* generate debugging and tasks docs ([a0b75c6](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a0b75c657d5816ae8bf797c75a613233906fa031))
+* **build:** allow refreshing on device list during build ([ed2e359](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ed2e359c02e28c36559e9bf256f7d16a735503f8))
+* **create:** allow setting a default path for project ([ae5eec8](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ae5eec8d237c86fd327b76275f5b76bbe309cd7a))
+* **create:** allow setting path when creating projects ([352f6e1](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/352f6e199f3de64478c1b799b8086b6a3b7d8651))
+* **create/module:** support selecting android and ios codebase ([0d5d169](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0d5d1697d1378bcaf854a136f9e5b4d2abd5bc30))
+* **explorer:** always show run button, stop running build if clicked ([8631b8e](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/8631b8edf865d33b99b5475c3abbca5876ed1397)), closes [#436](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/436)
+* **tasks:** allow usage of variables in task definitions ([9fad8d6](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/9fad8d654dc0f40b0ed9462da90ec0759f5b6427))
+* **update:** install Node.js when required ([#406](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/406)) ([f4ed53f](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/f4ed53f04663158de6e178ceb5b283ad1345d925))
+
+
+### Bug Fixes
+
+* addded sudo to the command as it has been removd from commons ([24ca92b](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/24ca92b70205d139052b0c7212f03041dd0c1d0d))
+* wait for a moment before starting the new build ([c378687](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c378687c1a0d3cfa2b8343089021be3adc9dd11c))
+* **completions:** read only properties are not shown ([#488](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/488)) ([3068723](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/30687234374e9652ab150ffd442f78a1df448067))
+* **create/module:** always refresh environment information ([7778f48](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/7778f480b53e229db9e15cfede458f034dfc95bf))
+* **creation/module:** get environment info if we haven't already got it ([63adae4](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/63adae41736cc0fb7f49b26a0cbad62c5e9c9eb6))
+* **explorer/build:** handle no environment info loaded ([0a68a00](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0a68a00978ab1cb6b3acb4e1d5c3f9f838900429))
+* **package/android:** respect keystore settings ([ae52c36](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ae52c3648d81db96e6ed59abdebff728aaea76de)), closes [#438](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/438)
+
 ### [0.9.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.9.0...v0.9.1) (2020-09-16)
 
 ## [0.9.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.8.0...v0.9.0) (2020-07-02)
