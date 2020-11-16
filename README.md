@@ -84,6 +84,7 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.codeTemplates.tssClass` | Style class (.) template | `\n'.${text}': {\n}\n` |
 | `titanium.codeTemplates.tssId` | Style ID (#) template | `\n'#${text}': {\n}\n` |
 | `titanium.codeTemplates.tssTag` | Style tag template | `\n'${text}': {\n}\n` |
+| `titanium.general.defaultCreationDirectory` | Default directory to use when creating projects | `No Default` |
 | `titanium.general.appcCommandPath` | Set the full path to the `appc` command if VS Code is unable to locate it. | `appc` |
 | `titanium.general.displayBuildCommandInConsole` | The executed build command is written to the output channel to aid debugging. This will include password arguments. | `true` |
 | `titanium.general.logLevel` | Logging level for commands being run | `info` |
