@@ -55,7 +55,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		);
 	}
 
-	public abstract async resolveTaskInformation (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<string>
+	public abstract resolveTaskInformation (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<string>
 
 	public async executeTask (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<number> {
 		// Use this as a centralized place to do things like login checks, analytics etc.
@@ -88,7 +88,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 
 	}
 
-	protected abstract async executeTaskInternal (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<void>
+	protected abstract executeTaskInternal (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<void>
 
 	public getHelper (platform: Platform): TaskHelper {
 		return this.helpers[platform];
