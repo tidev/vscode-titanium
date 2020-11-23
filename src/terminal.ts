@@ -65,7 +65,7 @@ export default class Terminal {
 
 	}
 
-	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }): Thenable<unknown> {
+	public runCommandInBackground (args: string[], progressOptions: ProgressOptions = { location: ProgressLocation.Window }, spawnOptions: SpawnOptions = { shell: true }): Thenable<void> {
 		return window.withProgress(progressOptions, () => {
 			return new Promise((resolve, reject) => {
 				if (!this.channel) {
