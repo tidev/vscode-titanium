@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as semver from 'semver';
-import * as _ from 'underscore';
 import appc from './appc';
 
 import { platform } from 'os';
@@ -240,14 +239,16 @@ export function toUnixPath (p: string): string { // https://github.com/anodynos/
  * @returns {Array}
  */
 export function getAllKeys (obj: Record<string, unknown>): string[] {
-	if (!_.isObject(obj)) {
+	if (typeof obj !== 'object') {
 		return [];
 	}
 	const result = [];
 	for (const [ key, value ] of Object.entries(obj)) {
 		result.push(key);
-		for (const val of getAllKeys(value)) {
-			result.push(key + '.' + val);
+		if (typeof value === 'object' && value !== null) {
+			for (const val of getAllKeys(value as Record<string, unknown>)) {
+				result.push(key + '.' + val);
+			}
 		}
 	}
 	return result;

@@ -1,5 +1,4 @@
 import { completion } from 'titanium-editor-commons';
-import * as _ from 'underscore';
 import project from '../../project';
 import * as related from '../../related';
 import * as utils from '../../utils';
@@ -167,7 +166,7 @@ export class StyleCompletionItemProvider implements CompletionItemProvider {
 			}
 		}
 
-		const candidateProperties = _.isEmpty(innerProperties) ? properties : innerProperties;
+		const candidateProperties = Object.keys(innerProperties).length === 0 ? properties : innerProperties;
 		for (const property in candidateProperties) {
 			if (!prefix || utils.matches(property, prefix)) {
 
