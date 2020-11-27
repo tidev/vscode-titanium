@@ -68,13 +68,3 @@ export async function openAllFiles (): Promise<void> {
 		openRelatedFile(type);
 	});
 }
-
-/**
- * Open or close related files
- */
-export async function  toggleAllRelatedFiles (): Promise<void> {
-	if (!window.activeTextEditor) {
-		return;
-	}
-	openAllFiles();
-}
