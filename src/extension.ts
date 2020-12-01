@@ -24,17 +24,7 @@ import {
 import { GlobalState, VSCodeCommands } from './constants';
 import { ExtensionContainer } from './container';
 
-import { ControllerCompletionItemProvider } from './providers/completion/controllerCompletionItemProvider';
-import { StyleCompletionItemProvider } from './providers/completion/styleCompletionItemProvider';
-import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
-import { ViewCompletionItemProvider } from './providers/completion/viewCompletionItemProvider';
-
 import { Config, Configuration, configuration } from './configuration';
-import { ControllerDefinitionProvider } from './providers/definition/controllerDefinitionProvider';
-import { StyleDefinitionProvider } from './providers/definition/styleDefinitionProvider';
-import { ViewCodeActionProvider } from './providers/definition/viewCodeActionProvider';
-import { ViewDefinitionProvider } from './providers/definition/viewDefinitionProvider';
-import { ViewHoverProvider } from './providers/definition/viewHoverProvider';
 
 import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
 
@@ -54,6 +44,7 @@ import { registerTaskProviders, debugSessionInformation, DEBUG_SESSION_VALUE } f
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 import { executeAsTask } from './utils';
 import { sleep } from './common/utils';
+import { registerProviders } from './providers';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -80,29 +71,11 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		ExtensionContainer.context.globalState.update(GlobalState.Enabled, true);
 	}
 
-	const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
-	const styleFilePattern = '**/*.tss';
-	const controllerFilePattern = '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}';
 	const deviceExplorer = new DeviceExplorer();
 	const updateExplorer = new UpdateExplorer();
+
+	registerProviders(context);
 	context.subscriptions.push(
-		// register completion providers
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCompletionItemProvider(), '.', '\'', '"'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleCompletionItemProvider(), '.', '\'', '"'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerCompletionItemProvider(), '.', '\'', '"', '/'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, new TiappCompletionItemProvider(), '.'),
-
-		// register hover providers
-		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, new ViewHoverProvider()),
-
-		// register definition providers
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewDefinitionProvider()),
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleDefinitionProvider()),
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerDefinitionProvider()),
-
-		// register code action providers
-		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider()),
-
 		// register init command
 		vscode.commands.registerCommand('titanium.init', init),
 
