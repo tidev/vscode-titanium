@@ -6,7 +6,7 @@ import { selectPlatform } from '../quickpicks/common';
 import { getBuildTask, Platform } from '../tasks/tasksHelper';
 import { BuildTask } from '../tasks/buildTaskProvider';
 
-export async function buildModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
+export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 		const platform = node?.platform as Platform || (await selectPlatform()).id as Platform;

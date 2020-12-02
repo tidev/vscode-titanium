@@ -39,7 +39,7 @@ interface LastBuildState extends AppBuildTaskTitaniumBuildBase {
 	target: 'device' | 'emulator' | 'simulator';
 }
 
-export async function buildApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
+export async function buildApplication (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {
 		checkLogin();
 
