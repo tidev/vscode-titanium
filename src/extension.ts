@@ -4,23 +4,8 @@ import * as vscode from 'vscode';
 import appc from './appc';
 import DeviceExplorer from './explorer/tiExplorer';
 import project from './project';
-import * as related from './related';
 
-import {
-	AlloyComponentExtension,
-	AlloyComponentFolder,
-	AlloyComponentType,
-	buildApplication,
-	buildModule,
-	cleanApplication,
-	Commands,
-	createApplication,
-	createModule,
-	generateComponent,
-	generateModel,
-	packageApplication,
-	packageModule
-} from './commands';
+import { Commands, handleInteractionError, InteractionChoice, InteractionError } from './commands';
 import { GlobalState, VSCodeCommands } from './constants';
 import { ExtensionContainer } from './container';
 
@@ -28,23 +13,21 @@ import { Config, Configuration, configuration } from './configuration';
 
 import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
 
-import { LogLevel, UpdateChoice } from './types/common';
+import { UpdateChoice } from './types/common';
 
 import ms = require('ms');
 import { completion, environment, updates } from 'titanium-editor-commons';
-import { handleInteractionError, InteractionChoice, InteractionError  } from './commands/common';
-import { UpdateNode, DeviceNode } from './explorer/nodes';
 import UpdateExplorer from './explorer/updatesExplorer';
-import { quickPick, selectUpdates } from './quickpicks/common';
 let projectStatusBarItem: vscode.StatusBarItem;
 
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 
-import { registerTaskProviders, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasks/tasksHelper';
+import { registerTaskProviders } from './tasks/tasksHelper';
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 import { executeAsTask } from './utils';
-import { sleep } from './common/utils';
 import { registerProviders } from './providers';
+import { registerCommands } from './commands/index';
+import { selectUpdates } from './quickpicks';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -74,75 +57,16 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 	const deviceExplorer = new DeviceExplorer();
 	const updateExplorer = new UpdateExplorer();
 
+	registerCommands();
 	registerProviders(context);
+
 	context.subscriptions.push(
 		// register init command
 		vscode.commands.registerCommand('titanium.init', init),
 
-		// register run command
-		vscode.commands.registerCommand(Commands.Build, async node => {
-			if (await ExtensionContainer.context.globalState.get<boolean>(GlobalState.Running)) {
-				await vscode.commands.executeCommand(Commands.StopBuild);
-				await sleep(100);
-			}
-			if (project.isTitaniumApp) {
-				return buildApplication(node);
-			} else if (project.isTitaniumModule) {
-				return buildModule(node);
-			}
-		}),
-
-		// register distribute command
-		vscode.commands.registerCommand(Commands.Package, node => {
-			if (project.isTitaniumApp) {
-				return packageApplication(node);
-			} else if (project.isTitaniumModule) {
-				return packageModule(node);
-			}
-		}),
-
-		// register stop command
-		vscode.commands.registerCommand(Commands.StopBuild, () => {
-			if (ExtensionContainer.runningTask) {
-				ExtensionContainer.runningTask.terminate();
-			}
-		}),
-
-		// register set log level command
-		vscode.commands.registerCommand(Commands.SetLogLevel, async () => {
-			const level = await quickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' }) as keyof typeof LogLevel;
-			const actualLevel = LogLevel[level];
-			if (actualLevel) {
-				await configuration.update('general.logLevel', actualLevel, vscode.ConfigurationTarget.Global);
-			}
-		}),
-
-		// register related view commands
-		vscode.commands.registerCommand(Commands.OpenRelatedView, () => {
-			related.openRelatedFile('xml');
-		}),
-		vscode.commands.registerCommand(Commands.OpenRelatedStyle, () => {
-			related.openRelatedFile('tss');
-		}),
-		vscode.commands.registerCommand(Commands.OpenRelatedController, () => {
-			related.openRelatedFile('js');
-		}),
-		vscode.commands.registerCommand(Commands.OpenAllRelatedFiles, () => {
-			related.openAllFiles();
-		}),
-
 		// register generate autocomplete suggestions command
 		vscode.commands.registerCommand(Commands.GenerateAutocomplete, async () => {
 			await generateCompletions(true);
-		}),
-
-		vscode.commands.registerCommand(Commands.OpenAppOnDashboard, () => {
-			const dashboardUrl = project.dashboardUrl();
-			if (dashboardUrl) {
-				vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(dashboardUrl));
-			} else {
-				vscode.window.showErrorMessage('Unable to open project on dashboard');
-			}
 		}),
 
 		vscode.window.registerTreeDataProvider('titanium.view.buildExplorer', deviceExplorer),
@@ -155,36 +79,6 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 
 		vscode.commands.registerCommand(Commands.RefreshUpdates, async () => {
 			await updateExplorer.refresh();
-		}),
-
-		vscode.commands.registerCommand(Commands.EnableLiveView, async () => {
-			await configuration.update('build.liveview', true, vscode.ConfigurationTarget.Global);
-			vscode.window.showInformationMessage('Enabled LiveView');
-		}),
-
-		vscode.commands.registerCommand(Commands.DisableLiveView, async () => {
-			await configuration.update('build.liveview', false, vscode.ConfigurationTarget.Global);
-			vscode.window.showInformationMessage('Disabled LiveView');
-		}),
-
-		vscode.commands.registerCommand(Commands.GenerateAlloyController, () => generateComponent(AlloyComponentType.Controller, AlloyComponentFolder.Controller, AlloyComponentExtension.Controller)),
-
-		vscode.commands.registerCommand(Commands.GenerateAlloyMigration, () => generateComponent(AlloyComponentType.Migration, AlloyComponentFolder.Migration, AlloyComponentExtension.Migration)),
-
-		vscode.commands.registerCommand(Commands.GenerateAlloyModel, generateModel),
-
-		vscode.commands.registerCommand(Commands.GenerateAlloyStyle, () => generateComponent(AlloyComponentType.Style, AlloyComponentFolder.Style, AlloyComponentExtension.Style)),
-
-		vscode.commands.registerCommand(Commands.GenerateAlloyView, () => generateComponent(AlloyComponentType.View, AlloyComponentFolder.View, AlloyComponentExtension.View)),
-
-		vscode.commands.registerCommand(Commands.GenerateAlloyWidget, () => generateComponent(AlloyComponentType.Widget, AlloyComponentFolder.Widget, AlloyComponentExtension.Widget)),
-
-		vscode.commands.registerCommand(Commands.CreateApp, createApplication),
-
-		vscode.commands.registerCommand(Commands.CreateModule, createModule),
-
-		vscode.commands.registerCommand(Commands.OpenReleaseNotes, ({ update }: UpdateNode) => {
-			vscode.env.openExternal(vscode.Uri.parse(update.releaseNotes));
 		}),
 
 		vscode.commands.registerCommand(Commands.CheckForUpdates, async () => {
@@ -268,21 +162,6 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 				// TODO: add some sort of error reporting
 			}
 		}),
-
-		vscode.commands.registerCommand(Commands.Clean, cleanApplication),
-
-		vscode.commands.registerCommand(Commands.Debug, async (node: DeviceNode) => {
-			const debugConfig: vscode.DebugConfiguration = {
-				type: 'titanium',
-				name: 'Debug Titanium App',
-				request: 'launch',
-				platform: node.platform
-			};
-
-			debugSessionInformation.set(DEBUG_SESSION_VALUE, node);
-
-			await vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], debugConfig);
-		})
 	);
 
 	registerTaskProviders(context);
