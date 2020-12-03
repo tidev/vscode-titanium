@@ -1,14 +1,18 @@
 import { ExtensionContext, TaskExecution } from 'vscode';
 import appc, { Appc } from './appc';
 import { Config, configuration } from './configuration';
+import DeviceExplorer from './explorer/tiExplorer';
+import UpdateExplorer from './explorer/updateExplorer';
 import Terminal from './terminal';
 
 export class ExtensionContainer {
 	private static _appc: Appc;
+	private static _buildExplorer: DeviceExplorer;
 	private static _config: Config | undefined;
 	private static _context: ExtensionContext;
-	private static _terminal: Terminal;
 	private static _runningTask: TaskExecution|undefined;
+	private static _terminal: Terminal;
+	private static _updateExplorer: UpdateExplorer;
 
 	public static inititalize (context: ExtensionContext, config: Config): void {
 		this._appc = appc;
@@ -48,5 +52,21 @@ export class ExtensionContainer {
 
 	static get runningTask (): TaskExecution|undefined {
 		return this._runningTask;
+	}
+
+	static set buildExplorer (buildExplorer: DeviceExplorer) {
+		this._buildExplorer = buildExplorer;
+	}
+
+	static get buildExplorer (): DeviceExplorer {
+		return this._buildExplorer;
+	}
+
+	static set updateExplorer (updateExplorer: UpdateExplorer) {
+		this._updateExplorer = updateExplorer;
+	}
+
+	static get updateExplorer (): UpdateExplorer {
+		return this._updateExplorer;
 	}
 }
