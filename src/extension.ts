@@ -2,7 +2,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from './appc';
-import DeviceExplorer from './explorer/tiExplorer';
 import project from './project';
 
 import { Commands, handleInteractionError, InteractionChoice, InteractionError } from './commands';
@@ -17,7 +16,6 @@ import { UpdateChoice } from './types/common';
 
 import ms = require('ms');
 import { completion, environment, updates } from 'titanium-editor-commons';
-import UpdateExplorer from './explorer/updatesExplorer';
 let projectStatusBarItem: vscode.StatusBarItem;
 
 import { UpdateInfo } from 'titanium-editor-commons/updates';
@@ -27,7 +25,7 @@ import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 import { executeAsTask } from './utils';
 import { registerProviders } from './providers';
 import { registerCommands } from './commands/index';
-import { selectUpdates } from './quickpicks';
+import { registerViews } from './explorer';
 
 function activate (context: vscode.ExtensionContext): Promise<void> {
 
@@ -54,11 +52,9 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		ExtensionContainer.context.globalState.update(GlobalState.Enabled, true);
 	}
 
-	const deviceExplorer = new DeviceExplorer();
-	const updateExplorer = new UpdateExplorer();
-
 	registerCommands();
 	registerProviders(context);
+	registerViews(context);
 
 	context.subscriptions.push(
 		// register init command
@@ -69,21 +65,9 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 			await generateCompletions(true);
 		}),
 
-		vscode.window.registerTreeDataProvider('titanium.view.buildExplorer', deviceExplorer),
-
-		vscode.commands.registerCommand(Commands.RefreshExplorer, async () => {
-			await deviceExplorer.refresh();
-		}),
-
-		vscode.window.registerTreeDataProvider('titanium.view.updateExplorer', updateExplorer),
-
-		vscode.commands.registerCommand(Commands.RefreshUpdates, async () => {
-			await updateExplorer.refresh();
-		}),
-
 		vscode.commands.registerCommand(Commands.CheckForUpdates, async () => {
 			await vscode.commands.executeCommand(Commands.RefreshUpdates);
-			const updateInfo = updateExplorer.updates;
+			const updateInfo = ExtensionContainer.updateExplorer.updates;
 			const numberOfUpdates = updateInfo.length;
 			if (!numberOfUpdates) {
 				return;
@@ -106,7 +90,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.commands.registerCommand(Commands.SelectUpdates, async (updateInfo: UpdateInfo[]) => {
 			try {
 				if (!updateInfo) {
-					updateInfo = updateExplorer.updates;
+					updateInfo = ExtensionContainer.updateExplorer.updates;
 				}
 
 				const updatesToInstall = await selectUpdates(updateInfo);
@@ -130,7 +114,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.commands.registerCommand(Commands.InstallAllUpdates, async updateInfo => {
 			try {
 				if (!updateInfo) {
-					updateInfo = updateExplorer.updates;
+					updateInfo = ExtensionContainer.updateExplorer.updates;
 				}
 				vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
 					const totalUpdates = updateInfo.length;
