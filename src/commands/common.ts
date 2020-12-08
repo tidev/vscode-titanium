@@ -24,7 +24,6 @@ export enum Commands {
 	GenerateAutocomplete = 'titanium.generate.autocompleteSuggestions',
 	InstallAllUpdates = 'titanium.updates.installAll',
 	InstallUpdate = 'titanium.updates.install',
-	OpenAppOnDashboard = 'titanium.openDashboard',
 	OpenAllRelatedFiles = 'titanium.alloy.open.allRelatedFiles',
 	OpenRelatedController = 'titanium.alloy.open.relatedController',
 	OpenRelatedStyle = 'titanium.alloy.open.relatedStyle',

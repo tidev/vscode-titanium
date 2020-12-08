@@ -93,14 +93,6 @@ export class Project {
 		}
 	}
 
-	public dashboardUrl (): string|undefined {
-		// this.tiapp.property[2].$.name
-		const appcAppIdProperty = this.tiapp.property.find((property: { $: { name: string }}) => property.$.name === 'appc-app-id');
-		if (appcAppIdProperty) {
-			return path.join(DASHBOARD_URL_ROOT, appcAppIdProperty._);
-		}
-	}
-
 	/**
 	 * Returns platforms for module project
 	 *

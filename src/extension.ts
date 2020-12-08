@@ -13,7 +13,6 @@ import { Config, Configuration, configuration } from './configuration';
 import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
 
 import { completion, environment, updates } from 'titanium-editor-commons';
-let projectStatusBarItem: vscode.StatusBarItem;
 
 import { registerTaskProviders } from './tasks/tasksHelper';
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
@@ -38,10 +37,8 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, false);
 		ExtensionContainer.context.globalState.update(GlobalState.Enabled, false);
 	} else {
-		setStatusBar();
 		project.onModified(async () => {
 			await Promise.all([
-				setStatusBar(),
 				generateCompletions()
 			]);
 		});
@@ -179,32 +176,6 @@ async function init (): Promise<void> {
 			return Promise.resolve();
 		});
 	}
-}
-
-/**
- * Set project name and link to dashboard in status bar
- */
-function setStatusBar (): void {
-	if (!project.isValid()) {
-		return;
-	}
-	if (!projectStatusBarItem) {
-		projectStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 2);
-	}
-	if (project.isTitaniumApp) {
-		projectStatusBarItem.text = `$(device-mobile)  ${project.appName()} (${project.sdk()})`;
-		if (project.dashboardUrl()) {
-			projectStatusBarItem.command = Commands.OpenAppOnDashboard;
-			projectStatusBarItem.tooltip = 'Open Axway Dashboard';
-		} else {
-			projectStatusBarItem.command = undefined;
-			projectStatusBarItem.tooltip = undefined;
-		}
-		projectStatusBarItem.show();
-	} else if (project.isTitaniumModule) {
-		projectStatusBarItem.text = `$(package) ${project.appName()}`;
-	}
-	projectStatusBarItem.show();
 }
 
 /**

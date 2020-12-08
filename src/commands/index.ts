@@ -81,15 +81,6 @@ export function registerCommands (): void {
 		related.openAllFiles();
 	});
 
-	registerCommand(Commands.OpenAppOnDashboard, () => {
-		const dashboardUrl = project.dashboardUrl();
-		if (dashboardUrl) {
-			vscode.commands.executeCommand('vscode.open', vscode.Uri.parse(dashboardUrl));
-		} else {
-			vscode.window.showErrorMessage('Unable to open project on dashboard');
-		}
-	});
-
 	registerCommand(Commands.EnableLiveView, async () => {
 		await configuration.update('build.liveview', true, vscode.ConfigurationTarget.Global);
 		vscode.window.showInformationMessage('Enabled LiveView');
