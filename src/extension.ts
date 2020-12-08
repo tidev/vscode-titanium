@@ -49,19 +49,7 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 	registerCommands();
 	registerProviders(context);
 	registerViews(context);
-
-	context.subscriptions.push(
-		// register init command
-		vscode.commands.registerCommand('titanium.init', init),
-
-		// register generate autocomplete suggestions command
-		vscode.commands.registerCommand(Commands.GenerateAutocomplete, async () => {
-			await generateCompletions(true);
-		}),
-	);
-
 	registerTaskProviders(context);
-
 	registerDebugProvider(context);
 
 	return init();
