@@ -169,11 +169,6 @@
     ],
     "commands": [
       {
-        "command": "titanium.init",
-        "title": "Init",
-        "category": "Titanium"
-      },
-      {
         "command": "titanium.create.application",
         "title": "Create application",
         "category": "Titanium",
@@ -284,11 +279,6 @@
       {
         "command": "titanium.alloy.open.allRelatedFiles",
         "title": "Open related files",
-        "category": "Titanium"
-      },
-      {
-        "command": "titanium.generate.autocompleteSuggestions",
-        "title": "Generate autocomplete list",
         "category": "Titanium"
       },
       {
@@ -533,10 +523,6 @@
           "when": "titanium:enabled"
         },
         {
-          "command": "titanium.generate.autocompleteSuggestions",
-          "when": "titanium:enabled"
-        },
-        {
           "command": "titanium.alloy.generate.controller",
           "when": "titanium:enabled"
         },
@@ -574,10 +560,6 @@
         },
         {
           "command": "titanium.build.debug",
-          "when": "false"
-        },
-        {
-          "command": "titanium.init",
           "when": "false"
         },
         {
