@@ -164,8 +164,7 @@ export function registerCommands (): void {
 				}
 				vscode.commands.executeCommand(Commands.RefreshUpdates);
 				vscode.commands.executeCommand(Commands.RefreshExplorer);
-				await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
-				return Promise.resolve();
+				vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
 			});
 		} catch (error) {
 			// TODO: add some sort of error reporting
