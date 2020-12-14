@@ -52,10 +52,11 @@ export async function yesNoQuestion (options: QuickPickOptions, shouldThrow = fa
 	}
 }
 
-export async function quickPick(items: string[], quickPickOptions?: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: CustomQuickPickOptions): Promise<string[]>;
+export async function quickPick(items: string[], quickPickOptions: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: CustomQuickPickOptions): Promise<string[]>;
 export async function quickPick(items: CustomQuickPick[], quickPickOptions?: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: CustomQuickPickOptions): Promise<CustomQuickPick[]>;
 export async function quickPick(items: string[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<string>;
 export async function quickPick(items: CustomQuickPick[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<CustomQuickPick>;
+export async function quickPick<T extends CustomQuickPick>(items: T[], quickPickOptions: QuickPickOptions & { canPickMany: true }, customQuickPickOptions?: CustomQuickPickOptions): Promise<T[]>;
 export async function quickPick<T extends CustomQuickPick>(items: T[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<T>;
 export async function quickPick<T extends CustomQuickPick> (items: T[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}): Promise<T> {
 	if (items.length === 1 && !forceShow) {
@@ -142,7 +143,7 @@ export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateChoic
 		})
 		);
 
-	const selected = await quickPick(choices, {
+	const selected = await quickPick<UpdateChoice>(choices, {
 		canPickMany: true,
 		placeHolder: 'Which updates would you like to install?'
 	}, {
@@ -153,5 +154,5 @@ export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateChoic
 		throw new UserCancellation();
 	}
 
-	return choices as UpdateChoice[];
+	return selected;
 }
