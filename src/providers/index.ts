@@ -1,9 +1,11 @@
+import { registerCommand } from '../commands';
 import * as vscode from 'vscode';
 import { ControllerCompletionItemProvider } from './completion/controllerCompletionItemProvider';
 import { StyleCompletionItemProvider } from './completion/styleCompletionItemProvider';
 import { TiappCompletionItemProvider } from './completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './completion/viewCompletionItemProvider';
 import { ControllerDefinitionProvider } from './definition/controllerDefinitionProvider';
+import { insert, insertCommandId, insertI18nString, insertI18nStringCommandId } from './definition/definitionProviderHelper';
 import { StyleDefinitionProvider } from './definition/styleDefinitionProvider';
 import { ViewCodeActionProvider } from './definition/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './definition/viewDefinitionProvider';
@@ -39,4 +41,8 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 	context.subscriptions.push(
 		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider())
 	);
+
+	// register code action commands
+	registerCommand(insertCommandId, insert);
+	registerCommand(insertI18nStringCommandId, insertI18nString);
 }

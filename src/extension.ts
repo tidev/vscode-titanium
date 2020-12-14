@@ -10,8 +10,6 @@ import { ExtensionContainer } from './container';
 
 import { Config, Configuration, configuration } from './configuration';
 
-import * as definitionProviderHelper from './providers/definition/definitionProviderHelper';
-
 import { completion, environment, updates } from 'titanium-editor-commons';
 
 import { registerTaskProviders } from './tasks/tasksHelper';
@@ -31,7 +29,6 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 
 	ExtensionContainer.inititalize(context, config);
 	project.load();
-	definitionProviderHelper.activate(context);
 
 	if (!project.isTitaniumProject()) {
 		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, false);
