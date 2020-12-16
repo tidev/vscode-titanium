@@ -9,7 +9,7 @@ import project from '../project';
 
 export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode> {
 
-	public updates: UpdateInfo[] = [];
+	public updates?: UpdateInfo[];
 
 	private _onDidChangeTreeData: vscode.EventEmitter<BaseNode|undefined> = new vscode.EventEmitter();
 
@@ -36,7 +36,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 		}
 		this.checkingForUpdates = false;
 		this._onDidChangeTreeData.fire(undefined);
-		if (this.updates.length) {
+		if (this.updates?.length) {
 			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
 			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
 		}
@@ -46,13 +46,18 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 		return element.getTreeItem(element);
 	}
 
-	public getChildren (): Promise<Array<BlankNode|UpdateNode>> {
+	public getChildren (): Array<BlankNode|UpdateNode> {
 
 		const elements = [];
 
 		if (this.checkingForUpdates) {
 			elements.push(new BlankNode('Checking for updates'));
-			return Promise.resolve(elements);
+			return elements;
+		}
+
+		if (!this.updates?.length) {
+			elements.push(new BlankNode('There are no updates available'));
+			return elements;
 		}
 
 		for (const update of this.updates) {
@@ -63,11 +68,7 @@ export default class UpdateExplorer implements vscode.TreeDataProvider<BaseNode>
 			elements.push(node);
 		}
 
-		if (!elements.length) {
-			elements.push(new BlankNode('There are no updates available'));
-		}
-
-		return Promise.resolve(elements);
+		return elements;
 	}
 
 }
