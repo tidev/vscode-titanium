@@ -10,7 +10,7 @@ import { sleep } from '../common/utils';
 import * as related from '../related';
 import { packageApplication } from './packageApp';
 import { packageModule } from './packageModule';
-import { quickPick, selectUpdates } from '../quickpicks';
+import { quickPick } from '../quickpicks';
 import { LogLevel } from '../types/common';
 import { configuration } from '../configuration';
 import { AlloyComponentExtension, AlloyComponentFolder, AlloyComponentType, generateComponent, generateModel } from './alloyGenerate';
@@ -20,10 +20,11 @@ import { createApplication } from './createApp';
 import { createModule } from './createModule';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
+import { updates } from 'titanium-editor-commons';
 
-export function registerCommand (commandId: string, callback: (...args: any[]) => any): void {
+export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
-		vscode.commands.registerCommand(commandId, async (...args: any[]) => {
+		vscode.commands.registerCommand(commandId, async (...args: unknown[]) => {
 			return callback(...args);
 		})
 	);
@@ -128,7 +129,7 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.CheckForUpdates, async () => {
 		await vscode.commands.executeCommand(Commands.RefreshUpdates);
-		const updateInfo = ExtensionContainer.updateExplorer.updates;
+		const updateInfo = ExtensionContainer.updateExplorer?.updates || await updates.checkAllUpdates();
 		const numberOfUpdates = updateInfo.length;
 		if (!numberOfUpdates) {
 			return;
@@ -141,7 +142,7 @@ export function registerCommands (): void {
 			return;
 		}
 		if (choice.title === 'Install') {
-			vscode.commands.executeCommand(Commands.SelectUpdates);
+			vscode.commands.executeCommand(Commands.SelectUpdates, updateInfo);
 		} else if (choice.title === 'View') {
 			// Focus the update view
 			await vscode.commands.executeCommand(Commands.ShowUpdatesView);
@@ -149,62 +150,15 @@ export function registerCommands (): void {
 	});
 
 	registerCommand(Commands.SelectUpdates, async (updateInfo: UpdateInfo[]) => {
-		try {
-			if (!updateInfo) {
-				updateInfo = ExtensionContainer.updateExplorer.updates;
-			}
-
-			const updatesToInstall = await selectUpdates(updateInfo);
-			vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
-				const totalUpdates = updatesToInstall.length;
-				await installUpdates(updatesToInstall, progress);
-				if (updateInfo.length === totalUpdates) {
-					ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-					vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-				}
-				vscode.commands.executeCommand(Commands.RefreshUpdates);
-				vscode.commands.executeCommand(Commands.RefreshExplorer);
-				vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
-			});
-		} catch (error) {
-			// TODO: add some sort of error reporting
-		}
+		return installUpdates(updateInfo, true);
 	});
 
-	registerCommand(Commands.InstallAllUpdates, async updateInfo => {
-		try {
-			if (!updateInfo) {
-				updateInfo = ExtensionContainer.updateExplorer.updates;
-			}
-			vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
-				const totalUpdates = updateInfo.length;
-				await installUpdates(updateInfo, progress);
-				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-				vscode.commands.executeCommand(Commands.RefreshUpdates);
-				vscode.commands.executeCommand(Commands.RefreshExplorer);
-				await vscode.window.showInformationMessage(`Installed ${totalUpdates} ${totalUpdates > 1 ? 'updates' : 'update'}`);
-				return Promise.resolve();
-			});
-		} catch (error) {
-			// TODO: add some sort of error reporting
-		}
+	registerCommand(Commands.InstallAllUpdates, () => {
+		return installUpdates();
 	});
 
-	registerCommand(Commands.InstallUpdate, async updateInfo => {
-		try {
-			vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
-				await installUpdates([ updateInfo.update ], progress);
-				ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-				vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
-				vscode.commands.executeCommand(Commands.RefreshUpdates);
-				vscode.commands.executeCommand(Commands.RefreshExplorer);
-				await vscode.window.showInformationMessage('Installed 1 update');
-				return Promise.resolve();
-			});
-		} catch (error) {
-			// TODO: add some sort of error reporting
-		}
+	registerCommand(Commands.InstallUpdate, (updateInfo: UpdateNode) => {
+		return installUpdates([ updateInfo.update ]);
 	});
 }
 

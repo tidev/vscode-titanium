@@ -5,7 +5,6 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
 import { UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
-import { UpdateChoice } from '../types/common';
 
 export interface CustomQuickPick extends QuickPickItem {
 	label: string;
@@ -129,30 +128,28 @@ export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
 	}
 }
 
-export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateChoice[]> {
-	const choices: UpdateChoice[] = updates
+export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateInfo[]> {
+	const choices = updates
 		.map(update => ({
-			label: `${update.productName}: ${update.latestVersion}`,
-			action: update.action,
-			latestVersion: update.latestVersion,
-			priority: update.priority,
-			picked: true,
-			productName: update.productName,
 			id: update.productName,
-			currentVersion: update.currentVersion
-		})
-		);
+			label: `${update.productName}: ${update.latestVersion}`,
+			picked: true
+		}));
 
-	const selected = await quickPick<UpdateChoice>(choices, {
+	const selected = await quickPick(choices, {
 		canPickMany: true,
 		placeHolder: 'Which updates would you like to install?'
 	}, {
-		forceShow: true
+		forceShow: true,
 	});
 
 	if (!selected) {
 		throw new UserCancellation();
 	}
 
-	return selected;
+	const selectedProducts = selected.map(product => product.id);
+
+	return updates.filter(update => {
+		return selectedProducts.includes(update.productName);
+	});
 }
