@@ -6,6 +6,7 @@ import { selectUpdates } from '../quickpicks/common';
 import { ExtensionContainer } from '../container';
 import { Commands } from '../commands';
 import { GlobalState } from '../constants';
+import { startup } from '../extension';
 
 export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice?: boolean): Promise<void> {
 	vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
@@ -19,6 +20,11 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 
 		if (promptForChoice) {
 			updateInfo = await selectUpdates(updateInfo);
+		}
+
+		// Don't continue on if no updates were selected
+		if (!updateInfo.length) {
+			return;
 		}
 
 		const selectedUpdates = updateInfo.length;
@@ -61,15 +67,18 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 			counter++;
 		}
 
-		// Only set the HasUpdates property if we installed all the updates
+		// Only set HasUpdates to false if we installed all the updates
 		if (totalUpdates === selectedUpdates) {
-			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, false);
-			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, false);
+			ExtensionContainer.setContext(GlobalState.HasUpdates, false);
 		}
 
 		vscode.commands.executeCommand(Commands.RefreshUpdates);
 		vscode.commands.executeCommand(Commands.RefreshExplorer);
 		vscode.window.showInformationMessage(`Installed ${selectedUpdates} ${selectedUpdates === 1 ? 'updates' : 'update'}`);
 
+		// If an install was triggered as a consequence of missing tooling then kick off another check
+		if (ExtensionContainer.context.globalState.get(GlobalState.MissingTooling)) {
+			startup();
+		}
 	});
 }
