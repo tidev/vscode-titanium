@@ -1,11 +1,10 @@
-/* eslint @typescript-eslint/no-use-before-define: off */
 import * as path from 'path';
 import * as vscode from 'vscode';
 import appc from './appc';
 import project from './project';
 
 import { Commands, handleInteractionError, InteractionChoice, InteractionError } from './commands';
-import { GlobalState, VSCodeCommands } from './constants';
+import { GlobalState } from './constants';
 import { ExtensionContainer } from './container';
 
 import { Config, Configuration, configuration } from './configuration';
@@ -18,30 +17,15 @@ import { registerProviders } from './providers';
 import { registerCommands } from './commands/index';
 import { registerViews } from './explorer';
 
-import { installUpdates } from './updates';
 import ms = require('ms');
 
-function activate (context: vscode.ExtensionContext): Promise<void> {
+export async function activate (context: vscode.ExtensionContext): Promise<void> {
 
 	Configuration.configure(context);
 
 	const config = configuration.get<Config>();
 
 	ExtensionContainer.inititalize(context, config);
-	project.load();
-
-	if (!project.isTitaniumProject()) {
-		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, false);
-		ExtensionContainer.context.globalState.update(GlobalState.Enabled, false);
-	} else {
-		project.onModified(async () => {
-			await Promise.all([
-				generateCompletions()
-			]);
-		});
-		vscode.commands.executeCommand(VSCodeCommands.SetContext, GlobalState.Enabled, true);
-		ExtensionContainer.context.globalState.update(GlobalState.Enabled, true);
-	}
 
 	registerCommands();
 	registerProviders(context);
@@ -49,118 +33,11 @@ function activate (context: vscode.ExtensionContext): Promise<void> {
 	registerTaskProviders(context);
 	registerDebugProvider(context);
 
-	return init();
+	startup();
 }
 
-exports.activate = activate; // eslint-disable-line no-undef
-
-/**
- * Deactivate
- */
-function deactivate (): void {
+export function deactivate (): void {
 	project.dispose();
-}
-exports.deactivate = deactivate;  // eslint-disable-line no-undef
-
-/**
- * Initialise extension - fetch appc info
- */
-async function init (): Promise<void> {
-	const isEnabled = ExtensionContainer.context.globalState.get<boolean>(GlobalState.Enabled);
-	if (isEnabled) {
-		vscode.window.withProgress({ cancellable: false, location: vscode.ProgressLocation.Notification, title: 'Titanium' }, async progress => {
-			progress.report({
-				message: 'Validating environment'
-			});
-
-			const { missing } = await environment.validateEnvironment();
-
-			if (missing.length) {
-				let message = 'You are missing the following required components for Titanium development:';
-				for (let i = 0; i < missing.length; i++) {
-					const product = missing[i];
-					if (i < missing.length - 1) {
-						message = `${message} ${product.name},`;
-					} else {
-						message = `${message} ${product.name}`;
-					}
-				}
-				message = `${message}. Without these components the extension will be unusable.`;
-				const choices: InteractionChoice[] = [
-					{
-						title: 'Install',
-						run: async (): Promise<void> => {
-							const updateInfo = [];
-							progress.report({
-								message: 'Fetching latest component versions'
-							});
-							for (const product of missing) {
-								updateInfo.push(await product.getInstallInfo());
-
-							}
-							await installUpdates(updateInfo, progress, false);
-						}
-					}
-				];
-				const installProducts = await vscode.window.showErrorMessage(message, ...choices);
-				if (installProducts) {
-					progress.report({
-						message: 'Installing missing components'
-					});
-
-					await installProducts.run();
-				} else {
-					vscode.window.showErrorMessage('Extension startup cancelled as required components are not installed');
-					return Promise.reject();
-				}
-			}
-
-			if (ExtensionContainer.context.globalState.get('titanium:liveview')) {
-				vscode.commands.executeCommand('setContext', 'titanium:liveview', true);
-			}
-
-			progress.report({
-				message: 'Fetching environment information'
-			});
-
-			try {
-				await appc.getInfo();
-			} catch (error) {
-				if (error instanceof InteractionError) {
-					handleInteractionError(error);
-					return;
-				}
-				vscode.window.showErrorMessage('Error fetching Appcelerator environment');
-				return;
-			}
-
-			if (project.isTitaniumApp) {
-				generateCompletions();
-			}
-
-			// Call refresh incase the Titanium Explorer activity pane became active before info
-			vscode.commands.executeCommand(Commands.RefreshExplorer);
-
-			// Perform the update check if we need to
-			const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
-			const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
-
-			// If there's no timestamp for when we last checked the updates then set to now
-			if (!lastUpdateCheck) {
-				ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
-			}
-
-			const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
-			if (checkUpdates) {
-				ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
-				vscode.commands.executeCommand(Commands.CheckForUpdates);
-			} else {
-				vscode.commands.executeCommand(Commands.RefreshUpdates);
-			}
-
-			return Promise.resolve();
-		});
-	}
 }
 
 /**
@@ -252,4 +129,82 @@ async function generateCompletions (force = false): Promise<void> {
 			await install.run();
 		}
 	}
+}
+
+/**
+ * Performs validation around environment status, whether the active folder is a Titanium project,
+ * and fully loads the extension if so.
+ *
+ * Extracted from the main activate function to allow for the update install logic to call it if
+ * we're installing from a missing tooling scenario
+ */
+export async function startup (): Promise<void> {
+	const { missing } = await environment.validateEnvironment();
+
+	if (missing.length) {
+		ExtensionContainer.setContext(GlobalState.MissingTooling, true);
+		return;
+	}
+
+	ExtensionContainer.setContext(GlobalState.MissingTooling, false);
+
+	project.load();
+
+	if (!project.isTitaniumProject()) {
+		ExtensionContainer.setContext(GlobalState.NotTitaniumProject, true);
+		return;
+	}
+
+	ExtensionContainer.setContext(GlobalState.NotTitaniumProject, false);
+
+	project.onModified(async () => {
+		generateCompletions();
+	});
+
+	ExtensionContainer.setContext(GlobalState.Enabled, true);
+
+	vscode.window.withProgress({ cancellable: false, location: vscode.ProgressLocation.Notification, title: 'Titanium' }, async progress => {
+		if (ExtensionContainer.context.globalState.get(GlobalState.Liveview)) {
+			ExtensionContainer.setContext(GlobalState.Liveview, true);
+		}
+
+		progress.report({
+			message: 'Fetching environment information'
+		});
+
+		try {
+			await appc.getInfo();
+		} catch (error) {
+			if (error instanceof InteractionError) {
+				handleInteractionError(error);
+				return;
+			}
+			vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+			return;
+		}
+
+		if (project.isTitaniumApp) {
+			generateCompletions();
+		}
+
+		// Call refresh incase the Titanium Explorer activity pane became active before info
+		vscode.commands.executeCommand(Commands.RefreshExplorer);
+
+		// Perform the update check if we need to
+		const lastUpdateCheck = ExtensionContainer.context.globalState.get<number>(GlobalState.LastUpdateCheck) || 0;
+		const updateInterval = ms(ExtensionContainer.config.general.updateFrequency);
+
+		// If there's no timestamp for when we last checked the updates then set to now
+		if (!lastUpdateCheck) {
+			ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+		}
+
+		const checkUpdates = Date.now() - lastUpdateCheck > updateInterval;
+		if (checkUpdates) {
+			ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
+			vscode.commands.executeCommand(Commands.CheckForUpdates);
+		} else {
+			vscode.commands.executeCommand(Commands.RefreshUpdates);
+		}
+	});
 }
