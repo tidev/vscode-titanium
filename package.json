@@ -933,7 +933,7 @@
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "chai": "^4.2.0",
-    "commitizen": "^4.2.2",
+    "commitizen": "^4.2.3",
     "cz-conventional-changelog": "^3.3.0",
     "danger": "^10.6.0",
     "eslint": "^7.18.0",
