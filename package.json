@@ -459,6 +459,11 @@
     "views": {
       "titanium": [
         {
+          "id": "titanium.view.welcome",
+          "name": "Get Started",
+          "when": "!titanium:enabled"
+        },
+        {
           "id": "titanium.view.buildExplorer",
           "name": "Build",
           "when": "titanium:enabled"
@@ -470,6 +475,13 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "titanium.view.welcome",
+        "contents": "Titanium tooling not installed, click below to install it.\nThis will not install any platform specific tooling. To install the required platform tooling please visit [the Android](https://docs.appcelerator.com/platform/latest/#!/guide/Installing_the_Android_SDK) or [iOS documentation](https://docs.appcelerator.com/platform/latest/#!/guide/Installing_the_iOS_SDK)\n[Install Tooling](command:titanium.updates.select)",
+        "when": "titanium:toolingMissing"
+      }
+    ],
     "menus": {
       "commandPalette": [
         {
@@ -886,16 +898,6 @@
     "extends": [
       "@commitlint/config-conventional"
     ]
-  },
-  "greenkeeper": {
-    "ignore": [
-      "@types/node",
-      "@types/vscode"
-    ],
-    "commitMessages": {
-      "dependencyUpdate": "chore(deps): update ${dependency} to version ${version}",
-      "devDependencyUpdate": "chore(deps): update ${dependency} to version ${version}"
-    }
   },
   "scripts": {
     "commit": "git-cz",
