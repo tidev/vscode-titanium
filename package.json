@@ -480,6 +480,11 @@
         "view": "titanium.view.welcome",
         "contents": "Titanium tooling not installed, click below to install it.\nThis will not install any platform specific tooling. To install the required platform tooling please visit [the Android](https://docs.appcelerator.com/platform/latest/#!/guide/Installing_the_Android_SDK) or [iOS documentation](https://docs.appcelerator.com/platform/latest/#!/guide/Installing_the_iOS_SDK)\n[Install Tooling](command:titanium.updates.select)",
         "when": "titanium:toolingMissing"
+      },
+      {
+        "view": "titanium.view.welcome",
+        "contents": "To use the Titanium extension you must have a Titanium project open\n[Open Project](command:workbench.action.addRootFolder)\nYou can also create a new Application or Module project\n[Create App](command:titanium.create.application)\n[Create Module](command:titanium.create.module)",
+        "when": "titanium:notProject"
       }
     ],
     "menus": {
