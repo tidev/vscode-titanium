@@ -472,6 +472,10 @@
           "id": "titanium.view.updateExplorer",
           "name": "Updates",
           "when": "titanium:enabled"
+        },
+        {
+          "id": "titanium.view.helpExplorer",
+          "name": "Help and Feedback"
         }
       ]
     },

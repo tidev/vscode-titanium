@@ -1,7 +1,9 @@
-export const ExtensionId = 'titanium';
+export const ExtensionName = 'titanium';
+export const ExtensionId = 'axway.vscode-titanium';
 
 export enum VSCodeCommands {
 	OpenFolder = 'vscode.openFolder',
+	ReportIssue = 'vscode.openIssueReporter',
 	SetContext = 'setContext'
 }
 

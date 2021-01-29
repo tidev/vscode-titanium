@@ -1,6 +1,6 @@
 import { TreeItem, TreeItemCollapsibleState } from 'vscode';
 import { DevelopmentTarget } from '../../types/cli';
-export abstract class BaseNode {
+export abstract class BaseNode implements TreeItem {
 
 	public abstract readonly collapsibleState: TreeItemCollapsibleState;
 	public abstract readonly contextValue: string;

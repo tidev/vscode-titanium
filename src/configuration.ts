@@ -1,5 +1,5 @@
 import { ConfigurationChangeEvent, ConfigurationTarget, ExtensionContext, Uri, workspace } from 'vscode';
-import { ExtensionId } from './constants';
+import { ExtensionName } from './constants';
 import { ExtensionContainer } from './container';
 
 export class Configuration {
@@ -12,16 +12,16 @@ export class Configuration {
 	public get<T> (section?: string, resource?: Uri, defaultValue?: T): T {
 		return defaultValue === undefined
 			? workspace
-				.getConfiguration(section === undefined ? undefined : ExtensionId, resource!)
-				.get<T>(section === undefined ? ExtensionId : section)!
+				.getConfiguration(section === undefined ? undefined : ExtensionName, resource!)
+				.get<T>(section === undefined ? ExtensionName : section)!
 			: workspace
-				.getConfiguration(section === undefined ? undefined : ExtensionId, resource!)
-				.get<T>(section === undefined ? ExtensionId : section, defaultValue)!;
+				.getConfiguration(section === undefined ? undefined : ExtensionName, resource!)
+				.get<T>(section === undefined ? ExtensionName : section, defaultValue)!;
 	}
 
 	public update (section: string, value: any, target: ConfigurationTarget, resourece?: Uri): Thenable<void> {
 		return workspace
-			.getConfiguration(ExtensionId, target === ConfigurationTarget.Global ? undefined : resourece!)
+			.getConfiguration(ExtensionName, target === ConfigurationTarget.Global ? undefined : resourece!)
 			.update(section, value, target);
 	}
 
