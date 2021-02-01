@@ -2,8 +2,7 @@ import * as vscode from 'vscode';
 import appc from '../appc';
 import { Platform } from '../types/common';
 import { platforms } from '../utils';
-import { BaseNode } from './nodes/baseNode';
-import { PlatformNode } from './nodes/platformNode';
+import { BaseNode, PlatformNode } from './nodes';
 
 export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode> {
 

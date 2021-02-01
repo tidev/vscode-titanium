@@ -1,8 +1,6 @@
 import { ExtensionId, VSCodeCommands } from '../constants';
 import * as vscode from 'vscode';
-import { BaseNode } from './nodes/baseNode';
-import { CommandNode } from './nodes/commandNode';
-import { UrlNode } from './nodes/urlNode';
+import { BaseNode, CommandNode, UpdateNode, UpdatesNode, UrlNode } from './nodes';
 
 export class HelpExplorer implements vscode.TreeDataProvider<BaseNode> {
 
@@ -10,20 +8,37 @@ export class HelpExplorer implements vscode.TreeDataProvider<BaseNode> {
 
 	// tslint:disable-next-line member-ordering
 	public readonly onDidChangeTreeData: vscode.Event<BaseNode|undefined> = this._onDidChangeTreeData.event;
+	private updatesNode: UpdatesNode|undefined;
 
 	public refresh (): void {
 		this._onDidChangeTreeData.fire(undefined);
 	}
 
-	public getTreeItem (element: BaseNode): vscode.TreeItem {
+	public getTreeItem (element: BaseNode): BaseNode {
 		return element.getTreeItem(element);
 	}
 
-	public getChildren(element: BaseNode): BaseNode[] | Promise<BaseNode[]> {
+	public async getChildren(element: BaseNode): Promise<BaseNode[]> {
+		if (element) {
+			return element.getChildren(element);
+		}
+
 		return [
 			new UrlNode('Titanium SDK Documentation', 'https://docs.appcelerator.com/platform/latest/', 'book'),
 			new UrlNode('Titanium Extension Documentation', 'https://docs.appcelerator.com/platform/latest/#!/guide/Visual_Studio_Code_Extension_for_Titanium', 'book'),
 			new CommandNode('Report Issue', VSCodeCommands.ReportIssue, [ ExtensionId ], 'report'),
+			this.updatesNode = new UpdatesNode('Updates')
 		];
+	}
+
+	public getParent (element: BaseNode): BaseNode|undefined {
+		if (element instanceof UpdateNode) {
+			return element.parentNode;
+		}
+		return undefined;
+	}
+
+	public getUpdatesNode (): UpdatesNode|undefined {
+		return this.updatesNode;
 	}
 }

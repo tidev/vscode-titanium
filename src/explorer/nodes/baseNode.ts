@@ -12,11 +12,11 @@ export abstract class BaseNode implements TreeItem {
 		this.label = label;
 	}
 
-	public getTreeItem (element: BaseNode): TreeItem {
+	public getTreeItem (element: BaseNode): BaseNode {
 		return element;
 	}
 
-	public getChildren (element: BaseNode): BaseNode[] | Promise<BaseNode[]>  {
+	public getChildren (_element: BaseNode): BaseNode[] | Promise<BaseNode[]>  {
 		return [];
 	}
 }

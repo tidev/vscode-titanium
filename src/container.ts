@@ -1,19 +1,24 @@
+import { updates } from 'titanium-editor-commons';
+import { UpdateInfo } from 'titanium-editor-commons/updates';
 import * as vscode from 'vscode';
 import appc, { Appc } from './appc';
 import { Config, configuration } from './configuration';
 import { GlobalState, VSCodeCommands } from './constants';
+import { HelpExplorer } from './explorer/helpExplorer';
 import DeviceExplorer from './explorer/tiExplorer';
-import UpdateExplorer from './explorer/updateExplorer';
+import project from './project';
 import Terminal from './terminal';
+import { getNodeSupportedVersion } from './utils';
 
 export class ExtensionContainer {
 	private static _appc: Appc;
 	private static _buildExplorer: DeviceExplorer;
 	private static _config: Config | undefined;
 	private static _context: vscode.ExtensionContext;
+	private static _helpExplorer: HelpExplorer;
 	private static _runningTask: vscode.TaskExecution|undefined;
 	private static _terminal: Terminal;
-	private static _updateExplorer: UpdateExplorer;
+	private static _updateInfo: UpdateInfo[];
 
 	public static inititalize (context: vscode.ExtensionContext, config: Config): void {
 		this._appc = appc;
@@ -63,12 +68,12 @@ export class ExtensionContainer {
 		return this._buildExplorer;
 	}
 
-	static set updateExplorer (updateExplorer: UpdateExplorer) {
-		this._updateExplorer = updateExplorer;
+	static set helpExplorer (helpExplorer: HelpExplorer) {
+		this._helpExplorer = helpExplorer;
 	}
 
-	static get updateExplorer (): UpdateExplorer {
-		return this._updateExplorer;
+	static get helpExplorer (): HelpExplorer {
+		return this._helpExplorer;
 	}
 
 	/**
@@ -81,5 +86,39 @@ export class ExtensionContainer {
 	static setContext<T>(stateName: GlobalState, value: T): void {
 		vscode.commands.executeCommand(VSCodeCommands.SetContext, stateName, value);
 		ExtensionContainer.context.globalState.update(stateName, value);
+	}
+
+	/**
+	 * Gets the supported SDK version for a project and then retrieves updates based
+	 * on that.
+	 *
+	 * @static
+	 * @param {boolean} [force] - Retrieve updates even if they have already been retrieved
+	 * @returns {Promise<UpdateInfo[]>}
+	 * @memberof ExtensionContainer
+	 */
+	static async getUpdates (force?: boolean): Promise<UpdateInfo[]> {
+		if (!force && this._updateInfo) {
+			return this._updateInfo;
+		}
+
+		let supportedVersions;
+		try {
+			supportedVersions = await getNodeSupportedVersion(project.sdk()[0]);
+		} catch (error) {
+			// ignore
+		}
+
+		try {
+			this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions });
+
+			if (this._updateInfo?.length) {
+				this.setContext(GlobalState.HasUpdates, true);
+			}
+
+			return this._updateInfo;
+		} catch (error) {
+			return [];
+		}
 	}
 }

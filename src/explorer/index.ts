@@ -2,31 +2,38 @@ import { Commands, registerCommand } from '../commands';
 import { ExtensionContainer } from '../container';
 import * as vscode from 'vscode';
 import DeviceExplorer from './tiExplorer';
-import UpdateExplorer from './updateExplorer';
 import { HelpExplorer } from './helpExplorer';
-import { UrlNode } from './nodes/urlNode';
+import { UrlNode } from './nodes';
 
 export function registerViews(context: vscode.ExtensionContext): void {
 
 	ExtensionContainer.buildExplorer = new DeviceExplorer();
-	ExtensionContainer.updateExplorer = new UpdateExplorer();
 	ExtensionContainer.helpExplorer = new HelpExplorer();
+
+	// We register the HelpExplorer via createTreeView to provide access to the underlying TreeView
+	// so we can programmatically reveal the Updates list
+	const helpTreeView = vscode.window.createTreeView('titanium.view.helpExplorer', { treeDataProvider: ExtensionContainer.helpExplorer });
 
 	context.subscriptions.push(
 		vscode.window.registerTreeDataProvider('titanium.view.buildExplorer', ExtensionContainer.buildExplorer),
-		vscode.window.registerTreeDataProvider('titanium.view.updateExplorer', ExtensionContainer.updateExplorer),
-		vscode.window.registerTreeDataProvider('titanium.view.helpExplorer', ExtensionContainer.helpExplorer)
 	);
 
 	registerCommand(Commands.RefreshExplorer, async () => {
 		await ExtensionContainer.buildExplorer.refresh();
 	});
 
-	registerCommand(Commands.RefreshUpdates, async () => {
-		await ExtensionContainer.updateExplorer.refresh();
+	registerCommand(Commands.RefreshHelp, async () => {
+		await ExtensionContainer.helpExplorer.refresh();
 	});
 
 	registerCommand(Commands.OpenUrl, async (node: UrlNode) => {
 		await node.openUrl();
+	});
+
+	registerCommand(Commands.ShowUpdates, async () => {
+		const updatesNode = ExtensionContainer.helpExplorer.getUpdatesNode();
+		if (updatesNode) {
+			helpTreeView.reveal(updatesNode, { select: true, expand: true, focus: true });
+		}
 	});
 }

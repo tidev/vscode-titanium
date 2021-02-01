@@ -20,7 +20,6 @@ import { createApplication } from './createApp';
 import { createModule } from './createModule';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
-import { updates } from 'titanium-editor-commons';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -128,8 +127,7 @@ export function registerCommands (): void {
 	});
 
 	registerCommand(Commands.CheckForUpdates, async () => {
-		await vscode.commands.executeCommand(Commands.RefreshUpdates);
-		const updateInfo = ExtensionContainer.updateExplorer?.updates || await updates.checkAllUpdates();
+		const updateInfo = await ExtensionContainer.getUpdates(true);
 		const numberOfUpdates = updateInfo.length;
 		if (!numberOfUpdates) {
 			return;
@@ -145,7 +143,7 @@ export function registerCommands (): void {
 			vscode.commands.executeCommand(Commands.SelectUpdates, updateInfo);
 		} else if (choice.title === 'View') {
 			// Focus the update view
-			await vscode.commands.executeCommand(Commands.ShowUpdatesView);
+			await vscode.commands.executeCommand(Commands.ShowUpdates);
 		}
 	});
 

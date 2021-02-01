@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { ProductNames, UpdateInfo } from 'titanium-editor-commons/updates';
 import { executeAsTask } from '../utils';
-import { updates } from 'titanium-editor-commons';
 import { selectUpdates } from '../quickpicks/common';
 import { ExtensionContainer } from '../container';
 import { Commands } from '../commands';
@@ -12,11 +11,8 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 	vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
 		if (!updateInfo) {
 			progress.report({ message: 'Checking for latest updates' });
-			// If this extension is active we can just pull off the UpdateExplorer. Otherwise we need to query for them
-			updateInfo = ExtensionContainer?.updateExplorer?.updates || await updates.checkAllUpdates();
+			updateInfo = await ExtensionContainer.getUpdates();
 		}
-
-		const totalUpdates = updateInfo.length;
 
 		if (promptForChoice) {
 			updateInfo = await selectUpdates(updateInfo);
@@ -67,14 +63,16 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 			counter++;
 		}
 
-		// Only set HasUpdates to false if we installed all the updates
-		if (totalUpdates === selectedUpdates) {
+		const updates = await ExtensionContainer.getUpdates(true);
+
+		// Only set HasUpdates to false if there a no outstanding updates
+		if (!updates.length) {
 			ExtensionContainer.setContext(GlobalState.HasUpdates, false);
 		}
 
-		vscode.commands.executeCommand(Commands.RefreshUpdates);
 		vscode.commands.executeCommand(Commands.RefreshExplorer);
-		vscode.window.showInformationMessage(`Installed ${selectedUpdates} ${selectedUpdates === 1 ? 'updates' : 'update'}`);
+		vscode.commands.executeCommand(Commands.RefreshHelp);
+		vscode.window.showInformationMessage(`Installed ${selectedUpdates} ${selectedUpdates === 1 ? 'update' : 'updates'}`);
 
 		// If an install was triggered as a consequence of missing tooling then kick off another check
 		if (ExtensionContainer.context.globalState.get(GlobalState.MissingTooling)) {

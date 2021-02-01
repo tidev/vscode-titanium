@@ -312,6 +312,11 @@
         "command": "titanium.clean",
         "title": "Clean project",
         "category": "Titanium"
+      },
+      {
+        "command": "titanium.updates.reveal",
+        "title": "Reveal Updates",
+        "category": "Titanium"
       }
     ],
     "keybindings": [
@@ -469,11 +474,6 @@
           "when": "titanium:enabled"
         },
         {
-          "id": "titanium.view.updateExplorer",
-          "name": "Updates",
-          "when": "titanium:enabled"
-        },
-        {
           "id": "titanium.view.helpExplorer",
           "name": "Help and Feedback"
         }
@@ -595,6 +595,10 @@
         },
         {
           "command": "titanium.updates.select"
+        },
+        {
+          "command": "titanium.updates.reveal",
+          "when": "false"
         }
       ],
       "editor/context": [
@@ -676,17 +680,12 @@
         {
           "command": "titanium.updates.installAll",
           "group": "2_workspace",
-          "when": "view == titanium.view.updateExplorer && titanium:update:hasUpdates"
+          "when": "view == titanium.view.helpExplorer && titanium:update:hasUpdates"
         },
         {
           "command": "titanium.updates.select",
           "group": "2_workspace",
-          "when": "view == titanium.view.updateExplorer && titanium:update:hasUpdates"
-        },
-        {
-          "command": "titanium.updates.checkAll",
-          "when": "view == titanium.view.updateExplorer",
-          "group": "navigation"
+          "when": "view == titanium.view.helpExplorer && titanium:update:hasUpdates"
         }
       ],
       "view/item/context": [
@@ -719,12 +718,17 @@
         },
         {
           "command": "titanium.updates.openReleaseNotes",
-          "when": "view == titanium.view.updateExplorer && viewItem == UpdateNode",
+          "when": "view == titanium.view.helpExplorer && viewItem == UpdateNode",
           "group": "inline"
         },
         {
           "command": "titanium.updates.install",
-          "when": "view == titanium.view.updateExplorer && viewItem == UpdateNode"
+          "when": "view == titanium.view.helpExplorer && viewItem == UpdateNode"
+        },
+        {
+          "command": "titanium.updates.checkAll",
+          "when": "view == titanium.view.helpExplorer && viewItem == UpdatesNode",
+          "group": "inline"
         }
       ]
     },
