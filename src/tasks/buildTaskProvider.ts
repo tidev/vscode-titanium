@@ -7,6 +7,7 @@ import { Helpers } from './helpers/';
 import { platforms } from '../utils';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { Platform } from '../types/common';
+import { Command } from './commandBuilder';
 
 export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
@@ -87,7 +88,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		);
 	}
 
-	public async resolveTaskInformation (context: TaskExecutionContext, task: BuildTask): Promise<string> {
+	public async resolveTaskInformation (context: TaskExecutionContext, task: BuildTask): Promise<Command> {
 		const { definition } = task;
 
 		if (!definition.titaniumBuild.projectDir) {

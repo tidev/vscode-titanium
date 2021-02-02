@@ -5,6 +5,7 @@ import { TaskHelper, Helpers } from './helpers';
 import { UserCancellation, handleInteractionError, InteractionError, checkLogin } from '../commands/common';
 import { LogLevel, Platform } from '../types/common';
 import { CommandError } from '../common/utils';
+import { Command } from './commandBuilder';
 
 function getPlatform (task: TitaniumTaskBase): Platform {
 	if (task.definition.titaniumBuild.platform === 'android' || task.definition.titaniumBuild.android !== undefined) {
@@ -56,7 +57,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		);
 	}
 
-	public abstract resolveTaskInformation (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<string>
+	public abstract resolveTaskInformation (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<Command>
 
 	public async executeTask (context: TaskExecutionContext, task: TitaniumTaskBase): Promise<number> {
 		// Use this as a centralized place to do things like login checks, analytics etc.

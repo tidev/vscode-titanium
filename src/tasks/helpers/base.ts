@@ -1,5 +1,5 @@
 import { TaskExecutionContext, ProjectType, isDistributionAppBuild } from '../tasksHelper';
-import { CommandBuilder } from '../commandBuilder';
+import { Command, CommandBuilder } from '../commandBuilder';
 import { ExtensionContainer } from '../../container';
 import { quickPick } from '../../quickpicks';
 import * as fs from 'fs-extra';
@@ -32,11 +32,12 @@ function shouldEnableLiveview (definition: AppBuildTaskTitaniumBuildBase): boole
 
 export abstract class TaskHelper {
 
-	public abstract resolveAppBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<string>
-	public abstract resolveAppPackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<string>
+	public abstract resolveAppBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<Command>
+	public abstract resolveAppPackageCommandLine (context: TaskExecutionContext,
+		definition: PackageTaskTitaniumBuildBase): Promise<Command>
 
-	public abstract resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<string>
-	public abstract resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<string>
+	public abstract resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<Command>
+	public abstract resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<Command>
 
 	public resolveCommonOptions (context: TaskExecutionContext, definition: TitaniumBuildBase, builder: CommandBuilder): void {
 
