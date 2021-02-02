@@ -1,5 +1,6 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { TaskHelper } from './base';
+import { Command } from '../commandBuilder';
 import { enterAndroidKeystoreInfo } from '../../quickpicks/build/android';
 import { KeystoreInfo } from '../../types/common';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
@@ -28,7 +29,7 @@ export interface AndroidPackageTaskTitaniumBuildBase extends AppPackageTaskTitan
 
 export class AndroidHelper extends TaskHelper {
 
-	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildTaskTitaniumBuildBase): Promise<string> {
+	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
 
 		await this.resolveCommonAppOptions(context, definition, builder);
@@ -43,7 +44,7 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: AndroidPackageTaskTitaniumBuildBase): Promise<string> {
+	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: AndroidPackageTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
 
 		await this.resolveCommonPackagingOptions(context, definition, builder);
@@ -56,11 +57,11 @@ export class AndroidHelper extends TaskHelper {
 
 		builder
 			.addQuotedOption('--keystore', androidInfo.keystore.location)
-			.addOption('--alias', androidInfo.keystore.alias)
-			.addQuotedOption('--store-password', androidInfo.keystore.password);
+			.addQuotedOption('--alias', androidInfo.keystore.alias)
+			.addEnvironmentArgument('--store-password', androidInfo.keystore.password);
 
 		if (androidInfo.keystore.privateKeyPassword) {
-			builder.addQuotedOption('--key-password', androidInfo.keystore.privateKeyPassword);
+			builder.addEnvironmentArgument('--key-password', androidInfo.keystore.privateKeyPassword);
 		}
 
 		definition.android = androidInfo;
@@ -70,7 +71,7 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<string> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
 
 		this.resolveCommonOptions(context, definition, builder);
@@ -78,7 +79,7 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<string> {
+	public async resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
 
 		this.resolveCommonOptions(context, definition, builder);

@@ -5,6 +5,7 @@ import * as cp from 'child_process';
 import { ExtensionContainer } from '../container';
 import { GlobalState } from '../constants';
 import { CommandError } from '../common/utils';
+import { Command } from './commandBuilder';
 
 type StdListeners = (content: string) => void;
 
@@ -14,14 +15,15 @@ export enum EscapeCodes {
 	Yellow = '33m'
 }
 
-async function spawnCommand (command: string, options: cp.SpawnOptions, onStdout: StdListeners, onStderr: StdListeners, token?: vscode.CancellationToken): Promise<void> {
+async function spawnCommand (command: string, args: string[], options: cp.SpawnOptions, onStdout: StdListeners, onStderr: StdListeners, token?: vscode.CancellationToken): Promise<void> {
 	return new Promise((resolve, reject) => {
 		let cancellationListener: vscode.Disposable;
 		options = options || {};
 		options.shell = true;
 
-		const process = cp.spawn(command, [], options);
 		let output = '';
+		const process = cp.spawn(command, args, options);
+
 		process.stdout?.on('data', (data: Buffer) => {
 			const out = data.toString();
 			onStdout(out);
@@ -111,13 +113,17 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 		}
 	}
 
-	public async executeCommand (command: string, folder: vscode.WorkspaceFolder, token?: vscode.CancellationToken): Promise<void> {
+	public async executeCommand (commandInfo: Command, folder: vscode.WorkspaceFolder, token?: vscode.CancellationToken): Promise<void> {
 
-		this.write(`${command} \r\n\r\n`);
+		const { args, command, environment }  = commandInfo;
+		const env = Object.assign(process.env, environment, { FORCE_COLOR: 1 });
+
+		this.write(`${command} ${args.join(' ')} \r\n\r\n`);
 
 		await spawnCommand(
 			command,
-			{ cwd: folder.uri.fsPath, env: { ...process.env, FORCE_COLOR: '1' } },
+			args,
+			{ cwd: folder.uri.fsPath, shell: true,  env },
 			(stdout: string) => {
 				this.write(stdout);
 			},
