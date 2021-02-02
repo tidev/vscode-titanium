@@ -20,7 +20,7 @@ interface iOSCodeBaseQuickPickItem extends CustomQuickPick {
 export async function selectPlatforms (): Promise<string[]> {
 	const choices: CustomQuickPick[] = platforms().map(platform => ({ label: nameForPlatform(platform), id: platform, picked: true }));
 	const selected = await quickPick(choices, { canPickMany: true, placeHolder: 'Choose platforms' });
-	return selected.map((platform: CustomQuickPick)  => platform.id);
+	return selected.map((platform: CustomQuickPick) => platform.id);
 }
 
 export async function selectCodeBases(platforms: string[]): Promise<CodeBase|undefined> {

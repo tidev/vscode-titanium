@@ -57,9 +57,11 @@ export async function quickPick(items: CustomQuickPick[], quickPickOptions?: Qui
 export async function quickPick(items: string[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<string>;
 export async function quickPick(items: CustomQuickPick[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<CustomQuickPick>;
 export async function quickPick<T extends CustomQuickPick>(items: T[], quickPickOptions?: QuickPickOptions, customQuickPickOptions?: CustomQuickPickOptions): Promise<T>;
-export async function quickPick<T extends CustomQuickPick> (items: T[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}): Promise<T> {
+export async function quickPick<T extends CustomQuickPick> (items: T[], quickPickOptions?: QuickPickOptions, { forceShow = false } = {}): Promise<T|T[]> {
 	if (items.length === 1 && !forceShow) {
-		return items[0];
+		// If canPickMany is set to true then we should return the items array as the caller will
+		// expect an array return type
+		return  quickPickOptions?.canPickMany ? items : items[0];
 	}
 	const result = await window.showQuickPick(items, quickPickOptions);
 	if (!result) {
