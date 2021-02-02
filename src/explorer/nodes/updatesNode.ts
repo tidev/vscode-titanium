@@ -13,7 +13,11 @@ export class UpdatesNode extends BaseNode {
 	private updateInfo: UpdateInfo[] = [];
 
 	public async getChildren(): Promise<Array<BlankNode|UpdateNode>> {
-		this.updateInfo = await ExtensionContainer.getUpdates();
+		try {
+			this.updateInfo = await ExtensionContainer.getUpdates();
+		} catch (error) {
+			return [ new BlankNode('Failed to get updates') ];
+		}
 
 		if (!this.updateInfo.length) {
 			return [ new BlankNode('You\'re fully up to date!') ];

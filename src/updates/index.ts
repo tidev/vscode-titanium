@@ -63,11 +63,15 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 			counter++;
 		}
 
-		const updates = await ExtensionContainer.getUpdates(true);
+		try {
+			const updates = await ExtensionContainer.getUpdates(true);
 
-		// Only set HasUpdates to false if there a no outstanding updates
-		if (!updates.length) {
-			ExtensionContainer.setContext(GlobalState.HasUpdates, false);
+			// Only set HasUpdates to false if there a no outstanding updates
+			if (!updates.length) {
+				ExtensionContainer.setContext(GlobalState.HasUpdates, false);
+			}
+		} catch (error) {
+			// ignore
 		}
 
 		vscode.commands.executeCommand(Commands.RefreshExplorer);

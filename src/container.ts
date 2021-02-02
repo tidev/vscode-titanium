@@ -109,16 +109,12 @@ export class ExtensionContainer {
 			// ignore
 		}
 
-		try {
-			this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions });
+		this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions });
 
-			if (this._updateInfo?.length) {
-				this.setContext(GlobalState.HasUpdates, true);
-			}
-
-			return this._updateInfo;
-		} catch (error) {
-			return [];
+		if (this._updateInfo?.length) {
+			this.setContext(GlobalState.HasUpdates, true);
 		}
+
+		return this._updateInfo;
 	}
 }

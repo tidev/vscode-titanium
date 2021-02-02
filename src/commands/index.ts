@@ -127,24 +127,29 @@ export function registerCommands (): void {
 	});
 
 	registerCommand(Commands.CheckForUpdates, async () => {
-		const updateInfo = await ExtensionContainer.getUpdates(true);
-		const numberOfUpdates = updateInfo.length;
-		if (!numberOfUpdates) {
-			return;
+		try {
+			const updateInfo = await ExtensionContainer.getUpdates(true);
+			const numberOfUpdates = updateInfo.length;
+			if (!numberOfUpdates) {
+				return;
+			}
+			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
+			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
+			const message = numberOfUpdates > 1 ? `There are ${numberOfUpdates} updates available` : `There is ${numberOfUpdates} update available`;
+			const choice = await vscode.window.showInformationMessage(message, { title: 'Install' }, { title: 'View' });
+			if (!choice) {
+				return;
+			}
+			if (choice.title === 'Install') {
+				vscode.commands.executeCommand(Commands.SelectUpdates, updateInfo);
+			} else if (choice.title === 'View') {
+				// Focus the update view
+				await vscode.commands.executeCommand(Commands.ShowUpdates);
+			}
+		} catch (error) {
+			vscode.window.showWarningMessage('Failed to check for updates');
 		}
-		ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
-		vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
-		const message = numberOfUpdates > 1 ? `There are ${numberOfUpdates} updates available` : `There is ${numberOfUpdates} update available`;
-		const choice = await vscode.window.showInformationMessage(message, { title: 'Install' }, { title: 'View' });
-		if (!choice) {
-			return;
-		}
-		if (choice.title === 'Install') {
-			vscode.commands.executeCommand(Commands.SelectUpdates, updateInfo);
-		} else if (choice.title === 'View') {
-			// Focus the update view
-			await vscode.commands.executeCommand(Commands.ShowUpdates);
-		}
+
 	});
 
 	registerCommand(Commands.SelectUpdates, async (updateInfo: UpdateInfo[]) => {
