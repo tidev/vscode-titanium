@@ -2,7 +2,7 @@ import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 import { Tag } from 'titanium-editor-commons/completions';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
 
