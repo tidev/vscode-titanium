@@ -24,6 +24,7 @@ import {
 import { GlobalState, VSCodeCommands } from './constants';
 import { ExtensionContainer } from './container';
 
+import { CompletionsFormat } from './providers/completion/baseCompletionItemProvider';
 import { ControllerCompletionItemProvider } from './providers/completion/controllerCompletionItemProvider';
 import { StyleCompletionItemProvider } from './providers/completion/styleCompletionItemProvider';
 import { TiappCompletionItemProvider } from './providers/completion/tiappCompletionItemProvider';
@@ -506,8 +507,8 @@ async function generateCompletions (force = false): Promise<void> {
 		const sdkPath = sdkInfo.path;
 		// Generate the completions
 		const [ alloy, sdk ] = await Promise.all([
-			completion.generateAlloyCompletions(force, completion.CompletionsFormat.v2),
-			completion.generateSDKCompletions(force, sdkVersion, sdkPath, completion.CompletionsFormat.v3)
+			completion.generateAlloyCompletions(force, CompletionsFormat),
+			completion.generateSDKCompletions(force, sdkVersion, sdkPath, CompletionsFormat)
 		]);
 		if (sdk || alloy) {
 			let message = 'Autocomplete suggestions generated for';
