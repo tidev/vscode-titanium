@@ -984,7 +984,7 @@
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.2",
     "semver": "^7.3.2",
-    "titanium-editor-commons": "^1.0.3",
+    "titanium-editor-commons": "^1.0.4",
     "underscore": "^1.11.0",
     "uuid": "^8.3.1",
     "vscode-debugadapter": "^1.41.1",
