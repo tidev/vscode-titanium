@@ -3,12 +3,13 @@ import * as path from 'path';
 import appc from '../../appc';
 import * as utils from '../../utils';
 
-import { CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, TextDocument, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, Position, Range, TextDocument, workspace } from 'vscode';
+import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
 /**
  * Tiapp.xml completion provider
  */
 
-export class TiappCompletionItemProvider implements CompletionItemProvider {
+export class TiappCompletionItemProvider extends BaseCompletionItemProvider {
 
 	/**
 	 * Provide completion items
@@ -20,7 +21,7 @@ export class TiappCompletionItemProvider implements CompletionItemProvider {
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public provideCompletionItems (document: TextDocument, position: Position): CompletionItem[] {
+	public async provideCompletionItems (document: TextDocument, position: Position): Promise<CompletionItem[]> {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const completions: CompletionItem[] = [];
 		let tag;
