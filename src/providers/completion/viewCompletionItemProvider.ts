@@ -1,17 +1,14 @@
 import * as path from 'path';
-import { completion } from 'titanium-editor-commons';
-import project from '../../project';
 import * as related from '../../related';
 import * as utils from '../../utils';
 import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
-import { CompletionItem, CompletionItemKind, CompletionItemProvider, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
+import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
+import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
 /**
  * Alloy View completion provider
  */
-export class ViewCompletionItemProvider implements CompletionItemProvider {
-
-	private completions: any;
+export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	/**
 	 * Provide completion items
 	 *
@@ -333,10 +330,5 @@ export class ViewCompletionItemProvider implements CompletionItemProvider {
 		if (matches && matches.length >= 2) {
 			return matches[1];
 		}
-	}
-
-	private async loadCompletions (): Promise<void> {
-		const sdk = project.sdk()[0];
-		this.completions = await completion.loadCompletions(sdk, completion.CompletionsFormat.v2);
 	}
 }
