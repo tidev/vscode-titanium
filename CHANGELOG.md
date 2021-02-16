@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.10.0...v0.10.1) (2021-02-16)
+
+
+### Bug Fixes
+
+* **completions:** generate v3 of alloy and titanium for completions ([2cda50c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/2cda50c1ae0ea48dfaa66e0230bb5ae60d48fec8))
+* **quickpick:** return array from quickpick if canPickMany is true ([5e40520](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/5e405203ff7974ff3504a72325c5a29b19ce0047))
+
 ## [0.10.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.9.0...v0.10.0) (2020-11-16)
 
 
