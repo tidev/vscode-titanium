@@ -961,7 +961,7 @@
     "tmp": "^0.2.1",
     "vscode-extension-tester": "^3.2.6",
     "vscode-extension-tester-native": "^3.0.2",
-    "vscode-test": "^1.5.0"
+    "vscode-test": "^1.5.1"
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.2",
