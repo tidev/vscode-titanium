@@ -884,12 +884,6 @@
       }
     ]
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
-  },
   "lint-staged": {
     "*.ts": "npm run lint",
     "*.js": "npm run lint"
@@ -914,7 +908,10 @@
     "test:integration": "node -e \"console.log('Hey there! You want to run the UI tests, but you cant do that via npm run. So you want to run ./runUITests.sh')\"",
     "vscode:prepublish": "npm run compile",
     "pretest": "npm run compile",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "postinstall": "husky install",
+    "prepublishOnly": "pinst --disable",
+    "postpublish": "pinst --enable"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.0.0",
@@ -943,8 +940,8 @@
     "commitizen": "^4.2.3",
     "cz-conventional-changelog": "^3.3.0",
     "danger": "^10.6.3",
-    "eslint": "^7.20.0",
     "ejs": "^3.1.6",
+    "eslint": "^7.20.0",
     "eslint-config-axway": "^5.0.0",
     "eslint-plugin-chai-friendly": "^0.6.0",
     "eslint-plugin-mocha": "^8.0.0",
@@ -955,10 +952,11 @@
     "mocha-jenkins-reporter": "^0.4.5",
     "mocha-multi-reporters": "^1.5.1",
     "nyc": "^15.1.0",
+    "pinst": "^2.1.6",
     "sinon": "^9.2.4",
     "standard-version": "^9.1.1",
-    "typescript": "^4.1.5",
     "tmp": "^0.2.1",
+    "typescript": "^4.1.5",
     "vscode-extension-tester": "^3.2.6",
     "vscode-extension-tester-native": "^3.0.2",
     "vscode-test": "^1.5.1"
