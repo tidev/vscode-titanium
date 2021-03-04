@@ -29,13 +29,14 @@ export enum Commands {
 	OpenRelatedStyle = 'titanium.alloy.open.relatedStyle',
 	OpenRelatedView = 'titanium.alloy.open.relatedView',
 	OpenReleaseNotes = 'titanium.updates.openReleaseNotes',
+	OpenUrl = 'titanium.openUrl',
 	Package = 'titanium.package.run',
 	RefreshExplorer = 'titanium.explorer.refresh',
-	RefreshUpdates = 'titanium.updateExplorer.refresh',
+	RefreshHelp = 'titanium.helpExplorer.refresh',
 	SelectUpdates = 'titanium.updates.select',
 	SetLogLevel = 'titanium.build.setLogLevel',
 	StopBuild = 'titanium.build.stop',
-	ShowUpdatesView = 'titanium.view.updateExplorer.focus',
+	ShowUpdates = 'titanium.updates.reveal',
 }
 
 export class UserCancellation extends Error {

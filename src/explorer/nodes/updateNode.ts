@@ -7,13 +7,13 @@ export class UpdateNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.None;
 	public readonly contextValue: string = 'UpdateNode';
+	public update: UpdateInfo;
+	public parentNode: BaseNode;
 
-	constructor (
-		public readonly label: string,
-		public readonly update: UpdateInfo
-	) {
+	public constructor(label: string, update: UpdateInfo, parentnode: BaseNode) {
 		super(label);
-		this.contextValue = 'UpdateNode';
+		this.update = update;
+		this.parentNode = parentnode;
 	}
 
 	get tooltip (): string {

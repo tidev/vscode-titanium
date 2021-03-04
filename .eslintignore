@@ -1,2 +1,3 @@
 dangerfile.js
 src/test/**/fixtures/**/*
+node_modules

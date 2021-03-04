@@ -112,7 +112,7 @@ export async function startup (): Promise<void> {
 			ExtensionContainer.context.globalState.update(GlobalState.LastUpdateCheck, Date.now());
 			vscode.commands.executeCommand(Commands.CheckForUpdates);
 		} else {
-			vscode.commands.executeCommand(Commands.RefreshUpdates);
+			vscode.commands.executeCommand(Commands.RefreshHelp);
 		}
 	});
 }
