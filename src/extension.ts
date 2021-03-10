@@ -47,9 +47,13 @@ export function deactivate (): void {
  * we're installing from a missing tooling scenario
  */
 export async function startup (): Promise<void> {
-	const { missing } = await environment.validateEnvironment();
+
+	const { missing } = await environment.validateEnvironment(undefined, !ExtensionContainer.isUsingTi());
 
 	if (missing.length) {
+		// We need to set Enabled here just incase are called by a change to the useTi setting
+		// where the environment was previously valid but now we are missing tooling
+		ExtensionContainer.setContext(GlobalState.Enabled, false);
 		ExtensionContainer.setContext(GlobalState.MissingTooling, true);
 		return;
 	}
@@ -59,6 +63,7 @@ export async function startup (): Promise<void> {
 	project.load();
 
 	if (!project.isTitaniumProject()) {
+		ExtensionContainer.setContext(GlobalState.Enabled, false);
 		ExtensionContainer.setContext(GlobalState.NotTitaniumProject, true);
 		return;
 	}

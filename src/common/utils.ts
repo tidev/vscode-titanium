@@ -48,3 +48,23 @@ export function sleep (time: number): Promise<void> {
 		}, time);
 	});
 }
+
+export class CommandError extends Error {
+	public code = 'E_COMMAND_ERROR';
+	public command: string;
+	public exitCode: number;
+	public output?: string;
+	public signal?: string;
+
+	constructor(message: string, command: string, exitCode: number, output?: string, signal?: string) {
+		super(message);
+		this.command = command;
+		this.exitCode = exitCode;
+		this.output = output;
+		this.signal = signal;
+	}
+}
+
+export interface CommandResponse {
+	output: string;
+}

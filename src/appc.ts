@@ -10,14 +10,29 @@ import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common
 import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 import { GlobalState } from './constants';
-import { InteractionError } from './commands';
+import { AlloyComponentType, InteractionError } from './commands';
+import { CommandResponse } from './common/utils';
 
 export interface AlloyGenerateOptions {
-	adapterType?: string;
 	cwd: string;
 	force?: boolean;
-	type: string;
+	type: Exclude<AlloyComponentType, AlloyComponentType.Model>;
 	name: string;
+}
+
+export interface AlloyModelGenerateOptions {
+	cwd: string;
+	force?: boolean;
+	adapterType: string;
+	type: AlloyComponentType.Model;
+	name: string;
+}
+
+function isModelType(options: AlloyGenerateOptions|AlloyModelGenerateOptions): options is AlloyModelGenerateOptions {
+	if (options.type === AlloyComponentType.Model) {
+		return true;
+	}
+	return false;
 }
 
 export class Appc {
@@ -48,7 +63,15 @@ export class Appc {
 			ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, true);
 			let result = '';
 			let output = '';
-			const proc = spawn('appc', [ 'ti', 'info', '-o', 'json', '--no-prompt' ], { shell: true });
+
+			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
+			const args = [ 'info', '-o', 'json' ];
+			if (!ExtensionContainer.isUsingTi()) {
+				args.unshift('ti');
+				args.push('--no-prompt');
+			}
+
+			const proc = spawn(command, args, { shell: true });
 			proc.stdout.on('data', data => {
 				result += data;
 				output += data;
@@ -334,33 +357,32 @@ export class Appc {
 	/**
 	 * Run `appc alloy generate` command
 	 *
-	 * @param {Object} opts - arguments.
-	 * @param {String} [opts.adapterType] - Adapter to use for Alloy model
-	 * @param {String} opts.cwd - Directory of the app.
-	 * @param {Boolean} opts.force - Force creation of the component, will overwrite existing component.
-	 * @param {String} opts.name -  Name of the component.
-	 * @param {String} opts.type - Type to generate.
+	 * @param {AlloyGenerateOptions|AlloyModelGenerateOptions} options - arguments.
+	 * @param {String} [options.adapterType] - Adapter to use for Alloy model
+	 * @param {String} options.cwd - Directory of the app.
+	 * @param {Boolean} options.force - Force creation of the component, will overwrite existing component.
+	 * @param {String} options.name -  Name of the component.
+	 * @param {String} options.type - Type to generate.
 	 * @returns {Promise}
 	 */
-	public generate ({ adapterType, cwd, force, name, type }: AlloyGenerateOptions): Promise<void> {
-		return new Promise((resolve, reject) => {
-			const args = [ 'alloy', 'generate', type, name ];
-			if (type === 'model') {
-				args.push(adapterType!);
-			}
-			if (force) {
-				args.push('--force');
-			}
-			const proc = spawn('appc', args, { cwd, shell: true });
+	public generate (options: AlloyGenerateOptions|AlloyModelGenerateOptions): Promise<CommandResponse> {
+		const { cwd, force, name, type } = options;
+		const command = ExtensionContainer.isUsingTi() ? 'alloy' : 'appc';
+		const args = [ 'generate', type, name ];
 
-			proc.on('close', code => {
-				if (code) {
-					// handle error
-					return reject();
-				}
-				return resolve();
-			});
-		});
+		if (isModelType(options)) {
+			args.push(options.adapterType);
+		}
+
+		if (force) {
+			args.push('--force');
+		}
+
+		if (!ExtensionContainer.isUsingTi()) {
+			args.unshift('alloy');
+		}
+
+		return ExtensionContainer.terminal.runInBackground(command, args, { cwd });
 	}
 
 	public getAdbPath (): string|undefined {

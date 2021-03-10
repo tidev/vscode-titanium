@@ -6,6 +6,7 @@ import * as utils from './utils';
 import { EventEmitter, Range, window, workspace } from 'vscode';
 import { handleInteractionError, InteractionError } from './commands/common';
 import { Platform } from './types/common';
+import { parseXmlString } from './common/utils';
 
 const TIAPP_FILENAME = 'tiapp.xml';
 const TIMODULEXML_FILENAME = 'timodule.xml';
@@ -25,7 +26,8 @@ export class Project {
 
 	private tiapp: any;
 	private modules: ModuleInformation[] = [];
-	private emitter: EventEmitter<void>|undefined;
+	private emitter: EventEmitter<void> = new EventEmitter();
+	private hasModifiedListener = false;
 
 	/**
 	 * Check if the current project is a Titanium app or module.
@@ -63,8 +65,9 @@ export class Project {
 	 * @param {Function} callback	callback function
 	 */
 	public onModified (callback: () => void): void {
-		if (this.isTitaniumApp && this.emitter) {
+		if (this.isTitaniumApp && !this.hasModifiedListener) {
 			this.emitter.event(callback);
+			this.hasModifiedListener = true;
 		}
 	}
 
@@ -133,9 +136,7 @@ export class Project {
 	 * Dispose of resources
 	 */
 	public dispose (): void {
-		if (this.emitter) {
-			this.emitter.dispose();
-		}
+		this.emitter.dispose();
 	}
 
 	/**
@@ -145,72 +146,66 @@ export class Project {
 	private async loadTiappFile  (): Promise<void> {
 		this.isTitaniumApp = false;
 		this.isValidTiapp = false;
-		let error: InteractionError | undefined;
 		const rootPath = workspace.rootPath;
 		if (!rootPath) {
 			return;
 		}
+
 		const filePath = path.join(rootPath, TIAPP_FILENAME);
-		if (utils.fileExists(filePath)) {
-			this.isTitaniumApp = true;
-			const fileData = fs.readFileSync(filePath, 'utf-8');
-			const parser = new xml2js.Parser();
-			let json;
-			parser.parseString(fileData, (err: Error, result: unknown) => {
-				if (err) {
-					let line: number;
-					let column: number;
-					let message = 'Errors found in tiapp.xml';
-					const columnExp = /Column: (.*?)(?:\s|$)/g;
-					const lineExp = /Line: (.*?)(?:\s|$)/g;
-					const columnMatch = columnExp.exec(err.message);
-					const lineMatch = lineExp.exec(err.message);
+		if (!utils.fileExists(filePath)) {
+			return;
+		}
 
-					if (lineMatch) {
-						line = parseInt(lineMatch[1], 10);
-						message = `${message} on line ${line + 1}`;
-					}
+		this.isTitaniumApp = true;
 
-					if (columnMatch) {
-						column = parseInt(columnMatch[1], 10);
-						message = `${message} in column ${column + 1}`;
-					}
-
-					error = new InteractionError(message);
-					error.interactionChoices.push({
-						title: 'Open tiapp.xml',
-						run: async () => {
-							const file = path.join(workspace.rootPath!, 'tiapp.xml');
-							const document = await workspace.openTextDocument(file);
-							const linePrefix = new Range(line, 0, line, column);
-							await window.showTextDocument(document.uri, { selection: linePrefix });
-						}
-					});
-					return error;
+		// if this is our first time running through then load setup the file watcher
+		if (!this.tiapp) {
+			workspace.onDidSaveTextDocument(async (event) => {
+				if (event.fileName === filePath) {
+					await this.loadTiappFile();
+					this.emitter.fire();
 				}
-				json = result;
-				this.isValidTiapp = true;
 			});
+		}
 
-			if (!this.emitter) {
-				this.emitter = new EventEmitter();
-				workspace.onDidSaveTextDocument(event => {
-					if (event.fileName === filePath) {
-						this.loadTiappFile();
-						if (this.emitter) {
-							this.emitter.fire();
-						}
-					}
-				});
-			}
+		try {
+			const fileData = fs.readFileSync(filePath, 'utf-8');
+			const json = await parseXmlString(fileData) as any;
+			this.isValidTiapp = true;
 
 			if (json && json['ti:app']) {
 				this.tiapp = json['ti:app'];
 			}
+		} catch (err) {
+			let line: number;
+			let column: number;
+			let message = 'Errors found in tiapp.xml';
+			const columnExp = /Column: (.*?)(?:\s|$)/g;
+			const lineExp = /Line: (.*?)(?:\s|$)/g;
+			const columnMatch = columnExp.exec(err.message);
+			const lineMatch = lineExp.exec(err.message);
 
-			if (error instanceof InteractionError) {
-				await handleInteractionError(error);
+			if (lineMatch) {
+				line = parseInt(lineMatch[1], 10);
+				message = `${message} on line ${line + 1}`;
 			}
+
+			if (columnMatch) {
+				column = parseInt(columnMatch[1], 10);
+				message = `${message} in column ${column + 1}`;
+			}
+
+			const error = new InteractionError(message);
+			error.interactionChoices.push({
+				title: 'Open tiapp.xml',
+				run: async () => {
+					const file = path.join(workspace.rootPath!, 'tiapp.xml');
+					const document = await workspace.openTextDocument(file);
+					const linePrefix = new Range(line, 0, line, column);
+					await window.showTextDocument(document.uri, { selection: linePrefix });
+				}
+			});
+			await handleInteractionError(error);
 		}
 	}
 

@@ -54,6 +54,10 @@ export class InteractionError extends Error {
  * Check Appcelerator login and prompt if necessary.
  */
 export function checkLogin (): void {
+	if (ExtensionContainer.isUsingTi()) {
+		return;
+	}
+
 	if (!ExtensionContainer.appc.isUserLoggedIn()) {
 		window.showInformationMessage('Please log in to the Appcelerator platform');
 		const error = new InteractionError('You are not logged in. Please log in to continue');

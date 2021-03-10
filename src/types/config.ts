@@ -20,6 +20,7 @@ export interface Config {
 		displayBuildCommandInConsole: boolean;
 		logLevel: LogLevel;
 		useTerminalForBuild: boolean;
+		useTi: boolean;
 		updateFrequency: string;
 	};
 	package: {
