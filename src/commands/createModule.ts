@@ -8,6 +8,7 @@ import { ExtensionContainer } from '../container';
 import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createModuleArguments, validateAppId } from '../utils';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { CommandError } from '../common/utils';
 
 export async function createModule (): Promise<void> {
 	try {
@@ -48,7 +49,14 @@ export async function createModule (): Promise<void> {
 			workspaceDir: workspaceDir.fsPath,
 			codeBases
 		});
-		await ExtensionContainer.terminal.runCommandInBackground(args, { cancellable: false, location: ProgressLocation.Notification, title: 'Creating module' });
+
+		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (progress) => {
+			progress.report({ message: 'Creating module' });
+			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
+			await ExtensionContainer.terminal.runInBackground(command, args);
+			return;
+		});
+
 		// TODO: Once workspace support is figured out, add an "add to workspace command"
 		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { title: 'Open Project' });
 		if (dialog) {
@@ -58,6 +66,20 @@ export async function createModule (): Promise<void> {
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
+		} else if (error instanceof CommandError) {
+			const choices = [];
+			if (error.output) {
+				choices.push('View Error');
+			}
+
+			const action = await window.showErrorMessage('Failed to create application', ...choices);
+			if (error.output && action === 'View Error') {
+				const channel = window.createOutputChannel('Titanium');
+				channel.append(`${error.command}\n`);
+				channel.append(error.output);
+				channel.show();
+			}
+			console.log(error);
 		}
 	}
 }

@@ -63,7 +63,7 @@ Promise<{ cwd: string; filePaths: string[]; name: string; type: AlloyComponentTy
 	return { cwd, filePaths, name, type };
 }
 
-export async function generateComponent (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension): Promise<void> {
+export async function generateComponent (type: Exclude<AlloyComponentType, AlloyComponentType.Model>, folder: AlloyComponentFolder, extension: AlloyComponentExtension): Promise<void> {
 	let name;
 	try {
 		const creationArgs = await promptForDetails(type, folder, extension);

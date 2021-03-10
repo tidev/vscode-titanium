@@ -64,9 +64,9 @@ async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise
 			const tcpPort = `tcp:${providedArgs.port}`;
 
 			if (providedArgs.target === 'emulator') {
-				const { stdout } = await ExtensionContainer.terminal.runInBackground(adbPath, [ 'forward', '--list' ]);
+				const { output } = await ExtensionContainer.terminal.runInBackground(adbPath, [ 'forward', '--list' ]);
 
-				for (const line of stdout.split('\n')) {
+				for (const line of output.split('\n')) {
 					if (!line.includes(tcpPort)) {
 						continue;
 					}

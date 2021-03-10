@@ -6,6 +6,7 @@ import { Config, configuration } from './configuration';
 import { GlobalState, VSCodeCommands } from './constants';
 import { HelpExplorer } from './explorer/helpExplorer';
 import DeviceExplorer from './explorer/tiExplorer';
+import { startup } from './extension';
 import project from './project';
 import Terminal from './terminal';
 import { getNodeSupportedVersion } from './utils';
@@ -48,8 +49,14 @@ export class ExtensionContainer {
 		return this._terminal;
 	}
 
-	public static resetConfig (): void {
-		this._config = undefined;
+	public static resetConfig (configEvent: vscode.ConfigurationChangeEvent): void {
+		this._config = configuration.get<Config>();
+
+		// if the config change is for the useTi setting we need to kick off the startup again to
+		// perform environment validation
+		if (configEvent.affectsConfiguration('titanium.general.useTi')) {
+			startup();
+		}
 	}
 
 	static set runningTask (task: vscode.TaskExecution|undefined) {
@@ -109,12 +116,16 @@ export class ExtensionContainer {
 			// ignore
 		}
 
-		this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions });
+		this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions }, !ExtensionContainer.isUsingTi());
 
 		if (this._updateInfo?.length) {
 			this.setContext(GlobalState.HasUpdates, true);
 		}
 
 		return this._updateInfo;
+	}
+
+	static isUsingTi (): boolean {
+		return this.config.general.useTi;
 	}
 }

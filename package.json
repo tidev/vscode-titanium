@@ -440,6 +440,11 @@
           "default": true,
           "description": "When true build/package commands will be run using the integrated terminal as opposed to using an output channel."
         },
+        "titanium.general.useTi": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to use the OSS based tooling (alloy + ti) instead of the Appcelerator platform based tool (appc)"
+        },
         "titanium.package.distributionOutputDirectory": {
           "type": "string",
           "default": "dist",
@@ -978,7 +983,7 @@
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.3",
     "semver": "^7.3.5",
-    "titanium-editor-commons": "^1.0.4",
+    "titanium-editor-commons": "^1.2.0",
     "uuid": "^8.3.2",
     "vscode-chrome-debug-core": "^6.8.9",
     "vscode-debugadapter": "^1.47.0",

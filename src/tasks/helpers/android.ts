@@ -30,7 +30,7 @@ export interface AndroidPackageTaskTitaniumBuildBase extends AppPackageTaskTitan
 export class AndroidHelper extends TaskHelper {
 
 	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: AndroidBuildTaskTitaniumBuildBase): Promise<string> {
-		const builder = CommandBuilder.create('appc', 'run');
+		const builder = this.createBuilder();
 
 		await this.resolveCommonAppOptions(context, definition, builder);
 
@@ -45,7 +45,7 @@ export class AndroidHelper extends TaskHelper {
 	}
 
 	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: AndroidPackageTaskTitaniumBuildBase): Promise<string> {
-		const builder = CommandBuilder.create('appc', 'run');
+		const builder = this.createBuilder();
 
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
@@ -72,7 +72,7 @@ export class AndroidHelper extends TaskHelper {
 	}
 
 	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<string> {
-		const builder = CommandBuilder.create('appc', 'run');
+		const builder = this.createBuilder();
 
 		this.resolveCommonOptions(context, definition, builder);
 
@@ -80,7 +80,7 @@ export class AndroidHelper extends TaskHelper {
 	}
 
 	public async resolveModulePackageCommandLine (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase): Promise<string> {
-		const builder = CommandBuilder.create('appc', 'run');
+		const builder = this.createBuilder();
 
 		this.resolveCommonOptions(context, definition, builder);
 

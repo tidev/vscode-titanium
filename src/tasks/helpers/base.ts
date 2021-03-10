@@ -158,4 +158,12 @@ export abstract class TaskHelper {
 	public storeLastState (type: WorkspaceState, buildOptions: TitaniumBuildBase): void {
 		ExtensionContainer.context.workspaceState.update(type, buildOptions);
 	}
+
+	public createBuilder (): CommandBuilder {
+		if (ExtensionContainer.isUsingTi()) {
+			return CommandBuilder.create('ti', 'build');
+		} else {
+			return CommandBuilder.create('appc', 'run');
+		}
+	}
 }
