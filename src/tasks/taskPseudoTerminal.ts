@@ -4,6 +4,7 @@ import { TaskExecutionContext, runningTasks } from './tasksHelper';
 import * as cp from 'child_process';
 import { ExtensionContainer } from '../container';
 import { GlobalState } from '../constants';
+import { CommandError } from '../common/utils';
 
 type StdListeners = (content: string) => void;
 
@@ -13,20 +14,6 @@ export enum EscapeCodes {
 	Yellow = '33m'
 }
 
-export class CommandError extends Error {
-	public code = 'E_COMMAND_ERROR';
-	public command: string;
-	public exitCode: number;
-	public signal: string;
-
-	constructor(message: string, command: string, exitCode: number, signal: string) {
-		super(message);
-		this.command = command;
-		this.exitCode = exitCode;
-		this.signal = signal;
-	}
-}
-
 async function spawnCommand (command: string, options: cp.SpawnOptions, onStdout: StdListeners, onStderr: StdListeners, token?: vscode.CancellationToken): Promise<void> {
 	return new Promise((resolve, reject) => {
 		let cancellationListener: vscode.Disposable;
@@ -34,13 +21,17 @@ async function spawnCommand (command: string, options: cp.SpawnOptions, onStdout
 		options.shell = true;
 
 		const process = cp.spawn(command, [], options);
-
+		let output = '';
 		process.stdout?.on('data', (data: Buffer) => {
-			onStdout(data.toString());
+			const out = data.toString();
+			onStdout(out);
+			output += out;
 		});
 
 		process.stderr?.on('data', (data: Buffer) => {
-			onStderr(data.toString());
+			const out = data.toString();
+			onStderr(out);
+			output += out;
 		});
 
 		process.on('close', (code, signal) => {
@@ -52,7 +43,7 @@ async function spawnCommand (command: string, options: cp.SpawnOptions, onStdout
 				return reject(new Error('user cancelled'));
 			} else if (code) {
 				// throw nice error
-				const error = new CommandError(`Process exited with ${code}`, command, code, signal);
+				const error = new CommandError(`Process exited with ${code}`, command, code, output, signal);
 
 				return reject(error);
 			}
