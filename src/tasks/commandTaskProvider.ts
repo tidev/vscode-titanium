@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { TaskExecutionContext, Platform, ProjectType } from './tasksHelper';
-import { TaskPseudoTerminal, CommandError } from './taskPseudoTerminal';
+import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
 import { UserCancellation, handleInteractionError, InteractionError, checkLogin } from '../commands/common';
 import { LogLevel } from '../types/common';
+import { CommandError } from '../common/utils';
 
 function getPlatform (task: TitaniumTaskBase): Platform {
 	if (task.definition.titaniumBuild.platform === 'android' || task.definition.titaniumBuild.android !== undefined) {
