@@ -4,6 +4,7 @@ import { TargetNode } from './targetNode';
 import { TreeItemCollapsibleState } from 'vscode';
 import { Platform, PlatformPretty } from '../../types/common';
 import { nameForPlatform } from '../../utils';
+import { DistributeNode } from './distributeNode';
 
 export class PlatformNode extends BaseNode {
 
@@ -19,17 +20,21 @@ export class PlatformNode extends BaseNode {
 		this.contextValue = 'PlatformNode';
 	}
 
-	public getChildren (): TargetNode[] {
+	public getChildren (): Array<DistributeNode|TargetNode> {
 		switch (this.platform) {
 			case 'android':
 				return [
 					new TargetNode('Device', this.platform),
-					new TargetNode('Emulator', this.platform)
+					new TargetNode('Emulator', this.platform),
+					new DistributeNode('Play Store', this.platform, this.label, 'dist-playstore')
 				];
 			case 'ios':
 				return [
 					new TargetNode('Device', this.platform),
-					new TargetNode('Simulator', this.platform)
+					new TargetNode('Simulator', this.platform),
+					new DistributeNode('Ad Hoc', this.platform, this.label, 'dist-adhoc'),
+					new DistributeNode('App Store', this.platform, this.label, 'dist-appstore')
+
 				];
 			default:
 				return [];
