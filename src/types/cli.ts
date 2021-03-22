@@ -80,8 +80,8 @@ export interface CleanAppOptions extends BaseCLIOptions {
 	projectDir: string;
 }
 
-export type Target = DevelopmentTarget | DeploymenTarget;
+export type Target = DevelopmentTarget | DeploymentTarget;
 
 export type DevelopmentTarget = 'device' | 'emulator' | 'simulator';
 
-export type DeploymenTarget = 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';
+export type DeploymentTarget = 'dist-adhoc' | 'dist-appstore' | 'dist-playstore';

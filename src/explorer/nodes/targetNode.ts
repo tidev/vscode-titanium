@@ -1,6 +1,7 @@
 import { TreeItemCollapsibleState } from 'vscode';
 import { BaseNode } from './baseNode';
 import { DeviceNode } from './deviceNode';
+import { DistributeNode } from './distributeNode';
 import { OSVerNode } from './osVerNode';
 
 import appc from '../../appc';
@@ -51,6 +52,10 @@ export class TargetNode extends BaseNode {
 						devices.push(new DeviceNode(label, this.platform, this.label, device.udid, this.targetId));
 					}
 					break;
+				case 'Package':
+					devices.push(new DistributeNode('Adhoc', this.platform, this.label, 'dist-adhoc'));
+					devices.push(new DistributeNode('App Store', this.platform, this.label, 'dist-appstore'));
+					break;
 			}
 		} else if (this.platform === 'android') {
 			switch (this.label) {
@@ -69,6 +74,9 @@ export class TargetNode extends BaseNode {
 							devices.push(new DeviceNode(label, this.platform, this.label, emulator.id, this.targetId));
 						}
 					}
+					break;
+				case 'Package':
+					devices.push(new DistributeNode('Play Store', this.platform, this.label, 'dist-playstore'));
 					break;
 			}
 		}
