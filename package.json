@@ -981,7 +981,7 @@
     "semver": "^7.3.5",
     "titanium-editor-commons": "^1.0.4",
     "uuid": "^8.3.2",
-    "vscode-debugadapter": "^1.42.1",
+    "vscode-debugadapter": "^1.45.0",
     "which": "^2.0.2",
     "xml2js": "^0.4.23"
   }
