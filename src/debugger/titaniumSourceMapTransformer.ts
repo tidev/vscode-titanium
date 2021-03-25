@@ -1,4 +1,4 @@
-import { BaseSourceMapTransformer } from '@awam/vscode-chrome-debug-core';
+import { BaseSourceMapTransformer } from 'vscode-chrome-debug-core';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';

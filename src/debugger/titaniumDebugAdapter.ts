@@ -1,5 +1,5 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
-import { ChromeDebugAdapter, Crdp } from '@awam/vscode-chrome-debug-core';
+import { ChromeDebugAdapter, Crdp } from 'vscode-chrome-debug-core';
 import * as got from 'got';
 import { sleep } from '../common/utils';
 import { URL } from 'url';
