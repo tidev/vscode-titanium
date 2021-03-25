@@ -1,5 +1,5 @@
 /* eslint require-atomic-updates: 0 */
-import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from '@awam/vscode-chrome-debug-core';
+import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
 import * as path from 'path';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
