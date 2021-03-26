@@ -971,7 +971,7 @@
     "vscode-test": "^1.5.2"
   },
   "dependencies": {
-    "@awam/remotedebug-ios-webkit-adapter": "^0.4.2",
+    "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
     "fs-extra": "^9.1.0",
     "get-port": "^5.1.1",
     "got": "^9.6.0",
