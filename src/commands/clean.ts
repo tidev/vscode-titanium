@@ -15,7 +15,7 @@ export async function cleanApplication (): Promise<void> {
 			const platformInfo = await selectPlatform(undefined, isValidPlatform);
 			projectDir = path.join(projectDir, platformInfo.id);
 		}
-		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification, title: 'Cleaning project' }, async (progress) => {
+		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification, title: 'Cleaning project' }, async () => {
 			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
 			const args = [
 				'clean',

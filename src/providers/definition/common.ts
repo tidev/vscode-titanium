@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as related from '../../related';
 import * as utils from '../../utils';
 
-import { TextDocument, workspace } from 'vscode';
+import { TextDocument } from 'vscode';
 import { ExtensionContainer } from '../../container';
 
 export interface DefinitionSuggestion {

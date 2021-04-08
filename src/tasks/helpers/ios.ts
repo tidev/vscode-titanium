@@ -4,7 +4,6 @@ import { getCorrectCertificateName } from '../../utils';
 import project from '../../project';
 import { IosCertificateType, IosCert } from '../../types/common';
 import { TaskHelper } from './base';
-import { CommandBuilder } from '../commandBuilder';
 import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';

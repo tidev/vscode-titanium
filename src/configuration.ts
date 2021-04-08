@@ -19,9 +19,9 @@ export class Configuration {
 				.get<T>(section === undefined ? ExtensionName : section, defaultValue)!;
 	}
 
-	public update (section: string, value: any, target: ConfigurationTarget, resourece?: Uri): Thenable<void> {
+	public update (section: string, value: unknown, target: ConfigurationTarget, resource?: Uri): Thenable<void> {
 		return workspace
-			.getConfiguration(ExtensionName, target === ConfigurationTarget.Global ? undefined : resourece!)
+			.getConfiguration(ExtensionName, target === ConfigurationTarget.Global ? undefined : resource!)
 			.update(section, value, target);
 	}
 
