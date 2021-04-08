@@ -1,6 +1,6 @@
 import * as definitionProviderHelper from './definitionProviderHelper';
 
-import { CancellationToken, HoverProvider, Position, TextDocument, Hover } from 'vscode';
+import { HoverProvider, Position, TextDocument, Hover } from 'vscode';
 
 export class ViewHoverProvider implements HoverProvider {
 

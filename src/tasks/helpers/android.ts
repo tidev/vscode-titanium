@@ -1,6 +1,5 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { TaskHelper } from './base';
-import { CommandBuilder } from '../commandBuilder';
 import { enterAndroidKeystoreInfo } from '../../quickpicks/build/android';
 import { KeystoreInfo } from '../../types/common';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';

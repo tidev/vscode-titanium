@@ -11,7 +11,6 @@ import { parseXmlString } from './common/utils';
 const TIAPP_FILENAME = 'tiapp.xml';
 const TIMODULEXML_FILENAME = 'timodule.xml';
 const MANIFEST_FILENAME = 'manifest';
-const DASHBOARD_URL_ROOT = 'https://platform.axway.com/#/app/';
 
 interface ModuleInformation {
 	path: string;
