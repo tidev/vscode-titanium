@@ -23,6 +23,10 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 
 ## Features
 
+### Selecting tooling
+
+By default this extension will use the Appcelerator CLI tooling. You can switch to the Titanium CLI tooling by enabling the `General: Use Ti` property in the package settings. This can also be set per-project by setting the `titanium.general.useTi` property in a `./vscode/settings.json` file.
+
 ### Commands
 
 This extension makes the following commands available in the Command Palette to enhance your development experience.
@@ -47,7 +51,6 @@ This extension makes the following commands available in the Command Palette to 
 | `Titanium: Open related style` | Open related style |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>s</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>s</kbd> |
 | `Titanium: Open related controller` | Open related controller |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> |
 | `Titanium: Open related files` | Open related files |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> |
-| `Titanium: Generate autocomplete list` | Generate autocomplete list | - |
 | `Titanium: Check For Updates` | Check For Updates | - |
 | `Titanium: Install All Updates` | Install All Updates | - |
 | `Titanium: Select Updates` | Select Updates | - |
@@ -90,6 +93,7 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.general.logLevel` | Logging level for commands being run | `info` |
 | `titanium.general.updateFrequency` | Controls the frequency for how often to show an alert if there are updates available. Updates can always be viewed in the Titanium activity pane. Accepts values in time formats like 60 minutes, 12 hours, 7 days etc. | `1 day` |
 | `titanium.general.useTerminalForBuild` | When true build/package commands will be run using the integrated terminal as opposed to using an output channel. | `true` |
+| `titanium.general.useTi` | Whether to use the OSS based tooling (alloy + ti) instead of the Appcelerator platform based tool (appc) | `false` |
 | `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
 | `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
 
