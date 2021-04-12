@@ -7,7 +7,7 @@ import * as xml2js from 'xml2js';
 import { parsePlatformsFromTiapp, dismissNotifications } from '../../util/common';
 import { ProjectCreator } from '../../util/create';
 
-(process.env.JENKINS ? describe.skip : describe)('Application creation', function () {
+describe('Application creation', function () {
 	this.timeout(30000);
 
 	let browser: VSBrowser;
@@ -15,7 +15,8 @@ import { ProjectCreator } from '../../util/create';
 	let tempDirectory: tmp.DirResult;
 	let creator: ProjectCreator;
 
-	beforeEach(async function () {
+	before(async function () {
+		this.timeout(180000);
 		browser = VSBrowser.instance;
 		driver = browser.driver;
 		const editorView = new EditorView();
@@ -24,7 +25,7 @@ import { ProjectCreator } from '../../util/create';
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
 		creator = new ProjectCreator(driver);
-		await creator.waitForEnvironmentDetectionCompletion();
+		await creator.waitForGetStarted();
 	});
 
 	afterEach(async function () {
@@ -39,7 +40,6 @@ import { ProjectCreator } from '../../util/create';
 
 		await creator.createApp({
 			id: 'com.axway.e2e',
-			enableServices: false,
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android', 'ios' ]
@@ -62,7 +62,6 @@ import { ProjectCreator } from '../../util/create';
 
 		await creator.createApp({
 			id: 'com.axway.e2e',
-			enableServices: false,
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android' ]

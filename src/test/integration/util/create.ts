@@ -17,7 +17,6 @@ export class ProjectCreator extends CommonUICreator {
 		await this.setName(options.name);
 		await this.setId(options.id);
 		await this.setPlatforms(options.platforms);
-		await this.setEnableServices(options.enableServices);
 		await this.setFolder();
 
 		try {

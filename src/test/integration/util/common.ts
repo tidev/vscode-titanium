@@ -222,7 +222,6 @@ export class CommonUICreator {
 					for (const choice of choices) {
 						items.push(await choice.getText());
 					}
-					console.log(items);
 
 					throw new Error(`It looks like you dont have tooling installed, you are missing ${items}`);
 				}

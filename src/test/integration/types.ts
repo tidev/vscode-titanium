@@ -7,7 +7,6 @@ export type Target = {
 
 export type AppCreateOptions = {
 	id: string;
-	enableServices: boolean;
 	folder: string;
 	name: string;
 	platforms: string[];
