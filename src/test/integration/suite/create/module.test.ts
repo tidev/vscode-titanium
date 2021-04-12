@@ -6,7 +6,7 @@ import * as tmp from 'tmp';
 import { ProjectCreator } from '../../util/create';
 import { dismissNotifications } from '../../util/common';
 
-(process.env.JENKINS ? describe.skip : describe)('Module creation', function () {
+describe('Module creation', function () {
 	this.timeout(30000);
 
 	let browser: VSBrowser;
@@ -14,7 +14,8 @@ import { dismissNotifications } from '../../util/common';
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
 
-	beforeEach(async function () {
+	before(async function () {
+		this.timeout(180000);
 		browser = VSBrowser.instance;
 		driver = browser.driver;
 		const editorView = new EditorView();
@@ -23,7 +24,7 @@ import { dismissNotifications } from '../../util/common';
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
 		creator = new ProjectCreator(driver);
-		await creator.waitForEnvironmentDetectionCompletion();
+		await creator.waitForGetStarted();
 	});
 
 	afterEach(async function () {

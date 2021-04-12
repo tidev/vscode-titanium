@@ -8,7 +8,7 @@ import * as tmp from 'tmp';
 
 const projectDirectory = path.join(getFixturesDirectory(), 'alloy-project');
 
-describe.only('Alloy component generation', function () {
+describe('Alloy component generation', function () {
 	this.timeout(30000);
 
 	let browser: VSBrowser;
