@@ -1,4 +1,4 @@
-import { BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -93,19 +93,108 @@ export class CommonUICreator {
 		await setting.setValue(value);
 	}
 
+	/**
+	 * Waits for the Build explorer to be shown and for the build action to be active
+	 *
+	 * @returns {Promise<void>}
+	 * @memberof CommonUICreator
+	 */
 	public async waitForEnvironmentDetectionCompletion(): Promise<void> {
-		let exists = true;
-		while (exists) {
-			// do nothing
-			const notification = await notificationExists('Validating Environment');
-			if (!notification) {
-				exists = false;
-			} else {
-				console.log('notification exists');
-				console.log(notification);
+		const tiActivity = await this.getActivityView();
+		const view  = await tiActivity.openView();
+		const content = await view.getContent();
+
+		await this.driver.wait(async () => {
+			try {
+				const sections = await content.getSections();
+				let section: ViewSection|undefined;
+				for (const sec of sections) {
+					const title = await sec.getTitle();
+					if (title.toLowerCase().includes('build')) {
+						section = sec;
+						continue;
+					}
+				}
+
+				if (!section || !section.isDisplayed()) {
+					return false;
+				}
+
+				let active = false;
+				const actions = await section.getActions();
+				for (const action of actions) {
+					const label = await action.getLabel();
+					if (label.toLowerCase().includes('build')) {
+						active = true;
+					}
+				}
+				return active;
+			} catch (error) {
+				// ignore error while we're waiting for the section to load
 			}
-		}
-		return;
+		}, 60000);
+	}
+
+	/**
+	 * Waits for the Get Started view to be shown and active in the tooling installed but no open project state
+	 *
+	 * @returns {Promise<void>}
+	 * @memberof CommonUICreator
+	 */
+	public async waitForGetStarted (): Promise<void> {
+		const tiActivity = await this.getActivityView();
+		const view  = await tiActivity.openView();
+		const content = await view.getContent();
+
+		await this.driver.wait(async () => {
+			try {
+				const sections = await content.getSections();
+				let section: ViewSection|undefined;
+				for (const sec of sections) {
+					const title = await sec.getTitle();
+					if (title.toLowerCase().includes('get started')) {
+						section = sec;
+						continue;
+					}
+				}
+
+				if (!section || !section.isDisplayed()) {
+					return false;
+				}
+
+				const welcomeContent = await section.findWelcomeContent();
+
+				if (!welcomeContent) {
+					return false;
+				}
+
+				const welcomeText = await welcomeContent.getTextSections();
+				console.log(welcomeText);
+				if (welcomeText.find(text => text.toLowerCase().includes('titanium project open'))) {
+					return true;
+				}
+			} catch (error) {
+				// ignore error while we're waiting for the section to load
+			}
+		}, 30000);
+	}
+
+	/**
+	 * Looks for and returns an instance of the Titanium activity view
+	 *
+	 * @returns {Promise<ViewControl>}
+	 * @memberof CommonUICreator
+	 */
+	public async getActivityView (): Promise<ViewControl> {
+		const activityBar = new ActivityBar();
+		const tiActivity = await this.driver.wait<ViewControl>(async () => {
+			const activity = await activityBar.getViewControl('Titanium');
+			if (!activity?.isDisplayed()) {
+				return false;
+			}
+			return activity;
+		}, 5000);
+		return tiActivity;
 	}
 }
 
