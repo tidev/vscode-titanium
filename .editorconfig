@@ -19,3 +19,6 @@ indent_style = 2
 
 [*.json]
 indent_style = 4
+
+[*.yml]
+indent_style = 2

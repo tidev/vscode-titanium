@@ -10,10 +10,16 @@ async function main (): Promise<void> {
 	const tempDirectory = tmp.dirSync();
 	try {
 		await testSetup();
-		const tester = new ExTester(undefined, ReleaseQuality.Stable, tempDirectory.name);
+
+		// When setting the version to "insider" we want to actually use "latest" and then switch
+		// to the ReleaseQuality.Insider stream, not set the version as "insider"
+		const vsCodeVersion = (!process.env.CODE_VERSION || process.env.CODE_VERSION === 'insider') ? 'latest' : process.env.CODE_VERSION;
 		const mochaConfig = path.join(__dirname, '.mocharc.js');
 		const settings = path.join(getFixturesDirectory(), 'settings.json');
-		tester.setupAndRunTests('out/test/integration/suite/**/*.test.js', undefined, undefined, { config: mochaConfig, settings });
+		const releaseQuality = process.env.CODE_VERSION === 'insider' ? ReleaseQuality.Insider : ReleaseQuality.Stable;
+
+		const tester = new ExTester(undefined, releaseQuality, tempDirectory.name);
+		tester.setupAndRunTests('out/test/integration/suite/**/*.test.js', vsCodeVersion, undefined, { config: mochaConfig, settings });
 	} finally {
 		fs.removeSync(tempDirectory.name);
 	}
