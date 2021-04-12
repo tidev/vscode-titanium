@@ -8,7 +8,7 @@ import * as tmp from 'tmp';
 
 const projectDirectory = path.join(getFixturesDirectory(), 'alloy-project');
 
-describe('Alloy component generation', function () {
+describe.only('Alloy component generation', function () {
 	this.timeout(30000);
 
 	let browser: VSBrowser;
@@ -17,7 +17,7 @@ describe('Alloy component generation', function () {
 	let tempDirectory: tmp.DirResult;
 
 	before(async function () {
-		this.timeout(120000);
+		this.timeout(180000);
 		browser = VSBrowser.instance;
 		driver = browser.driver;
 		const editorView = new EditorView();

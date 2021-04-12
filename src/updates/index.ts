@@ -12,6 +12,7 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 		if (!updateInfo) {
 			progress.report({ message: 'Checking for latest updates' });
 			updateInfo = await ExtensionContainer.getUpdates();
+			progress.report({ message: 'Please select updates' });
 		}
 
 		if (promptForChoice) {
