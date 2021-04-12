@@ -918,7 +918,7 @@
     "lint": "eslint src/ scripts/",
     "release": "npm run generate-docs && standard-version && npx vsce package",
     "test": "cross-env COVERAGE=1 node ./out/test/unit/runTest.js",
-    "test:integration": "node -e \"console.log('Hey there! You want to run the UI tests, but you cant do that via npm run. So you want to run ./runUITests.sh')\"",
+    "test:integration": "npm run compile && node ./out/test/integration/runTests.js",
     "vscode:prepublish": "npm run compile",
     "pretest": "npm run compile",
     "watch": "tsc -watch -p ./",

@@ -58,6 +58,14 @@ export class ProjectCreator extends CommonUICreator {
 		// maybe we should just have a notification for it?
 		await this.driver.sleep(10000);
 
+		try {
+			// has info loaded yet?
+			await InputBox.create();
+		} catch (error) {
+			// no! Lets wait some more, InputBox.create just waited 5 seconds for us too
+			await this.driver.sleep(10000);
+		}
+
 		await this.setName(options.name);
 		await this.setId(options.id);
 		await this.setPlatforms(options.platforms);

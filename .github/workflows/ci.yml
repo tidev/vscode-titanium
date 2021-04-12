@@ -4,8 +4,25 @@ on:
   - push
 
 jobs:
-  Test:
-    name: ${{ matrix.os }} - Tests
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Install NPM dependencies
+        run: npm ci
+      - name: Type Check
+        run: npm run compile
+      - name: Lint
+        run: npm run lint
+
+  Unit-Test:
+    name: ${{ matrix.os }} - Unit Tests
+    needs: Lint
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -23,18 +40,25 @@ jobs:
         with:
           run: npm run test
 
-  Lint:
-    runs-on: ubuntu-latest
+  Integration-Test:
+    name: ${{ matrix.version }} - Integration Tests
+    runs-on: macos-latest
+    needs: Lint
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ 1.49.0, latest, insider ]
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
           node-version: '12.x'
-      - name: Install NPM dependencies
-        run: npm ci
-      - name: Type Check
-        run: npm run compile
-      - name: Lint
-        run: npm run lint
+      - name: Install dependencies and requirements
+        run: |
+          npm ci
+          npm i titanium alloy -g
+          ti sdk install latest
+      - name: Run Integration Tests
+        run: npm run test:integration
+        env:
+          CODE_VERSION: ${{ matrix.version }}

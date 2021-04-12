@@ -49,21 +49,6 @@ timestamps {
             }
           } // stage('Unit Test')
 
-          // Integration tests are flaky in ci so skip for now - EH 15/10/2020
-          // stage('Integration Test') {
-          //   appc.install()
-          //   appc.installAndSelectSDK(sdkVersion)
-          //   appc.loggedIn {
-          //     // Run ui/e2e tests
-          //     try {
-          //       sh './runUITests.sh'
-          //     } finally {
-          //       sh 'ls'
-          //       junit 'junit_report-ui.xml'
-          //     }
-          //   }
-          // } // stage('Integration Test')
-
           stage('Build vsix') {
             // Create the vsix package
             sh 'npx vsce package'
