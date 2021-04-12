@@ -16,7 +16,8 @@ describe('Alloy component generation', function () {
 	let generator: AlloyGenerate;
 	let tempDirectory: tmp.DirResult;
 
-	beforeEach(async function () {
+	before(async function () {
+		this.timeout(120000);
 		browser = VSBrowser.instance;
 		driver = browser.driver;
 		const editorView = new EditorView();
@@ -26,11 +27,12 @@ describe('Alloy component generation', function () {
 		generator = new AlloyGenerate(driver);
 		tempDirectory = tmp.dirSync();
 		await copy(projectDirectory, tempDirectory.name);
+		await generator.waitForGetStarted();
 		await generator.openFolder(tempDirectory.name);
 		await generator.waitForEnvironmentDetectionCompletion();
 	});
 
-	afterEach(async function () {
+	after(async function () {
 		if (tempDirectory) {
 			await remove(tempDirectory.name);
 		}
@@ -38,28 +40,28 @@ describe('Alloy component generation', function () {
 
 	// alloy generate controller creates all 3 files
 	it('should be able to generate a controller and related files', async function () {
-		await generator.generateComponent('controller', 'test');
+		await generator.generateComponent('controller', 'test1');
 
 		for (const [ folder, fileType ] of Object.entries({ controllers: '.js', styles: '.tss', views: '.xml' })) {
-			const file = path.join(tempDirectory.name, 'app', folder, `test${fileType}`);
+			const file = path.join(tempDirectory.name, 'app', folder, `test1${fileType}`);
 			expect(pathExistsSync(file)).to.equal(true, `${file} did not exist`);
 		}
 	});
 
 	// alloy generate style only creates a style
 	it('should be able to generate a style', async function () {
-		await generator.generateComponent('style', 'test');
+		await generator.generateComponent('style', 'test2');
 
-		const file = path.join(tempDirectory.name, 'app', 'styles', 'test.tss');
+		const file = path.join(tempDirectory.name, 'app', 'styles', 'test2.tss');
 		expect(pathExistsSync(file)).to.equal(true, `${file} did not exist`);
 	});
 
 	// alloy generate view generates view and a style
 	it('should be able to generate a view and related files', async function () {
-		await generator.generateComponent('view', 'test');
+		await generator.generateComponent('view', 'test3');
 
 		for (const [ folder, fileType ] of Object.entries({ styles: '.tss', views: '.xml' })) {
-			const file = path.join(tempDirectory.name, 'app', folder, `test${fileType}`);
+			const file = path.join(tempDirectory.name, 'app', folder, `test3${fileType}`);
 			expect(pathExistsSync(file)).to.equal(true, `${file} did not exist`);
 		}
 	});
