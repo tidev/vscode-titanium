@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -7,11 +7,32 @@ import { Target } from '../types';
 const exec = promisify(cp.exec);
 
 export async function testSetup(): Promise<void> {
-	try {
-		await exec('appc');
-	} catch (error) {
-		console.error('Unable to find appcelerator CLI. Please install it');
+
+	function exit (reason: string) {
+		console.error(reason);
 		process.exit(1);
+	}
+
+	try {
+		await exec('ti');
+	} catch (error) {
+		exit('Unable to find titanium CLI. Please install it');
+	}
+
+	try {
+		await exec('alloy');
+	} catch (error) {
+		exit('Unable to find alloy CLI. Please install it');
+	}
+
+	try {
+		const { stdout } = await exec('ti sdk list -o json');
+		const sdks = JSON.parse(stdout);
+		if (Object.keys(sdks.installed).length === 0) {
+			exit('Unable to find any Titanium SDKs. Please install one');
+		}
+	} catch (error) {
+		exit('Failed to lookup SDKs');
 	}
 }
 
@@ -22,10 +43,12 @@ export async function testSetup(): Promise<void> {
  * @returns {(Promise<Notification | undefined>)}
  */
 export async function notificationExists(text: string): Promise<Notification | undefined> {
+	// lowercase the text to avoid requiring specific text
+	text = text.toLowerCase();
 	const notifications = await new Workbench().getNotifications();
 	for (const notification of notifications) {
 		const message = await notification.getMessage();
-		if (message.indexOf(text) >= 0) {
+		if (message.toLowerCase().includes(text)) {
 			return notification;
 		}
 	}
@@ -169,14 +192,47 @@ export class CommonUICreator {
 				}
 
 				const welcomeText = await welcomeContent.getTextSections();
-				console.log(welcomeText);
 				if (welcomeText.find(text => text.toLowerCase().includes('titanium project open'))) {
 					return true;
+				} else if (welcomeText.find(text => text.toLowerCase().includes('click below to install it'))) {
+					// lets try and output what's missing...
+					const buttons = await welcomeContent.getButtons();
+					let installButton: WelcomeContentButton|undefined;
+					for (const button of buttons) {
+						const buttonText = await button.getText();
+						if (buttonText.toLowerCase().includes('install')) {
+							installButton = button;
+						}
+					}
+
+					if (!installButton) {
+						return false;
+					}
+
+					await installButton.click();
+
+					await this.driver.wait(async () => {
+						await this.driver.sleep(500);
+						return notificationExists('please select');
+					}, 45000);
+
+					const input = await InputBox.create();
+					const choices = await input.getQuickPicks();
+					const items = [];
+					for (const choice of choices) {
+						items.push(await choice.getText());
+					}
+					console.log(items);
+
+					throw new Error(`It looks like you dont have tooling installed, you are missing ${items}`);
 				}
 			} catch (error) {
 				// ignore error while we're waiting for the section to load
+				if (error.message?.includes('It looks')) {
+					throw error;
+				}
 			}
-		}, 30000);
+		}, 120000);
 	}
 
 	/**
