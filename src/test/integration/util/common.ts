@@ -179,6 +179,11 @@ export class CommonUICreator {
 						section = sec;
 						continue;
 					}
+
+					if (title.toLowerCase().includes('build')) {
+						// The extension is already up and running, so lets just continue on
+						return true;
+					}
 				}
 
 				if (!section || !section.isDisplayed()) {
