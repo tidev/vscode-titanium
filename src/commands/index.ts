@@ -43,7 +43,11 @@ export function registerCommands (): void {
 		}
 	});
 
-	registerCommand(Commands.Package, node => {
+	registerCommand(Commands.Package, async (node) => {
+		if (ExtensionContainer.context.globalState.get<boolean>(GlobalState.Running)) {
+			await vscode.commands.executeCommand(Commands.StopBuild);
+			await sleep(100);
+		}
 		if (project.isTitaniumApp) {
 			return packageApplication(node);
 		} else if (project.isTitaniumModule) {
