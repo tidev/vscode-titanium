@@ -7,7 +7,7 @@ import appc from './appc';
 import { platform } from 'os';
 import { workspace, tasks, Task, ShellExecution } from 'vscode';
 import { CreateAppOptions, CreateModuleOptions, Target } from './types/cli';
-import { IosCert, IosCertificateType, PlatformPretty } from './types/common';
+import { IosCert, IosCertificateType, Platform, PlatformPretty } from './types/common';
 import { ExtensionContainer } from './container';
 
 /**
@@ -427,4 +427,38 @@ export async function executeAsTask(command: string, name: string): Promise<void
 		});
 	});
 	return taskEndPromise;
+}
+
+/**
+ * Maps a device ID to the device name reported in ti info output
+ *
+ * @export
+ * @param {string} deviceID - The device ID
+ * @param {Platform} platform - The platform the device belongs to
+ * @param {string} target - The target type the device belongs to
+ * @returns {string}
+ */
+export function getDeviceNameFromId (deviceID: string, platform: Platform, target: string): string {
+	let deviceName: string|undefined;
+	if (platform === 'android' && target === 'device') {
+		deviceName = (appc.androidDevices().find(device => device.id === deviceID))?.name;
+	} else if (platform === 'android' && target === 'emulator') {
+		deviceName = (appc.androidEmulators().AVDs.find(emulator => emulator.id === deviceID))?.name;
+	} else if (platform === 'ios' && target === 'device') {
+		deviceName = (appc.iOSDevices().find(device => device.udid === deviceID))?.name;
+	} else if (platform === 'ios' && target === 'simulator') {
+		for (const simVer of appc.iOSSimulatorVersions()) {
+			deviceName = (appc.iOSSimulators()[simVer].find(simulator => simulator.udid === deviceID))?.name;
+			if (deviceName) {
+				deviceName = `${deviceName} (${simVer})`;
+				break;
+			}
+		}
+	}
+
+	if (!deviceName) {
+		throw new Error(`Unable to find a name for ${deviceID}`);
+	}
+
+	return deviceName;
 }

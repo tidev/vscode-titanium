@@ -1,5 +1,4 @@
-import { KeystoreInfo, LogLevel, Platform as PlatformEnum  } from './common';
-import { Platform } from '../tasks/tasksHelper';
+import { KeystoreInfo, LogLevel, Platform } from './common';
 import { CodeBase } from '../quickpicks/creation';
 
 export interface BaseCLIOptions {
@@ -43,7 +42,7 @@ export interface BuildModuleOptions extends BaseBuildOptions {
 
 export interface BasePackageOptions extends BaseCLIOptions {
 	outputDirectory: string;
-	platform: PlatformEnum;
+	platform: Platform;
 	projectDir: string;
 	target: string;
 }

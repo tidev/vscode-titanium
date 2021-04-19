@@ -2,10 +2,11 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { selectBuildTarget } from '../quickpicks/build/common';
-import { TaskExecutionContext, Platform, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasksHelper';
+import { TaskExecutionContext, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasksHelper';
 import { Helpers } from './helpers/';
 import { platforms } from '../utils';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
+import { Platform } from '../types/common';
 
 export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
