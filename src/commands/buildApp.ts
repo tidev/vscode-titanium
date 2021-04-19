@@ -2,42 +2,12 @@ import * as vscode from 'vscode';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 import { selectPlatform } from '../quickpicks';
-import { getBuildTask, Platform } from '../tasks/tasksHelper';
-import { AppBuildTask, AppBuildTaskTitaniumBuildBase } from '../tasks/buildTaskProvider';
+import { getBuildTask } from '../tasks/tasksHelper';
+import { AppBuildTask } from '../tasks/buildTaskProvider';
 import { ExtensionContainer } from '../container';
 import { WorkspaceState } from '../constants';
-import { nameForPlatform, nameForTarget } from '../utils';
-import appc from '../appc';
-
-function getDeviceNameFromId (deviceID: string, platform: Platform, target: string): string {
-	let deviceName: string|undefined;
-	if (platform === 'android' && target === 'device') {
-		deviceName = (appc.androidDevices().find(device => device.id === deviceID))?.name;
-	} else if (platform === 'android' && target === 'emulator') {
-		deviceName = (appc.androidEmulators().AVDs.find(emulator => emulator.id === deviceID))?.name;
-	} else if (platform === 'ios' && target === 'device') {
-		deviceName = (appc.iOSDevices().find(device => device.udid === deviceID))?.name;
-	} else if (platform === 'ios' && target === 'simulator') {
-		for (const simVer of appc.iOSSimulatorVersions()) {
-			deviceName = (appc.iOSSimulators()[simVer].find(simulator => simulator.udid === deviceID))?.name;
-			if (deviceName) {
-				deviceName = `${deviceName} (${simVer})`;
-				break;
-			}
-		}
-	}
-
-	if (!deviceName) {
-		throw new Error(`Unable to find a name for ${deviceID}`);
-	}
-
-	return deviceName;
-}
-
-interface LastBuildState extends AppBuildTaskTitaniumBuildBase {
-	deviceId: string;
-	target: 'device' | 'emulator' | 'simulator';
-}
+import { getDeviceNameFromId, nameForPlatform, nameForTarget } from '../utils';
+import { LastBuildState, Platform } from '../types/common';
 
 export async function buildApplication (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {

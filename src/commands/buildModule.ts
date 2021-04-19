@@ -3,8 +3,9 @@ import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nod
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
-import { getBuildTask, Platform } from '../tasks/tasksHelper';
+import { getBuildTask } from '../tasks/tasksHelper';
 import { BuildTask } from '../tasks/buildTaskProvider';
+import { Platform } from '../types/common';
 
 export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
 	try {

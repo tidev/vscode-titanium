@@ -1,6 +1,5 @@
 import { IAttachRequestArgs, ILaunchRequestArgs } from 'vscode-chrome-debug-core';
-import { LogLevel } from '../types/common';
-import { Platform } from '../tasks/tasksHelper';
+import { LogLevel, Platform } from '../types/common';
 import { AppBuildTaskTitaniumBuildBase } from '../tasks/buildTaskProvider';
 
 export interface Request {

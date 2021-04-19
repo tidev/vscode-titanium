@@ -8,8 +8,6 @@ import { TitaniumTaskBase, TitaniumTaskDefinitionBase } from './commandTaskProvi
 import { DeviceNode } from '../explorer/nodes';
 
 export type TitaniumTaskTypes = 'titanium-build' | 'titanium-package';
-
-export type Platform = 'android' | 'ios';
 export type ProjectType = 'app' | 'module';
 
 export interface RunningTask {

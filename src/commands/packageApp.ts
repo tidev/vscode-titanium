@@ -3,11 +3,12 @@ import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nod
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
-import { Platform, getPackageTask } from '../tasks/tasksHelper';
+import { getPackageTask } from '../tasks/tasksHelper';
 import { ExtensionContainer } from '../container';
 import { WorkspaceState } from '../constants';
 import { nameForPlatform, nameForTarget } from '../utils';
 import { PackageTask, AppPackageTaskTitaniumBuildBase } from '../tasks/packageTaskProvider';
+import { Platform } from '../types/common';
 
 interface LastState extends AppPackageTaskTitaniumBuildBase {
 	target: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';

@@ -1,3 +1,4 @@
+import { AppBuildTaskTitaniumBuildBase } from '../tasks/buildTaskProvider';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 
 export interface KeystoreInfo {
@@ -51,13 +52,15 @@ export enum PlatformPretty {
 	ios = 'iOS'
 }
 
-export enum Platform {
-	android = 'android',
-	ios = 'ios'
-}
+export type Platform = 'android' | 'ios';
 
 export interface UpdateChoice extends Omit<UpdateInfo, 'hasUpdate' | 'releaseNotes'> {
 	label: string;
 	picked: boolean;
 	id: string;
+}
+
+export interface LastBuildState extends AppBuildTaskTitaniumBuildBase {
+	deviceId: string;
+	target: 'device' | 'emulator' | 'simulator';
 }
