@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { BuildTaskProvider, AppBuildTaskTitaniumBuildBase } from './buildTaskProvider';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { androidHelper, iOSHelper, Helpers } from './helpers';
-import { PackageTaskProvider } from './packageTaskProvider';
+import { AppPackageTaskTitaniumBuildBase, PackageTaskProvider } from './packageTaskProvider';
 import { ExtensionContainer } from '../container';
 import { TitaniumTaskBase, TitaniumTaskDefinitionBase } from './commandTaskProvider';
 import { DeviceNode } from '../explorer/nodes';
@@ -92,4 +92,18 @@ export function getTasks <T extends TitaniumTaskDefinitionBase> (folder: string)
 	const allTasks = workspaceTasks && workspaceTasks.tasks as T[] || [];
 
 	return allTasks;
+}
+
+/**
+ * Determines whether a build definition is for an distribution build or not.
+ *
+ * @export
+ * @param {AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase} definition - The build definition
+ * @returns {Boolean}
+ */
+export function isDistributionAppBuild (definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase): definition is AppPackageTaskTitaniumBuildBase {
+	if (definition.target?.startsWith('dist')) {
+		return true;
+	}
+	return false;
 }

@@ -1,4 +1,4 @@
-import { TaskExecutionContext, ProjectType } from '../tasksHelper';
+import { TaskExecutionContext, ProjectType, isDistributionAppBuild } from '../tasksHelper';
 import { CommandBuilder } from '../commandBuilder';
 import { ExtensionContainer } from '../../container';
 import { quickPick } from '../../quickpicks';
@@ -14,15 +14,8 @@ import { WorkspaceState } from '../../constants';
 import { selectDevice } from '../../quickpicks/build/common';
 import { IosBuildTaskTitaniumBuildBase } from './ios';
 
-function isDistributionBuild (definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase): definition is AppPackageTaskTitaniumBuildBase {
-	if (definition.target?.startsWith('dist')) {
-		return true;
-	}
-	return false;
-}
-
-function isAppBuild<T extends PackageTaskTitaniumBuildBase>(definition: PackageTaskTitaniumBuildBase): definition is T {
-	if (definition.projectType) {
+function isAppBuild<T extends TitaniumBuildBase>(definition: TitaniumBuildBase): definition is T {
+	if (definition.projectType === 'app') {
 		return true;
 	}
 	return false;
@@ -72,7 +65,7 @@ export abstract class TaskHelper {
 
 		builder.addOption('--target', definition.target);
 
-		if (!isDistributionBuild(definition)) {
+		if (!isDistributionAppBuild(definition)) {
 
 			if (shouldEnableLiveview(definition)) {
 				builder.addFlag('--liveview');
@@ -157,6 +150,10 @@ export abstract class TaskHelper {
 
 	public storeLastState (type: WorkspaceState, buildOptions: TitaniumBuildBase): void {
 		ExtensionContainer.context.workspaceState.update(type, buildOptions);
+		// Only store for app builds for now
+		if (isAppBuild<AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase>(buildOptions)) {
+			ExtensionContainer.addRecentBuild(buildOptions);
+		}
 	}
 
 	public createBuilder (): CommandBuilder {

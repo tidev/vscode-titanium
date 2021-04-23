@@ -3,11 +3,14 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import * as vscode from 'vscode';
 import appc, { Appc } from './appc';
 import { Config, configuration } from './configuration';
-import { GlobalState, VSCodeCommands } from './constants';
+import { GlobalState, VSCodeCommands, WorkspaceState } from './constants';
 import { HelpExplorer } from './explorer/helpExplorer';
 import DeviceExplorer from './explorer/tiExplorer';
 import { startup } from './extension';
 import project from './project';
+import { AppBuildTaskTitaniumBuildBase } from './tasks/buildTaskProvider';
+import { isDistributionAppBuild } from './tasks/tasksHelper';
+import { AppPackageTaskTitaniumBuildBase } from './tasks/packageTaskProvider';
 import Terminal from './terminal';
 import { getNodeSupportedVersion } from './utils';
 
@@ -20,6 +23,7 @@ export class ExtensionContainer {
 	private static _runningTask: vscode.TaskExecution|undefined;
 	private static _terminal: Terminal;
 	private static _updateInfo: UpdateInfo[];
+	private static _recentBuilds: Map<string, AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase>;
 
 	public static inititalize (context: vscode.ExtensionContext, config: Config): void {
 		this._appc = appc;
@@ -83,6 +87,13 @@ export class ExtensionContainer {
 		return this._helpExplorer;
 	}
 
+	static get recentBuilds (): Map<string, AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase> {
+		if (!this._recentBuilds) {
+			this._recentBuilds = new Map(this._context.workspaceState.get(WorkspaceState.RecentBuilds) || []);
+		}
+		return this._recentBuilds;
+	}
+
 	/**
 	 * Updates the property in both VS Code context, for when clauses used in the package.json, and
 	 * also the globalSate for the ExtensionContext
@@ -92,7 +103,7 @@ export class ExtensionContainer {
 	 */
 	static setContext<T>(stateName: GlobalState, value: T): void {
 		vscode.commands.executeCommand(VSCodeCommands.SetContext, stateName, value);
-		ExtensionContainer.context.globalState.update(stateName, value);
+		this._context.globalState.update(stateName, value);
 	}
 
 	/**
@@ -127,5 +138,37 @@ export class ExtensionContainer {
 
 	static isUsingTi (): boolean {
 		return this.config.general.useTi;
+	}
+
+	/**
+	 * Adds a build definition into the list of recent builds. The list is capped at 5, and uniqueness
+	 * is determined by the deviceId for device/emulator builds and the target for distribution builds.
+	 * The list is stored as workspace state so will be unique to each project/workspace
+	 *
+	 * @static
+	 * @param {AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase} buildData - The build definition to store
+	 * @memberof ExtensionContainer
+	 */
+	static addRecentBuild (buildData: AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase): void {
+		// We only want to store a maximum of 1 of each
+		const key = isDistributionAppBuild(buildData) ? buildData.target : buildData.deviceId;
+
+		if (!key) {
+			// This should pretty much never happen as addRecentBuild is called after collecting
+			// all the build data. But ignore this build definition just in case
+			return;
+		}
+
+		if (this._recentBuilds.has(key)) {
+			this._recentBuilds.delete(key);
+		} else if (this._recentBuilds.size >= 5) {
+			const { value: [ key ] } = this._recentBuilds.entries().next();
+
+			this._recentBuilds.delete(key);
+		}
+
+		this._recentBuilds.set(key, buildData);
+		this.context.workspaceState.update(WorkspaceState.RecentBuilds, Array.from(this._recentBuilds));
+		this._buildExplorer.refreshRecentBuilds();
 	}
 }
