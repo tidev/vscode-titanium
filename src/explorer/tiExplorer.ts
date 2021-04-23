@@ -3,6 +3,7 @@ import appc from '../appc';
 import { Platform } from '../types/common';
 import { platforms } from '../utils';
 import { BaseNode, PlatformNode } from './nodes';
+import { RecentNode } from './nodes/recentNode';
 
 export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode> {
 
@@ -12,6 +13,7 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 	public readonly onDidChangeTreeData: vscode.Event<BaseNode|undefined> = this._onDidChangeTreeData.event;
 
 	private platforms: Map<string, PlatformNode> = new Map();
+	private recentNode = new RecentNode('Recent Builds');
 
 	public async refresh (): Promise<void> {
 		return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, async () => {
@@ -27,6 +29,10 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 				return Promise.reject();
 			}
 		});
+	}
+
+	public refreshRecentBuilds (): void {
+		this._onDidChangeTreeData.fire(this.recentNode);
 	}
 
 	public getTreeItem (element: BaseNode): vscode.TreeItem {
@@ -45,6 +51,8 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 			this.platforms.set(platform, node);
 			elements.push(node);
 		}
+
+		elements.push(this.recentNode);
 		return Promise.resolve(elements);
 	}
 }
