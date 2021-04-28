@@ -6,6 +6,7 @@ import { window, workspace } from 'vscode';
 import { inputBox, quickPick } from '../quickpicks';
 import { capitalizeFirstLetter } from '../utils';
 import { UserCancellation } from './common';
+import { promptForWorkspaceFolder } from '../quickpicks/common';
 
 export enum AlloyModelAdapterType {
 	Properties = 'properties',
@@ -42,7 +43,8 @@ async function promptForDetails (type: AlloyComponentType, folder: AlloyComponen
 Promise<{ cwd: string; filePaths: string[]; name: string; type: AlloyComponentType }> {
 	const name = await inputBox({ prompt: `Enter the name for your ${type}` });
 
-	const cwd = workspace.rootPath!;
+	const { folder: workspaceFolder } = await promptForWorkspaceFolder();
+	const cwd = workspaceFolder.uri.fsPath;
 	const mainFile = path.join(cwd, 'app', folder, `${name}${extension}`);
 	const filePaths = [];
 	if (type === AlloyComponentType.Widget) {

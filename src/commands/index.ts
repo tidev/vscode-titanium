@@ -2,7 +2,6 @@ import { ExtensionContainer } from '../container';
 import * as vscode from 'vscode';
 import { Commands } from './common';
 import { GlobalState } from '../constants';
-import project from '../project';
 import { buildApplication } from './buildApp';
 import { buildModule } from './buildModule';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode, UpdateNode } from '../explorer/nodes';
@@ -20,6 +19,7 @@ import { createApplication } from './createApp';
 import { createModule } from './createModule';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
+import { promptForWorkspaceFolder } from '../quickpicks/common';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -36,10 +36,13 @@ export function registerCommands (): void {
 			await vscode.commands.executeCommand(Commands.StopBuild);
 			await sleep(100);
 		}
-		if (project.isTitaniumApp) {
-			return buildApplication(node);
-		} else if (project.isTitaniumModule) {
-			return buildModule(node);
+
+		const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: 'Please select a project to build' });
+
+		if (type === 'app') {
+			return buildApplication(node, folder);
+		} else if (type === 'module') {
+			return buildModule(node, folder);
 		}
 	});
 
@@ -48,10 +51,13 @@ export function registerCommands (): void {
 			await vscode.commands.executeCommand(Commands.StopBuild);
 			await sleep(100);
 		}
-		if (project.isTitaniumApp) {
-			return packageApplication(node);
-		} else if (project.isTitaniumModule) {
-			return packageModule(node);
+
+		const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: 'Please select a project to package' });
+
+		if (type === 'app') {
+			return packageApplication(node, folder);
+		} else if (type === 'module') {
+			return packageModule(node, folder);
 		}
 	});
 
@@ -127,7 +133,8 @@ export function registerCommands (): void {
 
 		debugSessionInformation.set(DEBUG_SESSION_VALUE, node);
 
-		await vscode.debug.startDebugging(vscode.workspace.workspaceFolders![0], debugConfig);
+		const { folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: 'Please select a project to debug' });
+		await vscode.debug.startDebugging(folder, debugConfig);
 	});
 
 	registerCommand(Commands.CheckForUpdates, async () => {

@@ -37,7 +37,7 @@ export function selectAndroidEmulator (): Promise<DeviceQuickPickItem>  {
 	return deviceQuickPick(options, { placeHolder: 'Select emulator' });
 }
 
-export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePath?: string): Promise<string|undefined> {
+export async function selectAndroidKeystore (workspaceFolder: vscode.WorkspaceFolder, lastUsed?: string, savedKeystorePath?: string): Promise<string|undefined> {
 	const items = [ {
 		label: 'Browse for keystore',
 		id: 'browse'
@@ -63,7 +63,7 @@ export async function selectAndroidKeystore (lastUsed?: string, savedKeystorePat
 		return uri[0].path;
 	} else if (savedKeystorePath && keystoreAction.id === 'saved') {
 		if (!path.isAbsolute(savedKeystorePath)) {
-			savedKeystorePath = path.resolve(vscode.workspace.rootPath!, savedKeystorePath);
+			savedKeystorePath = path.resolve(workspaceFolder.uri.fsPath, savedKeystorePath);
 		}
 		return savedKeystorePath;
 	} else if (lastUsed) {
@@ -101,7 +101,7 @@ export async function enterAndroidKeystoreInfo (workspaceFolder: vscode.Workspac
 	const savedKeystorePath = ExtensionContainer.config.android.keystorePath;
 
 	if (!keystoreInfo?.location) {
-		keystoreInfo.location = await selectAndroidKeystore(lastUsed, savedKeystorePath);
+		keystoreInfo.location = await selectAndroidKeystore(workspaceFolder, lastUsed, savedKeystorePath);
 	}
 
 	await verifyKeystorePath(keystoreInfo.location, workspaceFolder);

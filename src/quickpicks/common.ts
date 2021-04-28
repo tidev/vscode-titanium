@@ -1,10 +1,12 @@
 import * as utils from '../utils';
+import * as path from 'path';
 
 import { pathExists, ensureDir } from 'fs-extra';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window } from 'vscode';
+import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
+import { ProjectType } from '../tasks/tasksHelper';
 
 export interface CustomQuickPick extends QuickPickItem {
 	label: string;
@@ -154,4 +156,81 @@ export async function selectUpdates (updates: UpdateInfo[]): Promise<UpdateInfo[
 	return updates.filter(update => {
 		return selectedProducts.includes(update.productName);
 	});
+}
+
+/**
+ * Detects folders in the workspace that are valid Titanium projects.
+ *
+ * @export
+ * @param {Object} [options] - Options to control the types of projects to detect
+ * @param {Object} [options.apps=true] - Detect Titanium app projects
+ * @param {Object} [options.modules=false] - Detect Titanium module projects
+ * @returns {Promise<WorkspaceFolder[]>}
+ */
+export async function getValidWorkspaceFolders({ apps = true, modules = false } = {}): Promise<FolderDetails[]> {
+	const { workspaceFolders } = workspace;
+
+	if (!workspaceFolders) {
+		throw new Error('No workspace folders');
+	}
+
+	const folders = [];
+	for (const folder of workspaceFolders) {
+		const folderPath = folder.uri.fsPath;
+		if (apps) {
+			const filePath = path.join(folderPath, 'tiapp.xml');
+			if (await pathExists(filePath)) {
+				folders.push({ folder, type: 'app' as ProjectType });
+			}
+		}
+
+		if (modules) {
+			const androidPath = path.join(folderPath, 'android', 'timodule.xml');
+			const iosPath = path.join(folderPath, 'ios', 'timodule.xml');
+			const iphonePath = path.join(folderPath, 'iphone', 'timodule.xml');
+
+			if (await pathExists(androidPath) || await pathExists(iosPath) || await pathExists(iphonePath)) {
+				folders.push({ folder, type: 'module' as ProjectType });
+			}
+		}
+	}
+
+	return folders;
+}
+
+interface WorkspaceFolderPromptOptions {
+	apps?: boolean;
+	modules?: boolean;
+	placeHolder?: string;
+}
+
+interface FolderDetails {
+	folder: WorkspaceFolder;
+	type: ProjectType;
+}
+
+/**
+ * Prompts the users to select a workspace folder. Intended to be used to have the user select
+ * which folder to perform an action in when multiple Titanium projects are in the workspace
+ *
+ * @export
+ * @param {Object} [options] - Options to control the types of projects to detect
+ * @param {Object} [options.apps=true] - Detect Titanium app projects
+ * @param {Object} [options.modules=false] - Detect Titanium module projects
+ * @returns {Promise<WorkspaceFolder>}
+ */
+export async function promptForWorkspaceFolder ({ apps = true, modules = false, placeHolder = 'Please select a folder to perform action within' }: WorkspaceFolderPromptOptions = {}): Promise<FolderDetails> {
+	const folders = await getValidWorkspaceFolders({ apps, modules });
+	const choices: CustomQuickPick[] = folders.map(({ folder }) => ({ label: folder.name, id: folder.uri.fsPath  }));
+
+	const choice = await quickPick(choices, { canPickMany: false, placeHolder });
+	if (!choice) {
+		throw new Error('no choice');
+	}
+	const folder = folders.find(({ folder }) => folder.uri.fsPath === choice.id);
+	if (!folder) {
+		// should not happen unless removed between prompt and pick?
+		throw new Error('could not find');
+	}
+	return folder;
 }

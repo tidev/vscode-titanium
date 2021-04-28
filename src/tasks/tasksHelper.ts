@@ -87,8 +87,8 @@ export async function getPackageTask(task: TitaniumTaskBase): Promise<vscode.Tas
  * @param {string} folder - Workspace folder to get tasks for.
  * @returns {TitaniumTaskDefinitionBase[]}
  */
-export function getTasks <T extends TitaniumTaskDefinitionBase> (folder: string): T[] {
-	const workspaceTasks = vscode.workspace.getConfiguration('tasks', vscode.Uri.file(folder));
+export function getTasks <T extends TitaniumTaskDefinitionBase> (folder: vscode.WorkspaceFolder): T[] {
+	const workspaceTasks = vscode.workspace.getConfiguration('tasks', folder);
 	const allTasks = workspaceTasks && workspaceTasks.tasks as T[] || [];
 
 	return allTasks;

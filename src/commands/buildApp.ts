@@ -8,8 +8,9 @@ import { ExtensionContainer } from '../container';
 import { WorkspaceState } from '../constants';
 import { getDeviceNameFromId, nameForPlatform, nameForTarget } from '../utils';
 import { LastBuildState, Platform } from '../types/common';
+import { promptForWorkspaceFolder } from '../quickpicks/common';
 
-export async function buildApplication (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
+export async function buildApplication (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode, folder?: vscode.WorkspaceFolder): Promise<void> {
 	try {
 		checkLogin();
 
@@ -28,8 +29,11 @@ export async function buildApplication (node?: DeviceNode | OSVerNode | Platform
 			}
 		}
 
-		const buildChoice = node?.platform as string || (await selectPlatform(lastBuildDescription)).id;
+		if (!folder) {
+			folder = (await promptForWorkspaceFolder()).folder;
+		}
 
+		const buildChoice = node?.platform as string || (await selectPlatform(lastBuildDescription)).id;
 		const platform = buildChoice === 'last' ? lastBuildState?.platform as Platform : buildChoice as Platform;
 
 		const taskDefinition: AppBuildTask = {
@@ -37,7 +41,7 @@ export async function buildApplication (node?: DeviceNode | OSVerNode | Platform
 				titaniumBuild: {
 					projectType: 'app',
 					platform,
-					projectDir: vscode.workspace.rootPath!
+					projectDir: folder.uri.fsPath
 				},
 				type: 'titanium-build',
 				name: `Build ${platform}`

@@ -1,19 +1,24 @@
 import * as path from 'path';
-import { ProgressLocation, window, workspace } from 'vscode';
+import { ProgressLocation, window } from 'vscode';
+import * as fs from 'fs-extra';
 import { ExtensionContainer } from '../container';
-import project from '../project';
-import { selectPlatform } from '../quickpicks/common';
-import { isValidPlatform, quoteArgument } from '../utils';
+import { selectPlatform, promptForWorkspaceFolder } from '../quickpicks/common';
+import { quoteArgument } from '../utils';
 import { handleInteractionError, InteractionError } from './common';
 
 export async function cleanApplication (): Promise<void> {
 	try {
 		const logLevel = ExtensionContainer.config.general.logLevel;
-		let projectDir = workspace.rootPath!;
+		const { folder } = await promptForWorkspaceFolder({ apps: true, modules: true });
+		let projectDir: string;
 
-		if (project.isTitaniumModule) {
-			const platformInfo = await selectPlatform(undefined, isValidPlatform);
-			projectDir = path.join(projectDir, platformInfo.id);
+		const isAppProject = await fs.pathExists(path.join(folder.uri.fsPath, 'tiapp.xml'));
+
+		if (!isAppProject) {
+			const platformInfo = await selectPlatform(undefined, (platform) => fs.pathExistsSync(path.join(folder.uri.fsPath, platform)));
+			projectDir = path.join(folder.uri.fsPath, platformInfo.id);
+		} else {
+			projectDir = folder.uri.fsPath;
 		}
 		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification, title: 'Cleaning project' }, async () => {
 			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
