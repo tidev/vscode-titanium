@@ -364,10 +364,6 @@ export function matches (text: string, test: string): boolean {
 	return new RegExp(test, 'i').test(text);
 }
 
-export function isValidPlatform (targetPlatform: string): boolean {
-	return fs.pathExistsSync(path.join(workspace.rootPath!, targetPlatform));
-}
-
 /**
  * Determine the correct certificate name value to provide to the SDK build process.
  * Prior to SDK 8.2.0 only the "name" property was allowed, but for 8.2.0 and above

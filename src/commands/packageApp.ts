@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { DistributeNode, PlatformNode } from '../explorer/nodes';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
-import { selectPlatform } from '../quickpicks/common';
+import { promptForWorkspaceFolder, selectPlatform } from '../quickpicks/common';
 import { getPackageTask } from '../tasks/tasksHelper';
 import { ExtensionContainer } from '../container';
 import { WorkspaceState } from '../constants';
@@ -22,7 +22,7 @@ function isDistributeNode(node?: PlatformNode | DistributeNode): node is Distrib
 	return false;
 }
 
-export async function packageApplication (node?: PlatformNode | DistributeNode): Promise<void> {
+export async function packageApplication (node?: PlatformNode | DistributeNode, folder?: vscode.WorkspaceFolder): Promise<void> {
 	try {
 		checkLogin();
 
@@ -33,10 +33,13 @@ export async function packageApplication (node?: PlatformNode | DistributeNode):
 			try {
 				lastDescription = `${nameForPlatform(lastState.platform)} ${nameForTarget(lastState.target)}`;
 			} catch (error) {
-				console.log(error);
 				// Ignore and clear the state, we don't want to error due to a bad state
 				ExtensionContainer.context.workspaceState.update(WorkspaceState.LastBuildState, undefined);
 			}
+		}
+
+		if (!folder) {
+			folder = (await promptForWorkspaceFolder()).folder;
 		}
 
 		const buildChoice = node?.platform as string || (await selectPlatform(lastDescription)).id;
@@ -47,7 +50,7 @@ export async function packageApplication (node?: PlatformNode | DistributeNode):
 				titaniumBuild: {
 					projectType: 'app',
 					platform,
-					projectDir: vscode.workspace.rootPath!
+					projectDir: folder.uri.fsPath
 				},
 				type: 'titanium-package',
 				name: `Package ${platform}`

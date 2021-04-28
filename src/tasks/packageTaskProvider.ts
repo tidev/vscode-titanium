@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import * as path from 'path';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { Helpers } from './helpers';
@@ -6,6 +5,7 @@ import { TaskExecutionContext } from './tasksHelper';
 import { selectDistributionTarget } from '../quickpicks/build/common';
 import { DeploymentTarget } from '../types/cli';
 import { Command } from './commandBuilder';
+import { promptForWorkspaceFolder } from '../quickpicks';
 
 export interface PackageTask extends TitaniumTaskBase {
 	definition: PackageTaskDefinitionBase;
@@ -38,7 +38,15 @@ export class PackageTaskProvider extends CommandTaskProvider {
 		const { definition } = task;
 
 		if (!definition.titaniumBuild.projectDir) {
-			definition.titaniumBuild.projectDir = vscode.workspace.rootPath!;
+			const folderDetectOptions = { apps: true, modules: true };
+
+			if (definition.titaniumBuild.projectType === 'app') {
+				folderDetectOptions.modules = false;
+			} else if (definition.titaniumBuild.projectType === 'module') {
+				folderDetectOptions.apps = false;
+			}
+			const { folder } = await promptForWorkspaceFolder(folderDetectOptions);
+			definition.titaniumBuild.projectDir = folder.uri.fsPath;
 		}
 
 		const helper = this.getHelper(definition.titaniumBuild.platform);

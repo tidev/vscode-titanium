@@ -43,7 +43,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 
 	protected constructor (private readonly telemetryName: string, private readonly helpers: Helpers) { }
 
-	public provideTasks (): vscode.Task[] {
+	public async provideTasks (): Promise<vscode.Task[]> {
 		return [];
 	}
 

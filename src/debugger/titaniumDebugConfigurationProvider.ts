@@ -2,7 +2,7 @@ import * as getPort from 'get-port';
 import * as vscode from 'vscode';
 import * as which from 'which';
 import { UserCancellation } from '../commands';
-import { selectPlatform } from '../quickpicks/common';
+import { promptForWorkspaceFolder, selectPlatform } from '../quickpicks/common';
 import { AppBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';
 import { getTasks } from '../tasks/tasksHelper';
 
@@ -48,7 +48,8 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 		}
 
 		if (config.preLaunchTask) {
-			const preLaunchTask = getTasks<AppBuildTaskDefinitionBase>(vscode.workspace.rootPath!).find(task => task.label === config.preLaunchTask);
+			const { folder } = await promptForWorkspaceFolder();
+			const preLaunchTask = getTasks<AppBuildTaskDefinitionBase>(folder).find(task => task.label === config.preLaunchTask);
 
 			if (!preLaunchTask) {
 				throw new Error(`Unable to find a preLaunchTask named ${config.preLaunchTask}`);
