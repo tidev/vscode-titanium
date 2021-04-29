@@ -1,0 +1,46 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - ewanharris
+  ignore:
+  - dependency-name: got
+    versions:
+    - "> 9.6.0"
+  - dependency-name: "@types/node"
+    versions:
+    - "> 12.12.0"
+  - dependency-name: "@types/uuid"
+    versions:
+    - "> 3.4.7"
+  - dependency-name: "@types/vscode"
+    versions:
+    - "> 1.49.0"
+  - dependency-name: vscode-debugadapter
+    versions:
+    - 1.44.0
+    - 1.45.0
+    - 1.47.0
+  - dependency-name: "@awam/remotedebug-ios-webkit-adapter"
+    versions:
+    - 0.4.3
+  - dependency-name: titanium-editor-commons
+    versions:
+    - 1.1.0
+    - 1.2.0
+  - dependency-name: "@types/fs-extra"
+    versions:
+    - 9.0.10
+    - 9.0.8
+  - dependency-name: husky
+    versions:
+    - 5.0.9
+    - 5.1.0
+  - dependency-name: sinon
+    versions:
+    - 10.0.1
