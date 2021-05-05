@@ -34,6 +34,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`["']\\.${text}["'[]`, 'g');
 		},
 		title (fileName: string): string {
@@ -51,6 +52,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`["']#${text}["'[]`, 'g');
 		},
 		title (fileName: string): string {
@@ -68,6 +70,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`["']${text}`, 'g');
 		},
 		title (fileName: string): string {
@@ -89,6 +92,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return getRelatedFiles(project, 'js');
 		},
 		definitionRegExp (text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`function ${text}\\s*?\\(`);
 		},
 		title (fileName: string): string {
@@ -115,6 +119,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // i18n
 		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*$/,
 		definitionRegExp(text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
 		},
 		async files(project: Project): Promise<string[]> {

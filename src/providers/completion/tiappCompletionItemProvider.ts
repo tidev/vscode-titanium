@@ -48,7 +48,7 @@ export class TiappCompletionItemProvider extends BaseCompletionItemProvider {
 					continue;
 				}
 				completions.push({
-					label: sdk.fullversion!,
+					label: sdk.fullversion || sdk.version,
 					kind: CompletionItemKind.Value,
 					insertText: sdk.fullversion?.replace(sdkVersion, '')
 				});

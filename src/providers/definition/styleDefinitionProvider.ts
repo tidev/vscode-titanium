@@ -8,6 +8,7 @@ const suggestions: DefinitionSuggestion[] = [
 	{ // id
 		regExp: /["']#[A-Za-z0-9_=[\]]+/,
 		definitionRegExp (text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`id=["']${text.replace('#', '')}`, 'g');
 		},
 		files (project: Project, document: vscode.TextDocument): string[] {
@@ -21,6 +22,7 @@ const suggestions: DefinitionSuggestion[] = [
 	{ // class
 		regExp: /["']\.[A-Za-z0-9_=[\]]+/,
 		definitionRegExp (text: string): RegExp {
+			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`class=["']${text.replace('.', '')}`, 'g');
 		},
 		files (project: Project, document: vscode.TextDocument): string[] {

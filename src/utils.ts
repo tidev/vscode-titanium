@@ -331,6 +331,7 @@ export function validateAppId (appId: string): boolean {
  * @returns {Boolean}
  */
 export function matches (text: string, test: string): boolean {
+	// eslint-disable-next-line security/detect-non-literal-regexp
 	return new RegExp(test, 'i').test(text);
 }
 
@@ -353,7 +354,11 @@ export function getCorrectCertificateName (certificateName: string, sdkVersion: 
 		throw new Error(`Failed to lookup certificate ${certificateName}`);
 	}
 
-	if (semver.gte(semver.coerce(sdkVersion)!, '8.2.0')) {
+	const coerced = semver.coerce(sdkVersion);
+
+	// If we cant coerce the SDK version just assume it's newer than 8.2.0 because lets be honest,
+	// it almost certainly is
+	if (!coerced || semver.gte(coerced, '8.2.0')) {
 		return certificate.fullname;
 	} else {
 		return certificate.name;

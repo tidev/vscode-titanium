@@ -70,8 +70,9 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	}
 
 	public getTargetPathFromClientPath (clientPath: string): string {
-		if (path.isAbsolute(clientPath) && this._localPathToTargetUrl.has(utils.canonicalizeUrl(clientPath))) {
-			clientPath = this._localPathToTargetUrl.get(utils.canonicalizeUrl(clientPath))!;
+		const targetUrl = this._localPathToTargetUrl.get(utils.canonicalizeUrl(clientPath));
+		if (path.isAbsolute(clientPath) && targetUrl) {
+			clientPath = targetUrl;
 		}
 		return clientPath;
 	}

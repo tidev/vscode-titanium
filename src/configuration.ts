@@ -12,16 +12,16 @@ export class Configuration {
 	public get<T> (section?: string, resource?: Uri, defaultValue?: T): T {
 		return defaultValue === undefined
 			? workspace
-				.getConfiguration(section === undefined ? undefined : ExtensionName, resource!)
+				.getConfiguration(section === undefined ? undefined : ExtensionName, resource)
 				.get<T>(section === undefined ? ExtensionName : section)!
 			: workspace
-				.getConfiguration(section === undefined ? undefined : ExtensionName, resource!)
+				.getConfiguration(section === undefined ? undefined : ExtensionName, resource)
 				.get<T>(section === undefined ? ExtensionName : section, defaultValue)!;
 	}
 
 	public update (section: string, value: unknown, target: ConfigurationTarget, resource?: Uri): Thenable<void> {
 		return workspace
-			.getConfiguration(ExtensionName, target === ConfigurationTarget.Global ? undefined : resource!)
+			.getConfiguration(ExtensionName, target === ConfigurationTarget.Global ? undefined : resource)
 			.update(section, value, target);
 	}
 

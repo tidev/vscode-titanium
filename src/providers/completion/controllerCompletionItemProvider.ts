@@ -136,6 +136,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		}
 		const document = await workspace.openTextDocument(relatedFile);
 		let tagName;
+		// eslint-disable-next-line security/detect-non-literal-regexp
 		const regex = new RegExp(`id=["']${id}["']`, 'g');
 		const ids = regex.exec(document.getText());
 		if (ids) {
@@ -332,6 +333,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		}
 		const document = await workspace.openTextDocument(relatedFile);
 		let tagName;
+		// eslint-disable-next-line security/detect-non-literal-regexp
 		const regex = new RegExp(`id=["']${id}["']`, 'g');
 		const ids = regex.exec(document.getText());
 		if (ids) {

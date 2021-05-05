@@ -78,8 +78,11 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 	}
 
 	public open (): void {
+		// When open is called for a task that is started via the build explorer we need to resolve
+		// the workspace folder based on the project dir, when called for a task defined in tasks.json
+		// it is already resolved on task.scope
 		const folder = this.task.scope === vscode.TaskScope.Workspace
-			? vscode.workspace.workspaceFolders![0]
+			? this.getProject(this.task.definition.titaniumBuild.projectDir)
 			: this.task.scope as vscode.WorkspaceFolder;
 
 		const executionContext: TaskExecutionContext = {
@@ -156,5 +159,13 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 		if (data === String.fromCharCode(3)) {
 			this.close();
 		}
+	}
+
+	private getProject (projectDir: string): vscode.WorkspaceFolder {
+		const workspaceFolder = vscode.workspace.workspaceFolders?.find(folder => folder.uri.fsPath === projectDir);
+		if (!workspaceFolder) {
+			throw new Error(`Unable to resolve workspace folder for ${projectDir}`);
+		}
+		return workspaceFolder;
 	}
 }
