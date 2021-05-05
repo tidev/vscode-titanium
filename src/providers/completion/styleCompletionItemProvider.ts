@@ -5,6 +5,7 @@ import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 import { Tag } from 'titanium-editor-commons/completions';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
+import { Project } from '../../project';
 
 /**
  * Alloy Style completion provider
@@ -21,36 +22,39 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @returns {Thenable|Array}
 	 */
 	public async provideCompletionItems (document: TextDocument, position: Position): Promise<CompletionItem[]> {
+		const project = await this.getProject(document);
+
+		if (!project) {
+			return [];
+		}
+
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character + 1));
 		const prefixRange = document.getWordRangeAtPosition(position);
 		const prefix = prefixRange ? document.getText(prefixRange) : undefined;
 		const completions: CompletionItem[] = [];
-		if (!this.completions) {
-			await this.loadCompletions();
-		}
 		// property value - foo: _ or foo: ba_
 		if (/\s*\w+\s*:\s*\w*[(]?["'.]?\w*["'.]?[,]?$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult: CompletionItem[] = [];
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
-					ruleResult = await rule.getCompletions();
+					ruleResult = await rule.getCompletions(project);
 				}
 			}
 			if (ruleResult.length) {
 				return ruleResult;
 			} else {
-				return this.getPropertyValueCompletions(linePrefix, position, document, prefix);
+				return this.getPropertyValueCompletions(linePrefix, position, document, project, prefix);
 			}
 		// property name - _ or fo_
 		} else if (/^\s*\w*$/.test(linePrefix)) {
-			return this.getPropertyNameCompletions(linePrefix, position, document, prefix);
+			return this.getPropertyNameCompletions(linePrefix, position, document, project, prefix);
 			// class or id - ".foo_ or "#foo
 		} else if (/^\s*['"][.#][\w*]["']?$/.test(linePrefix)) {
-			return this.getClassOrIdCompletions(linePrefix, position, document, prefix);
+			return this.getClassOrIdCompletions(linePrefix, position, document, project, prefix);
 			// tag - "Wind_ or "_
 		} else if (/^\s*['"][\w*]["']?$/.test(linePrefix)) {
-			return this.getTagCompletions(linePrefix, position, document, prefix);
+			return this.getTagCompletions(linePrefix, position, document, project, prefix);
 		}
 
 		return completions;
@@ -62,14 +66,15 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @param {String} linePrefix line prefix text
 	 * @param {Position} position caret position
 	 * @param {TextDocument} document text document for request
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getClassOrIdCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string): Promise<CompletionItem[]> {
+	public async getClassOrIdCompletions (linePrefix: string, position: Position, document: TextDocument, project: Project, prefix?: string): Promise<CompletionItem[]> {
 		const completions: CompletionItem[] = [];
 		const values: string[] = [];
-		const relatedFile = related.getTargetPath('xml');
+		const relatedFile = related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}
@@ -104,15 +109,17 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @param {String} linePrefix line prefix text
 	 * @param {Position} position caret position
 	 * @param {TextDocument} document text document for request
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Array}
 	 */
-	public getTagCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string): CompletionItem[] {
+	public async getTagCompletions (linePrefix: string, position: Position, document: TextDocument, project: Project, prefix?: string): Promise<CompletionItem[]> {
+		const { alloy } = await this.getCompletions(project);
 		const completions: CompletionItem[] = [];
 		const range = document.getWordRangeAtPosition(position, /\w+["']/);
 		const quote = /'/.test(linePrefix) ? '\'' : '"';
-		for (const [ key, value ] of Object.entries(this.completions.alloy.tags) as [ string, Tag ][]) {
+		for (const [ key, value ] of Object.entries(alloy.tags) as [ string, Tag ][]) {
 			if (!prefix || utils.matches(key, prefix)) {
 				completions.push({
 					label: key,
@@ -133,13 +140,16 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @param {String} linePrefix line prefix text
 	 * @param {Position} position caret position
 	 * @param {TextDocument} document text document for request
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Array}
 	 */
-	public getPropertyNameCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string): CompletionItem[] {
+	public async getPropertyNameCompletions (linePrefix: string, position: Position, document: TextDocument, project: Project, prefix?: string): Promise<CompletionItem[]> {
 		const parentObjName = this.getParentObjectName(position, document);
-		const { properties, types } = this.completions.titanium;
+
+		const { titanium } = await this.getCompletions(project);
+		const { properties, types } = titanium;
 		const innerProperties: { [key: string]: unknown } = {};
 		const completions: CompletionItem[] = [];
 
@@ -200,12 +210,15 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @param {String} linePrefix line prefix text
 	 * @param {Position} position caret position
 	 * @param {TextDocument} document text document for request
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} [prefix] word prefix text
 	 *
 	 * @returns {Array}
 	 */
-	public getPropertyValueCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string): CompletionItem[] {
-		const { properties } = this.completions.titanium;
+	public async getPropertyValueCompletions (linePrefix: string, position: Position, document: TextDocument, project: Project, prefix?: string): Promise<CompletionItem[]> {
+		const { titanium } = await this.getCompletions(project);
+
+		const { properties } = titanium;
 		const range = document.getWordRangeAtPosition(position, /([\w".'$]+)/);
 		const completions: CompletionItem[] = [];
 

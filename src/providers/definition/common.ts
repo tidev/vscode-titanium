@@ -4,24 +4,23 @@ import * as utils from '../../utils';
 
 import { TextDocument } from 'vscode';
 import { ExtensionContainer } from '../../container';
+import { Project } from '../../project';
 
 export interface DefinitionSuggestion {
 	regExp: RegExp;
 	i18nString?: boolean;
-	files (document: TextDocument, text: string, value: string): string[];
-	files (document: TextDocument, text: string, value?: string): string[];
-	files (document: TextDocument, text?: string, value?: string): string[];
+	files (project: Project, document: TextDocument, text?: string, value?: string): Promise<string[]>|string[];
 	definitionRegExp? (text: string): RegExp;
 	title? (fileName: string): string;
 	insertText? (text: string): string|undefined;
 }
 
-function getRelatedFiles(fileType: string): string[] {
+function getRelatedFiles(project: Project, fileType: string): string[] {
 	const relatedFiles: string[] = [];
 	if (fileType === 'tss') {
-		relatedFiles.push(path.join(utils.getAlloyRootPath(), 'styles', 'app.tss'));
+		relatedFiles.push(path.join(project.filePath, 'app', 'styles', 'app.tss'));
 	}
-	const relatedFile = related.getTargetPath(fileType);
+	const relatedFile = related.getTargetPath(project, fileType);
 	if (relatedFile) {
 		relatedFiles.push(relatedFile);
 	}
@@ -31,8 +30,8 @@ function getRelatedFiles(fileType: string): string[] {
 export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // class
 		regExp: /class=["'][\s0-9a-zA-Z-_^]*$/,
-		files (): string[] {
-			return getRelatedFiles('tss');
+		files (project: Project): string[] {
+			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`["']\\.${text}["'[]`, 'g');
@@ -48,8 +47,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // id
 		regExp: /id=["'][\s0-9a-zA-Z-_^]*$/,
-		files (): string[] {
-			return getRelatedFiles('tss');
+		files (project: Project): string[] {
+			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`["']#${text}["'[]`, 'g');
@@ -65,8 +64,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // tag
 		regExp: /<[A-Z][A-Za-z]*$/,
-		files (): string[] {
-			return getRelatedFiles('tss');
+		files (project: Project): string[] {
+			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`["']${text}`, 'g');
@@ -86,8 +85,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // handler
 		regExp: /on(.*?)=["'][A-Za-z]*$/,
-		files (): string[] {
-			return getRelatedFiles('js');
+		files (project: Project): string[] {
+			return getRelatedFiles(project, 'js');
 		},
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`function ${text}\\s*?\\(`);
@@ -103,13 +102,13 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // widget
 		regExp: /<Widget[\s0-9a-zA-Z-_^='"]*src=["']$/,
-		files (document: TextDocument, text: string): string[] {
+		files (project: Project, document: TextDocument, text: string): string[] {
 			return [ document.fileName.replace(/app\/(.*)$/, `app/widgets/${text}/controllers/widget.js`) ];
 		}
 	},
 	{ // require
 		regExp: /<Require[\s0-9a-zA-Z-_^='"]*src=["']/,
-		files (document: TextDocument, text: string): string[] {
+		files (project: Project, document: TextDocument, text: string): string[] {
 			return [ document.fileName.replace(/app\/(.*)$/, `app/controllers/${text}.js`) ];
 		}
 	},
@@ -118,9 +117,19 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		definitionRegExp(text: string): RegExp {
 			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
 		},
-		files(): string[] {
-			return [ path.join(utils.getI18nPath(), ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
+		async files(project: Project): Promise<string[]> {
+			const i18nPath = await project.getI18NPath();
+			if (!i18nPath) {
+				return [];
+			}
+			return [ path.join(i18nPath, ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
 		},
 		i18nString: true
 	}
 ];
+
+export async function getProject (document: TextDocument): Promise<Project|undefined> {
+	const filePath = document.uri.fsPath;
+	const projectDir = await utils.findProjectDirectory(filePath);
+	return ExtensionContainer.projects.get(projectDir);
+}

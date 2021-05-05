@@ -5,6 +5,7 @@ import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
 import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
+import { Project } from '../../project';
 
 /**
  * Alloy Controller completion provider
@@ -22,23 +23,24 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 */
 	public async provideCompletionItems (document: TextDocument, position: Position): Promise<CompletionItem[]> {
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
+		const project = await this.getProject(document);
 
-		if (!this.completions) {
-			await this.loadCompletions();
+		if (!project) {
+			return [];
 		}
 
 		// Alloy XML ID - $._
 		if (/\$\.([-a-zA-Z0-9-_]*)$/.test(linePrefix)) {
-			return this.getIdCompletions();
+			return this.getIdCompletions(project);
 		// Alloy XML ID property or function - $.tableView._
 		} else if (/\$\.([-a-zA-Z0-9-_]*).([-a-zA-Z0-9-_]*)$/.test(linePrefix)) {
-			return this.getMethodAndPropertyCompletions(linePrefix);
+			return this.getMethodAndPropertyCompletions(linePrefix, project);
 		// Titanium APIs - Ti.UI._ or Ti._
 		} else if (/(?:Ti|Titanium)\.?\S+/i.test(linePrefix)) {
-			return this.getTitaniumApiCompletions(linePrefix);
+			return this.getTitaniumApiCompletions(linePrefix, project);
 		// Event name - $.tableView.addEventListener('click', ...)
 		} else if (/\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
-			return this.getEventNameCompletions(linePrefix);
+			return this.getEventNameCompletions(linePrefix, project);
 		// require('')
 		} else if (/require\(["']?([^'");]*)["']?\)?$/.test(linePrefix)) {
 			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/);
@@ -47,28 +49,28 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 			}
 			const requestedModule = matches[1];
 			const range = document.getWordRangeAtPosition(position, /([\w/.$]+)/);
-			return this.getFileCompletions('lib', requestedModule, range);
+			return this.getFileCompletions('lib', project, requestedModule, range);
 		// Alloy.createController('')
 		} else if (/Alloy\.(createController|Controllers\.instance)\(["']([-a-zA-Z0-9-_/]*["']?\)?)$/.test(linePrefix)) {
-			return this.getFileCompletions('controllers');
+			return this.getFileCompletions('controllers', project);
 		// Alloy.createModel('')
 		} else if (/Alloy\.(createModel|Models\.instance|createCollection|Collections\.instance)\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
-			return this.getFileCompletions('models');
+			return this.getFileCompletions('models', project);
 		// Alloy.createWidget('')
 		} else if (/Alloy\.(createWidget|Widgets\.instance)\(["']([-a-zA-Z0-9-_/.]*)$/.test(linePrefix)) {
-			return this.getWidgetCompletions();
+			return this.getWidgetCompletions(project);
 			// Alloy APIs - Alloy._
 		} else if (/(?:Alloy)\.?\S+/.test(linePrefix)) {
-			return this.getAlloyApiCompletions(linePrefix);
+			return this.getAlloyApiCompletions(linePrefix, project);
 		} else {
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
 					if (rule.requireRange) {
 						const range = document.getWordRangeAtPosition(position, rule.rangeRegex);
-						return await rule.getCompletions(range);
+						return await rule.getCompletions(project, range);
 					}
 
-					return await rule.getCompletions();
+					return await rule.getCompletions(project);
 				}
 			}
 		}
@@ -79,11 +81,12 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	/**
 	 * Get ID completions
 	 *
+	 * @param {Project} project - The Titanium project instance
 	 * @returns {Thenable}
 	 */
-	public async getIdCompletions (): Promise<CompletionItem[]> {
+	public async getIdCompletions (project: Project): Promise<CompletionItem[]> {
 		const completions: CompletionItem[] = [];
-		const relatedFile = related.getTargetPath('xml');
+		const relatedFile = related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}
@@ -109,12 +112,14 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 * Get controller member method and properties completions
 	 *
 	 * @param {String} linePrefix line prefix text
+	 * @param {Project} project - The Titanium project instance
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getMethodAndPropertyCompletions (linePrefix: string): Promise<CompletionItem[]> {
-		const { tags } = this.completions.alloy;
-		const { types } = this.completions.titanium;
+	public async getMethodAndPropertyCompletions (linePrefix: string, project: Project): Promise<CompletionItem[]> {
+		const { alloy, titanium } = await this.getCompletions(project);
+		const { tags } = alloy;
+		const { types } = titanium;
 
 		const matches = linePrefix.match(/\$\.([-a-zA-Z0-9-_]*)\.?$/);
 
@@ -125,7 +130,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		const id = matches[1];
 
 		const completions: CompletionItem[] = [];
-		const relatedFile = related.getTargetPath('xml');
+		const relatedFile = related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}
@@ -169,11 +174,14 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 * Get Titanium API completions
 	 *
 	 * @param {String} linePrefix line prefix text
+	 * @param {Project} project - The Titanium project instance
 	 *
 	 * @returns {Array}
 	 */
-	public getTitaniumApiCompletions (linePrefix: string): CompletionItem[] {
-		const { types } = this.completions.titanium;
+	public async getTitaniumApiCompletions (linePrefix: string, project: Project): Promise<CompletionItem[]> {
+		const { titanium } = await this.getCompletions(project);
+		const { types } = titanium;
+
 		const matches = linePrefix.match(/(Ti\.(?:(?:[A-Z]\w*|iOS|iPad)\.?)*)([a-z]\w*)*$/);
 		const completions: CompletionItem[] = [];
 		let apiName: string|undefined;
@@ -237,11 +245,13 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 * Get Alloy API completions
 	 *
 	 * @param {String} linePrefix line prefix text
+	 * @param {Project} project - The Titanium project instance
 	 *
 	 * @returns {Array}
 	 */
-	public getAlloyApiCompletions (linePrefix: string): CompletionItem[] {
-		const { types } = this.completions.alloy;
+	public async getAlloyApiCompletions (linePrefix: string, project: Project): Promise<CompletionItem[]> {
+		const { alloy } = await this.getCompletions(project);
+		const { types } = alloy;
 		const matches = linePrefix.match(/(Alloy\.(?:(?:[A-Z]\w*)\.?)*)([a-z]\w*)*$/);
 		const completions: CompletionItem[] = [];
 
@@ -301,12 +311,14 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 * Get event name completions
 	 *
 	 * @param {String} linePrefix line prefix text
+	 * @param {Project} project - The Titanium project instance
 	 *
 	 * @returns {Thenable}
 	 */
-	public async getEventNameCompletions (linePrefix: string): Promise<CompletionItem[]> {
-		const { tags } = this.completions.alloy;
-		const { types } = this.completions.titanium;
+	public async getEventNameCompletions (linePrefix: string, project: Project): Promise<CompletionItem[]> {
+		const { alloy, titanium } = await this.getCompletions(project);
+		const { tags } = alloy;
+		const { types } = titanium;
 		const matches = /\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.exec(linePrefix);
 		const completions: CompletionItem[] = [];
 
@@ -314,7 +326,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 			return completions;
 		}
 		const id = matches[1];
-		const relatedFile = related.getTargetPath('xml');
+		const relatedFile = related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}
@@ -348,14 +360,15 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 * Get js file completions. Used to return controller, model and require references.
 	 *
 	 * @param {String} directory alloy directory
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} moduleName name of the module
 	 * @param {Range} range the range of text to be replaced by the completion
 	 *
 	 * @returns {Thenable}
 	 */
-	public getFileCompletions(directory: string, moduleName?: string, range?: Range): CompletionItem[] {
+	public getFileCompletions(directory: string, project: Project, moduleName?: string, range?: Range): CompletionItem[] {
 		const completions: CompletionItem[] = [];
-		const filesPath = path.join(utils.getAlloyRootPath(), directory);
+		const filesPath = path.join(project.filePath, 'app', directory);
 		if (moduleName && moduleName.startsWith('/')) {
 			moduleName = moduleName.substring(0);
 		}
@@ -380,11 +393,12 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	/**
 	 * Get Widget completions
 	 *
+	 * @param {Project} project - The Titanium project instance
 	 * @returns {Thenable}
 	 */
-	public async getWidgetCompletions (): Promise<CompletionItem[]> {
+	public async getWidgetCompletions (project: Project): Promise<CompletionItem[]> {
 		const completions = [];
-		const alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
+		const alloyConfigPath = path.join(project.filePath, 'app', 'config.json');
 		const document = await workspace.openTextDocument(alloyConfigPath);
 		const configObj = JSON.parse(document.getText());
 		const dependencies = configObj.dependencies || {};

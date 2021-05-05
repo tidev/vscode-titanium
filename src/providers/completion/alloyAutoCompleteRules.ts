@@ -5,18 +5,20 @@ import * as utils from '../../utils';
 import { CompletionItem, CompletionItemKind, workspace, Range } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { parseXmlString } from '../../common/utils';
+import { Project } from '../..//project';
+import { pathExists } from 'fs-extra';
 
 interface AlloyAutoCompleteRule {
 	regExp: RegExp;
-	getCompletions: (range?: Range) => Promise<CompletionItem[]>|CompletionItem[];
+	getCompletions: (project: Project, range?: Range) => Promise<CompletionItem[]>|CompletionItem[];
 	requireRange?: boolean;
 	rangeRegex?: RegExp;
 }
 
 export const cfgAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)[,]?$/,
-	async getCompletions () {
-		const cfgPath = path.join(utils.getAlloyRootPath(), 'config.json');
+	async getCompletions (projectDir) {
+		const cfgPath = path.join(projectDir.filePath, 'app', 'config.json');
 		const completions: CompletionItem[] = [];
 		if (utils.fileExists(cfgPath)) {
 			const document = await workspace.openTextDocument(cfgPath);
@@ -44,23 +46,25 @@ export const cfgAutoComplete: AlloyAutoCompleteRule = {
 
 export const i18nAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*["']?)$/,
-	async getCompletions () {
+	async getCompletions (projectDir) {
 		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
-		const i18nPath = utils.getI18nPath();
+		const i18nPath = await projectDir.getI18NPath();
 		const completions: CompletionItem[] = [];
-		if (utils.directoryExists(i18nPath)) {
-			const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
-			if (utils.fileExists(i18nStringPath)) {
-				const document = await workspace.openTextDocument(i18nStringPath);
-				const result = await parseXmlString(document.getText()) as { resources: { string: { $: { name: string }; _: string }[] } };
-				if (result && result.resources && result.resources.string) {
-					for (const value of result.resources.string) {
-						completions.push({
-							label: value.$.name,
-							kind: CompletionItemKind.Reference,
-							detail: value._
-						});
-					}
+		if (!i18nPath || !await pathExists(i18nPath)) {
+			return completions;
+		}
+
+		const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
+		if (utils.fileExists(i18nStringPath)) {
+			const document = await workspace.openTextDocument(i18nStringPath);
+			const result = await parseXmlString(document.getText()) as { resources: { string: { $: { name: string }; _: string }[] } };
+			if (result && result.resources && result.resources.string) {
+				for (const value of result.resources.string) {
+					completions.push({
+						label: value.$.name,
+						kind: CompletionItemKind.Reference,
+						detail: value._
+					});
 				}
 			}
 		}
@@ -72,9 +76,9 @@ export const imageAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /image\s*[:=]\s*["']([\w\s\\/\-_():.]*)['"]?$/,
 	requireRange: true,
 	rangeRegex: /([\w/.$]+)/,
-	getCompletions (range) {
-		const alloyRootPath = utils.getAlloyRootPath();
-		const assetPath = path.join(alloyRootPath, 'assets');
+	async getCompletions (projectDir, range) {
+		const rootPath = await projectDir.isAlloyProject() ? path.join(projectDir.filePath) : projectDir.filePath;
+		const assetPath = path.join(rootPath, 'assets');
 		const completions: CompletionItem[] = [];
 		// limit search to these sub-directories
 		let paths = [ 'images', 'iphone', 'android', 'windows' ];
