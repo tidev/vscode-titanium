@@ -1,3 +1,4 @@
+import { Project } from '../../project';
 import * as vscode from 'vscode';
 import * as related from '../../related';
 import { DefinitionSuggestion } from './common';
@@ -9,8 +10,8 @@ const suggestions: DefinitionSuggestion[] = [
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`id=["']${text.replace('#', '')}`, 'g');
 		},
-		files (document: vscode.TextDocument): string[] {
-			const relatedFile = related.getTargetPath('xml', document.fileName);
+		files (project: Project, document: vscode.TextDocument): string[] {
+			const relatedFile = related.getTargetPath(project, 'xml', document.fileName);
 			if (relatedFile) {
 				return [ relatedFile ];
 			}
@@ -22,8 +23,8 @@ const suggestions: DefinitionSuggestion[] = [
 		definitionRegExp (text: string): RegExp {
 			return new RegExp(`class=["']${text.replace('.', '')}`, 'g');
 		},
-		files (document: vscode.TextDocument): string[] {
-			const relatedFile = related.getTargetPath('xml', document.fileName);
+		files (project: Project, document: vscode.TextDocument): string[] {
+			const relatedFile = related.getTargetPath(project, 'xml', document.fileName);
 			if (relatedFile) {
 				return [ relatedFile ];
 			}

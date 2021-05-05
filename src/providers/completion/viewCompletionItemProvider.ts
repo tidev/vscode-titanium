@@ -5,6 +5,7 @@ import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 
 import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
+import { Project } from '../../project';
 /**
  * Alloy View completion provider
  */
@@ -20,38 +21,40 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @returns {Thenable|Array}
 	 */
 	public async provideCompletionItems (document: TextDocument, position: Position): Promise<CompletionItem[]> {
+		const project = await this.getProject(document);
+
+		if (!project) {
+			return [];
+		}
+
 		const line = document.lineAt(position).text;
 		const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 		const prefixRange = document.getWordRangeAtPosition(position);
 		const prefix = prefixRange ? document.getText(prefixRange) : undefined;
 
-		if (!this.completions) {
-			await this.loadCompletions();
-		}
-
 		// opening tag <_ or <Vie_
 		if (/^\s*<\/?\w*$/.test(linePrefix)) {
-			return this.getTagNameCompletions(line, linePrefix, position, prefixRange, prefix);
+			return this.getTagNameCompletions(line, linePrefix, position, project, prefixRange, prefix);
 			// attribute <View _ or <View backg_
 		} else if (/^\s*<\w+[\s+\w*="()']*\s+\w*$/.test(linePrefix)) {
-			return this.getAttributeNameCompletions(linePrefix, position, prefix);
+			return this.getAttributeNameCompletions(linePrefix, position, project, prefix);
 			// attribute value <View backgroundColor="_"
 		} else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('.]*$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult;
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
-					ruleResult = await rule.getCompletions();
+					ruleResult = await rule.getCompletions(project);
 				}
 			}
 			if (ruleResult) {
 				return ruleResult;
 			} else {
-				return await this.getAttributeValueCompletions(linePrefix, position, document, prefix);
+				return await this.getAttributeValueCompletions(linePrefix, position, document, project, prefix);
 			}
 		}
 		// outside tag, test localised string function
-		return await alloyAutoCompleteRules.i18nAutoComplete.getCompletions();
+		return await alloyAutoCompleteRules.i18nAutoComplete.getCompletions(project);
 	}
 
 	/**
@@ -60,17 +63,20 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @param {String} line line text
 	 * @param {String} linePrefix line prefix text
 	 * @param {Position} position caret position
+	 * @param {Project} project - The Titanium project instance
 	 * @param {Range} prefixRange work prefix range
 	 * @param {String} [prefix] word prefix
 	 *
 	 * @returns {Array}
 	 */
-	public getTagNameCompletions (line: string, linePrefix: string, position: Position, prefixRange?: Range, prefix?: string): CompletionItem[] {
+	public async getTagNameCompletions (line: string, linePrefix: string, position: Position, project: Project, prefixRange?: Range, prefix?: string): Promise<CompletionItem[]> {
 		// ensure prefix contains valid characters
 		if (prefix && !/^[a-zA-Z]+$/.test(prefix)) {
 			return [];
 		}
-		const { tags } = this.completions.alloy;
+
+		const { alloy } = await this.getCompletions(project);
+		const { tags } = alloy;
 		const completions: CompletionItem[] = [];
 		const isClosing = new RegExp(`</${prefix || ''}$`).test(linePrefix);
 		const useSnippet = new RegExp(`^\\s*</?${prefix || ''}\\s*>?\\s*$`).test(line);
@@ -97,13 +103,15 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	 *
 	 * @param {String} linePrefix line prefix text
 	 * @param {Position} position caret position
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} [prefix] word prefix
 	 *
 	 * @returns {Array}
 	 */
-	public getAttributeNameCompletions (linePrefix: string, position: Position, prefix?: string): CompletionItem[] {
-		const { tags } = this.completions.alloy;
-		const { types } = this.completions.titanium;
+	public async getAttributeNameCompletions (linePrefix: string, position: Position, project: Project, prefix?: string): Promise<CompletionItem[]> {
+		const { alloy, titanium } = await this.getCompletions(project);
+		const { tags } = alloy;
+		const { types } = titanium;
 		const completions: CompletionItem[] = [];
 		let tagName: string|undefined;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
@@ -115,7 +123,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 			return completions;
 		}
 
-		const tagAttributes = this.getTagAttributes(tagName).concat([ 'id', 'class', 'platform', 'bindId' ]);
+		const tagAttributes = [ 'id', 'class', 'platform', 'bindId', ...await this.getTagAttributes(tagName, project) ];
 		let apiName = tagName;
 		if (tags[tagName] && tags[tagName].apiName) {
 			apiName = tags[tagName].apiName;
@@ -161,11 +169,12 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	 * @param {String} linePrefix text string upto posiiton
 	 * @param {Position} position caret position
 	 * @param {TextDocument} document active text document
+	 * @param {Project} project - The Titanium project instance
 	 * @param {String} [prefix] word prefix
 	 *
 	 * @returns {Thenable|Array}
 	 */
-	public async getAttributeValueCompletions (linePrefix: string, position: Position, document: TextDocument, prefix?: string): Promise<CompletionItem[]> {
+	public async getAttributeValueCompletions (linePrefix: string, position: Position, document: TextDocument, project: Project, prefix?: string): Promise<CompletionItem[]> {
 		let values;
 		let tag;
 		const matches = linePrefix.match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
@@ -180,8 +189,8 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		// Related and global TSS
 		//
 		if (attribute === 'id' || attribute === 'class') {
-			const relatedFile = related.getTargetPath('tss', document.fileName);
-			const appTss = path.join(workspace.rootPath!, 'app', 'styles', 'app.tss');
+			const relatedFile = related.getTargetPath(project, 'tss', document.fileName);
+			const appTss = path.join(project.filePath, 'app', 'styles', 'app.tss');
 
 			const files = [];
 			// FIXME: This function should be refactored, it's weird that it mutates the completions array
@@ -225,10 +234,10 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 			// Require src attribute
 			//
 			if (tag === 'Require') {
-				const controllerPath = path.join(utils.getAlloyRootPath(), 'controllers');
+				const controllerPath = path.join(project.filePath, 'app', 'controllers');
 				if (utils.directoryExists(controllerPath)) {
 					const files = utils.filterJSFiles(controllerPath);
-					const relatedControllerFile = related.getTargetPath('js', document.fileName);
+					const relatedControllerFile = related.getTargetPath(project, 'js', document.fileName);
 					for (const file of files) {
 						if (relatedControllerFile === file.path) {
 							continue;
@@ -245,7 +254,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 			// Widget src attribute
 			//
 			} else if (tag === 'Widget') {
-				const alloyConfigPath = path.join(utils.getAlloyRootPath(), 'config.json');
+				const alloyConfigPath = path.join(project.filePath, 'app', 'config.json');
 				const doc = await workspace.openTextDocument(alloyConfigPath);
 				const configObj = JSON.parse(doc.getText());
 				for (const widgetName of Object.keys(configObj.dependencies)) {
@@ -262,7 +271,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		// Attribute values for prefix
 		//
 		if (completions.length === 0 && attribute) {
-			values = this.getAttributeValues(attribute);
+			values = await this.getAttributeValues(attribute, project);
 			for (let value of values) {
 				value = value.replace(/["']/g, '');
 				if (!prefix || utils.matches(value, prefix)) {
@@ -282,12 +291,14 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	 * Get tag attributes
 	 *
 	 * @param {String} tag tag name
-	 *
+	 * @param {Project} project - The Titanium project instance
+
 	 * @returns {Array}
 	 */
-	public getTagAttributes (tag: string): string[] {
-		const { tags } = this.completions.alloy;
-		const { types } = this.completions.titanium;
+	public async getTagAttributes (tag: string, project: Project): Promise<string[]> {
+		const { alloy, titanium } = await this.getCompletions(project);
+		const { tags } = alloy;
+		const { types } = titanium;
 		const type = types[tags[tag] ? tags[tag].apiName : undefined];
 		if (type) {
 			return type.properties;
@@ -299,11 +310,13 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 	 * Get attribute values
 	 *
 	 * @param {String} attributeName attribute name
-	 *
+	 *@param {Project} project - The Titanium project instance
+
 	 * @returns {Array}
 	 */
-	public getAttributeValues (attributeName: string): string[] {
-		const { properties } = this.completions.titanium;
+	public async getAttributeValues (attributeName: string, project: Project): Promise<string[]> {
+		const { titanium } = await this.getCompletions(project);
+		const { properties } = titanium;
 		const attribute = properties[attributeName];
 		if (attribute) {
 			return attribute.values;

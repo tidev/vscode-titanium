@@ -5,7 +5,8 @@ import * as utils from '../../utils';
 
 import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, Command } from 'vscode';
 import { ExtensionContainer } from '../../container';
-import { DefinitionSuggestion } from './common';
+import { DefinitionSuggestion, getProject } from './common';
+import { Project } from '../..//project';
 
 /**
  * Definition provider helper
@@ -26,7 +27,13 @@ export const insertI18nStringCommandId = 'titanium.insertI18nStringCodeAction';
  *
  * @returns {Hover}
  */
-export function provideHover (document: TextDocument, position: Position): Hover|undefined {
+export async function provideHover (document: TextDocument, position: Position): Promise<Hover|undefined> {
+	const project = await getProject(document);
+
+	if (!project) {
+		return;
+	}
+
 	const line = document.lineAt(position).text;
 	const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 	// const wordRange = document.getWordRangeAtPosition(position);
@@ -53,7 +60,7 @@ export function provideHover (document: TextDocument, position: Position): Hover
 
 	if (/image\s*[=:]\s*["'][\s0-9a-zA-Z-_^./]*$/.test(linePrefix)) {
 		const relativePath = path.parse(value);
-		const dir = path.join(utils.getAlloyRootPath(), 'assets');
+		const dir = path.join(project?.filePath, 'app', 'assets');
 		const fileNameRegExp = new RegExp(`${relativePath.name}.*${relativePath.ext}$`);
 		const files = walkSync(dir, {
 			nodir: true,
@@ -116,6 +123,10 @@ export async function getReferences<T> (files: string[]|string, regExp: RegExp, 
  * @returns {Thenable}
  */
 export async function provideDefinition (document: TextDocument, position: Position, suggestions: DefinitionSuggestion[]): Promise<Definition|DefinitionLink[]> {
+	const project = await getProject(document);
+	if (!project) {
+		return [];
+	}
 	const line = document.lineAt(position).text;
 	const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
 	const wordRange = document.getWordRangeAtPosition(position);
@@ -140,13 +151,13 @@ export async function provideDefinition (document: TextDocument, position: Posit
 	for (const suggestion of suggestions) {
 		if (suggestion.regExp.test(linePrefix)) {
 			if (suggestion.definitionRegExp) {
-				const suggestionFiles = suggestion.files(document, word, value);
+				const suggestionFiles = await suggestion.files(project, document, word, value);
 				const definitionRegExp = suggestion.definitionRegExp(word || value);
 				return await getReferences<Location>(suggestionFiles, definitionRegExp, (file: string, range: Range) => {
 					return new Location(Uri.file(file), range);
 				});
 			} else {
-				const files = suggestion.files(document, word, value);
+				const files = await suggestion.files(project, document, word, value);
 				for (const file of files) {
 					const link: DefinitionLink = {
 						originSelectionRange: new Range(position.line, startIndex, position.line, endIndex),
@@ -171,6 +182,10 @@ export async function provideDefinition (document: TextDocument, position: Posit
  * @returns {Thenable}
  */
 export async function provideCodeActions(document: TextDocument, range: Range | Selection, suggestions: DefinitionSuggestion[]): Promise<Command[]> {
+	const project = await getProject(document);
+	if (!project) {
+		return [];
+	}
 	const linePrefix = document.getText(new Range(range.end.line, 0, range.end.line, range.end.character));
 	const wordRange = document.getWordRangeAtPosition(range.end);
 	const word = wordRange ? document.getText(wordRange) : null;
@@ -182,8 +197,8 @@ export async function provideCodeActions(document: TextDocument, range: Range | 
 
 	for (const suggestion of suggestions) {
 		if (suggestion.regExp.test(linePrefix)) {
-			const suggestionFiles = suggestion.files(document, word);
-			const index = suggestionFiles.indexOf(path.join(utils.getAlloyRootPath(), 'styles', 'app.tss'));
+			const suggestionFiles = await suggestion.files(project, document, word);
+			const index = suggestionFiles.indexOf(path.join(project.filePath, 'app', 'styles', 'app.tss'));
 			suggestionFiles.splice(index, 1);
 
 			if (!suggestion.definitionRegExp || !suggestion.title) {
@@ -210,7 +225,7 @@ export async function provideCodeActions(document: TextDocument, range: Range | 
 				codeActions.push({
 					title: 'Generate i18n string',
 					command: insertI18nStringCommandId,
-					arguments: [ word ]
+					arguments: [ word, project ]
 				});
 			}
 		}
@@ -239,10 +254,11 @@ export async function insert (text: string, filePath: string): Promise<void> {
  * Insert i18n string to end of given file and generate file if necessary
  *
  * @param {String} text text to insert
+ * @param {Project} project - The Titanium project instance
  */
-export async function insertI18nString (text: string): Promise<void> {
+export async function insertI18nString (text: string, project: Project): Promise<void> {
 	const defaultLang =  ExtensionContainer.config.project.defaultI18nLanguage;
-	const i18nPath = utils.getI18nPath();
+	const i18nPath = await project.getI18NPath();
 	if (!i18nPath) {
 		return;
 	}

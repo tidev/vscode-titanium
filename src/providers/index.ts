@@ -1,6 +1,6 @@
 import { handleInteractionError, InteractionChoice, InteractionError, registerCommand } from '../commands';
 import * as vscode from 'vscode';
-import project from '../project';
+import { Project } from '../project';
 import { completion, updates } from 'titanium-editor-commons';
 import appc from '../appc';
 import * as path from 'path';
@@ -58,8 +58,9 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 * Generate Alloy and Titanium SDK Completion files
 *
 * @param {boolean} [force=false] generate the completions even if they exist
+* @param {Project} project - The Titanium project instance
 */
-export async function generateCompletions (force = false): Promise<void> {
+export async function generateCompletions (force = false, project: Project): Promise<void> {
 	if (!project.isValid()) {
 		return;
 	}
@@ -71,7 +72,7 @@ export async function generateCompletions (force = false): Promise<void> {
 			error.interactionChoices.push({
 				title: 'Open tiapp.xml',
 				run: async () => {
-					const file = path.join(vscode.workspace.rootPath!, 'tiapp.xml');
+					const file = path.join(project.filePath, 'tiapp.xml');
 					const document = await vscode.workspace.openTextDocument(file);
 					await vscode.window.showTextDocument(document);
 				}
@@ -82,7 +83,7 @@ export async function generateCompletions (force = false): Promise<void> {
 			error.interactionChoices.push({
 				title: 'Open tiapp.xml',
 				run: async () => {
-					const file = path.join(vscode.workspace.rootPath!, 'tiapp.xml');
+					const file = path.join(project.filePath, 'tiapp.xml');
 					const document = await vscode.workspace.openTextDocument(file);
 					await vscode.window.showTextDocument(document);
 				}
@@ -130,7 +131,7 @@ export async function generateCompletions (force = false): Promise<void> {
 						try {
 							await updates.titanium.sdk.installUpdate(sdkVersion as string);
 							await appc.getInfo();
-							await generateCompletions(force);
+							await generateCompletions(force, project);
 						} catch (err) {
 							return Promise.reject(err);
 						}

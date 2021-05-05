@@ -4,7 +4,7 @@ import { HoverProvider, Position, TextDocument, Hover } from 'vscode';
 
 export class ViewHoverProvider implements HoverProvider {
 
-	public provideHover (document: TextDocument, position: Position): Hover|undefined {
+	public async provideHover (document: TextDocument, position: Position): Promise<Hover|undefined> {
 		return definitionProviderHelper.provideHover(document, position);
 	}
 }

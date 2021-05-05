@@ -4,9 +4,8 @@ import * as fs from 'fs';
 import { after, before, describe, it } from 'mocha';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import * as tce from 'titanium-editor-commons';
+import { Project } from '../../../project';
 import * as vscode from 'vscode';
-import project from '../../../project';
 
 import { StyleCompletionItemProvider } from '../../../providers/completion/styleCompletionItemProvider';
 
@@ -16,20 +15,19 @@ const uri = vscode.Uri.file(file);
 const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
 const completions = JSON.parse(rawData);
 
-async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
-	const text = await vscode.workspace.openTextDocument(uri);
-	const provider = new StyleCompletionItemProvider();
-	return provider.provideCompletionItems(text, position);
-}
 let sandbox: sinon.SinonSandbox;
-
 describe('TSS Suggestions', () => {
+	const provider = new StyleCompletionItemProvider();
+	async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
+		const text = await vscode.workspace.openTextDocument(uri);
+		return provider.provideCompletionItems(text, position);
+	}
 
 	before(async function () {
 		this.timeout(5000);
 		sandbox = sinon.createSandbox();
-		sandbox.stub(project, 'sdk').returns([ '8.1.0.GA' ]);
-		sandbox.stub(tce.completion, 'loadCompletions').resolves(completions);
+		sandbox.stub(provider, 'getProject').resolves(new Project('/test', 'app'));
+		sandbox.stub(provider, 'getCompletions').resolves(completions);
 	});
 
 	after(async function () {
