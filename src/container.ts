@@ -7,10 +7,12 @@ import { GlobalState, VSCodeCommands, WorkspaceState } from './constants';
 import { HelpExplorer } from './explorer/helpExplorer';
 import DeviceExplorer from './explorer/tiExplorer';
 import { startup } from './extension';
-import project from './project';
 import { AppBuildTaskTitaniumBuildBase } from './tasks/buildTaskProvider';
 import { isDistributionAppBuild } from './tasks/tasksHelper';
 import { AppPackageTaskTitaniumBuildBase } from './tasks/packageTaskProvider';
+import { Project } from './project';
+import { generateCompletions } from './providers';
+import { getValidWorkspaceFolders } from './quickpicks/common';
 import Terminal from './terminal';
 import { getNodeSupportedVersion } from './utils';
 
@@ -20,6 +22,7 @@ export class ExtensionContainer {
 	private static _config: Config | undefined;
 	private static _context: vscode.ExtensionContext;
 	private static _helpExplorer: HelpExplorer;
+	private static _projects: Map<string, Project> = new Map();
 	private static _runningTask: vscode.TaskExecution|undefined;
 	private static _terminal: Terminal;
 	private static _updateInfo: UpdateInfo[];
@@ -94,6 +97,10 @@ export class ExtensionContainer {
 		return this._recentBuilds;
 	}
 
+	static get projects (): Map<string, Project> {
+		return this._projects;
+	}
+
 	/**
 	 * Updates the property in both VS Code context, for when clauses used in the package.json, and
 	 * also the globalSate for the ExtensionContext
@@ -122,7 +129,7 @@ export class ExtensionContainer {
 
 		let supportedVersions;
 		try {
-			supportedVersions = await getNodeSupportedVersion(project.sdk()[0]);
+			supportedVersions = await getNodeSupportedVersion();
 		} catch (error) {
 			// ignore
 		}
@@ -170,5 +177,24 @@ export class ExtensionContainer {
 		this._recentBuilds.set(key, buildData);
 		this.context.workspaceState.update(WorkspaceState.RecentBuilds, Array.from(this._recentBuilds));
 		this._buildExplorer.refreshRecentBuilds();
+	}
+
+	static async loadProjects(): Promise<void> {
+		for (const { folder, type } of await getValidWorkspaceFolders({ apps: true, modules: true })) {
+			const filePath = folder.uri.fsPath;
+			if (this._projects.has(filePath)) {
+				continue;
+			}
+			const project = new Project(filePath, type);
+			this._projects.set(filePath, project);
+
+			await project.load();
+			if (project.type === 'app') {
+				generateCompletions(false, project)
+					.catch(() => {
+						// ignore
+					});
+			}
+		}
 	}
 }

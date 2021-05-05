@@ -3,9 +3,10 @@ import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as semver from 'semver';
 import appc from './appc';
+import * as findUp from 'find-up';
 
 import { platform } from 'os';
-import { workspace, tasks, Task, ShellExecution } from 'vscode';
+import { tasks, Task, ShellExecution } from 'vscode';
 import { CreateAppOptions, CreateModuleOptions, Target } from './types/cli';
 import { IosCert, IosCertificateType, Platform, PlatformPretty } from './types/common';
 import { ExtensionContainer } from './container';
@@ -158,15 +159,6 @@ export function iOSProvisioningProfileMatchesAppId (profileAppId: string, appId:
 }
 
 /**
- * Alloy app directory
- *
- * @returns {String}
- */
-export function getAlloyRootPath (): string {
-	return path.join(workspace.rootPath!, 'app');
-}
-
-/**
  * Returns true if directory exists at given path
  *
  * @param {String} directoryPath 	directory path
@@ -178,28 +170,6 @@ export function directoryExists (directoryPath: string): boolean {
 		return stat.isDirectory();
 	} catch (err) {
 		return !(err && err.code === 'ENOENT');
-	}
-}
-
-/**
- * Returns true if current project is an Alloy project
- *
- * @returns {Boolean}
- */
-export function isAlloyProject (): boolean {
-	return directoryExists(getAlloyRootPath());
-}
-
-/**
- * i18n project directory
- *
- * @returns {String}
- */
-export function getI18nPath (): string {
-	if (isAlloyProject()) {
-		return path.join(getAlloyRootPath(), 'i18n');
-	} else {
-		return path.join(workspace.rootPath!, 'i18n');
 	}
 }
 
@@ -390,14 +360,27 @@ export function getCorrectCertificateName (certificateName: string, sdkVersion: 
 	}
 }
 
-export async function getNodeSupportedVersion(sdkVersion: string): Promise<string|undefined> {
+export async function getNodeSupportedVersion(): Promise<string|undefined> {
+	// TODO: we'll just take the first app project for now and use that as the supported range,
+	// this should potentially be improved in future to collate the various supported ranges,
+	// but that's a much more invasive change
+	let sdkVersion;
+	for (const proj of ExtensionContainer.projects.values()) {
+		if (proj.type !== 'app') {
+			continue;
+		}
+		sdkVersion = proj.sdk()[0];
+	}
+
+	if (!sdkVersion) {
+		return;
+	}
 
 	const sdkInfo = appc.sdkInfo(sdkVersion);
 	if (!sdkInfo) {
 		return;
 	}
 	const sdkPath = sdkInfo.path;
-
 	const packageJSON = path.join(sdkPath, 'package.json');
 	const { vendorDependencies } = await fs.readJSON(packageJSON);
 	return vendorDependencies.node;
@@ -457,4 +440,27 @@ export function getDeviceNameFromId (deviceID: string, platform: Platform, targe
 	}
 
 	return deviceName;
+}
+
+/*
+ * Given a file path, will walk the file tree until it finds a tiapp.xml, and will return the
+ * parent directory of that tiapp.xml. Useful for helping to work backwards from a file that has
+ * triggered completions to a project.
+ *
+ * @export
+ * @param {string} filePath - The file path to start from
+ * @returns {Promise<string>} The parent directory
+ */
+export async function findProjectDirectory (filePath: string): Promise<string> {
+	try {
+		const tiappFile = await findUp('tiapp.xml', { cwd: filePath, type: 'file' });
+		if (!tiappFile) {
+			throw new Error(`Unable to find project dir for ${filePath}`);
+		}
+
+		return path.dirname(tiappFile);
+	} catch (error) {
+		console.log(error);
+		throw error;
+	}
 }

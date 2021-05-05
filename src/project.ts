@@ -3,10 +3,11 @@ import * as path from 'path';
 import * as xml2js from 'xml2js';
 import * as utils from './utils';
 
-import { EventEmitter, Range, window, workspace } from 'vscode';
+import { Range, window, workspace } from 'vscode';
 import { handleInteractionError, InteractionError } from './commands/common';
 import { Platform } from './types/common';
 import { parseXmlString } from './common/utils';
+import { ProjectType } from './tasks/tasksHelper';
 
 const TIAPP_FILENAME = 'tiapp.xml';
 const TIMODULEXML_FILENAME = 'timodule.xml';
@@ -18,22 +19,16 @@ interface ModuleInformation {
 }
 
 export class Project {
-
-	public isTitaniumApp = false;
-	public isTitaniumModule = false;
 	public isValidTiapp = false;
+	public filePath: string;
+	public type: ProjectType;
 
 	private tiapp: any;
 	private modules: ModuleInformation[] = [];
-	private emitter: EventEmitter<void> = new EventEmitter();
-	private hasModifiedListener = false;
 
-	/**
-	 * Check if the current project is a Titanium app or module.
-	 * @returns {Boolean} Whether the project is a Titanium app or module.
-	 */
-	public isTitaniumProject (): boolean {
-		return this.isTitaniumApp || this.isTitaniumModule;
+	constructor(filePath: string, type: ProjectType) {
+		this.filePath = filePath;
+		this.type = type;
 	}
 
 	/**
@@ -47,26 +42,11 @@ export class Project {
 	/**
 	 * Load tiapp.xml file
 	 */
-	public load (): void {
-		this.isTitaniumApp = false;
-		this.isTitaniumModule = false;
-
-		this.loadTiappFile();
-
-		if (!this.isTitaniumApp) {
-			this.loadModules();
-		}
-	}
-
-	/**
-	 * Register on modified callback
-	 *
-	 * @param {Function} callback	callback function
-	 */
-	public onModified (callback: () => void): void {
-		if (this.isTitaniumApp && !this.hasModifiedListener) {
-			this.emitter.event(callback);
-			this.hasModifiedListener = true;
+	public async load (): Promise<void> {
+		if (this.type === 'app') {
+			await this.loadTiappFile();
+		} else if (this.type === 'module') {
+			await this.loadModules();
 		}
 	}
 
@@ -76,7 +56,7 @@ export class Project {
 	 * @returns {String}
 	 */
 	public appId (): string {
-		if (this.isTitaniumApp) {
+		if (this.type === 'app') {
 			return String(this.tiapp.id);
 		}
 		throw new Error('Project is not a Titanium application');
@@ -88,7 +68,7 @@ export class Project {
 	 * @returns {String}
 	 */
 	public appName (): string {
-		if (this.isTitaniumApp) {
+		if (this.type === 'app') {
 			return String(this.tiapp.name);
 		} else {
 			return this.modules[0].name;
@@ -101,7 +81,7 @@ export class Project {
 	 * @returns {Array}
 	 */
 	public platforms (): string[]|undefined {
-		if (this.isTitaniumModule) {
+		if (this.type === 'module') {
 			return this.modules.map((mod) => mod.platform);
 		}
 	}
@@ -125,17 +105,10 @@ export class Project {
 	 * @returns {String}
 	 */
 	public sdk (): string[] {
-		if (this.isTitaniumApp) {
+		if (this.type === 'app') {
 			return this.tiapp['sdk-version'];
 		}
 		return [];
-	}
-
-	/**
-	 * Dispose of resources
-	 */
-	public dispose (): void {
-		this.emitter.dispose();
 	}
 
 	/**
@@ -143,32 +116,16 @@ export class Project {
 	 *
 	 */
 	private async loadTiappFile  (): Promise<void> {
-		this.isTitaniumApp = false;
 		this.isValidTiapp = false;
-		const rootPath = workspace.rootPath;
-		if (!rootPath) {
+		let error: InteractionError | undefined;
+		const filePath = path.join(this.filePath, TIAPP_FILENAME);
+
+		if (!await fs.pathExists(filePath)) {
 			return;
-		}
-
-		const filePath = path.join(rootPath, TIAPP_FILENAME);
-		if (!utils.fileExists(filePath)) {
-			return;
-		}
-
-		this.isTitaniumApp = true;
-
-		// if this is our first time running through then load setup the file watcher
-		if (!this.tiapp) {
-			workspace.onDidSaveTextDocument(async (event) => {
-				if (event.fileName === filePath) {
-					await this.loadTiappFile();
-					this.emitter.fire();
-				}
-			});
 		}
 
 		try {
-			const fileData = fs.readFileSync(filePath, 'utf-8');
+			const fileData = await fs.readFile(filePath, 'utf-8');
 			const json = await parseXmlString(fileData) as any;
 			this.isValidTiapp = true;
 
@@ -198,7 +155,7 @@ export class Project {
 			error.interactionChoices.push({
 				title: 'Open tiapp.xml',
 				run: async () => {
-					const file = path.join(workspace.rootPath!, 'tiapp.xml');
+					const file = path.join(this.filePath, 'tiapp.xml');
 					const document = await workspace.openTextDocument(file);
 					const linePrefix = new Range(line, 0, line, column);
 					await window.showTextDocument(document.uri, { selection: linePrefix });
@@ -212,15 +169,11 @@ export class Project {
 	 * Attempt to find module projects by loading timodule.xml and manifest files
 	 */
 	private loadModules (): void {
-		const rootPath = workspace.rootPath;
-		if (!rootPath) {
-			return;
-		}
 		const paths = [
-			path.join(rootPath),
-			path.join(rootPath, 'android'),
-			path.join(rootPath, 'ios'),
-			path.join(rootPath, 'iphone'),
+			path.join(this.filePath),
+			path.join(this.filePath, 'android'),
+			path.join(this.filePath, 'ios'),
+			path.join(this.filePath, 'iphone'),
 		];
 		for (let i = 0, numPaths = paths.length; i < numPaths; i++) {
 			this.loadModuleAt(paths[i]);
@@ -268,11 +221,31 @@ export class Project {
 				manifest.platform = utils.normalisedPlatform(manifest.platform);
 
 				this.modules.push(manifest);
-
-				this.isTitaniumModule = true;
 			}
 		}
 	}
-}
 
-export default new Project();
+	async isAlloyProject(): Promise<boolean> {
+		if (this.type !== 'app') {
+			return false;
+		}
+
+		if (await fs.pathExists(path.join(this.filePath, 'app'))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	async getI18NPath (): Promise<string|undefined> {
+		if (this.type !== 'app') {
+			return;
+		}
+
+		if (await this.isAlloyProject()) {
+			return path.join(this.filePath, 'app', 'i18n');
+		} else {
+			return path.join(this.filePath, 'i18n');
+		}
+	}
+}
