@@ -78,7 +78,9 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		const { alloy } = await this.getCompletions(project);
 		const { tags } = alloy;
 		const completions: CompletionItem[] = [];
+		// eslint-disable-next-line security/detect-non-literal-regexp
 		const isClosing = new RegExp(`</${prefix || ''}$`).test(linePrefix);
+		// eslint-disable-next-line security/detect-non-literal-regexp
 		const useSnippet = new RegExp(`^\\s*</?${prefix || ''}\\s*>?\\s*$`).test(line);
 		const range = prefixRange ? new Range(position.line, prefixRange.start.character, position.line, line.length) : new Range(position.line, position.character, position.line, line.length);
 		for (const tag in tags) {

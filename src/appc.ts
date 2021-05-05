@@ -219,7 +219,7 @@ export class Appc {
 
 	public iOSSimulatorVersions (): string[] {
 		const sims = this.iOSSimulators();
-		return Object.keys(sims).sort((a, b) => semver.compare(semver.coerce(a)!, semver.coerce(b)!)).reverse();
+		return Object.keys(sims).sort((a, b) => semver.compare(semver.coerce(a) || a, semver.coerce(b) || b)).reverse();
 	}
 
 	/**

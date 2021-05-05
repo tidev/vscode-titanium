@@ -61,6 +61,7 @@ export async function provideHover (document: TextDocument, position: Position):
 	if (/image\s*[=:]\s*["'][\s0-9a-zA-Z-_^./]*$/.test(linePrefix)) {
 		const relativePath = path.parse(value);
 		const dir = path.join(project?.filePath, 'app', 'assets');
+		// eslint-disable-next-line security/detect-non-literal-regexp
 		const fileNameRegExp = new RegExp(`${relativePath.name}.*${relativePath.ext}$`);
 		const files = walkSync(dir, {
 			nodir: true,
