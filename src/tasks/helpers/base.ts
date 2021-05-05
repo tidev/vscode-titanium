@@ -9,10 +9,10 @@ import { UserCancellation } from '../../commands/common';
 import { BuildTaskTitaniumBuildBase, AppBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { PackageTaskTitaniumBuildBase, AppPackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { TitaniumBuildBase } from '../commandTaskProvider';
-import project from '../../project';
 import { WorkspaceState } from '../../constants';
 import { selectDevice } from '../../quickpicks/build/common';
 import { IosBuildTaskTitaniumBuildBase } from './ios';
+import { Project } from '../../project';
 
 function isAppBuild<T extends TitaniumBuildBase>(definition: TitaniumBuildBase): definition is T {
 	if (definition.projectType === 'app') {
@@ -89,6 +89,7 @@ export abstract class TaskHelper {
 			builder.addOption('--device-id', definition.deviceId);
 		}
 
+		const project = this.getProject(definition.projectDir);
 		builder.addQuotedOption('--sdk', project.sdk()[0]);
 
 	}
@@ -163,5 +164,13 @@ export abstract class TaskHelper {
 		} else {
 			return CommandBuilder.create('appc', 'run');
 		}
+	}
+
+	public getProject(projectDir: string): Project {
+		const project = ExtensionContainer.projects.get(projectDir);
+		if (!project) {
+			throw new Error(`Unable to find loaded project for ${projectDir}, please ensure it is active in the workspace`);
+		}
+		return project;
 	}
 }

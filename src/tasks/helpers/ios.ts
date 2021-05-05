@@ -1,7 +1,6 @@
 import { TaskExecutionContext, runningTasks } from '../tasksHelper';
 import { selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
 import { getCorrectCertificateName } from '../../utils';
-import project from '../../project';
 import { IosCertificateType, IosCert } from '../../types/common';
 import { TaskHelper } from './base';
 import { Command } from '../commandBuilder';
@@ -41,6 +40,7 @@ export class IosHelper extends TaskHelper {
 
 	public async resolveAppBuildCommandLine (context: TaskExecutionContext, definition: IosBuildTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
+		const project = this.getProject(definition.projectDir);
 
 		await this.resolveCommonAppOptions(context, definition, builder);
 
@@ -84,6 +84,7 @@ export class IosHelper extends TaskHelper {
 
 	public async resolveAppPackageCommandLine(context: TaskExecutionContext, definition: IosPackageTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
+		const project = this.getProject(definition.projectDir);
 
 		await this.resolveCommonPackagingOptions(context, definition, builder);
 
