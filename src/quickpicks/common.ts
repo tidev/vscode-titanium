@@ -227,13 +227,11 @@ export async function promptForWorkspaceFolder ({ apps = true, modules = false, 
 	const choices: CustomQuickPick[] = folders.map(({ folder }) => ({ label: folder.name, id: folder.uri.fsPath  }));
 
 	const choice = await quickPick(choices, { canPickMany: false, placeHolder });
-	if (!choice) {
-		throw new Error('no choice');
-	}
+
 	const folder = folders.find(({ folder }) => folder.uri.fsPath === choice.id);
 	if (!folder) {
 		// should not happen unless removed between prompt and pick?
-		throw new Error('could not find');
+		throw new Error(`Could not find ${choice.id}. Has it been removed?`);
 	}
 	return folder;
 }

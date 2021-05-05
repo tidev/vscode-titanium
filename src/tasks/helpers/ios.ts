@@ -49,8 +49,7 @@ export class IosHelper extends TaskHelper {
 			let certificate: IosCert|undefined;
 
 			if (!iosInfo.certificate) {
-				iosInfo.certificate = (await selectiOSCertificate('run')).id;
-				certificate = appc.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
+				certificate = await selectiOSCertificate('run');
 			} else {
 				certificate = appc.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
 			}
@@ -62,7 +61,7 @@ export class IosHelper extends TaskHelper {
 			iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], IosCertificateType.developer);
 
 			if (!iosInfo.provisioningProfile) {
-				iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, 'run', project.appId())).uuid;
+				iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).uuid;
 			}
 
 			if (!iosInfo.provisioningProfile) {
@@ -92,8 +91,7 @@ export class IosHelper extends TaskHelper {
 		let certificate: IosCert|undefined;
 
 		if (!iosInfo.certificate) {
-			iosInfo.certificate = (await selectiOSCertificate('distribute')).id;
-			certificate = appc.iOSCertificates(IosCertificateType.distribution).find(cert => cert.fullname === iosInfo.certificate);
+			certificate = await selectiOSCertificate('distribute');
 		} else {
 			certificate = appc.iOSCertificates(IosCertificateType.distribution).find(cert => cert.fullname === iosInfo.certificate);
 		}
@@ -105,7 +103,7 @@ export class IosHelper extends TaskHelper {
 		iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], IosCertificateType.distribution);
 
 		if (!iosInfo.provisioningProfile) {
-			iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).id;
+			iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).uuid;
 		}
 
 		if (!iosInfo.provisioningProfile) {
