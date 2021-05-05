@@ -171,7 +171,7 @@ export async function getValidWorkspaceFolders({ apps = true, modules = false } 
 	const { workspaceFolders } = workspace;
 
 	if (!workspaceFolders) {
-		throw new Error('No workspace folders');
+		return [];
 	}
 
 	const folders = [];
@@ -221,6 +221,9 @@ interface FolderDetails {
  */
 export async function promptForWorkspaceFolder ({ apps = true, modules = false, placeHolder = 'Please select a folder to perform action within' }: WorkspaceFolderPromptOptions = {}): Promise<FolderDetails> {
 	const folders = await getValidWorkspaceFolders({ apps, modules });
+	if (!folders.length) {
+		throw new Error('No workspace folders are present');
+	}
 	const choices: CustomQuickPick[] = folders.map(({ folder }) => ({ label: folder.name, id: folder.uri.fsPath  }));
 
 	const choice = await quickPick(choices, { canPickMany: false, placeHolder });

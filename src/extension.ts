@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import appc from './appc';
-import project from './project';
 
 import { Commands, handleInteractionError, InteractionError } from './commands';
 import { GlobalState } from './constants';
@@ -15,6 +14,7 @@ import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 import { generateCompletions, registerProviders } from './providers';
 import { registerCommands } from './commands/index';
 import { registerViews } from './explorer';
+import { dirname } from 'path';
 
 import ms = require('ms');
 
@@ -33,10 +33,27 @@ export async function activate (context: vscode.ExtensionContext): Promise<void>
 	registerDebugProvider(context);
 
 	startup();
+
+	vscode.workspace.onDidSaveTextDocument(async (event) => {
+		if (!event.fileName.includes('tiapp.xml')) {
+			return;
+		}
+
+		const parent = dirname(event.fileName);
+		const project = ExtensionContainer.projects.get(parent);
+
+		if (!project) {
+			return;
+		}
+
+		await project.load();
+		await generateCompletions(false, project);
+	});
+
 }
 
 export function deactivate (): void {
-	project.dispose();
+	// CLEANUP
 }
 
 /**
@@ -60,20 +77,15 @@ export async function startup (): Promise<void> {
 
 	ExtensionContainer.setContext(GlobalState.MissingTooling, false);
 
-	project.load();
+	await ExtensionContainer.loadProjects();
 
-	if (!project.isTitaniumProject()) {
+	if (!ExtensionContainer.projects.size) {
 		ExtensionContainer.setContext(GlobalState.Enabled, false);
 		ExtensionContainer.setContext(GlobalState.NotTitaniumProject, true);
 		return;
 	}
 
 	ExtensionContainer.setContext(GlobalState.NotTitaniumProject, false);
-
-	project.onModified(async () => {
-		generateCompletions();
-	});
-
 	ExtensionContainer.setContext(GlobalState.Enabled, true);
 
 	vscode.window.withProgress({ cancellable: false, location: vscode.ProgressLocation.Notification, title: 'Titanium' }, async progress => {
@@ -94,10 +106,6 @@ export async function startup (): Promise<void> {
 			}
 			vscode.window.showErrorMessage('Error fetching Appcelerator environment');
 			return;
-		}
-
-		if (project.isTitaniumApp) {
-			generateCompletions();
 		}
 
 		// Call refresh incase the Titanium Explorer activity pane became active before info
