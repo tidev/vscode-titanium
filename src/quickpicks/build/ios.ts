@@ -1,9 +1,10 @@
+import { Target } from '../..//types/cli';
 import appc from '../../appc';
-import { IosCertificateType } from '../../types/common';
+import { IosCert, IosCertificateType, ProvisioningProfile } from '../../types/common';
 import { quickPick, CustomQuickPick } from '../common';
 import { deviceQuickPick, DeviceQuickPickItem } from './common';
 
-export function selectiOSCertificate (buildType: string): Promise<CustomQuickPick> {
+export async function selectiOSCertificate (buildType: string): Promise<IosCert> {
 	const certificateType: IosCertificateType = buildType === 'run' ? IosCertificateType.developer : IosCertificateType.distribution;
 	const certificates = appc.iOSCertificates(certificateType).map(cert => ({
 		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
@@ -11,34 +12,41 @@ export function selectiOSCertificate (buildType: string): Promise<CustomQuickPic
 		pem: cert.pem,
 		id: cert.fullname
 	}));
-	return quickPick(certificates, { placeHolder: 'Select certificate' });
+	const choice = await quickPick(certificates, { placeHolder: 'Select certificate' });
+
+	const certificate = appc.iOSCertificates(certificateType).find(cert => cert.pem === choice.pem);
+
+	if (!certificate) {
+		throw new Error(`Unable to resolve certificate ${choice.label}`);
+	}
+
+	return certificate;
 }
 
-export function selectiOSProvisioningProfile (certificate: any, target: string, appId: string): Promise<CustomQuickPick> {
+export async function selectiOSProvisioningProfile (certificate: IosCert, target: Target, appId: string): Promise<ProvisioningProfile> {
 	let deployment = 'development';
 	if (target === 'dist-adhoc') {
 		deployment = 'distribution';
 	} else if (target === 'dist-appstore') {
 		deployment = 'appstore';
 	}
-	const profiles = appc.iOSProvisioningProfiles(deployment, certificate, appId).map(({ expirationDate, name, uuid }) => ({
+	const profiles = appc.iOSProvisioningProfiles(deployment, certificate, appId);
+	const choices = profiles.map(({ expirationDate, name, uuid }) => ({
 		description: uuid,
 		detail: `Expires: ${new Date(expirationDate).toLocaleString('en-US')}`,
 		label: name,
 		uuid,
 		id: uuid
 	}));
-	return quickPick(profiles, { placeHolder: 'Select provisioning profile' });
-}
+	const choice = await quickPick(choices, { placeHolder: 'Select provisioning profile' });
 
-export async function selectiOSCodeSigning (buildType: string, target: string, appId: string): Promise<{ certificate: CustomQuickPick; provisioningProfile: CustomQuickPick & { uuid: string } }> {
-	const certificate = await selectiOSCertificate(buildType);
+	const profile = profiles.find(p => p.uuid === choice.uuid);
 
-	const provisioningProfile = await selectiOSProvisioningProfile(certificate, target, appId) as CustomQuickPick & { uuid: string };
-	return {
-		certificate,
-		provisioningProfile
-	};
+	if (!profile) {
+		throw new Error(`Unable to resolve provisioning profile ${choice.label}`);
+	}
+
+	return profile;
 }
 
 export function selectiOSDevice (): Promise<DeviceQuickPickItem> {
@@ -53,7 +61,7 @@ export function selectiOSSimulatorVersion (): Promise<CustomQuickPick> {
 
 export async function selectiOSSimulator (iOSVersion?: string): Promise<DeviceQuickPickItem> {
 	if (!iOSVersion) {
-		iOSVersion = (await selectiOSSimulatorVersion()).label; // eslint-disable-line require-atomic-updates
+		iOSVersion = (await selectiOSSimulatorVersion()).label;
 	}
 	if (!appc.iOSSimulatorVersions().includes(iOSVersion)) {
 		throw new Error(`iOS Version ${iOSVersion} does not exist`);
