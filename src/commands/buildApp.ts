@@ -33,6 +33,7 @@ export async function buildApplication (node?: DeviceNode | OSVerNode | Platform
 			folder = (await promptForWorkspaceFolder()).folder;
 		}
 
+		const projectDir = folder.uri.fsPath;
 		const buildChoice = node?.platform as string || (await selectPlatform(lastBuildDescription)).id;
 		const platform = buildChoice === 'last' ? lastBuildState?.platform as Platform : buildChoice as Platform;
 
@@ -41,7 +42,7 @@ export async function buildApplication (node?: DeviceNode | OSVerNode | Platform
 				titaniumBuild: {
 					projectType: 'app',
 					platform,
-					projectDir: folder.uri.fsPath
+					projectDir
 				},
 				type: 'titanium-build',
 				name: `Build ${platform}`
@@ -52,11 +53,12 @@ export async function buildApplication (node?: DeviceNode | OSVerNode | Platform
 			presentationOptions: {},
 			problemMatchers: [],
 			runOptions: {},
-			scope: vscode.TaskScope.Workspace
+			scope: folder
 		};
 
 		if (buildChoice === 'last') {
-			Object.assign(taskDefinition.definition.titaniumBuild, lastBuildState);
+			// copy over the details from the last build, setting projectDir to the newly selected one
+			Object.assign(taskDefinition.definition.titaniumBuild, lastBuildState, { projectDir });
 		} else {
 			if (node?.targetId) {
 				taskDefinition.definition.titaniumBuild.target = node.targetId as 'device' | 'emulator' | 'simulator';
