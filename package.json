@@ -954,7 +954,7 @@
     "eslint-config-axway": "^6.0.1",
     "eslint-plugin-chai-friendly": "^0.7.1",
     "eslint-plugin-mocha": "^8.1.0",
-    "glob": "^7.1.6",
+    "glob": "^7.1.7",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
     "mocha": "^8.3.2",
