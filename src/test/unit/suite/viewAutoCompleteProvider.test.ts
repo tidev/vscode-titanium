@@ -1,18 +1,14 @@
 import { expect } from 'chai';
-import * as fs from 'fs';
 import { after, before, describe, it } from 'mocha';
-import * as path from 'path';
 import * as sinon from 'sinon';
 import { Project } from '../../../project';
 import * as vscode from 'vscode';
 
 import { ViewCompletionItemProvider } from '../../../providers/completion/viewCompletionItemProvider';
+import { getFileUri, loadCompletions } from '../utils';
+import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
 
-const fixturesPath = path.join(__dirname, '../../../..', 'src', 'test', 'unit', 'suite', 'fixtures');
-const xmlFile = path.join(fixturesPath, 'sample.xml');
-const uri = vscode.Uri.file(xmlFile);
-const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
-const completions = JSON.parse(rawData);
+const uri = getFileUri('views/sample.xml');
 
 let sandbox: sinon.SinonSandbox;
 
@@ -20,13 +16,15 @@ describe('View suggestions', () => {
 	const provider = new ViewCompletionItemProvider();
 
 	async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
+		await vscode.window.showTextDocument(uri);
 		const text = await vscode.workspace.openTextDocument(uri);
 		return provider.provideCompletionItems(text, position);
 	}
 	before(async function () {
 		this.timeout(5000);
+		const completions = loadCompletions();
 		sandbox = sinon.createSandbox();
-		sandbox.stub(provider, 'getProject').resolves(new Project('/test', 'app'));
+		sandbox.stub(provider, 'getProject').resolves(new Project(getCommonAlloyProjectDirectory(), 'app'));
 		sandbox.stub(provider, 'getCompletions').resolves(completions);
 	});
 
