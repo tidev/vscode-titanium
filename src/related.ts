@@ -25,7 +25,7 @@ export function getTargetPath (project: Project, type: string, currentFilePath?:
 
 	const alloyRootPath = path.join(project.filePath, 'app');
 
-	if (!currentFilePath || currentFilePath.includes(alloyRootPath)) {
+	if (!currentFilePath || !currentFilePath.includes(alloyRootPath)) {
 		return;
 	}
 
