@@ -36,10 +36,10 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		if (/^\s*<\/?\w*$/.test(linePrefix)) {
 			return this.getTagNameCompletions(line, linePrefix, position, project, prefixRange, prefix);
 			// attribute <View _ or <View backg_
-		} else if (/^\s*<\w+[\s+\w*="()']*\s+\w*$/.test(linePrefix)) {
+		} else if (/^\s*<\w+[\s+\w*="()']*\s+\w*[/]?[>]?$/.test(linePrefix)) {
 			return this.getAttributeNameCompletions(linePrefix, position, project, prefix);
 			// attribute value <View backgroundColor="_"
-		} else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('.]*$/.test(linePrefix)) {
+		} else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('.]*"[/]?[>]$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult;
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
@@ -341,7 +341,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 			quoteIndex--;
 		}
 		linePrefix = linePrefix.substring(0, quoteIndex);
-		const matches = /\s+([a-zA-Z][-a-zA-Z]*)\s*=\s*$/.exec(linePrefix);
+		const matches = /\s+([a-zA-Z][-a-zA-Z]*)\s*=\s*/.exec(linePrefix);
 		if (matches && matches.length >= 2) {
 			return matches[1];
 		}
