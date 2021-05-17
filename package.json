@@ -927,7 +927,7 @@
     "postpublish": "pinst --enable"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.1",
+    "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.1",
     "@seadub/danger-plugin-dependencies": "^1.0.0",
     "@seadub/danger-plugin-eslint": "^2.0.0",
