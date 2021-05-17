@@ -31,7 +31,6 @@ describe('TSS Suggestions', () => {
 	after(async function () {
 		this.timeout(5000);
 		sandbox.restore();
-
 	});
 
 	it('Should provide tag suggestions', async () => {
@@ -56,7 +55,6 @@ describe('TSS Suggestions', () => {
 		expect(suggestions[3].label).to.equal('CenterView');
 		expect(suggestions[3].detail).to.equal('Ti.UI.Android.DrawerLayout.CenterView');
 		expect((suggestions[3].insertText as vscode.SnippetString).value).to.equal('CenterView": {\n\t${1}\t\n}');
-
 	});
 
 	it('Should provide property name suggestions', async () => {
@@ -80,7 +78,6 @@ describe('TSS Suggestions', () => {
 		expect(suggestions[3].label).to.equal('hidesSearchBarWhenScrolling');
 		expect(suggestions[3].kind).to.equal(9);
 		expect(suggestions[3].insertText).to.equal('hidesSearchBarWhenScrolling: ');
-
 	});
 
 	it('Should provide property value suggestions if Position is  at colon', async () => {
@@ -94,7 +91,6 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions[1].label).to.equal('Ti.UI.TABLE_VIEW_SEPARATOR_STYLE_SINGLE_LINE');
 		expect(suggestions[1].kind).to.equal(11);
-
 	});
 
 	it('Should not provide property value suggestions if Position is in property', async () => {
@@ -102,7 +98,6 @@ describe('TSS Suggestions', () => {
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(0);
-
 	});
 
 	it('should provide color values with quotes', async () => {
@@ -116,7 +111,6 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions[1].label).to.equal('\'maroon\'');
 		expect(suggestions[1].kind).to.equal(11);
-
 	});
 
 	it('should provide color values without quotes', async () => {
@@ -130,7 +124,6 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions[1].label).to.equal('\'maroon\'');
 		expect(suggestions[1].kind).to.equal(11);
-
 	});
 
 	it('should provide layout values', async () => {
@@ -147,6 +140,25 @@ describe('TSS Suggestions', () => {
 
 		expect(suggestions[2].label).to.equal('\'composite\'');
 		expect(suggestions[2].kind).to.equal(11);
+	});
 
+	it('should provide class completions', async () => {
+		const position = new vscode.Position(24, 3);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('foo');
+		expect(suggestions[0].kind).to.equal(17);
+	});
+
+	it('should provide id completions', async () => {
+		const position = new vscode.Position(26, 3);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('scrollView');
+		expect(suggestions[0].kind).to.equal(17);
 	});
 });

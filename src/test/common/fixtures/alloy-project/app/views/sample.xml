@@ -1,9 +1,15 @@
 <Alloy>
     <Tab title="test">
-        <Window onOpen >
+        <Window class="foo" onOpen >
             <ScrollView id="scrollView">
 
             </ScrollView>
         </Window>
+		<Label />
+		<Label color=""/>
+		<Label class=""/>
+		<Label id=""/>
+		<Require src=""/>
+		<Widget src=""/>
     </Tab>
 </Alloy>
