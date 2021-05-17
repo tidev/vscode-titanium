@@ -55,11 +55,10 @@ describe('View suggestions', () => {
 		expect(suggestions[3].label).to.equal('WindowToolbar');
 		expect(suggestions[3].kind).to.equal(6);
 		expect(suggestions[3].detail).to.equal('Ti.UI.Window.WindowToolbar');
-
 	});
 
 	it('Should provide event suggestions for', async () => {
-		const position = new vscode.Position(2, 22); // <Window onOpen
+		const position = new vscode.Position(2, 34); // <Window onOpen
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(1);
@@ -67,6 +66,65 @@ describe('View suggestions', () => {
 		expect(suggestions[0].label).to.equal('onOpen');
 		expect((suggestions[0].insertText as vscode.SnippetString).value).to.equal('onOpen="$1"$0');
 		expect(suggestions[0].kind).to.equal(22);
+	});
 
+	it('should provide attribute suggestion', async () => {
+		const position = new vscode.Position(7, 15);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(107);
+
+		expect(suggestions[0].label).to.equal('id');
+		expect(suggestions[0].kind).to.equal(9);
+	});
+
+	it('should provide attribute value suggestion', async () => {
+		const position = new vscode.Position(8, 22);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(24);
+
+		expect(suggestions[0].label).to.equal('transparent');
+		expect(suggestions[0].kind).to.equal(11);
+	});
+
+	it('should provide tss class suggestions', async () => {
+		const position = new vscode.Position(9, 22);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('container');
+		expect(suggestions[0].kind).to.equal(17);
+	});
+
+	it('should provide tss id suggestions', async () => {
+		const position = new vscode.Position(10, 19);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(2);
+
+		expect(suggestions[0].label).to.equal('label');
+		expect(suggestions[0].kind).to.equal(17);
+	});
+
+	it('should provide require src suggestions', async () => {
+		const position = new vscode.Position(11, 22);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(2);
+
+		expect(suggestions[0].label).to.equal('/existing-file');
+		expect(suggestions[0].kind).to.equal(17);
+	});
+
+	it('should provide widget src suggestions', async () => {
+		const position = new vscode.Position(12, 21);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('widget-test');
+		expect(suggestions[0].kind).to.equal(17);
 	});
 });
