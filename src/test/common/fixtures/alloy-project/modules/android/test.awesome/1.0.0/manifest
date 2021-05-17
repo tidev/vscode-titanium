@@ -1,0 +1,18 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 2
+architectures: armv7 arm64 i386 x86_64
+description: A test module
+author: A test person
+license: Apache-2.0
+copyright: Copyright (c) 2019 by Test Person
+
+# these should not be edited
+name: test-awesome
+moduleid: test.awesome
+guid: 11111111-1111-1111-1111-111111111111
+platform: iphone
+minsdk: 9.2.0
