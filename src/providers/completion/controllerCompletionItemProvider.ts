@@ -340,7 +340,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 			const position = document.positionAt(ids.index);
 			const closestId = document.getText(new Range(position.line, 0, position.line, position.character)).match(/<([a-zA-Z][-a-zA-Z]*)(?:\s|$)/);
 			if (closestId) {
-				tagName = matches[1];
+				tagName = closestId[1];
 			}
 		}
 
