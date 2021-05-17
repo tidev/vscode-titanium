@@ -154,7 +154,84 @@ describe('Controller suggestions', () => {
 
 			expect(suggestions[1].label).to.equal('addListener');
 			expect(suggestions[1].kind).to.equal(1);
+		});
 
+		it('should provide controller suggestion', async () => {
+			const position = new vscode.Position(10, 24);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(3);
+
+			expect(suggestions[0].label).to.equal('/existing-file');
+			expect(suggestions[0].kind).to.equal(17);
+		});
+
+		it('should provide model suggestion', async () => {
+			const position = new vscode.Position(11, 19);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(1);
+
+			expect(suggestions[0].label).to.equal('/test');
+			expect(suggestions[0].kind).to.equal(17);
+		});
+
+		it('should provide widget suggestion', async () => {
+			const position = new vscode.Position(12, 20);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(1);
+
+			expect(suggestions[0].label).to.equal('widget-test');
+			expect(suggestions[0].kind).to.equal(17);
+		});
+	});
+
+	describe('id completions', () => {
+		it('Should return id completions', async () => {
+			const position = new vscode.Position(6, 2); // $.
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(1);
+
+			expect(suggestions[0].label).to.equal('scrollView');
+			expect(suggestions[0].kind).to.equal(17);
+		});
+
+		it('should return completions for the type of id', async () => {
+			const position = new vscode.Position(7, 13); // $.scrollView.
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(272);
+			expect(suggestions[0].label).to.equal('addEventListener');
+			expect(suggestions[1].label).to.equal('removeEventListener');
+		});
+	});
+
+	describe('event name completions', () => {
+		it('Should return event name completions', async () => {
+			const position = new vscode.Position(8, 31); // $.scrollView.addEventListener('')
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(22);
+
+			expect(suggestions[0].label).to.equal('click');
+			expect(suggestions[0].kind).to.equal(22);
+
+			expect(suggestions[17].label).to.equal('scroll');
+			expect(suggestions[17].kind).to.equal(22);
+		});
+	});
+
+	describe('require completions', () => {
+		it('Should return lib files for equire', async () => {
+			const position = new vscode.Position(9, 9); // $.scrollView.addEventListener('')
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(1);
+
+			expect(suggestions[0].label).to.equal('/http');
+			expect(suggestions[0].kind).to.equal(17);
 		});
 	});
 });
