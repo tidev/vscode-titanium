@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 
 import Appc from '../../../appc';
 import { IosCertificateType } from '../../../types/common';
-import info from './fixtures/data/ti_info';
+import info from '../fixtures/ti_info';
 
 Appc.info = info;
 

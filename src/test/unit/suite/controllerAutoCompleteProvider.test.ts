@@ -1,39 +1,36 @@
 import { expect } from 'chai';
-import * as fs from 'fs';
-import { after, before, describe, it } from 'mocha';
-import * as path from 'path';
+import { afterEach, beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import { Project } from '../../../project';
 import * as vscode from 'vscode';
 
 import { ControllerCompletionItemProvider } from '../../../providers/completion/controllerCompletionItemProvider';
+import { getFileUri, loadCompletions } from '../utils';
+import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
 
-const fixturesPath = path.join(__dirname, '../../../..', 'src', 'test', 'unit', 'suite', 'fixtures');
-const file = path.join(fixturesPath, 'sample.js');
-const uri = vscode.Uri.file(file);
-const rawData = fs.readFileSync(path.join(fixturesPath, 'data', 'completions.json'), 'utf8');
-const completions = JSON.parse(rawData);
+const uri = getFileUri('controllers/sample.js');
 
 let sandbox: sinon.SinonSandbox;
 
 describe('Controller suggestions', () => {
 	const provider = new ControllerCompletionItemProvider();
 	async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
+		await vscode.window.showTextDocument(uri);
 		const text = await vscode.workspace.openTextDocument(uri);
 		return provider.provideCompletionItems(text, position);
 	}
 
-	before(async function () {
+	beforeEach(async function () {
 		this.timeout(5000);
+		const completions = loadCompletions();
 		sandbox = sinon.createSandbox();
-		sandbox.stub(provider, 'getProject').resolves(new Project('/test', 'app'));
+		sandbox.stub(provider, 'getProject').resolves(new Project(getCommonAlloyProjectDirectory(), 'app'));
 		sandbox.stub(provider, 'getCompletions').resolves(completions);
 	});
 
-	after(async function () {
+	afterEach(async function () {
 		this.timeout(5000);
 		sandbox.restore();
-
 	});
 
 	describe('Ti namespace suggestions', () => {
