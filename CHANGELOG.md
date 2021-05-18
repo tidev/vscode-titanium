@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.11.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.10.0...v0.11.0) (2021-05-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removes the Generate Completions command as it is no longer required to regenerate completions manually, and removes the Init command as it is also no longer required
+* Removes the item in the status bar that displayed the app name and sdk version and the command that would open the project on the platform
+
+### Features
+
+* support using OSS tooling ([49f6e8e](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/49f6e8e2167c965e1d68b8228beb86aef22f803d))
+* **explorer:** add new help and feedback view ([#579](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/579)) ([f8e0382](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/f8e0382b658857005051ea6cd05446e08d19f12e))
+* add welcome view for no titanium project open state ([e43fc63](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/e43fc63e86b65cc422e50275290b64b047276f92))
+* add welcome view for no tooling installed state ([8ff9a6c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/8ff9a6c024d407709fed140574fb4151900742e5))
+* surface error from environment detection if one occurs ([4c3de15](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/4c3de151071877c4143ef496b0bee0ff4175608b))
+
+
+### Bug Fixes
+
+* **debugging:** adapt to iOS 13.4 changes for displaying variables in debugger sidebar ([ddf183a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ddf183a22b2ec49de5e9f1d5e92c5956f1ce47d5))
+* **tasks/build:** check cancellation status before closing terminal ([10feca5](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/10feca5d18b10651fff7f825f900403c5bfa5e69))
+* **updates:** close update progress when finished ([2f5fc62](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/2f5fc62680515c83f120c7f37e2247013dd83ad2))
+* **updates:** only install selected updates ([1007886](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/10078869684ad409a60e6dfcaaa658c8c9935550))
+
+
+* remove statusbaritem and associated command ([977ce56](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/977ce5662015e8486b36ec277de2faf9da494d14))
+* remove unnecessary commands ([ed7cff9](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ed7cff9a564e53019e9cab3f821c5066a2d3f4ce))
+
 ### [0.10.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.10.0...v0.10.1) (2021-02-16)
 
 
