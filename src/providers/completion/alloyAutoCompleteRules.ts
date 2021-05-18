@@ -45,7 +45,7 @@ export const cfgAutoComplete: AlloyAutoCompleteRule = {
 };
 
 export const i18nAutoComplete: AlloyAutoCompleteRule = {
-	regExp: /(L\(|titleid\s*[:=]\s*)["'](\w*["']?)$/,
+	regExp: /(L\(|(?:hinttext|title|text)id\s*[:=]\s*)["'](\w*["']?)$/,
 	async getCompletions (projectDir) {
 		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
 		const i18nPath = await projectDir.getI18NPath();
@@ -77,12 +77,12 @@ export const imageAutoComplete: AlloyAutoCompleteRule = {
 	requireRange: true,
 	rangeRegex: /([\w/.$]+)/,
 	async getCompletions (projectDir, range) {
-		const rootPath = await projectDir.isAlloyProject() ? path.join(projectDir.filePath) : projectDir.filePath;
+		const rootPath = await projectDir.isAlloyProject() ? path.join(projectDir.filePath, 'app') : projectDir.filePath;
 		const assetPath = path.join(rootPath, 'assets');
 		const completions: CompletionItem[] = [];
 		// limit search to these sub-directories
-		let paths = [ 'images', 'iphone', 'android', 'windows' ];
-		paths = paths.map(aPath => path.join(assetPath, aPath));
+		let paths = [ 'images', 'iphone', 'android' ];
+		paths = [ ...paths.map(aPath => path.join(assetPath, aPath)), assetPath];
 
 		for (const imgPath of paths) {
 			if (!utils.directoryExists(imgPath)) {
