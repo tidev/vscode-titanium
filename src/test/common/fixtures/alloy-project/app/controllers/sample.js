@@ -11,3 +11,5 @@ require('')
 Alloy.createController('')
 Alloy.createModel('')
 Alloy.createWidget('')
+Alloy.CFG.
+L('')
