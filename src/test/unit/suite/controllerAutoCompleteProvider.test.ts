@@ -185,6 +185,26 @@ describe('Controller suggestions', () => {
 			expect(suggestions[0].label).to.equal('widget-test');
 			expect(suggestions[0].kind).to.equal(17);
 		});
+
+		it('should complete Alloy.CFG', async () => {
+			const position = new vscode.Position(13, 10);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(1);
+
+			expect(suggestions[0].label).to.equal('test');
+			expect(suggestions[0].kind).to.equal(11);
+		});
+
+		it('should provide i18n strings', async () => {
+			const position = new vscode.Position(14, 3);
+			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+			expect(suggestions.length).to.equal(1);
+
+			expect(suggestions[0].label).to.equal('test');
+			expect(suggestions[0].kind).to.equal(17);
+		});
 	});
 
 	describe('id completions', () => {
