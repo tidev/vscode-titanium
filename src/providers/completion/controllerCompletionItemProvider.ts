@@ -59,18 +59,18 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		// Alloy.createWidget('')
 		} else if (/Alloy\.(createWidget|Widgets\.instance)\(["']([-a-zA-Z0-9-_/.]*)$/.test(linePrefix)) {
 			return this.getWidgetCompletions(project);
-			// Alloy APIs - Alloy._
-		} else if (/(?:Alloy)\.?\S+/.test(linePrefix)) {
+		// Alloy APIs - Alloy._, but ignore Alloy.CFG. to fall through to else
+		} else if (/(?:Alloy)\.?(?!.*CFG)\S+/.test(linePrefix)) {
 			return this.getAlloyApiCompletions(linePrefix, project);
 		} else {
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
 				if (rule.regExp.test(linePrefix)) {
 					if (rule.requireRange) {
 						const range = document.getWordRangeAtPosition(position, rule.rangeRegex);
-						return await rule.getCompletions(project, range);
+						return rule.getCompletions(project, range);
 					}
 
-					return await rule.getCompletions(project);
+					return rule.getCompletions(project);
 				}
 			}
 		}
