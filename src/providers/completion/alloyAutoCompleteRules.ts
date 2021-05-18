@@ -47,7 +47,7 @@ export const cfgAutoComplete: AlloyAutoCompleteRule = {
 export const i18nAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /(L\(|(?:hinttext|title|text)id\s*[:=]\s*)["'](\w*["']?)$/,
 	async getCompletions (projectDir) {
-		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
+		const defaultLang = ExtensionContainer.config?.project.defaultI18nLanguage || 'en';
 		const i18nPath = await projectDir.getI18NPath();
 		const completions: CompletionItem[] = [];
 		if (!i18nPath || !await pathExists(i18nPath)) {
