@@ -161,4 +161,24 @@ describe('TSS Suggestions', () => {
 		expect(suggestions[0].label).to.equal('scrollView');
 		expect(suggestions[0].kind).to.equal(17);
 	});
+
+	it('should provide i18n completions',  async () => {
+		const position = new vscode.Position(29, 13);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('test');
+		expect(suggestions[0].kind).to.equal(17);
+	});
+
+	it('should provide image completions', async () => {
+		const position = new vscode.Position(33, 12);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('/test.png');
+		expect(suggestions[0].kind).to.equal(16);
+	});
 });
