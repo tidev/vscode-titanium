@@ -4,6 +4,7 @@ import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, Tita
 import { Helpers } from './helpers';
 import { TaskExecutionContext } from './tasksHelper';
 import { selectDistributionTarget } from '../quickpicks/build/common';
+import { DeploymentTarget } from '../types/cli';
 
 export interface PackageTask extends TitaniumTaskBase {
 	definition: PackageTaskDefinitionBase;
@@ -22,7 +23,7 @@ export interface ModulePackageTaskTitaniumBuildBase extends PackageTaskTitaniumB
 }
 
 export interface AppPackageTaskTitaniumBuildBase extends PackageTaskTitaniumBuildBase {
-	target?: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
+	target?: DeploymentTarget;
 	projectType?: 'app';
 }
 

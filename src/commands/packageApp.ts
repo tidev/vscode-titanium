@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
+import { DistributeNode, PlatformNode } from '../explorer/nodes';
 import { checkLogin, handleInteractionError, InteractionError } from './common';
 
 import { selectPlatform } from '../quickpicks/common';
@@ -9,12 +9,20 @@ import { WorkspaceState } from '../constants';
 import { nameForPlatform, nameForTarget } from '../utils';
 import { PackageTask, AppPackageTaskTitaniumBuildBase } from '../tasks/packageTaskProvider';
 import { Platform } from '../types/common';
+import { DeploymentTarget } from '../types/cli';
 
 interface LastState extends AppPackageTaskTitaniumBuildBase {
-	target: 'dist-appstore' | 'dist-adhoc' | 'dist-playstore';
+	target: DeploymentTarget;
 }
 
-export async function packageApplication (node: DeviceNode | OSVerNode | PlatformNode | TargetNode): Promise<void> {
+function isDistributeNode(node: PlatformNode | DistributeNode): node is DistributeNode {
+	if (node.contextValue === 'DistributeNode') {
+		return true;
+	}
+	return false;
+}
+
+export async function packageApplication (node: PlatformNode | DistributeNode): Promise<void> {
 	try {
 		checkLogin();
 
@@ -55,6 +63,8 @@ export async function packageApplication (node: DeviceNode | OSVerNode | Platfor
 
 		if (buildChoice === 'last') {
 			Object.assign(taskDefinition.definition.titaniumBuild, lastState);
+		} else if (isDistributeNode(node)) {
+			(taskDefinition.definition.titaniumBuild as AppPackageTaskTitaniumBuildBase).target = node.targetId;
 		}
 
 		const task = await getPackageTask(taskDefinition);
