@@ -2,6 +2,7 @@ export * from './nodes/baseNode';
 export * from './nodes/blankNode';
 export * from './nodes/commandNode';
 export * from './nodes/deviceNode';
+export * from './nodes/distributeNode';
 export * from './nodes/osVerNode';
 export * from './nodes/platformNode';
 export * from './nodes/targetNode';
