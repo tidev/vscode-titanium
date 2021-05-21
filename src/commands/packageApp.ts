@@ -15,14 +15,14 @@ interface LastState extends AppPackageTaskTitaniumBuildBase {
 	target: DeploymentTarget;
 }
 
-function isDistributeNode(node: PlatformNode | DistributeNode): node is DistributeNode {
-	if (node.contextValue === 'DistributeNode') {
+function isDistributeNode(node?: PlatformNode | DistributeNode): node is DistributeNode {
+	if (node?.contextValue === 'DistributeNode') {
 		return true;
 	}
 	return false;
 }
 
-export async function packageApplication (node: PlatformNode | DistributeNode): Promise<void> {
+export async function packageApplication (node?: PlatformNode | DistributeNode): Promise<void> {
 	try {
 		checkLogin();
 
