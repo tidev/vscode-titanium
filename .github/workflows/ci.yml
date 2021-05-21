@@ -41,13 +41,9 @@ jobs:
           run: npm run test
 
   Integration-Test:
-    name: ${{ matrix.version }} - Integration Tests
+    name: Integration Tests - latest VS Code
     runs-on: macos-latest
     needs: Lint
-    strategy:
-      fail-fast: false
-      matrix:
-        version: [ 1.49.0, latest, insider ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -61,4 +57,4 @@ jobs:
       - name: Run Integration Tests
         run: npm run test:integration
         env:
-          CODE_VERSION: ${{ matrix.version }}
+          CODE_VERSION: latest
