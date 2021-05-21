@@ -1,0 +1,41 @@
+name: Daily Integration Tests
+on:
+  schedule:
+    - cron: 0 10 * * *
+
+jobs:
+  Check-For-Changes:
+    name: Check for changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check for commit
+        run:  |
+          gitLog="$(git log --since='24 hours ago')"
+          if [ -z "$gitLog"]
+          then
+            exit 1
+          fi
+
+  Integration-Test:
+    name: ${{ matrix.version }} - Integration Tests
+    runs-on: macos-latest
+    needs: Check-For-Changes
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [ 1.49.0, latest, insider ]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+      - name: Install dependencies and requirements
+        run: |
+          npm ci
+          npm i titanium alloy -g
+          ti sdk install latest
+      - name: Run Integration Tests
+        run: npm run test:integration
+        env:
+          CODE_VERSION: ${{ matrix.version }}
