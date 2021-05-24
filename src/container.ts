@@ -33,6 +33,7 @@ export class ExtensionContainer {
 		this._appc = appc;
 		this._config = config;
 		this._context = context;
+		this._recentBuilds = new Map(context.workspaceState.get(WorkspaceState.RecentBuilds) || []);
 	}
 
 	static get appc (): Appc {
