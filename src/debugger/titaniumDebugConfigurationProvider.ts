@@ -22,10 +22,6 @@ function validateTask (task: AppBuildTaskDefinitionBase, ourConfig: vscode.Debug
 export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 	public async resolveDebugConfiguration (folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration): Promise<vscode.DebugConfiguration> {
-		if (!config.projectDir) {
-			config.projectDir = '${workspaceFolder}'; // eslint-disable-line no-template-curly-in-string
-		}
-
 		const ourConfig: vscode.DebugConfiguration = {
 			...config
 		};
@@ -66,6 +62,10 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 				ourConfig.port = preLaunchTask.titaniumBuild.debugPort;
 				ourConfig.debugPort = preLaunchTask.titaniumBuild.debugPort;
 			}
+		}
+
+		if (!ourConfig.projectDir) {
+			ourConfig.projectDir = folder?.uri.fsPath || (await promptForWorkspaceFolder()).folder.uri.fsPath;
 		}
 
 		if (!ourConfig.platform) {
