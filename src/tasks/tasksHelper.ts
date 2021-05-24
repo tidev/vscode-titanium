@@ -14,7 +14,6 @@ export interface RunningTask {
 	buildOptions: AppBuildTaskTitaniumBuildBase;
 }
 
-export const runningTasks: Map<string, RunningTask> = new Map();
 export const debugSessionInformation: Map<string, DeviceNode> = new Map();
 export const DEBUG_SESSION_VALUE = 'DEBUG_SESSION_VALUE';
 

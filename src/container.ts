@@ -8,7 +8,7 @@ import { HelpExplorer } from './explorer/helpExplorer';
 import DeviceExplorer from './explorer/tiExplorer';
 import { startup } from './extension';
 import { AppBuildTaskTitaniumBuildBase } from './tasks/buildTaskProvider';
-import { isDistributionAppBuild } from './tasks/tasksHelper';
+import { isDistributionAppBuild, RunningTask } from './tasks/tasksHelper';
 import { AppPackageTaskTitaniumBuildBase } from './tasks/packageTaskProvider';
 import { Project } from './project';
 import { generateCompletions } from './providers';
@@ -24,6 +24,7 @@ export class ExtensionContainer {
 	private static _helpExplorer: HelpExplorer;
 	private static _projects: Map<string, Project> = new Map();
 	private static _runningTask: vscode.TaskExecution|undefined;
+	private static _runningTasks: Map<string, RunningTask> = new Map();
 	private static _terminal: Terminal;
 	private static _updateInfo: UpdateInfo[];
 	private static _recentBuilds: Map<string, AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase>;
@@ -99,6 +100,10 @@ export class ExtensionContainer {
 
 	static get projects (): Map<string, Project> {
 		return this._projects;
+	}
+
+	static get runningTasks (): Map<string, RunningTask> {
+		return this._runningTasks;
 	}
 
 	/**
