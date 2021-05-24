@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase } from './commandTaskProvider';
-import { TaskExecutionContext, runningTasks } from './tasksHelper';
+import { TaskExecutionContext } from './tasksHelper';
 import * as cp from 'child_process';
 import { ExtensionContainer } from '../container';
 import { GlobalState } from '../constants';
@@ -111,8 +111,8 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 		this.closeEmitter.fire(code || 0);
 		ExtensionContainer.context.globalState.update(GlobalState.Running, false);
 		vscode.commands.executeCommand('setContext', GlobalState.Running, false);
-		if (runningTasks.has(this.task.name)) {
-			runningTasks.delete(this.task.name);
+		if (ExtensionContainer.runningTasks.has(this.task.name)) {
+			ExtensionContainer.runningTasks.delete(this.task.name);
 		}
 	}
 

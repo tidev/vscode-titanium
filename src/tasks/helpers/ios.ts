@@ -1,4 +1,4 @@
-import { TaskExecutionContext, runningTasks } from '../tasksHelper';
+import { TaskExecutionContext } from '../tasksHelper';
 import { selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
 import { getCorrectCertificateName } from '../../utils';
 import { IosCertificateType, IosCert } from '../../types/common';
@@ -9,6 +9,7 @@ import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTask
 import { WorkspaceState } from '../../constants';
 
 import appc from '../../appc';
+import { ExtensionContainer } from '../../container';
 
 export interface IosTitaniumBuildDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: IosBuildTaskTitaniumBuildBase;
@@ -76,7 +77,7 @@ export class IosHelper extends TaskHelper {
 		}
 
 		this.storeLastState(WorkspaceState.LastBuildState, definition);
-		runningTasks.set(context.label, { buildOptions: definition });
+		ExtensionContainer.runningTasks.set(context.label, { buildOptions: definition });
 
 		return builder.resolve();
 	}

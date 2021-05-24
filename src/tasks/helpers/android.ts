@@ -1,4 +1,4 @@
-import { TaskExecutionContext, runningTasks } from '../tasksHelper';
+import { TaskExecutionContext } from '../tasksHelper';
 import { TaskHelper } from './base';
 import { Command } from '../commandBuilder';
 import { enterAndroidKeystoreInfo } from '../../quickpicks/build/android';
@@ -6,6 +6,7 @@ import { KeystoreInfo } from '../../types/common';
 import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
+import { ExtensionContainer } from '../../container';
 
 export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: AndroidBuildTaskTitaniumBuildBase;
@@ -39,7 +40,7 @@ export class AndroidHelper extends TaskHelper {
 		}
 
 		this.storeLastState(WorkspaceState.LastBuildState, definition);
-		runningTasks.set(context.label, { buildOptions: definition });
+		ExtensionContainer.runningTasks.set(context.label, { buildOptions: definition });
 
 		return builder.resolve();
 	}

@@ -4,7 +4,6 @@ import { MESSAGE_STRING, Request, TitaniumLaunchRequestArgs, FeedbackOptions, Re
 import { BuildAppOptions } from '../types/cli';
 import { ExtensionContainer } from '../container';
 import appc from '../appc';
-import {  runningTasks } from '../tasks/tasksHelper';
 import { Commands } from '../commands';
 
 async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise<void> {
@@ -25,7 +24,7 @@ async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise
 			// on the label, so we need remove that to lookup the task
 			const taskLabel = providedArgs.preLaunchTask.replace('Titanium:', '').trim();
 
-			const runningTask = runningTasks.get(taskLabel);
+			const runningTask = ExtensionContainer.runningTasks.get(taskLabel);
 
 			if (!runningTask) {
 				response.result.isError = true;
