@@ -21,6 +21,7 @@ export class ExtensionContainer {
 	private static _buildExplorer: DeviceExplorer;
 	private static _config: Config | undefined;
 	private static _context: vscode.ExtensionContext;
+	private static _debugPorts = new Map<string, number>();
 	private static _helpExplorer: HelpExplorer;
 	private static _projects: Map<string, Project> = new Map();
 	private static _runningTask: vscode.TaskExecution|undefined;
@@ -105,6 +106,10 @@ export class ExtensionContainer {
 
 	static get runningTasks (): Map<string, RunningTask> {
 		return this._runningTasks;
+	}
+
+	static get debugPorts(): Map<string, number> {
+		return this._debugPorts;
 	}
 
 	/**

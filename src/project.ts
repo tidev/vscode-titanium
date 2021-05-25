@@ -117,7 +117,6 @@ export class Project {
 	 */
 	private async loadTiappFile  (): Promise<void> {
 		this.isValidTiapp = false;
-		let error: InteractionError | undefined;
 		const filePath = path.join(this.filePath, TIAPP_FILENAME);
 
 		if (!await fs.pathExists(filePath)) {

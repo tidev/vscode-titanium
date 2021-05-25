@@ -11,21 +11,10 @@ export async function determineProjectType (projectDirectory: string): Promise<'
 }
 
 export async function getAppName (projectDirectory: string): Promise<string> {
-	return new Promise((resolve, reject) => {
-		try {
-			const tiappPath = path.join(projectDirectory, 'tiapp.xml');
-			const fileData = fs.readFileSync(tiappPath, 'utf-8');
-			const parser = new xml2js.Parser();
-			parser.parseString(fileData, (err: Error, result: any) => {
-				if (!err) {
-					return resolve(result['ti:app'].name[0]);
-				}
-			});
-		} catch (error) {
-			return reject(error);
-		}
-	});
-
+	const tiappPath = path.join(projectDirectory, 'tiapp.xml');
+	const fileData = fs.readFileSync(tiappPath, 'utf-8');
+	const result = await parseXmlString(fileData) as { 'ti:app': { name: string[] }};
+	return result['ti:app'].name[0];
 }
 
 export function parseXmlString (xmlString: string): Promise<unknown> {

@@ -35,8 +35,12 @@ export class AndroidHelper extends TaskHelper {
 
 		await this.resolveCommonAppOptions(context, definition, builder);
 
-		if (definition.debugPort || definition.debug) {
-			builder.addOption('--debug-host', `/localhost:${definition.debugPort || '9000'}`);
+		if (definition.debug) {
+			const port = definition.debugPort || ExtensionContainer.debugPorts.get(definition.projectDir);
+			if (!port) {
+				throw new Error(`Failed to find debug port associated with ${definition.projectDir}. Please try setting a "port" property in the configuration.`);
+			}
+			builder.addOption('--debug-host', `/localhost:${port}`);
 		}
 
 		this.storeLastState(WorkspaceState.LastBuildState, definition);
