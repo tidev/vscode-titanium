@@ -82,7 +82,7 @@ export const imageAutoComplete: AlloyAutoCompleteRule = {
 		const completions: CompletionItem[] = [];
 		// limit search to these sub-directories
 		let paths = [ 'images', 'iphone', 'android' ];
-		paths = [ ...paths.map(aPath => path.join(assetPath, aPath)), assetPath];
+		paths = [ ...paths.map(aPath => path.join(assetPath, aPath)), assetPath ];
 
 		for (const imgPath of paths) {
 			if (!utils.directoryExists(imgPath)) {
