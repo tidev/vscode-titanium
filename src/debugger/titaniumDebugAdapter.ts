@@ -73,8 +73,11 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return super.globalEvaluate(args);
 	}
 
-	private attachAndroid (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
-		return super.attach(attachArgs);
+	private async attachAndroid (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
+		// Rather than attaching straight away, wait for a small amount of time to allow the app
+		// to load and setup the debugger
+		await sleep(500);
+		await super.attach(attachArgs);
 	}
 
 	private async attachIOS (attachArgs: TitaniumAttachRequestArgs): Promise<void> {

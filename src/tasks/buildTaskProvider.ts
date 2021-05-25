@@ -63,8 +63,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 						platform: platform as Platform,
 						projectType: 'app',
 						projectDir: folder.uri.fsPath,
-						liveview: false,
-						debugPort: 9000
+						liveview: false
 					},
 					label: name,
 					name,

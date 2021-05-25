@@ -136,8 +136,7 @@
               },
               "port": {
                 "type": "number",
-                "description": "Port number to use for the debugger",
-                "defaultValue": 9000
+                "description": "Port number to use for the debugger"
               },
               "preLaunchTask": {
                 "type": "string",
