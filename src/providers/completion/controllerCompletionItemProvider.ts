@@ -378,7 +378,8 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 			const files = utils.filterJSFiles(filesPath);
 
 			for (const file of files) {
-				const value = `/${path.posix.relative(filesPath, file.path).replace('.js', '')}`;
+				const relativePath = path.relative(filesPath, file.path);
+				const value = `/${path.posix.format(path.parse(relativePath)).replace('.js', '')}`;
 				const completionItem: CompletionItem = {
 					label: value,
 					kind: CompletionItemKind.Reference
