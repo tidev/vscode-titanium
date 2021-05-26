@@ -12,7 +12,6 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	private activeRequests = new Map();
 	private deviceId: string|undefined;
 	private idCount = 0;
-	private isDisconnecting = false;
 	private platform: string|undefined;
 	private port: number|undefined;
 	private server!: ProxyServer;
@@ -59,7 +58,6 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	}
 
 	public async disconnect (args: DebugProtocol.DisconnectArguments): Promise<void> {
-		this.isDisconnecting = true;
 		await this.cleanup();
 		return super.disconnect(args);
 	}

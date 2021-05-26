@@ -7,7 +7,7 @@ import { OSVerNode } from './osVerNode';
 import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
-import { DevelopmentTarget } from '../../types/cli';
+import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../types/cli';
 import { BlankNode } from '../nodes';
 import { ExtensionContainer } from '../../container';
 import { GlobalState } from '../../constants';
@@ -19,7 +19,7 @@ export class TargetNode extends BaseNode {
 	public readonly targetId: DevelopmentTarget;
 
 	constructor (
-		public readonly label: string,
+		public readonly label: PrettyDevelopmentTarget,
 		public readonly platform: Platform
 	) {
 		super(label);
@@ -52,7 +52,7 @@ export class TargetNode extends BaseNode {
 						devices.push(new DeviceNode(label, this.platform, this.label, device.udid, this.targetId));
 					}
 					break;
-				case 'Package':
+				case 'Package' as PrettyDevelopmentTarget:
 					devices.push(new DistributeNode('Adhoc', this.platform, this.label, 'dist-adhoc'));
 					devices.push(new DistributeNode('App Store', this.platform, this.label, 'dist-appstore'));
 					break;
@@ -75,7 +75,7 @@ export class TargetNode extends BaseNode {
 						}
 					}
 					break;
-				case 'Package':
+				case 'Package' as PrettyDevelopmentTarget:
 					devices.push(new DistributeNode('Play Store', this.platform, this.label, 'dist-playstore'));
 					break;
 			}

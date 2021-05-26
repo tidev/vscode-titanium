@@ -1,7 +1,7 @@
 import { TaskExecutionContext } from '../tasksHelper';
 import { selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
 import { getCorrectCertificateName } from '../../utils';
-import { IosCertificateType, IosCert } from '../../types/common';
+import { IosCert } from '../../types/common';
 import { TaskHelper } from './base';
 import { Command } from '../commandBuilder';
 import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
@@ -59,7 +59,7 @@ export class IosHelper extends TaskHelper {
 				throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
 			}
 
-			iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], IosCertificateType.developer);
+			iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], 'developer');
 
 			if (!iosInfo.provisioningProfile) {
 				iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).uuid;
@@ -94,14 +94,14 @@ export class IosHelper extends TaskHelper {
 		if (!iosInfo.certificate) {
 			certificate = await selectiOSCertificate('distribute');
 		} else {
-			certificate = appc.iOSCertificates(IosCertificateType.distribution).find(cert => cert.fullname === iosInfo.certificate);
+			certificate = appc.iOSCertificates('distribution').find(cert => cert.fullname === iosInfo.certificate);
 		}
 
 		if (!certificate) {
 			throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
 		}
 
-		iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], IosCertificateType.distribution);
+		iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], 'distribution');
 
 		if (!iosInfo.provisioningProfile) {
 			iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).uuid;

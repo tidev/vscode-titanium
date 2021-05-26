@@ -8,10 +8,6 @@ export enum VSCodeCommands {
 	OpenSettings = 'workbench.action.openSettings'
 }
 
-export enum CommandContext {
-
-}
-
 export enum GlobalState {
 	Enabled = 'titanium:enabled',
 	Liveview = 'titanium:liveview',

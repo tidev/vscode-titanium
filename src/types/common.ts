@@ -42,15 +42,11 @@ export enum LogLevel {
 	Warn = 'warn'
 }
 
-export enum IosCertificateType {
-	developer = 'developer',
-	distribution = 'distribution'
-}
+export type IosCertificateType = 'developer' | 'distribution';
 
-export enum PlatformPretty {
-	android = 'Android',
-	ios = 'iOS'
-}
+export type IosProvisioningType = 'development' | 'distribution' | 'appstore';
+
+export type PlatformPretty = 'Android' | 'iOS';
 
 export type Platform = 'android' | 'ios';
 

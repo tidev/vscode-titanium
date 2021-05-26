@@ -6,6 +6,7 @@ import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
 import { Project } from '../../project';
+import { pathExists } from 'fs-extra';
 /**
  * Alloy View completion provider
  */
@@ -237,19 +238,21 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 			//
 			if (tag === 'Require') {
 				const controllerPath = path.join(project.filePath, 'app', 'controllers');
-				if (utils.directoryExists(controllerPath)) {
-					const files = utils.filterJSFiles(controllerPath);
-					const relatedControllerFile = related.getTargetPath(project, 'js', document.fileName);
-					for (const file of files) {
-						if (relatedControllerFile === file.path) {
-							continue;
-						}
-						const value = utils.toUnixPath(file.path.replace(controllerPath, '').split('.')[0]);
-						completions.push({
-							label: value,
-							kind: CompletionItemKind.Reference
-						});
+				if (!await pathExists(controllerPath)) {
+					return completions;
+				}
+
+				const files = utils.filterJSFiles(controllerPath);
+				const relatedControllerFile = related.getTargetPath(project, 'js', document.fileName);
+				for (const file of files) {
+					if (relatedControllerFile === file.path) {
+						continue;
 					}
+					const value = utils.toUnixPath(file.path.replace(controllerPath, '').split('.')[0]);
+					completions.push({
+						label: value,
+						kind: CompletionItemKind.Reference
+					});
 				}
 				return completions;
 			//

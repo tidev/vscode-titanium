@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { TitaniumDebugConfigurationProvider } from './titaniumDebugConfigurationProvider';
 import { MESSAGE_STRING, Request, TitaniumLaunchRequestArgs, FeedbackOptions, Response } from '../common/extensionProtocol';
-import { BuildAppOptions } from '../types/cli';
 import { ExtensionContainer } from '../container';
 import appc from '../appc';
 import { Commands } from '../commands';
@@ -48,7 +47,7 @@ async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise
 					break;
 			}
 		} else if (request.code === 'END') {
-			const providedArgs = request.args as BuildAppOptions & TitaniumLaunchRequestArgs;
+			const providedArgs = request.args as TitaniumLaunchRequestArgs;
 			await vscode.commands.executeCommand(Commands.StopBuild);
 
 			if (providedArgs.platform !== 'android') {

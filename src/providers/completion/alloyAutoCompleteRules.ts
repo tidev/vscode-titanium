@@ -20,25 +20,26 @@ export const cfgAutoComplete: AlloyAutoCompleteRule = {
 	async getCompletions (projectDir) {
 		const cfgPath = path.join(projectDir.filePath, 'app', 'config.json');
 		const completions: CompletionItem[] = [];
-		if (utils.fileExists(cfgPath)) {
-			const document = await workspace.openTextDocument(cfgPath);
-			const cfgObj = JSON.parse(document.getText());
-			const deconstructedConfig = {};
+		if (!await pathExists(cfgPath)) {
+			return completions;
+		}
+		const document = await workspace.openTextDocument(cfgPath);
+		const cfgObj = JSON.parse(document.getText());
+		const deconstructedConfig = {};
 
-			for (const [ key, value ] of Object.entries(cfgObj)) {
-				if (key === 'global' || key.startsWith('os:') || key.startsWith('env:')) {
-					// Ignore and traverse
-					Object.assign(deconstructedConfig, value);
-				}
+		for (const [ key, value ] of Object.entries(cfgObj)) {
+			if (key === 'global' || key.startsWith('os:') || key.startsWith('env:')) {
+				// Ignore and traverse
+				Object.assign(deconstructedConfig, value);
 			}
+		}
 
-			const allKeys = utils.getAllKeys(deconstructedConfig);
-			for (const key of allKeys) {
-				completions.push({
-					label: key,
-					kind: CompletionItemKind.Value
-				});
-			}
+		const allKeys = utils.getAllKeys(deconstructedConfig);
+		for (const key of allKeys) {
+			completions.push({
+				label: key,
+				kind: CompletionItemKind.Value
+			});
 		}
 		return completions;
 	}
@@ -55,17 +56,19 @@ export const i18nAutoComplete: AlloyAutoCompleteRule = {
 		}
 
 		const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
-		if (utils.fileExists(i18nStringPath)) {
-			const document = await workspace.openTextDocument(i18nStringPath);
-			const result = await parseXmlString(document.getText()) as { resources: { string: { $: { name: string }; _: string }[] } };
-			if (result && result.resources && result.resources.string) {
-				for (const value of result.resources.string) {
-					completions.push({
-						label: value.$.name,
-						kind: CompletionItemKind.Reference,
-						detail: value._
-					});
-				}
+
+		if (!await pathExists(i18nStringPath)) {
+			return completions;
+		}
+		const document = await workspace.openTextDocument(i18nStringPath);
+		const result = await parseXmlString(document.getText()) as { resources: { string: { $: { name: string }; _: string }[] } };
+		if (result && result.resources && result.resources.string) {
+			for (const value of result.resources.string) {
+				completions.push({
+					label: value.$.name,
+					kind: CompletionItemKind.Reference,
+					detail: value._
+				});
 			}
 		}
 		return completions;
@@ -85,7 +88,7 @@ export const imageAutoComplete: AlloyAutoCompleteRule = {
 		paths = [ ...paths.map(aPath => path.join(assetPath, aPath)), assetPath ];
 
 		for (const imgPath of paths) {
-			if (!utils.directoryExists(imgPath)) {
+			if (!await pathExists(imgPath)) {
 				continue;
 			}
 			const files = walkSync(imgPath, {

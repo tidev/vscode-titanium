@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import appc from '../../appc';
-import * as utils from '../../utils';
 
 import { CompletionItem, CompletionItemKind, Position, Range, TextDocument } from 'vscode';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
@@ -61,7 +60,8 @@ export class TiappCompletionItemProvider extends BaseCompletionItemProvider {
 			 * - Add support for the deploy type tag
 			 */
 			const modulePath = path.join(project.filePath, 'modules');
-			if (!utils.directoryExists(modulePath)) {
+
+			if (!await fs.pathExists(modulePath)) {
 				return completions;
 			}
 			const modules: { [key: string]: { platforms: string[] } } = {};
