@@ -3,14 +3,14 @@ import { EditorView, VSBrowser, WebDriver } from 'vscode-extension-tester';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
-import { ProjectCreator } from '../../util/create';
+import { Project } from '../../util/project';
 import { dismissNotifications } from '../../util/common';
 
 describe('Module creation', function () {
 	this.timeout(30000);
 
 	let browser: VSBrowser;
-	let creator: ProjectCreator;
+	let creator: Project;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
 
@@ -23,7 +23,7 @@ describe('Module creation', function () {
 		await browser.waitForWorkbench();
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
-		creator = new ProjectCreator(driver);
+		creator = new Project(driver);
 		await creator.waitForGetStarted();
 	});
 
