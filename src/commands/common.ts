@@ -21,7 +21,7 @@ export enum Commands {
 	GenerateAlloyStyle = 'titanium.alloy.generate.style',
 	GenerateAlloyView = 'titanium.alloy.generate.view',
 	GenerateAlloyWidget = 'titanium.alloy.generate.widget',
-	GenerateAutocomplete = 'titanium.generate.autocompleteSuggestions',
+	GenerateTask = 'titanium.task.generate',
 	InstallAllUpdates = 'titanium.updates.installAll',
 	InstallUpdate = 'titanium.updates.install',
 	OpenAllRelatedFiles = 'titanium.alloy.open.allRelatedFiles',

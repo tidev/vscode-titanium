@@ -5,9 +5,8 @@ import * as utils from './utils';
 
 import { Range, window, workspace } from 'vscode';
 import { handleInteractionError, InteractionError } from './commands/common';
-import { Platform } from './types/common';
+import { Platform, ProjectType } from './types/common';
 import { parseXmlString } from './common/utils';
-import { ProjectType } from './tasks/tasksHelper';
 
 const TIAPP_FILENAME = 'tiapp.xml';
 const TIMODULEXML_FILENAME = 'timodule.xml';

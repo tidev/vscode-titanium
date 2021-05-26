@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
-import { TaskExecutionContext, ProjectType } from './tasksHelper';
+import { TaskExecutionContext } from './tasksHelper';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
 import { UserCancellation, handleInteractionError, InteractionError, checkLogin } from '../commands/common';
-import { LogLevel, Platform } from '../types/common';
+import { LogLevel, Platform, ProjectType } from '../types/common';
 import { CommandError } from '../common/utils';
 import { Command } from './commandBuilder';
 
