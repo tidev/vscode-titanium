@@ -263,7 +263,7 @@ export class CommonUICreator {
  *
  * @returns {String}
  */
-export function getFixturesDirectory (): string {
+export function getIntegrationFixturesDirectory (): string {
 	return path.join(__dirname, '../../../..', 'src', 'test', 'integration', 'fixtures');
 }
 
