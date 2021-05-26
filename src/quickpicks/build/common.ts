@@ -51,7 +51,7 @@ export function selectBuildTarget (platform: Platform): Promise<CustomQuickPick>
 	const targets = utils.targetsForPlatform(platform)
 		.filter(target => !/^dist/.test(target))
 		.map(target => ({ label: utils.nameForTarget(target), id: target }));
-	return quickPick(targets);
+	return quickPick(targets, { placeHolder: 'Select a target' });
 }
 
 export function selectDistributionTarget (platform: Platform): Promise<CustomQuickPick>  {

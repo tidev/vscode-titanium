@@ -5,7 +5,7 @@ import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
 import * as xml2js from 'xml2js';
 import { parsePlatformsFromTiapp, dismissNotifications } from '../../util/common';
-import { ProjectCreator } from '../../util/create';
+import { Project } from '../../util/project';
 
 describe('Application creation', function () {
 	this.timeout(30000);
@@ -13,7 +13,7 @@ describe('Application creation', function () {
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
-	let creator: ProjectCreator;
+	let creator: Project;
 
 	before(async function () {
 		this.timeout(180000);
@@ -24,7 +24,7 @@ describe('Application creation', function () {
 		await browser.waitForWorkbench();
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
-		creator = new ProjectCreator(driver);
+		creator = new Project(driver);
 		await creator.waitForGetStarted();
 	});
 

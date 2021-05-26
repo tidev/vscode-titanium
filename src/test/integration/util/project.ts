@@ -1,12 +1,27 @@
-import { InputBox } from 'vscode-extension-tester';
+import { BottomBarPanel, InputBox } from 'vscode-extension-tester';
 import { notificationExists, CommonUICreator } from './common';
 import { expect } from 'chai';
-import { AppCreateOptions, ModuleCreateOptions } from '../types';
+import { AppBuildOptions, AppCreateOptions, ModuleBuildOptions, ModuleCreateOptions } from '../types';
 
 /**
  * Wrapper around the project creation flow to make it slightly easier to test
  */
-export class ProjectCreator extends CommonUICreator {
+export class Project extends CommonUICreator {
+
+	// App specific
+	public async buildApp(options: AppBuildOptions): Promise<void> {
+
+		await this.workbench.executeCommand('Titanium: Build');
+
+		await this.setPlatform(options.platform);
+		await this.setTarget(options.target);
+
+		if (options.platform === 'ios' && options.target === 'simulator') {
+			await this.setSimulatorVersion(options.simulatorVersion);
+		}
+
+		await this.setDevice(options.target, options.deviceId);
+	}
 
 	public async createApp(options: AppCreateOptions): Promise<void> {
 		// We need to configure the setting for the creation directory before running any commands
@@ -53,17 +68,16 @@ export class ProjectCreator extends CommonUICreator {
 
 		await this.workbench.executeCommand('Titanium: Create module');
 
-		// HACK: Need to figure out a better way to wait for the environment detection to finish,
-		// maybe we should just have a notification for it?
-		await this.driver.sleep(10000);
+		await this.driver.wait(async () => {
+			await this.driver.sleep(2500);
 
-		try {
-			// has info loaded yet?
-			await InputBox.create();
-		} catch (error) {
-			// no! Lets wait some more, InputBox.create just waited 5 seconds for us too
-			await this.driver.sleep(20000);
-		}
+			try {
+				// has info loaded yet?
+				await InputBox.create();
+				return true;
+			} catch (error) {
+			}
+		}, 30000);
 
 		await this.setName(options.name);
 		await this.setId(options.id);
@@ -105,8 +119,34 @@ export class ProjectCreator extends CommonUICreator {
 			const text = await this.getErrorOutput();
 			throw new Error(`Failed to create module, "Project created" notification did not show. Output error was ${text}`);
 		}
-
 	}
+
+	public async buildModule(options: ModuleBuildOptions): Promise<void> {
+		await this.workbench.executeCommand('Titanium: Build');
+
+		await this.setPlatform(options.platform);
+	}
+
+	public async packageModule(options: ModuleBuildOptions): Promise<void> {
+		await this.workbench.executeCommand('Titanium: Package');
+
+		await this.setPlatform(options.platform);
+
+		await this.waitForBuildCompletion();
+	}
+
+	public async cleanModule(options: ModuleBuildOptions): Promise<void> {
+		await this.workbench.executeCommand('Titanium: Clean');
+
+		await this.setPlatform(options.platform);
+
+		await this.driver.wait(async () => {
+			await this.driver.sleep(500);
+			return notificationExists('cleaning project');
+		}, 7500);
+	}
+
+	// Creation specific helpers
 
 	public async setEnableServices(enableServices: boolean): Promise<void> {
 		const servicesText = enableServices ? 'Yes' : 'No';
@@ -176,5 +216,68 @@ export class ProjectCreator extends CommonUICreator {
 		await input.setText(codeBase);
 		await input.confirm();
 		await this.driver.sleep(100);
+	}
+
+	// Building specific helpers
+
+	public async setPlatform(platform: string): Promise<void> {
+		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+
+		expect(placeHolderText).to.equal('Select a platform', 'Did not show platform selection');
+
+		await input.setText(platform);
+		await input.confirm();
+	}
+
+	public async setTarget(target: string): Promise<void> {
+		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+
+		expect(placeHolderText).to.equal('Select a target', 'Did not show target selection');
+
+		await input.setText(target);
+		await input.confirm();
+	}
+
+	public async setSimulatorVersion(version?: string): Promise<void> {
+		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+
+		expect(placeHolderText).to.equal('Select simulator version', 'Did not show simulator version selection');
+
+		if (version) {
+			await input.setText(version);
+		}
+		await input.confirm();
+	}
+
+	public async setDevice(target: string, deviceId?: string): Promise<void> {
+		const input = await InputBox.create();
+
+		const placeHolderText = await input.getPlaceHolder();
+
+		expect(placeHolderText).to.equal(`Select ${target}`, 'Did not show device selection');
+
+		if (deviceId) {
+			await input.setText(deviceId);
+		}
+		await input.confirm();
+	}
+
+	public async waitForBuildCompletion (): Promise<void> {
+		const terminal =  await new BottomBarPanel().openTerminalView();
+
+		await this.driver.wait(async () => {
+			await this.driver.sleep(2500);
+			const text = await terminal.getText();
+
+			if (text.includes('Terminal will be reused by tasks, press any key to close it.')) {
+				return true;
+			}
+		}, 60000);
 	}
 }

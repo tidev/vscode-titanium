@@ -12,6 +12,13 @@ export type AppCreateOptions = {
 	platforms: string[];
 }
 
+export type AppBuildOptions = {
+	platform: string;
+	target: string;
+	simulatorVersion?: string;
+	deviceId?: string;
+}
+
 export type ModuleCreateOptions = {
 	id: string;
 	folder: string;
@@ -21,4 +28,8 @@ export type ModuleCreateOptions = {
 		android?: 'java' | 'kotlin';
 		ios?: 'objc' | 'swift';
 	}
+}
+
+export type ModuleBuildOptions = {
+	platform: string;
 }

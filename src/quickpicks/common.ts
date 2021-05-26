@@ -80,7 +80,7 @@ export function selectPlatform (lastBuildDescription?: string, filter?: (platfor
 			id: 'last' as Platform
 		});
 	}
-	return quickPick(platforms);
+	return quickPick(platforms, { placeHolder: 'Select a platform' });
 }
 
 export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
