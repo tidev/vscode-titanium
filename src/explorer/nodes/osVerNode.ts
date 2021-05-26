@@ -5,7 +5,7 @@ import { DeviceNode } from './deviceNode';
 import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
-import { DevelopmentTarget } from '../../types/cli';
+import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../types/cli';
 
 export class OSVerNode extends BaseNode {
 
@@ -17,7 +17,7 @@ export class OSVerNode extends BaseNode {
 	constructor (
 		public readonly label: string,
 		public readonly platform: Platform,
-		public readonly target: string
+		public readonly target: PrettyDevelopmentTarget
 	) {
 		super(label);
 		this.version = label;

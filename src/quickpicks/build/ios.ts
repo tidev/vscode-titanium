@@ -1,11 +1,11 @@
 import { Target } from '../..//types/cli';
 import appc from '../../appc';
-import { IosCert, IosCertificateType, ProvisioningProfile } from '../../types/common';
+import { IosCert, IosCertificateType, IosProvisioningType, ProvisioningProfile } from '../../types/common';
 import { quickPick, CustomQuickPick } from '../common';
 import { deviceQuickPick, DeviceQuickPickItem } from './common';
 
 export async function selectiOSCertificate (buildType: string): Promise<IosCert> {
-	const certificateType: IosCertificateType = buildType === 'run' ? IosCertificateType.developer : IosCertificateType.distribution;
+	const certificateType: IosCertificateType = buildType === 'run' ? 'developer' : 'distribution';
 	const certificates = appc.iOSCertificates(certificateType).map(cert => ({
 		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
 		label: cert.fullname,
@@ -24,7 +24,7 @@ export async function selectiOSCertificate (buildType: string): Promise<IosCert>
 }
 
 export async function selectiOSProvisioningProfile (certificate: IosCert, target: Target, appId: string): Promise<ProvisioningProfile> {
-	let deployment = 'development';
+	let deployment: IosProvisioningType = 'development';
 	if (target === 'dist-adhoc') {
 		deployment = 'distribution';
 	} else if (target === 'dist-appstore') {

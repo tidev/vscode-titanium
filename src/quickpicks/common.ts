@@ -6,7 +6,7 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
-import { ProjectType } from '../types/common';
+import { Platform, ProjectType } from '../types/common';
 
 export interface CustomQuickPick extends QuickPickItem {
 	label: string;
@@ -72,12 +72,12 @@ export async function quickPick<T extends CustomQuickPick> (items: T[], quickPic
 	return result;
 }
 
-export function selectPlatform (lastBuildDescription?: string, filter?: (platform: string) => boolean): Promise<{id: string; label: string}> {
+export function selectPlatform (lastBuildDescription?: string, filter?: (platform: Platform) => boolean): Promise<{id: string; label: string}> {
 	const platforms = utils.platforms().filter(filter ? filter : (): boolean => true).map(platform => ({ label: utils.nameForPlatform(platform) as string, id: platform }));
 	if (lastBuildDescription) {
 		platforms.unshift({
 			label: `Last: ${lastBuildDescription}`,
-			id: 'last'
+			id: 'last' as Platform
 		});
 	}
 	return quickPick(platforms);

@@ -7,7 +7,7 @@ import * as findUp from 'find-up';
 
 import { platform } from 'os';
 import { tasks, Task, ShellExecution } from 'vscode';
-import { CreateAppOptions, CreateModuleOptions, Target } from './types/cli';
+import { CreateAppOptions, CreateModuleOptions, PrettyDevelopmentTarget, PrettyTarget, Target } from './types/cli';
 import { IosCert, IosCertificateType, Platform, PlatformPretty } from './types/common';
 import { ExtensionContainer } from './container';
 
@@ -17,11 +17,11 @@ import { ExtensionContainer } from './container';
  * @param {String} targetPlatform - Target platform.
  * @returns {String}
  */
-export function  normalisedPlatform (targetPlatform: string): string {
+export function  normalisedPlatform (targetPlatform: Platform | 'iphone' | 'ipad'): Lowercase<Platform> {
 	if (targetPlatform === 'iphone' || targetPlatform === 'ipad') {
 		return 'ios';
 	}
-	return targetPlatform.toLowerCase();
+	return targetPlatform.toLowerCase() as Lowercase<Platform>;
 }
 
 /**
@@ -39,7 +39,7 @@ export function  capitalizeFirstLetter (s: string): string {
  *
  * @returns {Array}
  */
-export function platforms (): string[] {
+export function platforms (): Platform[] {
 	switch (platform()) {
 		case 'darwin':
 			return [ 'ios', 'android' ];
@@ -58,13 +58,13 @@ export function platforms (): string[] {
  * @param {String} targetPlatform - target platform.
  * @returns {String}
  */
-export function nameForPlatform (targetPlatform: string): PlatformPretty {
+export function nameForPlatform (targetPlatform: Platform): PlatformPretty {
 	targetPlatform =  normalisedPlatform(targetPlatform);
 	switch (targetPlatform) {
 		case 'android':
-			return PlatformPretty.android;
+			return 'Android';
 		case 'ios':
-			return PlatformPretty.ios;
+			return 'iOS';
 		default:
 			throw new Error(`Unknown platform ${targetPlatform}`);
 	}
@@ -75,13 +75,13 @@ export function nameForPlatform (targetPlatform: string): PlatformPretty {
  * @param {String} target - target to get pretty name for.
  * @returns {String}
  */
-export function nameForTarget (target: string): string {
-	target = target.toLowerCase();
-	switch (target) {
+export function nameForTarget (target: Target): PrettyTarget {
+	const lowerCaseTarget: Lowercase<Target> = target.toLowerCase() as Lowercase<Target>;
+	switch (lowerCaseTarget) {
 		case 'device':
 		case 'emulator':
 		case 'simulator':
-			return capitalizeFirstLetter(target);
+			return capitalizeFirstLetter(target) as PrettyDevelopmentTarget;
 		case 'dist-adhoc':
 			return 'Ad-Hoc';
 		case 'dist-appstore':
@@ -89,7 +89,7 @@ export function nameForTarget (target: string): string {
 		case 'dist-playstore':
 			return 'Play Store';
 		default:
-			return target;
+			throw new Error(`Unknown target ${target}`);
 	}
 }
 
@@ -99,14 +99,14 @@ export function nameForTarget (target: string): string {
  * @param {String} targetPlatform - platform to get target for.
  * @returns {String}
  */
-export function targetForName (name: string): Target {
-	name = name.toLowerCase();
-	switch (name) {
-		case 'Ad-Hoc':
+export function targetForName (name: PrettyTarget): Target {
+	const lowerCaseName: Lowercase<PrettyTarget> = name.toLowerCase() as Lowercase<PrettyTarget>;
+	switch (lowerCaseName) {
+		case 'ad-hoc':
 			return 'dist-adhoc';
-		case 'App Store':
+		case 'app store':
 			return 'dist-appstore';
-		case 'Play Store':
+		case 'play store':
 			return 'dist-playstore';
 		case 'device':
 		case 'emulator':
@@ -116,9 +116,9 @@ export function targetForName (name: string): Target {
 	}
 }
 
-export function targetsForPlatform (platformName: string): string[] {
-	platformName = normalisedPlatform(platformName);
-	switch (platformName) {
+export function targetsForPlatform (platformName: Platform): Target[] {
+	const lowerCasePlatform = normalisedPlatform(platformName);
+	switch (lowerCasePlatform) {
 		case 'android':
 			return [ 'emulator', 'device', 'dist-playstore' ];
 		case 'ios':
@@ -156,36 +156,6 @@ export function iOSProvisioningProfileMatchesAppId (profileAppId: string, appId:
 	}
 
 	return false;
-}
-
-/**
- * Returns true if directory exists at given path
- *
- * @param {String} directoryPath 	directory path
- * @returns {Boolean}
- */
-export function directoryExists (directoryPath: string): boolean {
-	try {
-		const stat = fs.statSync(directoryPath);
-		return stat.isDirectory();
-	} catch (err) {
-		return !(err && err.code === 'ENOENT');
-	}
-}
-
-/**
- * Returns true if file exists at given path
- *
- * @param {String} filePath		file path
- * @returns {Boolean}
- */
-export function fileExists (filePath: string): boolean {
-	try {
-		const stat = fs.statSync(filePath);
-		return stat.isFile();
-	} catch (err) {
-		return !(err && err.code === 'ENOENT');
-	}
 }
 
 /**

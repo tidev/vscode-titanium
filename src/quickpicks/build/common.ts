@@ -4,6 +4,7 @@ import { commands, QuickPickOptions } from 'vscode';
 import { quickPick, CustomQuickPick } from '../common';
 import { selectAndroidDevice, selectAndroidEmulator } from './android';
 import { selectiOSDevice, selectiOSSimulator } from './ios';
+import { Platform } from 'src/types/common';
 
 export interface DeviceQuickPickItem extends CustomQuickPick {
 	id: string;
@@ -46,14 +47,14 @@ export async function selectDevice (platform: string, target: string, iOSSimulat
 	return deviceChoice;
 }
 
-export function selectBuildTarget (platform: string): Promise<CustomQuickPick>  {
+export function selectBuildTarget (platform: Platform): Promise<CustomQuickPick>  {
 	const targets = utils.targetsForPlatform(platform)
 		.filter(target => !/^dist/.test(target))
 		.map(target => ({ label: utils.nameForTarget(target), id: target }));
 	return quickPick(targets);
 }
 
-export function selectDistributionTarget (platform: string): Promise<CustomQuickPick>  {
+export function selectDistributionTarget (platform: Platform): Promise<CustomQuickPick>  {
 	const targets = utils.targetsForPlatform(platform)
 		.filter(target => /^dist/.test(target))
 		.map(target => ({ label: utils.nameForTarget(target), id: target }));

@@ -6,6 +6,7 @@ import * as alloyAutoCompleteRules from './alloyAutoCompleteRules';
 import { CompletionItem, CompletionItemKind, Position, Range, SnippetString, TextDocument, workspace } from 'vscode';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
 import { Project } from '../../project';
+import { pathExists } from 'fs-extra';
 
 /**
  * Alloy Controller completion provider
@@ -368,27 +369,30 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 *
 	 * @returns {Thenable}
 	 */
-	public getFileCompletions(directory: string, project: Project, moduleName?: string, range?: Range): CompletionItem[] {
+	public async getFileCompletions(directory: string, project: Project, moduleName?: string, range?: Range): Promise<CompletionItem[]> {
 		const completions: CompletionItem[] = [];
 		const filesPath = path.join(project.filePath, 'app', directory);
 		if (moduleName && moduleName.startsWith('/')) {
 			moduleName = moduleName.substring(0);
 		}
-		if (utils.directoryExists(filesPath)) {
-			const files = utils.filterJSFiles(filesPath);
 
-			for (const file of files) {
-				const relativePath = path.relative(filesPath, file.path);
-				const value = `/${path.posix.format(path.parse(relativePath)).replace('.js', '')}`;
-				const completionItem: CompletionItem = {
-					label: value,
-					kind: CompletionItemKind.Reference
-				};
-				if (range) {
-					completionItem.range = range;
-				}
-				completions.push(completionItem);
+		if (!await pathExists(filesPath)) {
+			return completions;
+		}
+
+		const files = utils.filterJSFiles(filesPath);
+
+		for (const file of files) {
+			const relativePath = path.relative(filesPath, file.path);
+			const value = `/${path.posix.format(path.parse(relativePath)).replace('.js', '')}`;
+			const completionItem: CompletionItem = {
+				label: value,
+				kind: CompletionItemKind.Reference
+			};
+			if (range) {
+				completionItem.range = range;
 			}
+			completions.push(completionItem);
 		}
 		return completions;
 	}

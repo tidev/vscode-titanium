@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { homedir } from 'os';
 import { ExtensionContainer } from './container';
-import { IosCert, IosCertificateType, ProvisioningProfile } from './types/common';
+import { IosCert, IosCertificateType, IosProvisioningType, ProvisioningProfile } from './types/common';
 import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 import { GlobalState } from './constants';
@@ -302,7 +302,7 @@ export class Appc {
 	 * @param {String} type     developer (default), distribution
 	 * @returns {Array}
 	 */
-	public iOSCertificates (type: IosCertificateType = IosCertificateType.developer): IosCert[] {
+	public iOSCertificates (type: IosCertificateType = 'developer'): IosCert[] {
 		const certificates = [];
 		if (this.info?.ios?.certs) {
 			for (const keychain of Object.values(this.info.ios.certs.keychains)) {
@@ -320,7 +320,7 @@ export class Appc {
 	 * @param {String} appId        enable by matching app ID
 	 * @returns {Array}
 	 */
-	public iOSProvisioningProfiles (deployment = 'development', certificate: IosCert, appId: string): ProvisioningProfile[] {
+	public iOSProvisioningProfiles (deployment: IosProvisioningType = 'development', certificate: IosCert, appId: string): ProvisioningProfile[] {
 		let pem: string|undefined;
 		if (certificate.pem) {
 			pem = certificate.pem.replace('-----BEGIN CERTIFICATE-----', '');

@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as walkSync from 'klaw-sync';
 import * as path from 'path';
-import * as utils from '../../utils';
 
 import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, Command } from 'vscode';
 import { ExtensionContainer } from '../../container';
@@ -264,7 +263,7 @@ export async function insertI18nString (text: string, project: Project): Promise
 		return;
 	}
 	const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
-	if (!utils.fileExists(i18nStringPath)) {
+	if (!await fs.pathExists(i18nStringPath)) {
 		fs.ensureDirSync(path.join(i18nPath, defaultLang));
 		fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
 	}

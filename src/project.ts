@@ -14,6 +14,7 @@ const MANIFEST_FILENAME = 'manifest';
 
 interface ModuleInformation {
 	path: string;
+	platform: Platform;
 	[ key: string ]: string;
 }
 
@@ -183,43 +184,44 @@ export class Project {
 	 *
 	 * @param {String} modulePath		path to module
 	 */
-	private loadModuleAt (modulePath: string): void {
-		if (utils.directoryExists(modulePath)) {
-			const timodulePath = path.join(modulePath, TIMODULEXML_FILENAME);
-			const manifestPath = path.join(modulePath, MANIFEST_FILENAME);
+	private async loadModuleAt (modulePath: string): Promise<void> {
+		const timodulePath = path.join(modulePath, TIMODULEXML_FILENAME);
+		const manifestPath = path.join(modulePath, MANIFEST_FILENAME);
 
-			if (!utils.fileExists(timodulePath)) {
+		if (!await fs.pathExists(timodulePath)) {
+			return;
+		}
+
+		const fileData = fs.readFileSync(timodulePath, 'utf-8');
+		const parser = new xml2js.Parser();
+		let json;
+		parser.parseString(fileData, (err: Error, result: unknown) => {
+			if (!err) {
+				json = result;
+			}
+		});
+		if (json && json['ti:module']) {
+
+			if (!fs.existsSync(manifestPath)) {
 				return;
 			}
 
-			const fileData = fs.readFileSync(timodulePath, 'utf-8');
-			const parser = new xml2js.Parser();
-			let json;
-			parser.parseString(fileData, (err: Error, result: unknown) => {
-				if (!err) {
-					json = result;
+			const manifestData: { [ key: string ]: string; } = {};
+
+			fs.readFileSync(manifestPath).toString().split(/\r?\n/).forEach(line => {
+				const match = line.match(/^(\S+)\s*:\s*(.*)$/);
+				if (match) {
+					manifestData[match[1].trim()] = match[2].trim();
 				}
 			});
-			if (json && json['ti:module']) {
 
-				if (!fs.existsSync(manifestPath)) {
-					return;
-				}
+			const moduleInformation: ModuleInformation = {
+				path: modulePath,
+				platform: utils.normalisedPlatform(manifestData.platform as Platform),
+				...manifestData
+			};
 
-				const manifest: ModuleInformation = {
-					path: modulePath
-				};
-
-				fs.readFileSync(manifestPath).toString().split(/\r?\n/).forEach(line => {
-					const match = line.match(/^(\S+)\s*:\s*(.*)$/);
-					if (match) {
-						manifest[match[1].trim()] = match[2].trim();
-					}
-				});
-				manifest.platform = utils.normalisedPlatform(manifest.platform);
-
-				this.modules.push(manifest);
-			}
+			this.modules.push(moduleInformation);
 		}
 	}
 

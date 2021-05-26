@@ -9,13 +9,9 @@ export class CommandNode extends BaseNode {
 	public readonly contextValue: string = 'CommandNode';
 	public command: vscode.Command;
 	public iconPath: vscode.ThemeIcon;
-	private commandName: string;
-	private args: string[]
 
 	constructor (label: string, commandName: Commands | VSCodeCommands | string, args: string[], icon: string) {
 		super(label);
-		this.commandName = commandName;
-		this.args = args;
 		this.command = {
 			command: commandName,
 			title: label,
