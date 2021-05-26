@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import Appc from '../appc';
 
-import { commands, ProgressLocation, Uri, window } from 'vscode';
+import { commands, ProgressLocation, Uri, window, workspace } from 'vscode';
 import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
@@ -57,11 +57,12 @@ export async function createModule (): Promise<void> {
 			return;
 		});
 
-		// TODO: Once workspace support is figured out, add an "add to workspace command"
-		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { title: 'Open Project' });
-		if (dialog) {
-			const projectDir = Uri.file(path.join(workspaceDir.fsPath, name));
+		const projectDir = Uri.file(path.join(workspaceDir.fsPath, name));
+		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { title: 'Open in new window', id: 'window' }, { title: 'Open in workspace', id: 'workspace' });
+		if (dialog?.id === 'window') {
 			await commands.executeCommand(VSCodeCommands.OpenFolder, projectDir, true);
+		} else if (dialog?.id === 'workspace') {
+			await workspace.updateWorkspaceFolders(0, 0, { uri: projectDir });
 		}
 	} catch (error) {
 		if (error instanceof InteractionError) {
