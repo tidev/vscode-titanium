@@ -8,7 +8,7 @@ export class HelpExplorer implements vscode.TreeDataProvider<BaseNode> {
 
 	// tslint:disable-next-line member-ordering
 	public readonly onDidChangeTreeData: vscode.Event<BaseNode|undefined> = this._onDidChangeTreeData.event;
-	private updatesNode: UpdatesNode|undefined;
+	private updatesNode: UpdatesNode = new UpdatesNode('Updates');
 
 	public refresh (): void {
 		this._onDidChangeTreeData.fire(undefined);
@@ -29,7 +29,7 @@ export class HelpExplorer implements vscode.TreeDataProvider<BaseNode> {
 			new UrlNode('TiSlack', 'https://tislack.org', 'comment-discussion'),
 			new CommandNode('Report Extension Issue', VSCodeCommands.ReportIssue, [ ExtensionId ], 'report'),
 			new CommandNode('Configure Settings', VSCodeCommands.OpenSettings, [ `@ext:${ExtensionId}` ], 'settings-gear'),
-			this.updatesNode = new UpdatesNode('Updates')
+			this.updatesNode
 		];
 	}
 
