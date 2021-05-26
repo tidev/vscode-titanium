@@ -1,16 +1,16 @@
 import { AlloyGenerate } from '../../util/alloy-generate';
 import { VSBrowser, WebDriver, EditorView, Workbench, InputBox } from 'vscode-extension-tester';
-import { dismissNotifications, getFixturesDirectory } from '../../util/common';
+import { dismissNotifications } from '../../util/common';
 import { expect } from 'chai';
 import { copy, pathExistsSync, remove, readFileSync } from 'fs-extra';
 import * as path from 'path';
 import * as tmp from 'tmp';
-
-const projectDirectory = path.join(getFixturesDirectory(), 'alloy-project');
+import { getCommonAlloyProjectDirectory } from '../../../common/utils';
 
 describe('Alloy component generation', function () {
 	this.timeout(30000);
 
+	const projectDirectory = getCommonAlloyProjectDirectory();
 	let browser: VSBrowser;
 	let driver: WebDriver;
 	let generator: AlloyGenerate;
