@@ -1,4 +1,4 @@
-import { TaskExecutionContext, ProjectType, isDistributionAppBuild } from '../tasksHelper';
+import { TaskExecutionContext, isDistributionAppBuild } from '../tasksHelper';
 import { Command, CommandBuilder } from '../commandBuilder';
 import { ExtensionContainer } from '../../container';
 import { quickPick } from '../../quickpicks';
@@ -13,6 +13,7 @@ import { WorkspaceState } from '../../constants';
 import { selectDevice } from '../../quickpicks/build/common';
 import { IosBuildTaskTitaniumBuildBase } from './ios';
 import { Project } from '../../project';
+import { ProjectType } from '../../types/common';
 
 function isAppBuild<T extends TitaniumBuildBase>(definition: TitaniumBuildBase): definition is T {
 	if (definition.projectType === 'app') {

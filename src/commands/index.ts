@@ -1,15 +1,16 @@
-import { ExtensionContainer } from '../container';
+import * as related from '../related';
 import * as vscode from 'vscode';
+
+import { ExtensionContainer } from '../container';
 import { Commands } from './common';
 import { GlobalState } from '../constants';
 import { buildApplication } from './buildApp';
 import { buildModule } from './buildModule';
-import { DeviceNode, OSVerNode, PlatformNode, TargetNode, UpdateNode } from '../explorer/nodes';
+import { DeviceNode, DistributeNode, OSVerNode, PlatformNode, TargetNode, UpdateNode } from '../explorer/nodes';
 import { sleep } from '../common/utils';
-import * as related from '../related';
 import { packageApplication } from './packageApp';
 import { packageModule } from './packageModule';
-import { quickPick } from '../quickpicks';
+import { promptForWorkspaceFolder, quickPick } from '../quickpicks';
 import { LogLevel } from '../types/common';
 import { configuration } from '../configuration';
 import { AlloyComponentExtension, AlloyComponentFolder, AlloyComponentType, generateComponent, generateModel } from './alloyGenerate';
@@ -19,7 +20,7 @@ import { createApplication } from './createApp';
 import { createModule } from './createModule';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
-import { promptForWorkspaceFolder } from '../quickpicks/common';
+import { generateTask } from './generateTask';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -173,6 +174,10 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.InstallUpdate, (updateInfo: UpdateNode) => {
 		return installUpdates([ updateInfo.update ]);
+	});
+
+	registerCommand(Commands.GenerateTask, async (node: DeviceNode|DistributeNode) => {
+		return generateTask(node);
 	});
 }
 

@@ -64,3 +64,5 @@ export interface LastBuildState extends AppBuildTaskTitaniumBuildBase {
 	deviceId: string;
 	target: 'device' | 'emulator' | 'simulator';
 }
+
+export type ProjectType = 'app' | 'module';

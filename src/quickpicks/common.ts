@@ -6,7 +6,7 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
-import { ProjectType } from '../tasks/tasksHelper';
+import { ProjectType } from '../types/common';
 
 export interface CustomQuickPick extends QuickPickItem {
 	label: string;

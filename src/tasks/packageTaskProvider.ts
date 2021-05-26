@@ -11,6 +11,10 @@ export interface PackageTask extends TitaniumTaskBase {
 	definition: PackageTaskDefinitionBase;
 }
 
+export interface AppPackageTaskDefinitionBase extends TitaniumTaskDefinitionBase {
+	titaniumBuild: AppPackageTaskTitaniumBuildBase;
+}
+
 export interface PackageTaskDefinitionBase extends TitaniumTaskDefinitionBase {
 	titaniumBuild: AppPackageTaskTitaniumBuildBase | ModulePackageTaskTitaniumBuildBase;
 }
