@@ -280,4 +280,27 @@ export class Project extends CommonUICreator {
 			}
 		}, 60000);
 	}
+
+	public async openInWorkspace (): Promise<void> {
+		const notification = await this.driver.wait(async () => {
+			return await notificationExists('project created');
+		});
+
+		if (!notification) {
+			throw new Error('Creation notification did not show');
+		}
+
+		let opened = false;
+		for (const button of await notification?.getActions()) {
+			const text = await button.getTitle();
+			if (text.includes('workspace')) {
+				await button.click();
+				opened = true;
+			}
+		}
+
+		if (!opened) {
+			throw new Error('Failed to open project');
+		}
+	}
 }
