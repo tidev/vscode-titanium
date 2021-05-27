@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 
-import { DefinitionLink, Hover, Location, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Definition, Command } from 'vscode';
+import { Hover, MarkdownString, Position, Range, Selection, TextDocument, Uri, workspace, WorkspaceEdit, Command } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { DefinitionSuggestion, getProject } from './common';
 import { Project } from '../..//project';
@@ -111,65 +111,6 @@ export async function getReferences<T> (files: string[]|string, regExp: RegExp, 
 		}
 	}
 	return definitions;
-}
-
-/**
- * Provide completion items
- *
- * @param {TextDocument} document active text document
- * @param {Position} position caret position
- * @param {Array} suggestions definition suggestions
- *
- * @returns {Thenable}
- */
-export async function provideDefinition (document: TextDocument, position: Position, suggestions: DefinitionSuggestion[]): Promise<Definition|DefinitionLink[]> {
-	const project = await getProject(document);
-	if (!project) {
-		return [];
-	}
-	const line = document.lineAt(position).text;
-	const linePrefix = document.getText(new Range(position.line, 0, position.line, position.character));
-	const wordRange = document.getWordRangeAtPosition(position);
-	const word = wordRange ? document.getText(wordRange) : undefined;
-	const results: DefinitionLink[] = [];
-
-	const regExp = /['"]/g;
-	let startIndex = 0;
-	let endIndex = position.character;
-
-	for (let matches = regExp.exec(line); matches !== null; matches = regExp.exec(line)) {
-		if (matches.index < position.character) {
-			startIndex = matches.index;
-		} else if (matches.index > position.character) {
-			endIndex = matches.index;
-			break;
-		}
-	}
-
-	const value = (startIndex && endIndex) ? line.substring(startIndex + 1, endIndex) : '';
-
-	for (const suggestion of suggestions) {
-		if (suggestion.regExp.test(linePrefix)) {
-			if (suggestion.definitionRegExp) {
-				const suggestionFiles = await suggestion.files(project, document, word, value);
-				const definitionRegExp = suggestion.definitionRegExp(word || value);
-				return await getReferences<Location>(suggestionFiles, definitionRegExp, (file: string, range: Range) => {
-					return new Location(Uri.file(file), range);
-				});
-			} else {
-				const files = await suggestion.files(project, document, word, value);
-				for (const file of files) {
-					const link: DefinitionLink = {
-						originSelectionRange: new Range(position.line, startIndex, position.line, endIndex),
-						targetRange: new Range(0, 0, 0, 0),
-						targetUri: Uri.file(file)
-					};
-					results.push(link);
-				}
-			}
-		}
-	}
-	return results;
 }
 
 /**

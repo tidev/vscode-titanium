@@ -1,12 +1,11 @@
 import { completion } from 'titanium-editor-commons';
 import { Project } from '../../project';
 import * as vscode from 'vscode';
-import { ExtensionContainer } from '../../container';
-import * as utils from '../../utils';
+import { BaseProvider } from '../baseProvider';
 
 export const CompletionsFormat = completion.CompletionsFormat.v3;
 
-export abstract class BaseCompletionItemProvider implements vscode.CompletionItemProvider {
+export abstract class BaseCompletionItemProvider extends BaseProvider implements vscode.CompletionItemProvider {
 	public CompletionsFormat = CompletionsFormat;
 	public completions: any
 	public completionsMap = new Map<string, any>();
@@ -27,11 +26,5 @@ export abstract class BaseCompletionItemProvider implements vscode.CompletionIte
 		}
 
 		return this.completionsMap.get(sdk);
-	}
-
-	public async getProject (document: vscode.TextDocument): Promise< Project|undefined> {
-		const filePath = document.uri.fsPath;
-		const projectDir = await utils.findProjectDirectory(filePath);
-		return ExtensionContainer.projects.get(projectDir);
 	}
 }
