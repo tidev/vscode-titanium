@@ -19,7 +19,9 @@ async function main (): Promise<void> {
 		const releaseQuality = process.env.CODE_VERSION === 'insider' ? ReleaseQuality.Insider : ReleaseQuality.Stable;
 
 		const tester = new ExTester(undefined, releaseQuality, tempDirectory.name);
-		tester.setupAndRunTests('out/test/integration/suite/**/*.test.js', vsCodeVersion, undefined, { config: mochaConfig, settings });
+		const files = process.env.SMOKE ? 'out/test/integration/suite/**/*.smoke.js' : 'out/test/integration/suite/**/*.test.js';
+
+		tester.setupAndRunTests(files, vsCodeVersion, undefined, { config: mochaConfig, settings });
 	} finally {
 		fs.removeSync(tempDirectory.name);
 	}
