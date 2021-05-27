@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
 import { Project } from '../../util/project';
-import { dismissNotifications } from '../../util/common';
+import { dismissNotifications, notificationExists } from '../../util/common';
 
 describe('Module smoke', function () {
 	this.timeout(30000);
@@ -51,12 +51,13 @@ describe('Module smoke', function () {
 		expect(fs.existsSync(projectPath)).to.equal(true);
 		expect(fs.existsSync(path.join(projectPath, 'android'))).to.equal(true);
 		expect(fs.existsSync(path.join(projectPath, 'ios'))).to.equal(true);
+
+		await project.openInWorkspace();
 	});
 
 	it('Android: should be able to package the module project', async function () {
 		this.timeout(90000);
 
-		await project.openFolder(projectPath);
 		await project.waitForEnvironmentDetectionCompletion();
 
 		await project.packageModule({
@@ -83,7 +84,6 @@ describe('Module smoke', function () {
 	it('iOS: should be able to package the module project', async function () {
 		this.timeout(90000);
 
-		await project.openFolder(projectPath);
 		await project.waitForEnvironmentDetectionCompletion();
 
 		await project.packageModule({
