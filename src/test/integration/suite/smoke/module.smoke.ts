@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
 import { Project } from '../../util/project';
-import { dismissNotifications, notificationExists } from '../../util/common';
+import { dismissNotifications } from '../../util/common';
 
 describe('Module smoke', function () {
 	this.timeout(30000);
