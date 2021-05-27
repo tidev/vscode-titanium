@@ -21,6 +21,19 @@ export class Project extends CommonUICreator {
 		}
 
 		await this.setDevice(options.target, options.deviceId);
+
+		await this.waitForBuildCompletion(/Start (application|simulator) log/);
+
+		await this.workbench.executeCommand('Titanium: Stop');
+	}
+
+	public async cleanApp(): Promise<void> {
+		await this.workbench.executeCommand('Titanium: Clean');
+
+		await this.driver.wait(async () => {
+			await this.driver.sleep(500);
+			return notificationExists('cleaning project');
+		}, 7500);
 	}
 
 	public async createApp(options: AppCreateOptions): Promise<void> {
@@ -76,6 +89,7 @@ export class Project extends CommonUICreator {
 				await InputBox.create();
 				return true;
 			} catch (error) {
+				// ignore
 			}
 		}, 30000);
 
@@ -132,7 +146,7 @@ export class Project extends CommonUICreator {
 
 		await this.setPlatform(options.platform);
 
-		await this.waitForBuildCompletion();
+		await this.waitForBuildCompletion(/Terminal will be reused by tasks, press any key to close it./);
 	}
 
 	public async cleanModule(options: ModuleBuildOptions): Promise<void> {
@@ -268,17 +282,21 @@ export class Project extends CommonUICreator {
 		await input.confirm();
 	}
 
-	public async waitForBuildCompletion (): Promise<void> {
+	public async waitForBuildCompletion (finishRegex: RegExp): Promise<void> {
 		const terminal =  await new BottomBarPanel().openTerminalView();
 
 		await this.driver.wait(async () => {
 			await this.driver.sleep(2500);
 			const text = await terminal.getText();
-
-			if (text.includes('Terminal will be reused by tasks, press any key to close it.')) {
+			// First check if the finishRegex has been matched, then check for errors in the log.
+			// We do this because we dont want errors from the runtime to cause an error
+			if (text.match(finishRegex)) {
 				return true;
 			}
-		}, 60000);
+
+			expect(text).to.not.include('ERROR', 'There were errors in the build logs');
+
+		}, 90000);
 	}
 
 	public async openInWorkspace (): Promise<void> {
