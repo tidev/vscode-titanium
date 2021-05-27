@@ -1,11 +1,19 @@
 import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
 import { ChromeDebugAdapter, Crdp } from 'vscode-chrome-debug-core';
-import * as got from 'got';
+import got from 'got';
 import { sleep } from '../common/utils';
 import { URL } from 'url';
 import { Event } from 'vscode-debugadapter';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { MESSAGE_STRING, Request, Response, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
+
+interface IWDBResponse {
+	metadata: {
+		deviceId: string;
+		url: string
+	};
+	webSocketDebuggerUrl: string
+}
 
 export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
@@ -115,7 +123,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return super.attach(attachArgs);
 	}
 
-	private async pollForApp (url: string, errorMessage: string, maxRetries = 5, iteration = 0): Promise<Array<{ metadata: { deviceId: string; url: string }; webSocketDebuggerUrl: string }>> {
+	private async pollForApp (url: string, errorMessage: string, maxRetries = 5, iteration = 0): Promise<IWDBResponse[]> {
 		if (iteration > maxRetries) {
 			throw Error(errorMessage);
 		}
@@ -124,8 +132,8 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 
 		let body;
 		try {
-			const resp = await got(url, {
-				json: true
+			const resp = await got<IWDBResponse[]>(url, {
+				responseType: 'json'
 			});
 			body = resp.body;
 		} catch (error) {
