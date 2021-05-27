@@ -930,7 +930,7 @@
   },
   "scripts": {
     "commit": "git-cz",
-    "compile": "tsc -p ./",
+    "compile": "rimraf out/ && tsc -p ./",
     "generate-docs": "node ./scripts/render.js",
     "lint": "eslint src/ scripts/",
     "release": "npm run generate-docs && standard-version && npx vsce package",
@@ -985,6 +985,7 @@
     "mocha-multi-reporters": "^1.5.1",
     "nyc": "^15.1.0",
     "pinst": "^2.1.6",
+    "rimraf": "^3.0.2",
     "sinon": "^10.0.0",
     "standard-version": "^9.3.0",
     "tmp": "^0.2.1",
