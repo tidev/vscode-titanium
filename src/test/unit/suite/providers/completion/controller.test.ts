@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
-import { Project } from '../../../project';
+import { Project } from '../../../../../project';
 import * as vscode from 'vscode';
 
-import { ControllerCompletionItemProvider } from '../../../providers/completion/controllerCompletionItemProvider';
-import { getFileUri, loadCompletions } from '../utils';
-import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
+import { ControllerCompletionItemProvider } from '../../../../../providers/completion/controllerCompletionItemProvider';
+import { getFileUri, loadCompletions } from '../../../utils';
+import { getCommonAlloyProjectDirectory } from '../../../../common/utils';
 
 const uri = getFileUri('controllers/sample.js');
 

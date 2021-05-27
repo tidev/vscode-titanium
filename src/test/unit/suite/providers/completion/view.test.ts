@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 import { after, before, describe, it } from 'mocha';
 import * as sinon from 'sinon';
-import { Project } from '../../../project';
+import { Project } from '../../../../../project';
 import * as vscode from 'vscode';
 
-import { ViewCompletionItemProvider } from '../../../providers/completion/viewCompletionItemProvider';
-import { getFileUri, loadCompletions } from '../utils';
-import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
+import { ViewCompletionItemProvider } from '../../../../../providers/completion/viewCompletionItemProvider';
+import { getFileUri, loadCompletions } from '../../../utils';
+import { getCommonAlloyProjectDirectory } from '../../../../common/utils';
 
 const uri = getFileUri('views/sample.xml');
 

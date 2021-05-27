@@ -2,12 +2,12 @@
 import { expect } from 'chai';
 import { after, before, describe, it } from 'mocha';
 import * as sinon from 'sinon';
-import { Project } from '../../../project';
+import { Project } from '../../../../../project';
 import * as vscode from 'vscode';
 
-import { StyleCompletionItemProvider } from '../../../providers/completion/styleCompletionItemProvider';
-import { getFileUri, loadCompletions } from '../utils';
-import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
+import { StyleCompletionItemProvider } from '../../../../../providers/completion/styleCompletionItemProvider';
+import { getFileUri, loadCompletions } from '../../../utils';
+import { getCommonAlloyProjectDirectory } from '../../../../../test/common/utils';
 
 const uri = getFileUri('styles/sample.tss');
 
