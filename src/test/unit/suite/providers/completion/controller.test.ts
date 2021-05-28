@@ -212,10 +212,13 @@ describe('Controller suggestions', () => {
 			const position = new vscode.Position(6, 2); // $.
 			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
-			expect(suggestions.length).to.equal(1);
+			expect(suggestions.length).to.equal(2);
 
-			expect(suggestions[0].label).to.equal('scrollView');
+			expect(suggestions[0].label).to.equal('container');
 			expect(suggestions[0].kind).to.equal(17);
+
+			expect(suggestions[1].label).to.equal('scrollView');
+			expect(suggestions[1].kind).to.equal(17);
 		});
 
 		it('should return completions for the type of id', async () => {

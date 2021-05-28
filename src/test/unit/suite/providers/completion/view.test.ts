@@ -94,7 +94,7 @@ describe('View suggestions', () => {
 
 		expect(suggestions.length).to.equal(1);
 
-		expect(suggestions[0].label).to.equal('container');
+		expect(suggestions[0].label).to.equal('testClass');
 		expect(suggestions[0].kind).to.equal(17);
 	});
 
@@ -102,10 +102,13 @@ describe('View suggestions', () => {
 		const position = new vscode.Position(10, 19);
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
-		expect(suggestions.length).to.equal(2);
+		expect(suggestions.length).to.equal(3);
 
-		expect(suggestions[0].label).to.equal('label');
+		expect(suggestions[0].label).to.equal('container');
 		expect(suggestions[0].kind).to.equal(17);
+
+		expect(suggestions[1].label).to.equal('label');
+		expect(suggestions[1].kind).to.equal(17);
 	});
 
 	it('should provide require src suggestions', async () => {

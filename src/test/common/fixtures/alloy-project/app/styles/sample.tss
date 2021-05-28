@@ -1,4 +1,4 @@
-".container": {
+"#container": {
 	backgroundColor: ma
 }
 
@@ -32,4 +32,8 @@
 
 "ImageView": {
 	image: "
+}
+
+".testClass": {
+
 }

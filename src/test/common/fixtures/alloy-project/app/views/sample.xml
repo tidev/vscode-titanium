@@ -1,5 +1,5 @@
 <Alloy>
-    <Tab title="test">
+    <Tab title="test" id="container">
         <Window class="foo" onOpen >
             <ScrollView id="scrollView">
 
@@ -11,5 +11,8 @@
 		<Label id=""/>
 		<Require src=""/>
 		<Widget src=""/>
+		<Label class="testClass" onClick="doClick" text="L('test')"/>
+		<Widget src="widget-test"/>
+		<Require src="existing-file"/>
     </Tab>
 </Alloy>
