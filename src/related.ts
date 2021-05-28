@@ -1,8 +1,9 @@
 import * as path from 'path';
+import * as utils from './utils';
 
-import { Uri, window, TextEditor } from 'vscode';
+import { Uri, window, TextEditor, TextDocument } from 'vscode';
+import { ExtensionContainer } from './container';
 import { Project } from './project';
-import { getProject } from './providers/definition/common';
 
 const alloyDirectoryMap: { [key: string]: string } = {
 	xml: 'views',
@@ -84,4 +85,10 @@ export async function openAllFiles (project?: Project): Promise<void> {
 	[ 'xml', 'tss', 'js' ].forEach(type => {
 		openRelatedFile(type, project);
 	});
+}
+
+async function getProject (document: TextDocument): Promise<Project|undefined> {
+	const filePath = document.uri.fsPath;
+	const projectDir = await utils.findProjectDirectory(filePath);
+	return ExtensionContainer.projects.get(projectDir);
 }

@@ -1,9 +1,11 @@
-import { handleInteractionError, InteractionChoice, InteractionError, registerCommand } from '../commands';
+import appc from '../appc';
+import * as fs from 'fs-extra';
+import * as path from 'path';
 import * as vscode from 'vscode';
+
+import { Commands, handleInteractionError, InteractionChoice, InteractionError, registerCommand } from '../commands';
 import { Project } from '../project';
 import { completion, updates } from 'titanium-editor-commons';
-import appc from '../appc';
-import * as path from 'path';
 
 // Import the various providers
 import { CompletionsFormat } from './completion/baseCompletionItemProvider';
@@ -12,11 +14,11 @@ import { StyleCompletionItemProvider } from './completion/styleCompletionItemPro
 import { TiappCompletionItemProvider } from './completion/tiappCompletionItemProvider';
 import { ViewCompletionItemProvider } from './completion/viewCompletionItemProvider';
 import { ControllerDefinitionProvider } from './definition/controllerDefinitionProvider';
-import { insert, insertCommandId, insertI18nString, insertI18nStringCommandId } from './definition/definitionProviderHelper';
 import { StyleDefinitionProvider } from './definition/styleDefinitionProvider';
-import { ViewCodeActionProvider } from './definition/viewCodeActionProvider';
+import { ViewCodeActionProvider } from './code-action/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './definition/viewDefinitionProvider';
-import { ViewHoverProvider } from './definition/viewHoverProvider';
+import { ViewHoverProvider } from './hover/viewHoverProvider';
+import { ExtensionContainer } from '../container';
 
 const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
 const styleFilePattern = '**/*.tss';
@@ -50,8 +52,38 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 	);
 
 	// register code action commands
-	registerCommand(insertCommandId, insert);
-	registerCommand(insertI18nStringCommandId, insertI18nString);
+	registerCommand(Commands.InsertCommandId, async (text: string, filePath: string) => {
+		const document = await vscode.workspace.openTextDocument(filePath);
+		const position = new vscode.Position(document.lineCount, 0);
+		if (document.lineAt(position.line - 1).text.trim().length) {
+			text = `\n${text}`;
+		}
+		const edit = new vscode.WorkspaceEdit();
+		edit.insert(vscode.Uri.file(filePath), position, text);
+		vscode.workspace.applyEdit(edit);
+	});
+
+	registerCommand(Commands.InsertI18nStringCommandId, async (text: string, project: Project) => {
+		const defaultLang = ExtensionContainer.config.project.defaultI18nLanguage;
+		const i18nPath = await project.getI18NPath();
+		if (!i18nPath) {
+			return;
+		}
+		const i18nStringPath = path.join(i18nPath, defaultLang, 'strings.xml');
+		if (!await fs.pathExists(i18nStringPath)) {
+			fs.ensureDirSync(path.join(i18nPath, defaultLang));
+			fs.writeFileSync(i18nStringPath, '<?xml version="1.0" encoding="UTF-8"?>\n<resources>\n</resources>');
+		}
+		const document = await vscode.workspace.openTextDocument(i18nStringPath);
+		const insertText = `\t<string name="${text}"></string>\n`;
+		const index = document.getText().indexOf('<\/resources>'); // eslint-disable-line no-useless-escape
+		if (index !== -1) {
+			const position = document.positionAt(index);
+			const edit = new vscode.WorkspaceEdit();
+			edit.insert(vscode.Uri.file(i18nStringPath), position, insertText);
+			vscode.workspace.applyEdit(edit);
+		}
+	});
 }
 
 /**
