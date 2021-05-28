@@ -112,7 +112,7 @@ export function targetForName (name: PrettyTarget): Target {
 		case 'emulator':
 		case 'simulator':
 		default:
-			return name as Target;
+			return lowerCaseName as Target;
 	}
 }
 
