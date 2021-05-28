@@ -103,7 +103,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		}
 	},
 	{ // widget
-		regExp: /<Widget[\s0-9a-zA-Z-_^='"]*src=["']$/,
+		regExp: /<Widget[\s0-9a-zA-Z-_^='"]*src=["']/,
 		files (project: Project, document: TextDocument, text: string): string[] {
 			return [ document.fileName.replace(/app\/(.*)$/, `app/widgets/${text}/controllers/widget.js`) ];
 		}
@@ -115,7 +115,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		}
 	},
 	{ // i18n
-		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*$/,
+		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*/,
 		definitionRegExp(text: string): RegExp {
 			// eslint-disable-next-line security/detect-non-literal-regexp
 			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');

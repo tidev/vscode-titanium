@@ -26,7 +26,7 @@ function setupCoverage () {
 
 export async function run (): Promise<void> {
 	const nyc = process.env.COVERAGE ? setupCoverage() : null;
-
+	const timeout = process.env.DEBUG ? 99999 : undefined;
 	const reportPath = path.join(__dirname, '..', '..', '..', 'junit_report.xml');
 
 	const mocha = new Mocha({
@@ -38,7 +38,8 @@ export async function run (): Promise<void> {
 				junit_report_path: reportPath
 			}
 		},
-		color: true
+		color: true,
+		timeout
 	});
 
 	const testsRoot = path.resolve(__dirname);

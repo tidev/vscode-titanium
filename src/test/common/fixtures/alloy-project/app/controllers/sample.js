@@ -13,3 +13,11 @@ Alloy.createModel('')
 Alloy.createWidget('')
 Alloy.CFG.
 L('')
+require('/http')
+Alloy.createController('existing-file');
+Alloy.createModel('test')
+Alloy.Collections.instance('test');
+Alloy.createWidget('widget-test')
+function doClick() {
+
+}

@@ -58,6 +58,9 @@
             "presentation": {
                 "group": "2_tests",
                 "order": 1
+            },
+            "env": {
+                "DEBUG": "1"
             }
         },
         {

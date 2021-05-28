@@ -1,10 +1,7 @@
-import * as path from 'path';
-import * as related from '../../related';
 import * as vscode from 'vscode';
 
 import { DefinitionSuggestion } from './common';
 import { BaseProvider } from '../baseProvider';
-import { Project } from '../../project';
 
 export class BaseDefinitionProvider extends BaseProvider implements vscode.DefinitionProvider {
 
