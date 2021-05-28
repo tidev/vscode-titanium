@@ -1,7 +1,10 @@
+import * as path from 'path';
+import * as related from '../../related';
 import * as vscode from 'vscode';
 
 import { DefinitionSuggestion } from './common';
 import { BaseProvider } from '../baseProvider';
+import { Project } from '../../project';
 
 export class BaseDefinitionProvider extends BaseProvider implements vscode.DefinitionProvider {
 
@@ -56,41 +59,5 @@ export class BaseDefinitionProvider extends BaseProvider implements vscode.Defin
 			}
 		}
 		return results;
-	}
-
-	/**
-	 * Returns matching definitions from given files
-	 *
-	 * @param {Array} files files to search
-	 * @param {RegExp} regExp search pattern
-	 * @param {Function} callback function to return item to add to definitions array
-	 *
-	 * @returns {Array}
-	*/
-	public async getReferences<T> (files: string[]|string, regExp: RegExp, callback: (file: string, range: vscode.Range) => T): Promise<T[]> {
-		const definitions = [];
-		if (!Array.isArray(files)) {
-			files = [ files ];
-		}
-		for (const file of files) {
-			let document;
-			try {
-				document = await vscode.workspace.openTextDocument(file);
-			} catch (error) {
-				// ignore the error, it's most likely the file doesn't exist
-				continue;
-			}
-			if (document.getText().length > 0) {
-				const matches = regExp.exec(document.getText());
-				if (!matches) {
-					continue;
-				}
-				for (const match of matches) {
-					const position = document.positionAt(matches.index);
-					definitions.push(callback(file, new vscode.Range(position.line, position.character, position.line, 0)));
-				}
-			}
-		}
-		return definitions;
 	}
 }

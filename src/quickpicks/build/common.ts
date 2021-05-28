@@ -4,7 +4,7 @@ import { commands, QuickPickOptions } from 'vscode';
 import { quickPick, CustomQuickPick } from '../common';
 import { selectAndroidDevice, selectAndroidEmulator } from './android';
 import { selectiOSDevice, selectiOSSimulator } from './ios';
-import { Platform } from 'src/types/common';
+import { Platform } from '../../types/common';
 
 export interface DeviceQuickPickItem extends CustomQuickPick {
 	id: string;

@@ -24,6 +24,8 @@ export enum Commands {
 	GenerateTask = 'titanium.task.generate',
 	InstallAllUpdates = 'titanium.updates.installAll',
 	InstallUpdate = 'titanium.updates.install',
+	InsertCommandId = 'titanium.insertCodeAction',
+	InsertI18nStringCommandId = 'titanium.insertI18nStringCodeAction',
 	OpenAllRelatedFiles = 'titanium.alloy.open.allRelatedFiles',
 	OpenRelatedController = 'titanium.alloy.open.relatedController',
 	OpenRelatedStyle = 'titanium.alloy.open.relatedStyle',

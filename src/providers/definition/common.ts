@@ -1,7 +1,5 @@
 import * as path from 'path';
 import * as related from '../../related';
-import * as utils from '../../utils';
-
 import { TextDocument } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { Project } from '../../project';
@@ -132,9 +130,3 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		i18nString: true
 	}
 ];
-
-export async function getProject (document: TextDocument): Promise<Project|undefined> {
-	const filePath = document.uri.fsPath;
-	const projectDir = await utils.findProjectDirectory(filePath);
-	return ExtensionContainer.projects.get(projectDir);
-}
