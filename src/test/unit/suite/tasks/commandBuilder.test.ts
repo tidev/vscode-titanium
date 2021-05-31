@@ -7,13 +7,12 @@ describe('CommandBuilder', () => {
 	function mockOS (platform: string) {
 		const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
 
-		// redefine process.platform
 		Object.defineProperty(process, 'platform', {
 			value: platform
 		});
 
 		return () => {
-			Object.defineProperty(process, 'platform', originalPlatform!);
+			Object.defineProperty(process, 'platform', originalPlatform!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 		};
 	}
 
