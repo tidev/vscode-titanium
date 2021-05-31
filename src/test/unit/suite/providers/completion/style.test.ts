@@ -156,7 +156,7 @@ describe('TSS Suggestions', () => {
 		const position = new vscode.Position(26, 3);
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
-		expect(suggestions.length).to.equal(1);
+		expect(suggestions.length).to.equal(2);
 
 		expect(suggestions[0].label).to.equal('scrollView');
 		expect(suggestions[0].kind).to.equal(17);
