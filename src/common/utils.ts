@@ -43,9 +43,9 @@ export class CommandError extends Error {
 	public command: string;
 	public exitCode: number;
 	public output?: string;
-	public signal?: string;
+	public signal?: NodeJS.Signals|null;
 
-	constructor(message: string, command: string, exitCode: number, output?: string, signal?: string) {
+	constructor(message: string, command: string, exitCode: number, output?: string, signal?: NodeJS.Signals|null) {
 		super(message);
 		this.command = command;
 		this.exitCode = exitCode;
