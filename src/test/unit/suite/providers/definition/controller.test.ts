@@ -39,7 +39,7 @@ describe('Controller definition', () => {
 		const suggestions: vscode.LocationLink[] = await testCompletion(position) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'lib', 'http.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'lib', 'http.js')));
 	});
 
 	it('should provide controller definitions', async () => {
@@ -47,22 +47,22 @@ describe('Controller definition', () => {
 		const suggestions: vscode.LocationLink[] = await testCompletion(position) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js')));
 	});
 
 	it('should provide model definitions', async () => {
 		const position = new vscode.Position(17, 19);
 		const suggestions: vscode.LocationLink[] = await testCompletion(position) as vscode.LocationLink[];
 
-		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'models', 'test.js'));
+		expect(suggestions.length).to.deep.equal(1);
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'models', 'test.js')));
 	});
 	it('should provide model definitions for Alloy.Collections', async () => {
 		const position = new vscode.Position(18, 28);
 		const suggestions: vscode.LocationLink[] = await testCompletion(position) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'models', 'test.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'models', 'test.js')));
 	});
 
 	it('should provide widget definitions', async () => {
@@ -70,7 +70,7 @@ describe('Controller definition', () => {
 		const suggestions: vscode.LocationLink[] = await testCompletion(position) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'widget.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'widget.js')));
 	});
 
 	it('should display widget controller definitions', async () => {
@@ -78,7 +78,7 @@ describe('Controller definition', () => {
 		const suggestions: vscode.LocationLink[] = await testCompletion(position, widgetUri) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'test.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'test.js')));
 	});
 
 	it('should display widget Collection definitions', async () => {
@@ -86,7 +86,7 @@ describe('Controller definition', () => {
 		const suggestions: vscode.LocationLink[] = await testCompletion(position, widgetUri) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'models', 'test.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'models', 'test.js')));
 	});
 
 	it('should display widget model definitions', async () => {
@@ -94,6 +94,6 @@ describe('Controller definition', () => {
 		const suggestions: vscode.LocationLink[] = await testCompletion(position, widgetUri) as vscode.LocationLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.path).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'models', 'test.js'));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'models', 'test.js')));
 	});
 });
