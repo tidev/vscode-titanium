@@ -26,9 +26,11 @@ describe('Alloy component generation', function () {
 		await dismissNotifications();
 		generator = new AlloyGenerate(driver);
 		tempDirectory = tmp.dirSync();
+		await generator.reset();
 		await copy(projectDirectory, tempDirectory.name);
 		await generator.waitForGetStarted();
 		await generator.openFolder(tempDirectory.name);
+		await driver.sleep(1000);
 		await generator.waitForEnvironmentDetectionCompletion();
 	});
 

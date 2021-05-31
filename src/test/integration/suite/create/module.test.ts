@@ -24,6 +24,7 @@ describe('Module creation', function () {
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
 		creator = new Project(driver);
+		await creator.reset();
 		await creator.waitForGetStarted();
 	});
 
