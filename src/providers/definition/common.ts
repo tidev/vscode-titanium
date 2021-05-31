@@ -39,7 +39,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return `Generate style (${fileName})`;
 		},
 		insertText (text: string): string {
-			let insertText = ExtensionContainer.config.codeTemplates.tssClass;
+			// eslint-disable-next-line no-template-curly-in-string
+			let insertText = ExtensionContainer.config?.codeTemplates.tssClass || '\\n\'.${text}\': {\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -57,7 +58,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return `Generate style (${fileName})`;
 		},
 		insertText (text: string): string {
-			let insertText = ExtensionContainer.config.codeTemplates.tssId;
+			// eslint-disable-next-line no-template-curly-in-string
+			let insertText = ExtensionContainer.config?.codeTemplates.tssId || '\\n\'#${text}\': {\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -79,7 +81,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 				|| text.startsWith('/')) {
 				return;
 			}
-			let insertText = ExtensionContainer.config.codeTemplates.tssTag;
+			// eslint-disable-next-line no-template-curly-in-string
+			let insertText = ExtensionContainer.config?.codeTemplates.tssTag || '\\n\'${text}\': {\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -97,7 +100,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return `Generate function (${fileName})`;
 		},
 		insertText (text: string): string {
-			let insertText = ExtensionContainer.config.codeTemplates.jsFunction;
+			// eslint-disable-next-line no-template-curly-in-string
+			let insertText = ExtensionContainer.config?.codeTemplates.jsFunction || '\\nfunction ${text}(e){\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
