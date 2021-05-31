@@ -5,57 +5,52 @@ import { describe, it } from 'mocha';
 import * as utils from '../../../utils';
 import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
 
-describe('iOS provisioning profile matches app ID', () => {
-
-	describe('Wildcard app ID', () => {
-		it('should match all', () => {
+describe('utils', () => {
+	describe('iOS provisioning profile matches app ID', () => {
+		it('Wildcard app ID should match all', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('*', 'com.example.app')).to.equal(true);
 			expect(utils.iOSProvisioningProfileMatchesAppId('*', 'com.anotherexample.app')).to.equal(true);
 		});
-	});
 
-	describe('Explicit app ID', () => {
-		it('should match case sensitivity', () => {
+		it('Explicit app ID should match case sensitivity', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.app', 'com.example.app')).to.equal(true);
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.app', 'com.Example.App')).to.equal(false);
 		});
-		it('mismatching path components', () => {
+		it('Explicit app ID mismatching path components', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.app', 'com.example.anotherapp')).to.equal(false);
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.app', 'com.anotherexample.app')).to.equal(false);
 		});
-	});
 
-	describe('Prefixed wildcard app ID', () => {
-		it('should match', () => {
+		it('Prefixed wildcard app ID should match', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.*', 'com.example.app')).to.equal(true);
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.*', 'com.anotherexample.app')).to.equal(false);
 		});
 
-		it('case sensitivity', () => {
+		it('Prefixed wildcard app ID case sensitivity', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.*', 'com.example.App')).to.equal(true);
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.*', 'com.Example.app')).to.equal(false);
 		});
-		it('additional path component', () => {
+
+		it('Prefixed wildcard app ID additional path component', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('com.example.*', 'com.example.example.app')).to.equal(true);
 		});
 	});
 
-});
-
-describe('#getCorrectCertificateName', () => {
-
-	it('Should return correct name property for <8.2.0', () => {
+	it('getCorrectCertificateName Should return correct name property for <8.2.0', () => {
 		const certificate = utils.getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41234)', '8.1.1.GA', 'developer');
 		expect(certificate).to.equal('Mrs Developer (D4BDS41234)');
 	});
 
-	it('Should return correct name property for >=8.2.0', () => {
+	it('getCorrectCertificateName return correct name property for >=8.2.0', () => {
 		const certificate = utils.getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41234)', '8.2.0.GA', 'developer');
 		expect(certificate).to.equal('iPhone Developer: Mrs Developer (D4BDS41234)');
 	});
-});
 
-describe('utils', () => {
+	it('getCorrectCertificateName should throw if cant find certificate', () => {
+		expect(() => {
+			utils.getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41233)', '8.2.0.GA', 'developer');
+		}).to.throw('Failed to lookup certificate iPhone Developer: Mrs Developer (D4BDS41233)');
+	});
 
 	it('findProjectDirectory', async () => {
 		const file = path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'sample.js');
@@ -96,5 +91,17 @@ describe('utils', () => {
 	it('targetsForPlatform', () => {
 		expect(utils.targetsForPlatform('android')).to.deep.equal([ 'emulator', 'device', 'dist-playstore' ]);
 		expect(utils.targetsForPlatform('ios')).to.deep.equal([ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ]);
+	});
+
+	it('should be able to retrieve a device name', () => {
+		expect(utils.getDeviceNameFromId('abcdefgh', 'android', 'device')).to.equal('HD1903');
+		expect(utils.getDeviceNameFromId('Nexus_5X_API_25_x86', 'android', 'emulator')).to.equal('Nexus 5X API 25 x86');
+
+		expect(utils.getDeviceNameFromId('034fdd80e5f4abd9a23db3640b694eb8bb1aab61', 'ios', 'device')).to.equal('Appcelerator iPad Air 2');
+		expect(utils.getDeviceNameFromId('9191DC9E-3B91-4BA9-9410-E85E86018E93', 'ios', 'simulator')).to.equal('iPhone 6s (11.0)');
+
+		expect(() => {
+			utils.getDeviceNameFromId('foo', 'android', 'device');
+		}).to.throw('Unable to find a name for foo');
 	});
 });
