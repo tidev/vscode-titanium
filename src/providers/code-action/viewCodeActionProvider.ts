@@ -24,7 +24,9 @@ export class ViewCodeActionProvider extends BaseProvider implements vscode.CodeA
 			if (suggestion.regExp.test(linePrefix)) {
 				const suggestionFiles = await suggestion.files(project, document, word);
 				const index = suggestionFiles.indexOf(path.join(project.filePath, 'app', 'styles', 'app.tss'));
-				suggestionFiles.splice(index, 1);
+				if (index >= 0) {
+					suggestionFiles.splice(index, 1);
+				}
 
 				if (!suggestion.definitionRegExp || !suggestion.title) {
 					continue;
