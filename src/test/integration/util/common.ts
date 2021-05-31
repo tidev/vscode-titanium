@@ -76,6 +76,7 @@ export async function dismissNotifications(): Promise<void> {
 	await center.close();
 }
 
+let activityView: ViewControl|undefined;
 /**
  * Common class for classes that wrap UI functionality to extend
  */
@@ -104,9 +105,7 @@ export class CommonUICreator {
 		await input.setText(folder);
 		await input.confirm();
 
-		await new Promise((resolve) => {
-			setTimeout(resolve, 2000);
-		});
+		await this.driver.sleep(2000);
 	}
 
 	public async configureSetting(section: string, settingName: string, value: string): Promise<void> {
@@ -239,6 +238,22 @@ export class CommonUICreator {
 		}, 120000);
 	}
 
+	public async reset(): Promise<void> {
+		if (activityView) {
+			await activityView.closeView();
+		}
+		const activityBar = new ActivityBar();
+		const activity = await this.driver.wait<ViewControl>(async () => {
+			const activityViews = await activityBar.getViewControls();
+			const activity = activityViews[0];
+			if (!activity?.isDisplayed()) {
+				return false;
+			}
+			return activity;
+		}, 10000);
+		await activity.openView();
+	}
+
 	/**
 	 * Looks for and returns an instance of the Titanium activity view
 	 *
@@ -246,6 +261,10 @@ export class CommonUICreator {
 	 * @memberof CommonUICreator
 	 */
 	public async getActivityView (): Promise<ViewControl> {
+		if (activityView) {
+			return activityView;
+		}
+
 		const activityBar = new ActivityBar();
 		const tiActivity = await this.driver.wait<ViewControl>(async () => {
 			const activity = await activityBar.getViewControl('Titanium');
@@ -253,8 +272,8 @@ export class CommonUICreator {
 				return false;
 			}
 			return activity;
-		}, 5000);
-		return tiActivity;
+		}, 10000);
+		return activityView = tiActivity;
 	}
 }
 
