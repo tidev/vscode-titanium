@@ -16,7 +16,8 @@ export enum GlobalState {
 	HasUpdates = 'titanium:update:hasUpdates',
 	RefreshEnvironment = 'titanium:environment:refresh',
 	MissingTooling = 'titanium:toolingMissing',
-	NotTitaniumProject = 'titanium:notProject'
+	NotTitaniumProject = 'titanium:notProject',
+	NeedsTrustedWorkspace = 'titanium:needsTrustedWorkspace'
 }
 
 export enum WorkspaceState {

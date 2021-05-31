@@ -50,10 +50,9 @@ export async function activate (context: vscode.ExtensionContext): Promise<void>
 		await generateCompletions(false, project);
 	});
 
-}
-
-export function deactivate (): void {
-	// CLEANUP
+	vscode.workspace.onDidGrantWorkspaceTrust(async () => {
+		await startup();
+	});
 }
 
 /**
@@ -64,6 +63,14 @@ export function deactivate (): void {
  * we're installing from a missing tooling scenario
  */
 export async function startup (): Promise<void> {
+
+	if (!vscode.workspace.isTrusted) {
+		// We need to set Enabled here just incase are called by a change to the useTi setting
+		// where the environment was previously valid but now we are missing tooling
+		ExtensionContainer.setContext(GlobalState.Enabled, false);
+		ExtensionContainer.setContext(GlobalState.NeedsTrustedWorkspace, true);
+		return;
+	}
 
 	const { missing } = await environment.validateEnvironment(undefined, !ExtensionContainer.isUsingTi());
 
