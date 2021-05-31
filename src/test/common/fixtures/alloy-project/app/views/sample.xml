@@ -14,5 +14,7 @@
 		<Label class="testClass" onClick="doClick" text="L('test')"/>
 		<Widget src="widget-test"/>
 		<Require src="existing-file"/>
+		<ImageView image="/assets/test.png">
+		<View id="noexistid" class="noexistclass" onClick="noExistFunc" text="L('noexist')"/>
     </Tab>
 </Alloy>
