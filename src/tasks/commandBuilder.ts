@@ -28,14 +28,12 @@ export class CommandBuilder {
 
 	private addArg (arg: string | ShellQuotedString | undefined): CommandBuilder {
 		if (typeof (arg) === 'string') {
-			if (arg) { // Quoted strings can be added as empty, but withArg will not allow an empty string arg
-				this.args.push(
-					{
-						value: arg,
-						quoting: ShellQuoting.Escape
-					}
-				);
-			}
+			this.args.push(
+				{
+					value: arg,
+					quoting: ShellQuoting.Escape
+				}
+			);
 		} else if (arg !== undefined) {
 			this.args.push(arg);
 		}
