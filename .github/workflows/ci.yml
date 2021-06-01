@@ -39,22 +39,3 @@ jobs:
         uses: GabrielBB/xvfb-action@v1.0
         with:
           run: npm run test
-
-  Integration-Test:
-    name: Integration Tests - latest VS Code
-    runs-on: macos-latest
-    needs: Lint
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - name: Install dependencies and requirements
-        run: |
-          npm ci
-          npm i titanium alloy -g
-          ti sdk install latest
-      - name: Run Integration Tests
-        run: npm run test:integration
-        env:
-          CODE_VERSION: latest
