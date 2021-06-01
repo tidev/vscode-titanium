@@ -11,6 +11,7 @@
         "rootDir": "src",
         "strict": true,
         "noUnusedLocals": false,
+        "noImplicitOverride": true,
         "baseUrl": ".",
         "types": [
             "node"

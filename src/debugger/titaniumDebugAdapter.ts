@@ -25,7 +25,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 	private server!: ProxyServer;
 	private target: string|undefined;
 
-	public commonArgs (args: TitaniumLaunchRequestArgs): void {
+	public override commonArgs (args: TitaniumLaunchRequestArgs): void {
 		args.sourceMaps = typeof args.sourceMaps === 'undefined' || args.sourceMaps;
 		this.deviceId = args.deviceId;
 		this.platform = args.platform;
@@ -34,7 +34,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		super.commonArgs(args);
 	}
 
-	public async launch (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
+	public override async launch (launchArgs: TitaniumLaunchRequestArgs): Promise<void> {
 		const info: any = await this.sendRequest('BUILD', launchArgs);
 
 		if (info.isError) {
@@ -54,7 +54,7 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		return this.attach(launchArgs);
 	}
 
-	public attach (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
+	public override attach (attachArgs: TitaniumAttachRequestArgs): Promise<void> {
 		const { platform } = attachArgs;
 		if (platform === 'android') {
 			return this.attachAndroid(attachArgs);
@@ -65,12 +65,12 @@ export class TitaniumDebugAdapter extends ChromeDebugAdapter {
 		}
 	}
 
-	public async disconnect (args: DebugProtocol.DisconnectArguments): Promise<void> {
+	public override async disconnect (args: DebugProtocol.DisconnectArguments): Promise<void> {
 		await this.cleanup();
 		return super.disconnect(args);
 	}
 
-	protected globalEvaluate (args: Crdp.Runtime.EvaluateRequest): Promise<Crdp.Runtime.EvaluateResponse> {
+	protected override globalEvaluate (args: Crdp.Runtime.EvaluateRequest): Promise<Crdp.Runtime.EvaluateResponse> {
 		// On Android we don't correctly handle no contextId being sent in an evaluate request
 		if (this.platform === 'android' && !args.contextId) {
 			args.contextId = 1;

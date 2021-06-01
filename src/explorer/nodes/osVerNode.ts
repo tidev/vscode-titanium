@@ -11,11 +11,11 @@ export class OSVerNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Collapsed;
 	public readonly contextValue: string = 'OSVerNode';
-	public readonly targetId: DevelopmentTarget;
-	public readonly version: string;
+	public override readonly targetId: DevelopmentTarget;
+	public override readonly version: string;
 
 	constructor (
-		public readonly label: string,
+		public override readonly label: string,
 		public readonly platform: Platform,
 		public readonly target: PrettyDevelopmentTarget
 	) {
@@ -24,7 +24,7 @@ export class OSVerNode extends BaseNode {
 		this.targetId = targetForName(this.target) as DevelopmentTarget;
 	}
 
-	public getChildren (): DeviceNode[] {
+	public override getChildren (): DeviceNode[] {
 		const simulators: DeviceNode[] = [];
 		if (this.platform === 'ios') {
 			const sims = appc.iOSSimulators();

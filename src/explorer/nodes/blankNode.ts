@@ -7,7 +7,7 @@ export class BlankNode extends BaseNode {
 	public readonly contextValue: string = 'BlankNode';
 
 	constructor (
-		public readonly label: string,
+		public override readonly label: string,
 	) {
 		super(label);
 		this.contextValue = 'BlankNode';

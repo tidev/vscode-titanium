@@ -10,12 +10,12 @@ export class DeviceNode extends BaseNode {
 	public readonly contextValue: string = 'DeviceNode';
 
 	constructor (
-		public readonly label: string,
+		public override readonly label: string,
 		public readonly platform: Platform,
 		public readonly target: string,
-		public readonly deviceId: string,
-		public readonly targetId: DevelopmentTarget,
-		public readonly version?: string
+		public override readonly deviceId: string,
+		public override readonly targetId: DevelopmentTarget,
+		public override readonly version?: string
 	) {
 		super(label);
 	}

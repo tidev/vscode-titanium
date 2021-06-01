@@ -4,7 +4,7 @@ import * as related from '../../related';
 import { BaseDefinitionProvider } from './baseDefinitionProvider';
 
 export class StyleDefinitionProvider extends BaseDefinitionProvider {
-	protected suggestions = [
+	protected override suggestions = [
 		{ // id
 			regExp: /["']#[A-Za-z0-9_=[\]]+/,
 			definitionRegExp (text: string): RegExp {

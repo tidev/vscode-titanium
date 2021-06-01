@@ -5,7 +5,7 @@ import { Project } from '../../project';
 import { BaseDefinitionProvider } from './baseDefinitionProvider';
 
 export class ControllerDefinitionProvider extends BaseDefinitionProvider {
-	protected suggestions = [
+	protected override suggestions = [
 		{ // require (/lib) name
 			regExp: /require\(["']([-a-zA-Z0-9-_/]*)$/,
 			files (project: Project, document: vscode.TextDocument, text: string, value: string): string[] {

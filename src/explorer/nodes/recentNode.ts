@@ -14,9 +14,9 @@ export class RecentNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Expanded;
 	public readonly contextValue: string = 'RecentNode';
-	public readonly label = 'Recent';
+	public override readonly label = 'Recent';
 
-	public getChildren (): Array<BlankNode | DeviceNode> {
+	public override getChildren (): Array<BlankNode | DeviceNode> {
 		const recentBuildNodes: Array<BlankNode | DeviceNode> = [];
 
 		// If we're refreshing hold off on populating this list so that we don't error when creating
