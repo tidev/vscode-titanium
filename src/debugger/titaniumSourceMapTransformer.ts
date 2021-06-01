@@ -10,12 +10,12 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 	private platform!: string;
 	private projectType!: string;
 
-	public async attach (args: TitaniumAttachRequestArgs): Promise<void> {
+	public override async attach (args: TitaniumAttachRequestArgs): Promise<void> {
 		await this.configureOptions(args.projectDir, args.platform);
 		return super.attach(args);
 	}
 
-	public async launch (args: TitaniumLaunchRequestArgs): Promise<void> {
+	public override async launch (args: TitaniumLaunchRequestArgs): Promise<void> {
 		await this.configureOptions(args.projectDir, args.platform);
 		return super.attach(args);
 	}
@@ -26,7 +26,7 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 		this.projectType = await determineProjectType(this.appDirectory);
 	}
 
-	public async scriptParsed (pathToGenerated: string, originalUrlToGenerated: string|undefined, sourceMapUrl: string): Promise<string[]> {
+	public override async scriptParsed (pathToGenerated: string, originalUrlToGenerated: string|undefined, sourceMapUrl: string): Promise<string[]> {
 		if (this.projectType === 'alloy') {
 			const sourceMapPlatform = this.platform === 'ios' ? 'iphone' : this.platform;
 			const mapDir = path.join(this.appDirectory, 'build', 'map', 'Resources', sourceMapPlatform);

@@ -15,12 +15,12 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	private projectType!: string;
 	private appName!: string;
 
-	public async attach (args: TitaniumAttachRequestArgs): Promise<void> {
+	public override async attach (args: TitaniumAttachRequestArgs): Promise<void> {
 		await this.configureTransformOptions(args);
 		return super.attach(args);
 	}
 
-	public async launch (args: TitaniumLaunchRequestArgs): Promise<void> {
+	public override async launch (args: TitaniumLaunchRequestArgs): Promise<void> {
 		await this.configureTransformOptions(args);
 		return super.attach(args);
 	}
@@ -33,7 +33,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		this.appName = await getAppName(this.appDirectory);
 	}
 
-	public setBreakpoints (source: DebugProtocol.Source): DebugProtocol.Source {
+	public override setBreakpoints (source: DebugProtocol.Source): DebugProtocol.Source {
 		if (!source.path) {
 			// sourceReference script, nothing to do
 			return source;
@@ -55,7 +55,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		}
 	}
 
-	public async scriptParsed (scriptUrl: string): Promise<string> {
+	public override async scriptParsed (scriptUrl: string): Promise<string> {
 		const localPath = await this.getLocalPath(scriptUrl);
 
 		if (localPath) {
@@ -69,7 +69,7 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		return Promise.resolve(scriptUrl);
 	}
 
-	public getTargetPathFromClientPath (clientPath: string): string {
+	public override getTargetPathFromClientPath (clientPath: string): string {
 		const targetUrl = this._localPathToTargetUrl.get(utils.canonicalizeUrl(clientPath));
 		if (path.isAbsolute(clientPath) && targetUrl) {
 			clientPath = targetUrl;
@@ -114,15 +114,15 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		return defaultPath;
 	}
 
-	public async stackTraceResponse (response: IStackTraceResponseBody): Promise<void> {
+	public override async stackTraceResponse (response: IStackTraceResponseBody): Promise<void> {
 		await Promise.all(response.stackFrames.map(frame => frame && frame.source && this.fixSource(frame.source)));
 	}
 
-	public getClientPathFromTargetPath (targetPath: string): string {
+	public override getClientPathFromTargetPath (targetPath: string): string {
 		return this._targetUrlToLocalPath.get(targetPath) || targetPath;
 	}
 
-	public async fixSource (source: DebugProtocol.Source): Promise<void> {
+	public override async fixSource (source: DebugProtocol.Source): Promise<void> {
 		if (source && source.path) {
 
 			const clientPath = this._targetUrlToLocalPath.get(source.path)

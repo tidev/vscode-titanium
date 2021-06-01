@@ -10,7 +10,7 @@ export class PlatformNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Expanded;
 	public readonly contextValue: string = 'PlatformNode';
-	public readonly label: PlatformPretty;
+	public override readonly label: PlatformPretty;
 	public readonly platform: Platform;
 
 	constructor (platform: Platform) {
@@ -20,7 +20,7 @@ export class PlatformNode extends BaseNode {
 		this.contextValue = 'PlatformNode';
 	}
 
-	public getChildren (): Array<DistributeNode|TargetNode> {
+	public override getChildren (): Array<DistributeNode|TargetNode> {
 		switch (this.platform) {
 			case 'android':
 				return [

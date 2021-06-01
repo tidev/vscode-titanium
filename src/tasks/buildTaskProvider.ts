@@ -51,7 +51,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		super('titanium-build', helpers);
 	}
 
-	public async provideTasks(): Promise<vscode.Task[]> {
+	public override async provideTasks(): Promise<vscode.Task[]> {
 		const tasks: vscode.Task[] = [];
 
 		for (const platform of platforms()) {
@@ -80,7 +80,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 		return tasks;
 	}
 
-	public async resolveTask (task: TitaniumTaskBase): Promise<vscode.Task> {
+	public override async resolveTask (task: TitaniumTaskBase): Promise<vscode.Task> {
 		// Run through create task
 		return this.createTask(
 			task.name,

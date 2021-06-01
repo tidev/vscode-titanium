@@ -16,17 +16,17 @@ export class TargetNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.Collapsed;
 	public readonly contextValue: string = 'TargetNode';
-	public readonly targetId: DevelopmentTarget;
+	public override readonly targetId: DevelopmentTarget;
 
 	constructor (
-		public readonly label: PrettyDevelopmentTarget,
+		public override readonly label: PrettyDevelopmentTarget,
 		public readonly platform: Platform
 	) {
 		super(label);
 		this.targetId = targetForName(this.label) as DevelopmentTarget;
 	}
 
-	public getChildren (): Array<OSVerNode|DeviceNode|BlankNode> {
+	public override getChildren (): Array<OSVerNode|DeviceNode|BlankNode> {
 		const devices = [];
 
 		// Check if we're refreshing the environment information currently and return early so that

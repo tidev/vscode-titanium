@@ -10,10 +10,10 @@ export class DistributeNode extends BaseNode {
 	public readonly contextValue: string = 'DistributeNode';
 
 	constructor (
-		public readonly label: string,
+		public override readonly label: string,
 		public readonly platform: Platform,
 		public readonly target: string,
-		public readonly targetId: DeploymentTarget
+		public override readonly targetId: DeploymentTarget
 	) {
 		super(label);
 	}

@@ -12,7 +12,7 @@ export class UpdatesNode extends BaseNode {
 
 	private updateInfo: UpdateInfo[] = [];
 
-	public async getChildren(): Promise<Array<BlankNode|UpdateNode>> {
+	public override async getChildren(): Promise<Array<BlankNode|UpdateNode>> {
 		try {
 			this.updateInfo = await ExtensionContainer.getUpdates();
 		} catch (error) {
