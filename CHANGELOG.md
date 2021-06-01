@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.12.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.11.0...v0.12.0) (2021-06-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* Raises the minimum VS Code version to 1.56.0
+
+### Features
+
+* add a command to generate a task for a device or distribution target ([fe62bee](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/fe62bee3e64f1d587087641d2164df9e4f9f0bb4))
+* add support for vscode workspace trust configuration ([618a9b9](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/618a9b94ef3aa4a8a67f0041724530a09fbe476e))
+* declare extension as incompatible with virtual workspaces ([eeda808](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/eeda808046d3291b2b0e0768a4701d9d8b91f97c))
+* **commands:** support multi-root workspaces ([cdc86b2](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/cdc86b24c3bc9206eaa4fc063f42ac018d44c1e0))
+* **create:** support opening created project in open workspace ([5511400](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/5511400edf974ce2326bbd8e12691e64b9064bb2))
+* **explorer/build:** add recent builds section ([ecdf45c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ecdf45c3724ed79332f515ff6613aab519cbad6e)), closes [#643](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/643)
+* **explorer/build:** display packaging options ([6d12555](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/6d125559e9396e620d3ca0f9630358abdf757d5e)), closes [#642](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/642)
+* **providers:** support multi-root workspaces ([c861d27](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c861d27c50b701e71371182d77f0a390fdcdad8c))
+* **tasks:** support multi-root workspaces ([265471d](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/265471ded85b3bb0be3836eca28493773bcc7308))
+* **tasks:** support passing arguments as environment variables ([691eaa5](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/691eaa5c9063ba1cb9454d0629d27b7547bec4ae))
+
+
+### Bug Fixes
+
+* **completions:** correctly format path for js files when running on Windows ([86ae13c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/86ae13ca9e418364e8104db33e8e29c2c58304f2))
+* **completions:** correctly get tag name when providing event name completions ([3ca1e77](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/3ca1e77dd9522510166eb5b6a568e27a3589a1ae))
+* **completions:** improve detection of tags when providing view suggestions ([33af87f](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/33af87feefee12abf2f2f29a9e78d268e253122b))
+* **create:** always display platform selection, error if none chosen ([65150c7](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/65150c7e59fc8568c8237be8b8695c77c60c3d90))
+* **create:** correctly handle force for alloy creation, error is project exists and force not chosen ([a170b2c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a170b2cbe015db95b92946a1f6b03a12e9cd48a4))
+* **debug/android:** improve reliability of Android debug attachment ([ba6bd7a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/ba6bd7aa910e17753c597d8d571950b5b1a5d46b))
+* **debugger:** correctly resolve projectDir when debugging if not specified ([c2bb757](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c2bb757b155a2d92d1becef11dbe9618076d7dee))
+* **explorer/help:** correctly reveal updates node when explorer hasn't been shown yet ([b1f4aa1](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/b1f4aa1c2a817b210468d01dd731cb8326ced751))
+* **package:** handle when package task is not triggered from a tree node ([0f5c810](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0f5c81084b0ebf0c417ad0313ef0dab27b3c8ddb))
+* **package:** pull target off node if called via explorer node ([8720407](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/87204073b3b37f8117832c444d4d8e229dc346dd))
+* **package:** stop a running package if called while one is running ([974bf7e](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/974bf7e0ddd5f0a6bd7b9a650ce49de5e6cb971c))
+* **providers:** correct alloy app path when searching for images ([fad06c1](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/fad06c1ce8a9f1272ef17891df99061eb247a188))
+* **providers:** ignore Alloy.CFG when providing Alloy namespace completions ([47b066f](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/47b066ff18dc2d52408dd5164bce766e9015c17d))
+* **providers/code-action:** dont call splice if app.tss is not in the suggestionfiles ([2d9bb9d](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/2d9bb9d13218922da2c90b481961e219f2847496))
+* **related:** correct detection of whether file is within current project ([a909431](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a9094319119b1e8109b309606f02f385dae105c5))
+* correctly set projectDir when using last build state ([bbd3e9f](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bbd3e9f5d1b716af3f025a77f8d7e3bf1478f985))
+* instantiate recentBuilds from workspace state on ExtensionContainer creation ([9975f70](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/9975f7095ea0da1059ece34ce70f6b331e5489cd))
+
 ## [0.11.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.10.0...v0.11.0) (2021-05-18)
 
 
