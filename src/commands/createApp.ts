@@ -35,6 +35,9 @@ export async function createApplication (): Promise<void> {
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir.fsPath);
 		if (await fs.pathExists(path.join(workspaceDir.fsPath, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That app already exists. Would you like to overwrite?' }, true);
+			if (!force) {
+				throw new InteractionError('App already exists and chose to not overwrite');
+			}
 		}
 
 		const args = createAppArguments({
@@ -54,6 +57,10 @@ export async function createApplication (): Promise<void> {
 
 			if (ExtensionContainer.isUsingTi()) {
 				progress.report({ message: 'Creating Alloy project' });
+				const alloyArgs =  [ 'new' ];
+				if (force) {
+					alloyArgs.push('--force');
+				}
 				await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
 			}
 			return;

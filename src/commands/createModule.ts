@@ -38,6 +38,9 @@ export async function createModule (): Promise<void> {
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir.fsPath);
 		if (await fs.pathExists(path.join(workspaceDir.fsPath, name))) {
 			force = await yesNoQuestion({ placeHolder: 'That module already exists. Would you like to overwrite?' }, true);
+			if (!force) {
+				throw new InteractionError('Module already exists and chose to not overwrite');
+			}
 		}
 
 		const args = createModuleArguments({
