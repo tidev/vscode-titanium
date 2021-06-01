@@ -45,7 +45,8 @@
   "capabilities": {
     "untrustedWorkspaces": {
       "supported": false
-    }
+    },
+    "virtualWorkspaces": false
   },
   "license": "Apache 2.0",
   "main": "./out/extension",
