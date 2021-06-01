@@ -976,7 +976,7 @@
     "eslint": "^7.27.0",
     "eslint-config-axway": "^6.0.2",
     "eslint-plugin-chai-friendly": "^0.7.1",
-    "eslint-plugin-mocha": "^8.1.0",
+    "eslint-plugin-mocha": "^9.0.0",
     "glob": "^7.1.7",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
