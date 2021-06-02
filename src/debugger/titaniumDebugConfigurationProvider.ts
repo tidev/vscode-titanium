@@ -1,7 +1,7 @@
-import * as getPort from 'get-port';
+import getPort from 'get-port';
 import { ExtensionContainer } from '../container';
 import * as vscode from 'vscode';
-import * as which from 'which';
+import which from 'which';
 import { UserCancellation } from '../commands';
 import { promptForWorkspaceFolder, selectPlatform } from '../quickpicks/common';
 import { AppBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';

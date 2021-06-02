@@ -1,5 +1,5 @@
 import * as glob from 'glob';
-import * as Mocha from 'mocha';
+import Mocha from 'mocha';
 import * as path from 'path';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
