@@ -1,4 +1,4 @@
-import * as walkSync from 'klaw-sync';
+import walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as utils from '../../utils';
 

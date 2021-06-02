@@ -1,12 +1,12 @@
 import * as fs from 'fs-extra';
-import * as walkSync from 'klaw-sync';
 import * as path from 'path';
 import * as semver from 'semver';
 import appc from './appc';
-import * as findUp from 'find-up';
+import findUp from 'find-up';
+import walkSync from 'klaw-sync';
 
 import { platform } from 'os';
-import { tasks, Task, ShellExecution } from 'vscode';
+import { tasks, Task, ShellExecution, TaskScope } from 'vscode';
 import { CreateAppOptions, CreateModuleOptions, PrettyDevelopmentTarget, PrettyTarget, Target } from './types/cli';
 import { IosCert, IosCertificateType, Platform, PlatformPretty } from './types/common';
 import { ExtensionContainer } from './container';
@@ -365,6 +365,7 @@ export async function executeAsTask(command: string, name: string): Promise<void
 
 	const task = new Task(
 		{ type: 'shell' },
+		TaskScope.Global,
 		name,
 		'Updates',
 		new ShellExecution(command)

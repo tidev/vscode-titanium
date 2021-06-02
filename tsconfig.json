@@ -12,6 +12,7 @@
         "strict": true,
         "noUnusedLocals": false,
         "noImplicitOverride": true,
+        "esModuleInterop": true,
         "baseUrl": ".",
         "types": [
             "node"

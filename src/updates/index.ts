@@ -55,6 +55,11 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 						if (runWithSudo) {
 							await executeAsTask(`sudo ${metadata.command}`, update.productName);
 						}
+					} else if (metadata.errorCode === 'ESELECTERROR') {
+						const select = await vscode.window.showErrorMessage(`Failed to set ${update.latestVersion} as the selected SDK. Would you like to manually select it?`, { title: 'Select' });
+						if (select) {
+							await executeAsTask(`${metadata.command}`, update.productName);
+						}
 					}
 				} else {
 					// TODO should we show the error that we got passed?
