@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.12.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.0...v0.12.1) (2021-06-03)
+
+
+### Bug Fixes
+
+* **updates:** select Titanium SDK after installing it ([0ecec2f](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/0ecec2f7a98b3aa5d6d4032439b445ec03e0e292))
+
 ## [0.12.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.11.0...v0.12.0) (2021-06-01)
 
 
