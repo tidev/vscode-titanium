@@ -1,6 +1,7 @@
-/* eslint require-atomic-updates: 0 */
-import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
+import * as fs from 'fs-extra';
 import * as path from 'path';
+
+import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
 import { DebugProtocol } from 'vscode-debugprotocol';
 import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { determineProjectType, getAppName } from '../common/utils';
@@ -8,12 +9,14 @@ import { determineProjectType, getAppName } from '../common/utils';
 export class TitaniumPathTransformer extends BasePathTransformer {
 
 	private appDirectory!: string;
+	private appRoot!: string;
 	private platform!: string;
 	private _pathMapping!: IPathMapping;
 	private _localPathToTargetUrl = new Map<string, string>();
 	private _targetUrlToLocalPath = new Map<string, string>();
 	private projectType!: string;
 	private appName!: string;
+	private widgets: string[] = [];
 
 	public override async attach (args: TitaniumAttachRequestArgs): Promise<void> {
 		await this.configureTransformOptions(args);
@@ -31,6 +34,17 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		this.platform = args.platform;
 		this.projectType = await determineProjectType(this.appDirectory);
 		this.appName = await getAppName(this.appDirectory);
+
+		if (this.projectType === 'alloy') {
+			this.appRoot = path.join(this.appDirectory, 'app');
+		} else if (this.projectType === 'classic') {
+			this.appRoot = path.join(this.appDirectory, 'Resources');
+		}
+
+		if (this.projectType === 'alloy' && await fs.pathExists(path.join(this.appRoot, 'widgets'))) {
+			this.widgets = await fs.readdir(path.join(this.appRoot, 'widgets'));
+		}
+
 	}
 
 	public override setBreakpoints (source: DebugProtocol.Source): DebugProtocol.Source {
@@ -78,10 +92,8 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 	}
 
 	public async getLocalPath (sourceUrl: string): Promise<string> {
-		const appRoot = this.projectType === 'alloy' ? path.join(this.appDirectory, 'app') : path.join(this.appDirectory, 'Resources');
-		const platformRoot = path.join(appRoot, this.platform);
 		let defaultPath = '';
-		const searchFolders = [ appRoot ];
+		const searchFolders = [ this.appRoot ];
 
 		if (this.platform === 'ios') {
 			// We must encode the app name here as the sourceUrl we're provided
@@ -91,12 +103,15 @@ export class TitaniumPathTransformer extends BasePathTransformer {
 		}
 
 		if (this.projectType !== 'alloy') {
-			searchFolders.push(platformRoot);
+			searchFolders.push(path.join(this.appRoot, this.platform));
 		}
 
 		if (this.projectType === 'alloy') {
-			searchFolders.push(path.join(appRoot, 'lib'));
-			searchFolders.push(path.join(appRoot, 'controllers', this.platform));
+			searchFolders.push(path.join(this.appRoot, 'lib'));
+			searchFolders.push(path.join(this.appRoot, 'controllers', this.platform));
+			for (const widget of this.widgets) {
+				searchFolders.push(path.join(this.appRoot, 'widgets', widget, 'lib'));
+			}
 		}
 
 		for (const folder of searchFolders) {
