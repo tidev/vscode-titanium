@@ -1,6 +1,7 @@
-import { BaseSourceMapTransformer } from 'vscode-chrome-debug-core';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+
+import { BaseSourceMapTransformer } from 'vscode-chrome-debug-core';
 import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { determineProjectType } from '../common/utils';
 
@@ -34,12 +35,18 @@ export class TitaniumSourceMapTransformer extends BaseSourceMapTransformer {
 			const filename = path.basename(pathToGenerated);
 			const relative = path.relative(path.join(this.appDirectory, 'app'), pathToGenerated);
 			const isLib = pathToGenerated.includes(libDir);
-			// if its under lib then its at the top level
+			const isWidgetLib = /app\/widgets\/(\S+)\/lib\//.exec(pathToGenerated);
 			if (filename === 'alloy.js' || filename === 'app.js') {
 				sourceMapUrl = path.join(mapDir, 'app.js.map');
 			} else if (isLib) {
+				// if its under app/lib then its at the top level
 				const filepath = path.relative(libDir, pathToGenerated);
 				sourceMapUrl = path.join(mapDir, `${filepath}.map`);
+			} else if (isWidgetLib) {
+				// Files from the lib folder of a widget are stored in a folder with the widget
+				// name at the top level
+				const [ , widgetName ] = isWidgetLib;
+				sourceMapUrl = path.join(mapDir, widgetName, filename);
 			} else {
 				let dir = path.dirname(relative);
 				dir = dir.split(path.sep).filter(e => e !== this.platform).join(path.sep);
