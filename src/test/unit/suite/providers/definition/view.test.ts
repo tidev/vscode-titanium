@@ -64,7 +64,7 @@ describe('View definition', () => {
 		const suggestions: vscode.DefinitionLink[] = await testCompletion(position) as vscode.DefinitionLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri).to.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'widget.js')));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'widget.js')));
 	});
 
 	it('should provide require src definitions', async () => {
@@ -72,7 +72,7 @@ describe('View definition', () => {
 		const suggestions: vscode.DefinitionLink[] = await testCompletion(position) as vscode.DefinitionLink[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri).to.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js')));
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js')));
 	});
 
 	it('should provide i18n definitions', async () => {
