@@ -109,13 +109,14 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // widget
 		regExp: /<Widget[\s0-9a-zA-Z-_^='"]*src=["']/,
 		files (project: Project, document: TextDocument, text: string): string[] {
-			return [ document.fileName.replace(/app\/(.*)$/, `app/widgets/${text}/controllers/widget.js`) ];
+
+			return [ path.join(project.filePath, 'app', 'widgets', text, 'controllers', 'widget.js') ];
 		}
 	},
 	{ // require
 		regExp: /<Require[\s0-9a-zA-Z-_^='"]*src=["']/,
 		files (project: Project, document: TextDocument, text: string): string[] {
-			return [ document.fileName.replace(/app\/(.*)$/, `app/controllers/${text}.js`) ];
+			return [ path.join(project.filePath, 'app', 'controllers', `${text}.js`) ];
 		}
 	},
 	{ // i18n
