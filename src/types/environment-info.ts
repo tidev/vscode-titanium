@@ -80,4 +80,20 @@ export interface AppcInfo {
 		version: string;
 		selectedSDK: string;
 	};
+	jdk: {
+		jdks: {
+			[key: string]: {
+				home: string;
+				version: string;
+				build: string;
+				executables: {
+					[key: string]: string
+				},
+				architecture: string
+			};
+		};
+		executables: {
+			[key: string]: string
+		},
+	}
 }

@@ -391,6 +391,12 @@ export class Appc {
 		}
 	}
 
+	public getKeytoolPath (): string|undefined {
+		if (this.info?.jdk.executables.keytool) {
+			return this.info?.jdk.executables.keytool;
+		}
+	}
+
 	/**
 	 * Returns appc CLI session for current user.
 	 *

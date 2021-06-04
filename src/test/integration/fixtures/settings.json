@@ -1,3 +1,4 @@
 {
-	"titanium.general.useTi": true
+	"titanium.general.useTi": true,
+	"security.workspace.trust.enabled": true
 }

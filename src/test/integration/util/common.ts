@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -82,7 +82,7 @@ let activityView: ViewControl|undefined;
  */
 export class CommonUICreator {
 	protected driver: WebDriver;
-	protected workbench: Workbench;
+	public workbench: Workbench;
 
 	constructor(driver: WebDriver) {
 		this.driver = driver;
@@ -122,6 +122,7 @@ export class CommonUICreator {
 	 * @memberof CommonUICreator
 	 */
 	public async waitForEnvironmentDetectionCompletion(): Promise<void> {
+		await this.trustWorkspace();
 		const tiActivity = await this.getActivityView();
 		const view  = await tiActivity.openView();
 		const content = await view.getContent();
@@ -164,10 +165,10 @@ export class CommonUICreator {
 	 * @memberof CommonUICreator
 	 */
 	public async waitForGetStarted (): Promise<void> {
+		await this.trustWorkspace();
 		const tiActivity = await this.getActivityView();
 		const view  = await tiActivity.openView();
 		const content = await view.getContent();
-
 		await this.driver.wait(async () => {
 			try {
 				const sections = await content.getSections();
@@ -274,6 +275,42 @@ export class CommonUICreator {
 			return activity;
 		}, 10000);
 		return activityView = tiActivity;
+	}
+
+	public async trustWorkspace(): Promise<void> {
+
+		// First check if we've got a prompt displayed
+		try {
+			const dialog = await this.driver.findElement(By.className('monaco-dialog-box'));
+
+			if (dialog) {
+				const trustButton = await this.driver.findElement(By.xpath('.//a[starts-with(@title, "Yes")]'));
+				if (trustButton) {
+					await trustButton.click();
+					return;
+				}
+			}
+		} catch (error) {
+			// dialog box doesnt always show, fallback to using the editor
+		}
+
+		try {
+			await this.workbench.executeCommand('manage workspace trust');
+			await this.driver.sleep(500);
+
+			const title = await this.driver.findElement(By.className('workspace-trust-title-text'));
+			const text = await title.getText();
+			if (text.toLowerCase().includes('you trust') || text.toLowerCase().includes('is trusted')) {
+				// already trusted!
+				return;
+			}
+
+			const button = await this.driver.findElement(By.xpath('//div[@class="workspace-trust-limitations trusted"]//a'));
+			await button.click();
+		} catch (error) {
+			// ignore
+		}
+
 	}
 }
 

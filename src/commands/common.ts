@@ -11,6 +11,7 @@ export enum Commands {
 	CheckForUpdates = 'titanium.updates.checkAll',
 	Clean = 'titanium.clean',
 	CreateApp = 'titanium.create.application',
+	CreateKeystore = 'titanium.create.keystore',
 	CreateModule = 'titanium.create.module',
 	Debug = 'titanium.build.debug',
 	DisableLiveView = 'titanium.build.setLiveViewDisabled',

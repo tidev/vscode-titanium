@@ -46,12 +46,17 @@ export default class Terminal {
 			});
 
 			proc.stderr?.on('data', data => {
+				data = data.toString();
 				output += data.toString();
+				// If we're prompted for some info, error out
+				if (data.match(/Enter .+:/)) {
+					proc.kill(1);
+				}
 			});
 
 			proc.on('close', code => {
 				if (code) {
-					const error = new CommandError('Failed to run command', `${command} ${args}`, code, output);
+					const error = new CommandError('Failed to run command', `${command} ${args.join(' ')}`, code, output);
 					return reject(error);
 				}
 				return resolve({ output });

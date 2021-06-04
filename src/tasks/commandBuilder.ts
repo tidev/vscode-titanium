@@ -41,11 +41,11 @@ export class CommandBuilder {
 		return this;
 	}
 
-	private toEnvironmentArg (value: string) {
+	private toEnvironmentArg (value: string, quote = false) {
 		if (process.platform === 'win32') {
 			return `%${value}%`;
 		} else {
-			return `$${value}`;
+			return quote ? `"$${value}"` : `$${value}`;
 		}
 	}
 
@@ -75,10 +75,9 @@ export class CommandBuilder {
 		return this;
 	}
 
-	public addEnvironmentArgument(option: string, value: string): CommandBuilder {
-		const environmentName = option.replace(/-/g, '').toUpperCase();
+	public addEnvironmentArgument(option: string, value: string, quote = false, environmentName = option.replace(/-/g, '').toUpperCase()): CommandBuilder {
 		this.environmentOptions[environmentName] = value;
-		this.addOption(option, this.toEnvironmentArg(environmentName));
+		this.addOption(option, this.toEnvironmentArg(environmentName, quote));
 
 		return this;
 	}
