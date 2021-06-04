@@ -135,7 +135,8 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			if (!i18nPath) {
 				return [];
 			}
-			return [ path.join(i18nPath, ExtensionContainer.config.project.defaultI18nLanguage, 'strings.xml') ];
+			const defaultLang = ExtensionContainer.config?.project.defaultI18nLanguage || 'en';
+			return [ path.join(i18nPath, defaultLang, 'strings.xml') ];
 		},
 		i18nString: true
 	}
