@@ -1,10 +1,10 @@
 <Alloy>
-    <Tab title="test" id="container">
-        <Window class="foo" onOpen >
-            <ScrollView id="scrollView">
+	<Tab title="test" id="container">
+		<Window class="foo" onOpen >
+			<ScrollView id="scrollView">
 
-            </ScrollView>
-        </Window>
+			</ScrollView>
+		</Window>
 		<Label />
 		<Label color=""/>
 		<Label class=""/>
@@ -16,5 +16,5 @@
 		<Require src="existing-file"/>
 		<ImageView image="/assets/test.png">
 		<View id="noexistid" class="noexistclass" onClick="noExistFunc" text="L('noexist')"/>
-    </Tab>
+	</Tab>
 </Alloy>

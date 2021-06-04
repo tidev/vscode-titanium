@@ -121,8 +121,14 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // i18n
 		regExp: /[:\s=,>)("]L\(["'][\w0-9_-]*/,
 		definitionRegExp(text: string): RegExp {
+			// Strip the brackets if they're included
+			if (text.includes('(')) {
+				const matches = /\(["'](\S+)["']\)/.exec(text);
+				text = matches?.[1] as string;
+
+			}
 			// eslint-disable-next-line security/detect-non-literal-regexp
-			return new RegExp(`name=["']${text}["']>(.*)?</`, 'g');
+			return new RegExp(`name=["']${text}["']>.*</`, 'g');
 		},
 		async files(project: Project): Promise<string[]> {
 			const i18nPath = await project.getI18NPath();

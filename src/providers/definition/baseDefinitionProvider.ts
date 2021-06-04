@@ -7,6 +7,10 @@ export class BaseDefinitionProvider extends BaseProvider implements vscode.Defin
 
 	protected suggestions: DefinitionSuggestion[] = [];
 
+	// This can be overridden to allow the getWordRangeAtPosition call to match non-word strings
+	// used as id or class names or i18n calls in views
+	protected wordRangeRegex: RegExp|undefined;
+
 	public async provideDefinition (document: vscode.TextDocument, position: vscode.Position): Promise<vscode.Definition|vscode.DefinitionLink[]> {
 		const project = await this.getProject(document);
 		const results: vscode.DefinitionLink[] = [];
@@ -16,7 +20,7 @@ export class BaseDefinitionProvider extends BaseProvider implements vscode.Defin
 		}
 		const line = document.lineAt(position).text;
 		const linePrefix = document.getText(new vscode.Range(position.line, 0, position.line, position.character));
-		const wordRange = document.getWordRangeAtPosition(position);
+		const wordRange = document.getWordRangeAtPosition(position, this.wordRangeRegex);
 		const word = wordRange ? document.getText(wordRange) : undefined;
 
 		const regExp = /['"]/g;

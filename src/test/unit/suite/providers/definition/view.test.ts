@@ -42,7 +42,7 @@ describe('View definition', () => {
 	});
 
 	it('should provide id definitions', async () => {
-		const position = new vscode.Position(1, 26);
+		const position = new vscode.Position(1, 23);
 		const suggestions: vscode.Location[] = await testCompletion(position) as vscode.Location[];
 
 		expect(suggestions.length).to.equal(1);
@@ -59,8 +59,7 @@ describe('View definition', () => {
 		expect(suggestions[0].range.start.line).to.equal(20);
 	});
 
-	// FIXME: fails because it detects "widget" as the string not "widget-test"
-	it.skip('should provide widget src definitions', async () => {
+	it('should provide widget src definitions', async () => {
 		const position = new vscode.Position(14, 21);
 		const suggestions: vscode.DefinitionLink[] = await testCompletion(position) as vscode.DefinitionLink[];
 
@@ -68,8 +67,7 @@ describe('View definition', () => {
 		expect(suggestions[0].targetUri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'widgets', 'widget-test', 'controllers', 'widget.js'));
 	});
 
-	// FIXME: fails because it detects "existing" as the string not "existing-file"
-	it.skip('should provide require src definitions', async () => {
+	it('should provide require src definitions', async () => {
 		const position = new vscode.Position(15, 22);
 		const suggestions: vscode.DefinitionLink[] = await testCompletion(position) as vscode.DefinitionLink[];
 
@@ -77,12 +75,11 @@ describe('View definition', () => {
 		expect(suggestions[0].targetUri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js'));
 	});
 
-	// FIXME: fails because it cannot pull the "test" i18n string out correctly to construct the regex
-	it.skip('should provide i18n definitions', async () => {
-		const position = new vscode.Position(13, 60);
-		const suggestions: vscode.DefinitionLink[] = await testCompletion(position) as vscode.DefinitionLink[];
+	it('should provide i18n definitions', async () => {
+		const position = new vscode.Position(13, 55);
+		const suggestions: vscode.Location[] = await testCompletion(position) as vscode.Location[];
 
 		expect(suggestions.length).to.equal(1);
-		expect(suggestions[0].targetUri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js'));
+		expect(suggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'i18n', 'en', 'strings.xml'));
 	});
 });
