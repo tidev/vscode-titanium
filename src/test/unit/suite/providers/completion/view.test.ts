@@ -35,7 +35,7 @@ describe('View suggestions', () => {
 	});
 
 	it('Should provide tag suggestions', async () => {
-		const position = new vscode.Position(2, 11); // <Wi
+		const position = new vscode.Position(2, 7);
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(4);
@@ -58,7 +58,7 @@ describe('View suggestions', () => {
 	});
 
 	it('Should provide event suggestions for', async () => {
-		const position = new vscode.Position(2, 34); // <Window onOpen
+		const position = new vscode.Position(2, 28); // <Window onOpen
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 		expect(suggestions.length).to.equal(1);

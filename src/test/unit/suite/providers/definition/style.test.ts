@@ -13,7 +13,7 @@ const styleUri = getFileUri('styles/sample.tss');
 
 let sandbox: sinon.SinonSandbox;
 
-describe('View definition', () => {
+describe('Style definition', () => {
 	const provider = new StyleDefinitionProvider();
 
 	async function testCompletion(position: vscode.Position, uri = styleUri): Promise<vscode.Definition|vscode.LocationLink[]> {
