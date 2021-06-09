@@ -14,13 +14,13 @@ export async function testSetup(): Promise<void> {
 	}
 
 	try {
-		await exec('ti');
+		await exec('ti -v');
 	} catch (error) {
 		exit('Unable to find titanium CLI. Please install it');
 	}
 
 	try {
-		await exec('alloy');
+		await exec('alloy -v');
 	} catch (error) {
 		exit('Unable to find alloy CLI. Please install it');
 	}
