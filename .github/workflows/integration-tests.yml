@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 1.49.0, latest, insider ]
+        version: [ 1.56.0, latest, insider ]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
