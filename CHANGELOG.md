@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.12.2](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.1...v0.12.2) (2021-06-14)
+
+
+### Bug Fixes
+
+* **debugger:** support breakpoints in widget lib files ([bb24ffd](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bb24ffd3ea9d060e08bb8898609a5ba5162f8755)), closes [#140](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/140)
+* **providers/definition:** correctly resolve widget and controller files on Windows ([b80f2a6](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/b80f2a662f461935285e6c06ca16a36c6905d41a))
+* **providers/view:** fix issues when providing definitions that included punctuation ([a09fb53](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a09fb53615ddb7e7f707f8f038611f050d81cafa))
+* **updates:** update editor commons to fix passing of error metadata ([4e4bb44](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/4e4bb44cdee861dd667cd1606739d6d1f3139c8b)), closes [#741](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/741)
+
 ### [0.12.1](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.0...v0.12.1) (2021-06-03)
 
 
