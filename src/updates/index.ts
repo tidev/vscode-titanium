@@ -26,6 +26,8 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 
 		const selectedUpdates = updateInfo.length;
 		let counter = 1;
+		let succeeded = 0;
+		let failed = 0;
 
 		// sort prior to running
 		updateInfo.sort((curr: UpdateInfo, prev: UpdateInfo) => curr.priority - prev.priority);
@@ -41,6 +43,7 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 					message: `Installed ${label} (${counter}/${selectedUpdates})`,
 					increment: 100 / selectedUpdates
 				});
+				succeeded++;
 			} catch (error) {
 				progress.report({
 					message: `Failed to install ${label} (${counter}/${selectedUpdates})`,
@@ -61,6 +64,7 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 							await executeAsTask(`${metadata.command}`, update.productName);
 						}
 					}
+					failed++;
 				} else {
 					// TODO should we show the error that we got passed?
 					await vscode.window.showErrorMessage(`Failed to update to ${label}`);
@@ -82,7 +86,14 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 
 		vscode.commands.executeCommand(Commands.RefreshExplorer);
 		vscode.commands.executeCommand(Commands.RefreshHelp);
-		vscode.window.showInformationMessage(`Installed ${selectedUpdates} ${selectedUpdates === 1 ? 'update' : 'updates'}`);
+
+		let message = `Installed ${succeeded} ${succeeded === 1 ? 'update' : 'updates'}`;
+
+		if (failed) {
+			message = `${message} and failed to install ${failed} ${failed === 1 ? 'update' : 'updates'}`;
+		}
+
+		vscode.window.showInformationMessage(message);
 
 		// If an install was triggered as a consequence of missing tooling then kick off another check
 		if (ExtensionContainer.context.globalState.get(GlobalState.MissingTooling)) {
