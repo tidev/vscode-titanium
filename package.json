@@ -1007,7 +1007,7 @@
     "standard-version": "^9.3.0",
     "tmp": "^0.2.1",
     "typescript": "^4.3.2",
-    "vscode-extension-tester": "^4.0.3",
+    "vscode-extension-tester": "^4.1.0",
     "vscode-extension-tester-native": "^3.0.2",
     "vscode-test": "^1.5.2"
   },
