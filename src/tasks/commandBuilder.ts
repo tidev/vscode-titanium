@@ -43,7 +43,7 @@ export class CommandBuilder {
 
 	private toEnvironmentArg (value: string, quote = false) {
 		if (process.platform === 'win32') {
-			return `%${value}%`;
+			return quote ? `"%${value}%"` : `%${value}%`;
 		} else {
 			return quote ? `"$${value}"` : `$${value}`;
 		}

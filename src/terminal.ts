@@ -39,7 +39,7 @@ export default class Terminal {
 			spawnOptions.shell = true;
 		}
 		return new Promise((resolve, reject) => {
-			const proc = spawn(command, args, spawnOptions);
+			const proc = spawn(`"${command}"`, args, spawnOptions);
 			let output = ';';
 			proc.stdout?.on('data', data => {
 				output += data.toString();
