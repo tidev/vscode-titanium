@@ -513,7 +513,7 @@
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage) [Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
+        "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage)\n[Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
         "when": "!isTrustedWorkspace"
       }
     ],
