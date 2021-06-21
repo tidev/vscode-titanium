@@ -180,6 +180,11 @@
         "description": "Create a new Titanium application project"
       },
       {
+        "command": "titanium.create.keystore",
+        "title": "Create keystore",
+        "category": "Titanium"
+      },
+      {
         "command": "titanium.create.module",
         "title": "Create module",
         "category": "Titanium",
@@ -508,7 +513,7 @@
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage) [Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
+        "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage)\n[Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
         "when": "!isTrustedWorkspace"
       }
     ],
@@ -516,6 +521,10 @@
       "commandPalette": [
         {
           "command": "titanium.create.application",
+          "when": "isWorkspaceTrusted"
+        },
+        {
+          "command": "titanium.create.keystore",
           "when": "isWorkspaceTrusted"
         },
         {
@@ -968,6 +977,7 @@
     "@seadub/danger-plugin-eslint": "^2.0.0",
     "@seadub/danger-plugin-junit": "^0.2.0",
     "@types/chai": "^4.2.18",
+    "@types/chai-as-promised": "^7.1.4",
     "@types/fs-extra": "^9.0.11",
     "@types/glob": "^7.1.3",
     "@types/got": "^9.6.11",
@@ -985,6 +995,7 @@
     "@typescript-eslint/eslint-plugin": "^4.26.1",
     "@typescript-eslint/parser": "^4.26.1",
     "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
     "commitizen": "^4.2.4",
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
@@ -1007,12 +1018,13 @@
     "standard-version": "^9.3.0",
     "tmp": "^0.2.1",
     "typescript": "^4.3.2",
-    "vscode-extension-tester": "^4.0.3",
+    "vscode-extension-tester": "^4.1.0",
     "vscode-extension-tester-native": "^3.0.2",
     "vscode-test": "^1.5.2"
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
+    "@redhat-developer/vscode-wizard": "^0.2.9",
     "detect-indent": "^6.1.0",
     "find-up": "^5.0.0",
     "fs-extra": "^10.0.0",

@@ -21,6 +21,7 @@ import { createModule } from './createModule';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
 import { generateTask } from './generateTask';
+import { createKeystore } from './createKeystore';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -178,6 +179,10 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.GenerateTask, async (node: DeviceNode|DistributeNode) => {
 		return generateTask(node);
+	});
+
+	registerCommand(Commands.CreateKeystore, async () => {
+		return createKeystore();
 	});
 }
 
