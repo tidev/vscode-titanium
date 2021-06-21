@@ -993,7 +993,7 @@
     "@types/which": "^2.0.0",
     "@types/xml2js": "^0.4.8",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.26.1",
+    "@typescript-eslint/parser": "^4.27.0",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
     "commitizen": "^4.2.4",
