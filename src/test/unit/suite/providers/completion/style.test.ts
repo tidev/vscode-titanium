@@ -181,4 +181,13 @@ describe('TSS Suggestions', () => {
 		expect(suggestions[0].label).to.equal('/test.png');
 		expect(suggestions[0].kind).to.equal(16);
 	});
+
+	it('should provide completions for inner properties', async () => {
+		const position = new vscode.Position(43, 8);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(4);
+
+		expect(suggestions[0].label).to.equal('fontFamily');
+	});
 });

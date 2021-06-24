@@ -37,7 +37,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		} else if (/\$\.([-a-zA-Z0-9-_]*).([-a-zA-Z0-9-_]*)$/.test(linePrefix)) {
 			return this.getMethodAndPropertyCompletions(linePrefix, project);
 		// Titanium APIs - Ti.UI._ or Ti._
-		} else if (/(?:Ti|Titanium)\.?\S+/i.test(linePrefix)) {
+		} else if (/\s*(?:Ti|Titanium)\.?\S+/i.test(linePrefix)) {
 			return this.getTitaniumApiCompletions(linePrefix, project);
 		// Event name - $.tableView.addEventListener('click', ...)
 		} else if (/\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {

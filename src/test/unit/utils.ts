@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { CompletionsData } from '../../../../titanium-editor-commons/completions';
 import { getCommonAlloyProjectDirectory } from '../common/utils';
 
 /**
@@ -15,7 +16,7 @@ export function getUnitFixturesDirectory(): string {
  * Loads and returns the completions from the fixtures directory
  * @returns {Object}
  */
-export function loadCompletions (): unknown {
+export function loadCompletions (): CompletionsData {
 	const rawData = fs.readFileSync(path.join(getUnitFixturesDirectory(), 'completions.json'), 'utf8');
 	return JSON.parse(rawData);
 }

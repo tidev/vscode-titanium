@@ -131,7 +131,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		if (tags[tagName] && tags[tagName].apiName) {
 			apiName = tags[tagName].apiName;
 		}
-		let events = [];
+		let events: string[] = [];
 		if (types[apiName]) {
 			events = types[apiName].events;
 		}
@@ -304,7 +304,8 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		const { alloy, titanium } = await this.getCompletions(project);
 		const { tags } = alloy;
 		const { types } = titanium;
-		const type = types[tags[tag] ? tags[tag].apiName : undefined];
+		const apiName = tags[tag]?.apiName;
+		const type = types[apiName];
 		if (type) {
 			return type.properties;
 		}
