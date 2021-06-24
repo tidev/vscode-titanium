@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { CompletionsData } from '../../../../titanium-editor-commons/completions';
+import { CompletionsData } from 'titanium-editor-commons/completions';
 import { getCommonAlloyProjectDirectory } from '../common/utils';
 
 /**
