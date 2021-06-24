@@ -5,8 +5,7 @@ import com.axway.AppcCLI;
 def appc = new AppcCLI(steps)
 timestamps {
   def nodeVersion = '12.18.0'
-  def npmVersion = 'latest-6'
-  def sdkVersion = '9.0.3.GA'
+  def npmVersion = 'latest'
 
   node('osx') {
     nodejs(nodeJSInstallationName: "node ${nodeVersion}") {
