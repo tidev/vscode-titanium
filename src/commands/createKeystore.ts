@@ -242,6 +242,8 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 							.resolve();
 
 						await ExtensionContainer.terminal.runInBackground(keytool, commandInfo.args, { env: commandInfo.environment });
+
+						vscode.window.showInformationMessage('Keystore created successfully');
 					} catch (error) {
 
 						// eslint-disable-next-line promise/catch-or-return

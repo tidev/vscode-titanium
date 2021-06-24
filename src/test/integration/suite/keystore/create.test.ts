@@ -3,7 +3,7 @@ import * as tmp from 'tmp';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { EditorView, InputBox, VSBrowser, WebDriver, WebView, By } from 'vscode-extension-tester';
-import { dismissNotifications, CommonUICreator } from '../../util/common';
+import { dismissNotifications, CommonUICreator, notificationExists } from '../../util/common';
 import { getCommonAlloyProjectDirectory } from '../../../common/utils';
 import { basename, join } from 'path';
 
@@ -67,7 +67,7 @@ describe('Keystore creation', function () {
 		await driver.sleep(2500);
 		(await webview.findWebElement(By.id('buttonFinish'))).click();
 
-		await driver.sleep(1000);
+		await driver.wait(() => notificationExists('Keystore created successfully'), 5000);
 
 		expect(fs.pathExistsSync(join(tempDirectory.name, 'keystore'))).to.equal(true, 'Keystore did not get created');
 	});
