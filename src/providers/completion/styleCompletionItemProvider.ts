@@ -158,16 +158,12 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 		}
 
 		// Lookup the property data
-		const propertyData: { description: string; type: string } = properties[parentObjName];
+		const propertyData = properties[parentObjName];
 		if (propertyData) {
-			const propertyType = properties[parentObjName].type;
+			const propertyType = propertyData.type;
 			const typeData = types[propertyType];
 			if (typeData && typeData.properties && typeData.properties.length) {
-				let completionProperty;
-				if (properties[parentObjName]) {
-					completionProperty = properties[parentObjName].type;
-				}
-				for (const property of types[completionProperty].properties) {
+				for (const property of typeData.properties) {
 					innerProperties[property] = {};
 				}
 			}
