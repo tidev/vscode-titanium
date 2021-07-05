@@ -1023,7 +1023,7 @@
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
-    "@redhat-developer/vscode-wizard": "^0.2.9",
+    "@redhat-developer/vscode-wizard": "^0.2.11",
     "detect-indent": "^6.1.0",
     "find-up": "^5.0.0",
     "fs-extra": "^10.0.0",
