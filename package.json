@@ -1019,7 +1019,7 @@
     "tmp": "^0.2.1",
     "typescript": "^4.3.5",
     "vscode-extension-tester": "^4.1.0",
-    "vscode-test": "^1.5.2"
+    "vscode-test": "^1.6.1"
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
