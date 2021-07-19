@@ -976,7 +976,7 @@
     "@seadub/danger-plugin-dependencies": "^1.0.0",
     "@seadub/danger-plugin-eslint": "^2.0.0",
     "@seadub/danger-plugin-junit": "^0.2.0",
-    "@types/chai": "^4.2.19",
+    "@types/chai": "^4.2.21",
     "@types/chai-as-promised": "^7.1.4",
     "@types/fs-extra": "^9.0.11",
     "@types/glob": "^7.1.3",
