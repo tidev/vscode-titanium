@@ -259,6 +259,7 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 							});
 						reject(error);
 						return {
+							success: false,
 							close: false,
 							templates: [],
 							returnObject: {}
