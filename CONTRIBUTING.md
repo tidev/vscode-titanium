@@ -73,7 +73,7 @@ To release of the extension the following needs to be followed:
 
 1. Ensure that your local `master` branch is completely up to date with the main repo.
 2. Run `npm run release`, which performs the following
-	- Runs `scripts/generate-settings-table.js` to ensure the configuration settings documentation is up to date.
+	- Runs `scripts/render.js` to ensure the documentation is up to date.
 	- Runs [standard-version](https://github.com/conventional-changelog/standard-version) to bump versions based on commit messages, updates the changelog, commits the files and tags a new release.
 	- Runs `npx vsce package` to generate a new `.vsix` file ready for upload to the marketplace.
 3. Push to the main repo with `git push` and `git push <appc remote> <tag>`.
