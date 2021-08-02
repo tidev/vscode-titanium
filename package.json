@@ -992,7 +992,7 @@
     "@types/vscode": "1.56.0",
     "@types/which": "^2.0.1",
     "@types/xml2js": "^0.4.9",
-    "@typescript-eslint/eslint-plugin": "^4.28.4",
+    "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.4",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
