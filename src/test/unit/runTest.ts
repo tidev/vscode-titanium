@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import { getCommonFixturesDirectory } from '../common/utils';
-import { runTests } from 'vscode-test';
+import { runTests } from '@vscode/test-electron';
 
 async function main (): Promise<void> {
 	try {
