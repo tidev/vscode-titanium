@@ -40,7 +40,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		},
 		insertText (text: string): string {
 			// eslint-disable-next-line no-template-curly-in-string
-			let insertText = ExtensionContainer.config?.codeTemplates.tssClass || '\\n\'.${text}\': {\\n}\\n';
+			let insertText = ExtensionContainer.config?.codeTemplates?.tssClass || '\\n\'.${text}\': {\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -59,7 +59,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		},
 		insertText (text: string): string {
 			// eslint-disable-next-line no-template-curly-in-string
-			let insertText = ExtensionContainer.config?.codeTemplates.tssId || '\\n\'#${text}\': {\\n}\\n';
+			let insertText = ExtensionContainer.config?.codeTemplates?.tssId || '\\n\'#${text}\': {\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -82,7 +82,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 				return;
 			}
 			// eslint-disable-next-line no-template-curly-in-string
-			let insertText = ExtensionContainer.config?.codeTemplates.tssTag || '\\n\'${text}\': {\\n}\\n';
+			let insertText = ExtensionContainer.config?.codeTemplates?.tssTag || '\\n\'${text}\': {\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -101,7 +101,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		},
 		insertText (text: string): string {
 			// eslint-disable-next-line no-template-curly-in-string
-			let insertText = ExtensionContainer.config?.codeTemplates.jsFunction || '\\nfunction ${text}(e){\\n}\\n';
+			let insertText = ExtensionContainer.config?.codeTemplates?.jsFunction || '\\nfunction ${text}(e){\\n}\\n';
 			insertText = insertText.replace(/(\${text})/g, text).replace(/\\n/g, '\n');
 			return insertText;
 		}
@@ -136,7 +136,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			if (!i18nPath) {
 				return [];
 			}
-			const defaultLang = ExtensionContainer.config?.project.defaultI18nLanguage || 'en';
+			const defaultLang = ExtensionContainer.config?.project?.defaultI18nLanguage || 'en';
 			return [ path.join(i18nPath, defaultLang, 'strings.xml') ];
 		},
 		i18nString: true
