@@ -4,6 +4,7 @@ import * as utils from './utils';
 import { Uri, window, TextEditor, TextDocument } from 'vscode';
 import { ExtensionContainer } from './container';
 import { Project } from './project';
+import { handleInteractionError, InteractionError } from './commands';
 
 const alloyDirectoryMap: { [key: string]: string } = {
 	xml: 'views',
@@ -19,18 +20,23 @@ const alloyDirectoryMap: { [key: string]: string } = {
  * @param {String} currentFilePath	path of current file
  * @returns {String}
  */
-export function getTargetPath (project: Project, type: string, currentFilePath?: string): string|undefined {
+export function getTargetPath (project: Project, type: string, currentFilePath = window.activeTextEditor?.document.fileName): string {
 	if (!currentFilePath) {
-		currentFilePath = window.activeTextEditor?.document.fileName;
+		throw new InteractionError('No active edtor');
 	}
 
 	const alloyRootPath = path.join(project.filePath, 'app');
 
-	if (!currentFilePath || !currentFilePath.includes(alloyRootPath)) {
-		return;
+	if (!currentFilePath.includes(alloyRootPath)) {
+		throw new InteractionError('File is not part of an Alloy project');
 	}
 
 	const pathUnderAlloy = path.relative(alloyRootPath, currentFilePath);
+
+	if (!/^(controllers|styles|views|widgets)/.test(pathUnderAlloy)) {
+		throw new InteractionError('File is not a controller, style, view or widget');
+	}
+
 	const pathSplitArr = pathUnderAlloy.split(path.sep);
 
 	if (pathSplitArr[0] === 'widgets') {
@@ -55,6 +61,7 @@ export function getTargetPath (project: Project, type: string, currentFilePath?:
  */
 export async function openRelatedFile (type: string, project?: Project): Promise<TextEditor|undefined> {
 	if (!window.activeTextEditor) {
+		window.showErrorMessage('No active editor');
 		return;
 	}
 
@@ -68,12 +75,14 @@ export async function openRelatedFile (type: string, project?: Project): Promise
 		project = proj;
 	}
 
-	const relatedPath = getTargetPath(project, type);
-	if (!relatedPath) {
-		return;
-	}
-	if (!window.visibleTextEditors.find(editor => editor.document.fileName === relatedPath)) {
+	try {
+		const relatedPath = getTargetPath(project, type);
+		// Don't check to see if it's open as we can only get the currently active editor anyway
 		return window.showTextDocument(Uri.file(relatedPath), { preview: false });
+	} catch (error) {
+		if (error instanceof InteractionError) {
+			handleInteractionError(error);
+		}
 	}
 }
 
@@ -82,9 +91,9 @@ export async function openRelatedFile (type: string, project?: Project): Promise
  * @param {Project} [project] - The Titanium project instance
  */
 export async function openAllFiles (project?: Project): Promise<void> {
-	[ 'xml', 'tss', 'js' ].forEach(type => {
-		openRelatedFile(type, project);
-	});
+	for (const type of [ 'xml', 'tss', 'js' ]) {
+		await openRelatedFile(type, project);
+	}
 }
 
 async function getProject (document: TextDocument): Promise<Project|undefined> {
