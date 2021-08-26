@@ -13,12 +13,12 @@ export interface DefinitionSuggestion {
 	insertText? (text: string): string|undefined;
 }
 
-function getRelatedFiles(project: Project, fileType: string): string[] {
+async function getRelatedFiles(project: Project, fileType: string): Promise<string[]> {
 	const relatedFiles: string[] = [];
 	if (fileType === 'tss') {
 		relatedFiles.push(path.join(project.filePath, 'app', 'styles', 'app.tss'));
 	}
-	const relatedFile = related.getTargetPath(project, fileType);
+	const relatedFile = await related.getTargetPath(project, fileType);
 	if (relatedFile) {
 		relatedFiles.push(relatedFile);
 	}
@@ -28,7 +28,7 @@ function getRelatedFiles(project: Project, fileType: string): string[] {
 export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // class
 		regExp: /class=["'][\s0-9a-zA-Z-_^]*$/,
-		files (project: Project): string[] {
+		async files (project: Project): Promise<string[]> {
 			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
@@ -47,7 +47,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // id
 		regExp: /id=["'][\s0-9a-zA-Z-_^]*$/,
-		files (project: Project): string[] {
+		async files (project: Project): Promise<string[]> {
 			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
@@ -66,7 +66,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // tag
 		regExp: /<[A-Z][A-Za-z]*$/,
-		files (project: Project): string[] {
+		async files (project: Project): Promise<string[]> {
 			return getRelatedFiles(project, 'tss');
 		},
 		definitionRegExp (text: string): RegExp {
@@ -89,7 +89,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	},
 	{ // handler
 		regExp: /on(.*?)=["'][A-Za-z]*$/,
-		files (project: Project): string[] {
+		async files (project: Project): Promise<string[]> {
 			return getRelatedFiles(project, 'js');
 		},
 		definitionRegExp (text: string): RegExp {

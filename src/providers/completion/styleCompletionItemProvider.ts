@@ -74,7 +74,7 @@ export class StyleCompletionItemProvider extends BaseCompletionItemProvider {
 	public async getClassOrIdCompletions (linePrefix: string, position: Position, document: TextDocument, project: Project, prefix?: string): Promise<CompletionItem[]> {
 		const completions: CompletionItem[] = [];
 		const values: string[] = [];
-		const relatedFile = related.getTargetPath(project, 'xml');
+		const relatedFile = await related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}

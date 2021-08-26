@@ -192,7 +192,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		// Related and global TSS
 		//
 		if (attribute === 'id' || attribute === 'class') {
-			const relatedFile = related.getTargetPath(project, 'tss', document.fileName);
+			const relatedFile = await related.getTargetPath(project, 'tss', document.fileName);
 			const appTss = path.join(project.filePath, 'app', 'styles', 'app.tss');
 
 			const files = [];
@@ -243,7 +243,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 				}
 
 				const files = utils.filterJSFiles(controllerPath);
-				const relatedControllerFile = related.getTargetPath(project, 'js', document.fileName);
+				const relatedControllerFile = await related.getTargetPath(project, 'js', document.fileName);
 				for (const file of files) {
 					if (relatedControllerFile === file.path) {
 						continue;

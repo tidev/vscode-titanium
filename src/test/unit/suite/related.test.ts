@@ -11,6 +11,7 @@ import { ExtensionContainer } from '../../../container';
 import { getFileUri } from '../utils';
 import { Project } from '../../../project';
 import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
+import { sleep } from '../../../common/utils';
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
@@ -24,6 +25,11 @@ describe('related', () => {
 
 	const indexView = path.join(appDirectory, 'views', 'index.xml');
 
+	const tsLookUpController = path.join(appDirectory, 'controllers', 'ts-lookup.ts');
+	const tsLookUpView = path.join(appDirectory, 'views', 'ts-lookup.xml');
+
+	const noViewController = path.join(appDirectory, 'controllers', 'folder', 'test.js');
+
 	const widgetsDirectory = path.join(appDirectory, 'widgets');
 	const widgetIndexController = path.join(widgetsDirectory, 'widget-test', 'controllers', 'widget.js');
 	const widgetIndexView = path.join(widgetsDirectory, 'widget-test', 'views', 'widget.xml');
@@ -33,9 +39,11 @@ describe('related', () => {
 	}
 
 	beforeEach(async () => {
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		for (const _editor of vscode.window.visibleTextEditors) {
+		// cleanup any open editors from previous tests. There's no public API to get all the
+		// open editors, so do this fun little thing
+		while (vscode.window.activeTextEditor) {
 			await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+			await sleep(250);
 		}
 	});
 
@@ -45,24 +53,36 @@ describe('related', () => {
 
 	describe('getTargetPath', () => {
 		it('should throw if no file path provided and no activeEditor', async () => {
-			expect(() => related.getTargetPath(project, 'xml')).to.throw('No active edtor');
+			await expect(related.getTargetPath(project, 'xml')).to.be.rejectedWith('No active edtor');
 		});
 
-		it('should throw if provided path is not under an alloy path', () => {
-			expect(() => related.getTargetPath(project, 'js', '/foo')).to.throw('File is not part of an Alloy project');
+		it('should throw if provided path is not under an alloy path', async () => {
+			await expect(related.getTargetPath(project, 'js', '/foo')).to.be.rejectedWith('File is not part of an Alloy project');
 		});
 
-		it('should throw if provided path is not relevant', () => {
-			expect(() => related.getTargetPath(project, 'js', path.join(appDirectory, 'config.json'))).to.throw('File is not a controller, style, view or widget');
+		it('should throw if provided path is not relevant', async () => {
+			await expect(related.getTargetPath(project, 'js', path.join(appDirectory, 'config.json'))).to.be.rejectedWith('File is not a controller, style, view or widget');
+		});
+
+		it('should throw if no file found', async () => {
+			await expect(related.getTargetPath(project, 'xml', noViewController)).to.be.rejectedWith('Unable to find related file');
 		});
 
 		it('should use active text editor if no path provided', async () => {
 			await openEditor('controllers/index.js');
-			expect(related.getTargetPath(project, 'xml')).to.equal(indexView);
+			await expect(related.getTargetPath(project, 'xml')).to.eventually.equal(indexView);
 		});
 
-		it('should handle widgets', () => {
-			expect(related.getTargetPath(project, 'xml', widgetIndexController)).to.equal(widgetIndexView);
+		it('should handle widgets', async () => {
+			await expect(related.getTargetPath(project, 'xml', widgetIndexController)).to.eventually.equal(widgetIndexView);
+		});
+
+		it('should find a ts file for a controller', async () => {
+			await expect(related.getTargetPath(project, 'js', tsLookUpView)).to.eventually.equal(tsLookUpController);
+		});
+
+		it('should find a view file for a ts controller', async () => {
+			await expect(related.getTargetPath(project, 'xml', tsLookUpController)).to.eventually.equal(tsLookUpView);
 		});
 	});
 

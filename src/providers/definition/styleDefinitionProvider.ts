@@ -11,8 +11,8 @@ export class StyleDefinitionProvider extends BaseDefinitionProvider {
 				// eslint-disable-next-line security/detect-non-literal-regexp
 				return new RegExp(`id=["']${text.replace('#', '')}`, 'g');
 			},
-			files (project: Project, document: vscode.TextDocument): string[] {
-				const relatedFile = related.getTargetPath(project, 'xml', document.fileName);
+			async files (project: Project, document: vscode.TextDocument): Promise<string[]> {
+				const relatedFile = await related.getTargetPath(project, 'xml', document.fileName);
 				if (relatedFile) {
 					return [ relatedFile ];
 				}
@@ -25,8 +25,8 @@ export class StyleDefinitionProvider extends BaseDefinitionProvider {
 				// eslint-disable-next-line security/detect-non-literal-regexp
 				return new RegExp(`class=["']${text.replace('.', '')}`, 'g');
 			},
-			files (project: Project, document: vscode.TextDocument): string[] {
-				const relatedFile = related.getTargetPath(project, 'xml', document.fileName);
+			async files (project: Project, document: vscode.TextDocument): Promise<string[]> {
+				const relatedFile = await related.getTargetPath(project, 'xml', document.fileName);
 				if (relatedFile) {
 					return [ relatedFile ];
 				}
