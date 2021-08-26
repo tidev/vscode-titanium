@@ -17,7 +17,7 @@ async function main (): Promise<void> {
 		const testWorkspace = path.join(getCommonFixturesDirectory(), 'alloy-project');
 
 		// Download VS Code, unzip it and run the integration test
-		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: [ testWorkspace ] });
+		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs: [ testWorkspace, '--disable-extensions' ] });
 	} catch (err) {
 		// tslint:disable-next-line:no-console
 		console.error('Failed to run tests');
