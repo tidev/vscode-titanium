@@ -87,7 +87,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 	 */
 	public async getIdCompletions (project: Project): Promise<CompletionItem[]> {
 		const completions: CompletionItem[] = [];
-		const relatedFile = related.getTargetPath(project, 'xml');
+		const relatedFile = await related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}
@@ -131,7 +131,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		const id = matches[1];
 
 		const completions: CompletionItem[] = [];
-		const relatedFile = related.getTargetPath(project, 'xml');
+		const relatedFile = await related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}
@@ -328,7 +328,7 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 			return completions;
 		}
 		const id = matches[1];
-		const relatedFile = related.getTargetPath(project, 'xml');
+		const relatedFile = await related.getTargetPath(project, 'xml');
 		if (!relatedFile) {
 			return completions;
 		}

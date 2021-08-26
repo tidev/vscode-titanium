@@ -1,3 +1,4 @@
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as utils from './utils';
 
@@ -20,7 +21,7 @@ const alloyDirectoryMap: { [key: string]: string } = {
  * @param {String} currentFilePath	path of current file
  * @returns {String}
  */
-export function getTargetPath (project: Project, type: string, currentFilePath = window.activeTextEditor?.document.fileName): string {
+export async function getTargetPath (project: Project, type: string, currentFilePath = window.activeTextEditor?.document.fileName): Promise<string> {
 	if (!currentFilePath) {
 		throw new InteractionError('No active edtor');
 	}
@@ -45,11 +46,23 @@ export function getTargetPath (project: Project, type: string, currentFilePath =
 		pathSplitArr[0] = alloyDirectoryMap[type];  // change type
 	}
 
-	const fileSplitArr = pathSplitArr[pathSplitArr.length - 1].split('.');
-	fileSplitArr[fileSplitArr.length - 1] = type; // change ext
+	const extensionLookups = [ type ];
+	if (type === 'js') {
+		extensionLookups.push('ts');
+	}
 
-	const targetPath = path.resolve(alloyRootPath, pathSplitArr.join(path.sep), '..', fileSplitArr.join('.'));
-	return targetPath;
+	for (const extension of extensionLookups) {
+		const fileSplitArr = pathSplitArr[pathSplitArr.length - 1].split('.');
+		fileSplitArr[fileSplitArr.length - 1] = extension; // change ext
+
+		const targetPath = path.resolve(alloyRootPath, pathSplitArr.join(path.sep), '..', fileSplitArr.join('.'));
+
+		if (await fs.pathExists(targetPath)) {
+			return targetPath;
+		}
+	}
+
+	throw new InteractionError('Unable to find related file');
 }
 
 /**
@@ -76,7 +89,7 @@ export async function openRelatedFile (type: string, project?: Project): Promise
 	}
 
 	try {
-		const relatedPath = getTargetPath(project, type);
+		const relatedPath = await getTargetPath(project, type);
 		// Don't check to see if it's open as we can only get the currently active editor anyway
 		return window.showTextDocument(Uri.file(relatedPath), { preview: false });
 	} catch (error) {
