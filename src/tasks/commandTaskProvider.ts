@@ -77,7 +77,7 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 			} else if (error instanceof UserCancellation) {
 				context.terminal.writeWarningLine('Task cancelled as no selection occurred');
 				return 0;
-			} else {
+			} else if (error instanceof Error) {
 				message = `${message}\n${error.message}`;
 			}
 

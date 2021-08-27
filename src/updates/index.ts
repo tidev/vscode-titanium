@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { ProductNames, UpdateInfo } from 'titanium-editor-commons/updates';
+import { InstallError } from 'titanium-editor-commons/util';
 import { executeAsTask } from '../utils';
 import { selectUpdates } from '../quickpicks/common';
 import { ExtensionContainer } from '../container';
@@ -49,7 +50,7 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 					message: `Failed to install ${label} (${counter}/${selectedUpdates})`,
 					increment: 100 / selectedUpdates
 				});
-				if (error.metadata) {
+				if (error instanceof InstallError && error.metadata) {
 					const { metadata } = error;
 					if ((update.productName === ProductNames.AppcInstaller || update.productName === ProductNames.Node) && metadata.errorCode === 'EACCES') {
 						const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${label} as it must be ran with sudo`, {

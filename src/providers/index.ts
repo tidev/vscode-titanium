@@ -5,7 +5,8 @@ import * as vscode from 'vscode';
 
 import { Commands, handleInteractionError, InteractionChoice, InteractionError, registerCommand } from '../commands';
 import { Project } from '../project';
-import { completion, updates } from 'titanium-editor-commons';
+import { completion, updates  } from 'titanium-editor-commons';
+import { CustomError } from 'titanium-editor-commons/completions/util';
 
 // Import the various providers
 import { CompletionsFormat } from './completion/baseCompletionItemProvider';
@@ -155,7 +156,7 @@ export async function generateCompletions (force = false, project: Project): Pro
 		}
 	} catch (error) {
 		const actions: InteractionChoice[] = [];
-		if (error.code === 'ESDKNOTINSTALLED') {
+		if (error instanceof CustomError && error.code === 'ESDKNOTINSTALLED') {
 			actions.push({
 				title: 'Install',
 				run: () => {
@@ -171,7 +172,8 @@ export async function generateCompletions (force = false, project: Project): Pro
 				}
 			});
 		}
-		const install = await vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${error.message}`, ...actions);
+		const message = error instanceof Error ? error.message : '';
+		const install = await vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${message}`, ...actions);
 		if (install) {
 			await install.run();
 		}
