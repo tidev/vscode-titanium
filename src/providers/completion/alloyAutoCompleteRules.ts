@@ -15,6 +15,13 @@ interface AlloyAutoCompleteRule {
 	rangeRegex?: RegExp;
 }
 
+interface ImageAutoComplete {
+	prefix: string;
+	suffix: string;
+	file: string;
+	scales: string[]
+}
+
 export const cfgAutoComplete: AlloyAutoCompleteRule = {
 	regExp: /Alloy\.CFG\.([-a-zA-Z0-9-_/]*)[,]?$/,
 	async getCompletions (projectDir) {
@@ -95,7 +102,7 @@ export const imageAutoComplete: AlloyAutoCompleteRule = {
 				nodir: true,
 				filter: item => path.basename(item.path) !== '.DS_Store'
 			});
-			const images = [];
+			const images: ImageAutoComplete[] = [];
 			for (const file of files) {
 				let prefix: string|undefined;
 				let scale: string|undefined;
