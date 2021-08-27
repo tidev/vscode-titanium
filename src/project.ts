@@ -132,6 +132,9 @@ export class Project {
 				this.tiapp = json['ti:app'];
 			}
 		} catch (err) {
+			if (!(err instanceof Error)) {
+				throw err;
+			}
 			let line: number;
 			let column: number;
 			let message = 'Errors found in tiapp.xml';

@@ -232,7 +232,7 @@ export class CommonUICreator {
 				}
 			} catch (error) {
 				// ignore error while we're waiting for the section to load
-				if (error.message?.includes('It looks')) {
+				if (error instanceof Error && error.message?.includes('It looks')) {
 					throw error;
 				}
 			}

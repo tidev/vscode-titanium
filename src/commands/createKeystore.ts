@@ -10,6 +10,7 @@ import { getValidWorkspaceFolders, quickPick } from '../quickpicks';
 import { BUTTONS, SEVERITY } from '@redhat-developer/vscode-wizard/lib/WebviewWizard';
 import { KeystoreInfo } from '../types/common';
 import { CommandBuilder } from '../tasks/commandBuilder';
+import { CommandError } from 'src/common/utils';
 
 export async function createKeystore (): Promise<KeystoreInfo> {
 
@@ -245,18 +246,20 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 
 						vscode.window.showInformationMessage('Keystore created successfully');
 					} catch (error) {
+						if (error instanceof CommandError) {
+							// eslint-disable-next-line promise/catch-or-return
+							vscode.window.showErrorMessage('There was an error creating the keystore', 'View')
+								.then(view => {
+									if (view) {
+										const output = vscode.window.createOutputChannel('Titanium - Keystore creation');
+										output.appendLine((error as CommandError).command);
+										output.appendLine((error as CommandError).output || '');
+										output.show();
+									}
+									return;
+								});
+						}
 
-						// eslint-disable-next-line promise/catch-or-return
-						vscode.window.showErrorMessage('There was an error creating the keystore', 'View')
-							.then(view => {
-								if (view) {
-									const output = vscode.window.createOutputChannel('Titanium - Keystore creation');
-									output.appendLine(error.command);
-									output.appendLine(error.output);
-									output.show();
-								}
-								return;
-							});
 						reject(error);
 						return {
 							success: false,

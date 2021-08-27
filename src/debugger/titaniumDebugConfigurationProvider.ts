@@ -77,11 +77,10 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 			try {
 				ourConfig.platform = (await selectPlatform()).id;
 			} catch (error) {
-				let message = error.message;
 				if (error instanceof UserCancellation) {
-					message = 'Failed to start debug session as no platform was selected';
+					throw new Error('Failed to start debug session as no platform was selected');
 				}
-				throw new Error(message);
+				throw error;
 			}
 		}
 
