@@ -1010,7 +1010,7 @@
     "glob": "^7.1.7",
     "husky": "^7.0.2",
     "lint-staged": "^11.1.2",
-    "mocha": "^9.1.0",
+    "mocha": "^9.1.1",
     "mocha-jenkins-reporter": "^0.4.6",
     "mocha-multi-reporters": "^1.5.1",
     "nyc": "^15.1.0",
