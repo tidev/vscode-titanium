@@ -10,7 +10,7 @@ import { getValidWorkspaceFolders, quickPick } from '../quickpicks';
 import { BUTTONS, SEVERITY } from '@redhat-developer/vscode-wizard/lib/WebviewWizard';
 import { KeystoreInfo } from '../types/common';
 import { CommandBuilder } from '../tasks/commandBuilder';
-import { CommandError } from 'src/common/utils';
+import { CommandError } from '../common/utils';
 
 export async function createKeystore (): Promise<KeystoreInfo> {
 
