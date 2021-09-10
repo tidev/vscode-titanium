@@ -115,7 +115,7 @@ describe('View suggestions', () => {
 		const position = new vscode.Position(11, 22);
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
-		expect(suggestions.length).to.equal(3);
+		expect(suggestions.length).to.equal(4);
 
 		expect(suggestions[0].label).to.equal('/existing-file');
 		expect(suggestions[0].kind).to.equal(17);
