@@ -48,7 +48,7 @@ export async function getTargetPath (project: Project, type: string, currentFile
 
 	const extensionLookups = [ type ];
 	if (type === 'js') {
-		extensionLookups.push('ts');
+		extensionLookups.unshift('ts');
 	}
 
 	for (const extension of extensionLookups) {
