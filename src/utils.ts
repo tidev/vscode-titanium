@@ -205,7 +205,17 @@ export function getAllKeys (obj: Record<string, unknown>): string[] {
 export function filterJSFiles (directory: string): readonly walkSync.Item[] {
 	return walkSync(directory, {
 		nodir: true,
-		filter: (item: walkSync.Item) => item.stats.isDirectory() || path.extname(item.path) === '.js'
+		filter: (item: walkSync.Item) => {
+			if (item.stats.isDirectory()) {
+				return true;
+			}
+			const isJsFile = path.extname(item.path) === '.js';
+			const tsFile = item.path.replace(/\.js$/, '.ts');
+			if ((isJsFile && !fs.existsSync(tsFile)) || (!isJsFile && fs.existsSync(tsFile))) {
+				return true;
+			}
+			return false;
+		}
 	});
 }
 

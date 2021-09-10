@@ -160,10 +160,14 @@ describe('Controller suggestions', () => {
 			const position = new vscode.Position(10, 24);
 			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
-			expect(suggestions.length).to.equal(4);
+			expect(suggestions.length).to.equal(5);
 
 			expect(suggestions[0].label).to.equal('/existing-file');
 			expect(suggestions[0].kind).to.equal(17);
+
+			// check that only 1 ts-lookup controller exists
+			const tsLookupFiles = suggestions.filter(suggestion => suggestion.label === '/ts-lookup');
+			expect(tsLookupFiles.length).to.equal(1, 'ts-lookup.ts and ts-lookup.js were in the suggestions');
 		});
 
 		it('should provide model suggestion', async () => {
