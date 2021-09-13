@@ -1011,7 +1011,7 @@
     "husky": "^7.0.2",
     "lint-staged": "^11.1.2",
     "mocha": "^9.1.1",
-    "mocha-jenkins-reporter": "^0.4.6",
+    "mocha-jenkins-reporter": "^0.4.7",
     "mocha-multi-reporters": "^1.5.1",
     "nyc": "^15.1.0",
     "pinst": "^2.1.6",
