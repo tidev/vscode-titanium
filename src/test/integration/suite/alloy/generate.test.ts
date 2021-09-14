@@ -24,7 +24,7 @@ describe('Alloy component generation', function () {
 		await editorView.closeAllEditors();
 		await browser.waitForWorkbench();
 		await dismissNotifications();
-		generator = new AlloyGenerate(driver);
+		generator = new AlloyGenerate(browser);
 		tempDirectory = tmp.dirSync();
 		await generator.reset();
 		await copy(projectDirectory, tempDirectory.name);
