@@ -47,10 +47,15 @@ export async function notificationExists(text: string): Promise<Notification | u
 	text = text.toLowerCase();
 	const notifications = await new Workbench().getNotifications();
 	for (const notification of notifications) {
-		const message = await notification.getMessage();
-		if (message.toLowerCase().includes(text)) {
+		try {
+			const message = await notification.getMessage();
+			if (message.toLowerCase().includes(text)) {
+				return notification;
+			}
+		} catch (error) {
 			return notification;
 		}
+
 	}
 }
 
@@ -71,9 +76,13 @@ export function parsePlatformsFromTiapp (tiapp: any): string[] {
  */
 export async function dismissNotifications(): Promise<void> {
 	const center = await new Workbench().openNotificationsCenter();
-	await center.clearAllNotifications();
-	await center.getDriver().sleep(250);
-	await center.close();
+	try {
+		await center.clearAllNotifications();
+		await center.getDriver().sleep(250);
+		await center.close();
+	} catch (error) {
+		// ignore
+	}
 }
 
 let activityView: ViewControl|undefined;
