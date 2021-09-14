@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EditorView, VSBrowser, WebDriver } from 'vscode-extension-tester';
+import { EditorView, VSBrowser } from 'vscode-extension-tester';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
@@ -11,20 +11,18 @@ describe('Application creation', function () {
 	this.timeout(30000);
 
 	let browser: VSBrowser;
-	let driver: WebDriver;
 	let tempDirectory: tmp.DirResult;
 	let creator: Project;
 
 	before(async function () {
 		this.timeout(180000);
 		browser = VSBrowser.instance;
-		driver = browser.driver;
 		const editorView = new EditorView();
 		await editorView.closeAllEditors();
 		await browser.waitForWorkbench();
 		tempDirectory = tmp.dirSync();
 		await dismissNotifications();
-		creator = new Project(driver);
+		creator = new Project(browser);
 		await creator.reset();
 		await creator.waitForGetStarted();
 	});

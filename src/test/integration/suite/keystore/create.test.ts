@@ -28,10 +28,10 @@ describe('Keystore creation', function () {
 		await editorView.closeAllEditors();
 		await browser.waitForWorkbench();
 		tempDirectory = tmp.dirSync();
-		creator = new CommonUICreator(driver);
+		creator = new CommonUICreator(browser);
 		await dismissNotifications();
 		await fs.copy(projectDirectory, tempDirectory.name);
-		await creator.openFolder(tempDirectory.name);
+		await browser.openResources(tempDirectory.name);
 		await creator.waitForGetStarted();
 	});
 

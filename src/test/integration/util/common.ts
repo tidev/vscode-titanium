@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -92,9 +92,11 @@ let activityView: ViewControl|undefined;
 export class CommonUICreator {
 	protected driver: WebDriver;
 	public workbench: Workbench;
+	public browser: VSBrowser;
 
-	constructor(driver: WebDriver) {
-		this.driver = driver;
+	constructor(browser: VSBrowser) {
+		this.browser = browser;
+		this.driver = browser.driver;
 		this.workbench = new Workbench();
 	}
 
@@ -109,10 +111,7 @@ export class CommonUICreator {
 	}
 
 	public async openFolder (folder: string): Promise<void> {
-		await this.workbench.executeCommand('extest open folder');
-		const input = await InputBox.create();
-		await input.setText(folder);
-		await input.confirm();
+		await this.browser.openResources(folder);
 
 		await this.driver.sleep(2000);
 	}

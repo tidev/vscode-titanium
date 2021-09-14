@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { EditorView, VSBrowser, WebDriver } from 'vscode-extension-tester';
+import { EditorView, VSBrowser } from 'vscode-extension-tester';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as tmp from 'tmp';
@@ -11,7 +11,6 @@ describe('Module smoke', function () {
 
 	let browser: VSBrowser;
 	let project: Project;
-	let driver: WebDriver;
 	const tempDirectory = tmp.dirSync();
 	const name = 'vscode-e2e-test-module';
 	const projectPath = path.join(tempDirectory.name, name);
@@ -19,12 +18,11 @@ describe('Module smoke', function () {
 	before(async function () {
 		this.timeout(180000);
 		browser = VSBrowser.instance;
-		driver = browser.driver;
 		const editorView = new EditorView();
 		await editorView.closeAllEditors();
 		await browser.waitForWorkbench();
 		await dismissNotifications();
-		project = new Project(driver);
+		project = new Project(browser);
 		await project.waitForGetStarted();
 	});
 
