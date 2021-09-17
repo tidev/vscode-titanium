@@ -16,5 +16,7 @@
 		<Require src="existing-file"/>
 		<ImageView image="/assets/test.png">
 		<View id="noexistid" class="noexistclass" onClick="noExistFunc" text="L('noexist')"/>
+		<Button onClick="btnClick" />
+
 	</Tab>
 </Alloy>

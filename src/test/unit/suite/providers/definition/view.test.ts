@@ -51,12 +51,21 @@ describe('View definition', () => {
 	});
 
 	it('should provide event handler definitions', async () => {
+		// Test function declaration
 		const position = new vscode.Position(13, 42);
 		const suggestions: vscode.Location[] = await testCompletion(position) as vscode.Location[];
 
 		expect(suggestions.length).to.equal(1);
 		expect(suggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'sample.js'));
 		expect(suggestions[0].range.start.line).to.equal(20);
+
+		// Test variable declaration
+		const variablePostion = new vscode.Position(18, 25);
+		const variableSuggestions: vscode.Location[] = await testCompletion(variablePostion) as vscode.Location[];
+
+		expect(variableSuggestions.length).to.equal(1);
+		expect(variableSuggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'sample.js'));
+		expect(variableSuggestions[0].range.start.line).to.equal(23);
 	});
 
 	it('should provide widget src definitions', async () => {
