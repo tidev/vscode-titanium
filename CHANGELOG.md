@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.12.3](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.2...v0.12.3) (2021-09-17)
+
+
+### Features
+
+* **related:** support opening a typescript file ([e5ee5d0](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/e5ee5d0f8257448d68764c605a5833d963eab211)), closes [#820](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/820)
+* add keystore creation and keystore information storage ([#752](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/752)) ([c5cd65c](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/c5cd65c632ed942ec1ca5147935c3997de73feac)), closes [#89](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/89)
+
+
+### Bug Fixes
+
+* **providers:** support TypeScript files in controller completions ([3f7f5aa](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/3f7f5aa04a6708062b0a7b63ae6b5fa5263cfe38))
+* **providers/definition:** handle event handlers that are variable declarations ([3a7a0b0](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/3a7a0b0566b3dd97955c0c4d05c8fd2c5ca5e1f8)), closes [#841](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/841)
+* **related:** prefer TypeScript source files ([be10b1a](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/be10b1a96c2e968194c763b2e216aaff749d4780))
+
 ### [0.12.2](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.1...v0.12.2) (2021-06-14)
 
 
