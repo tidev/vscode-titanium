@@ -94,7 +94,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 		},
 		definitionRegExp (text: string): RegExp {
 			// eslint-disable-next-line security/detect-non-literal-regexp
-			return new RegExp(`function ${text}\\s*?\\(`);
+			return new RegExp(`(?:function ${text}\\s*?\\(|(?:var|let|const)\\s*?${text}\\s*?=\\s*?\\()`);
 		},
 		title (fileName: string): string {
 			return `Generate function (${fileName})`;

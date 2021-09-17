@@ -21,3 +21,4 @@ Alloy.createWidget('widget-test')
 function doClick() {
 
 }
+const btnClick = () => {}
