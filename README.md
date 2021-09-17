@@ -34,6 +34,7 @@ This extension makes the following commands available in the Command Palette to 
 | Command | Description | Keybinding |
 | ------- | ----------- | ---------- |
 | `Titanium: Create application` | Create a new Titanium application project | - |
+| `Titanium: Create keystore` | Create keystore | - |
 | `Titanium: Create module` | Create a new Titanium module project | - |
 | `Titanium: Enable LiveView` | Enable LiveView | - |
 | `Titanium: Disable LiveView` | Disable LiveView | - |
