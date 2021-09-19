@@ -13,7 +13,7 @@ export class ControllerDefinitionProvider extends BaseDefinitionProvider {
 			}
 		},
 		{ // ES6 import from (/lib) name
-			regExp: /import (?:[-a-zA-Z0-9-_/\s]*)['"]([-a-zA-Z0-9-_/]*)$/,
+			regExp: /import (?:[-a-zA-Z0-9-_/\[\]\*\,\s]*)['"]([-a-zA-Z0-9-_/]*)$/,
 			files (project: Project, document: vscode.TextDocument, text: string, value: string): string[] {
 				return [path.join(project.filePath, 'app', 'lib', `${value}.js`)];
 			}
