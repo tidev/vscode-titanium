@@ -1,12 +1,15 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { before, describe, it } from 'mocha';
 
 import Appc from '../../../appc';
 import info from '../fixtures/ti_info';
 
-Appc.info = info;
-
 describe('appc', () => {
+
+	before(() => {
+		Appc.info = info;
+	});
+
 	describe('SDKs', () => {
 		it('should list all SDKs', () => {
 			const sdks = Appc.sdks();

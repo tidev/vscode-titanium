@@ -1,11 +1,18 @@
 import * as path from 'path';
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { before, describe, it } from 'mocha';
 
 import * as utils from '../../../utils';
 import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
+import Appc from '../../../appc';
+import info from '../fixtures/ti_info';
 
 describe('utils', () => {
+
+	before(() => {
+		Appc.info = info;
+	});
+
 	describe('iOS provisioning profile matches app ID', () => {
 		it('Wildcard app ID should match all', () => {
 			expect(utils.iOSProvisioningProfileMatchesAppId('*', 'com.example.app')).to.equal(true);

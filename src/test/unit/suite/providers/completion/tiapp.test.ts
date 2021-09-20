@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { afterEach, beforeEach, describe, it } from 'mocha';
+import { afterEach, before, beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { getUnitFixturesDirectory } from '../../../utils';
@@ -8,10 +8,16 @@ import * as vscode from 'vscode';
 
 import { TiappCompletionItemProvider } from '../../../../../providers/completion/tiappCompletionItemProvider';
 import { getCommonAlloyProjectDirectory } from '../../../../../test/common/utils';
+import Appc from '../../../../../appc';
+import info from '../../../fixtures/ti_info';
 
 let sandbox: sinon.SinonSandbox;
 
 describe('tiapp completion provider', () => {
+	before(() => {
+		Appc.info = info;
+	});
+
 	const provider = new TiappCompletionItemProvider();
 	const uri = vscode.Uri.file(path.join(getUnitFixturesDirectory(), 'completions', 'tiapp.xml'));
 	async function testCompletion (position: vscode.Position): Promise<vscode.CompletionItem[]> {
