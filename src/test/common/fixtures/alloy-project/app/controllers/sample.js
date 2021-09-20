@@ -22,3 +22,10 @@ function doClick() {
 
 }
 const btnClick = () => {}
+import http from '/http';
+import '/http';
+import * as foo from '/http';
+import { http } from '/http';
+const http = await import('/http');
+import('/http').then();
+await import('/http');
