@@ -250,15 +250,74 @@ describe('Controller suggestions', () => {
 		});
 	});
 
-	describe('require completions', () => {
-		it('Should return lib files for equire', async () => {
-			const position = new vscode.Position(9, 9); // $.scrollView.addEventListener('')
+	describe('require/import completions', () => {
+		it('Should return lib files for require', async () => {
+			const position = new vscode.Position(9, 9);
 			const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
 			expect(suggestions.length).to.equal(1);
 
 			expect(suggestions[0].label).to.equal('/http');
 			expect(suggestions[0].kind).to.equal(17);
+		});
+
+		it('Should return lib files for import', async () => {
+			const defaultPosition = new vscode.Position(31, 18);
+			const defaultSuggestions: vscode.CompletionItem[] = await testCompletion(defaultPosition);
+
+			expect(defaultSuggestions.length).to.equal(1);
+
+			expect(defaultSuggestions[0].label).to.equal('/http');
+			expect(defaultSuggestions[0].kind).to.equal(17);
+
+			const sideEffectsPosition = new vscode.Position(32, 8);
+			const sideEffectsSuggestions: vscode.CompletionItem[] = await testCompletion(sideEffectsPosition);
+
+			expect(sideEffectsSuggestions.length).to.equal(1);
+
+			expect(sideEffectsSuggestions[0].label).to.equal('/http');
+			expect(sideEffectsSuggestions[0].kind).to.equal(17);
+
+			const asPosition = new vscode.Position(33, 22);
+			const asSuggestions: vscode.CompletionItem[] = await testCompletion(asPosition);
+
+			expect(asSuggestions.length).to.equal(1);
+
+			expect(asSuggestions[0].label).to.equal('/http');
+			expect(asSuggestions[0].kind).to.equal(17);
+
+			const singlePosition = new vscode.Position(34, 22);
+			const singleSuggestions: vscode.CompletionItem[] = await testCompletion(singlePosition);
+
+			expect(singleSuggestions.length).to.equal(1);
+
+			expect(singleSuggestions[0].label).to.equal('/http');
+			expect(singleSuggestions[0].kind).to.equal(17);
+
+			const dynamicAwaitPosition = new vscode.Position(35, 27);
+			const dynamicAwaitSuggestions: vscode.CompletionItem[] = await testCompletion(dynamicAwaitPosition);
+
+			expect(dynamicAwaitSuggestions.length).to.equal(1);
+
+			expect(dynamicAwaitSuggestions[0].label).to.equal('/http');
+			expect(dynamicAwaitSuggestions[0].kind).to.equal(17);
+
+			const dynamicThenPosition = new vscode.Position(36, 8);
+			const dynamicThenSuggestions: vscode.CompletionItem[] = await testCompletion(dynamicThenPosition);
+
+			expect(dynamicThenSuggestions.length).to.equal(1);
+
+			expect(dynamicThenSuggestions[0].label).to.equal('/http');
+			expect(dynamicThenSuggestions[0].kind).to.equal(17);
+
+			const dynamicSideEffectsPosition = new vscode.Position(37, 14);
+			const dynamicSideEffectsSuggestions: vscode.CompletionItem[] = await testCompletion(dynamicSideEffectsPosition);
+
+			expect(dynamicSideEffectsSuggestions.length).to.equal(1);
+
+			expect(dynamicSideEffectsSuggestions[0].label).to.equal('/http');
+			expect(dynamicSideEffectsSuggestions[0].kind).to.equal(17);
+
 		});
 	});
 });

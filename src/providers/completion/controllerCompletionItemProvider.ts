@@ -42,13 +42,16 @@ export class ControllerCompletionItemProvider extends BaseCompletionItemProvider
 		// Event name - $.tableView.addEventListener('click', ...)
 		} else if (/\$\.([-a-zA-Z0-9-_]*)\.(add|remove)EventListener\(["']([-a-zA-Z0-9-_/]*)$/.test(linePrefix)) {
 			return this.getEventNameCompletions(linePrefix, project);
-		// require('')
-		} else if (/require\(["']?([^'");]*)["']?\)?$/.test(linePrefix)) {
-			const matches = linePrefix.match(/require\(["']?([^'");]*)["']?\)?$/);
+		// require('') or import foo from ''
+		} else if (/(?:require\(["']?([^'");]*)["']?\)?$|import\s*\(?(?:[{-\w-_/[\]*,\s}]*)?['"]+([-\w-_/]*)\)?)/.test(linePrefix)) {
+			const matches = linePrefix.match(/(?:require\(["']?([^'");]*)["']?\)?$|import\s*\(?(?:[{-\w-_/[\]*,\s}]*)?['"]+([-\w-_/]*)\)?)/);
 			if (!matches) {
 				return [];
 			}
-			const requestedModule = matches[1];
+			const requestedModule = matches[1] ?? matches[2];
+			if (requestedModule === undefined) {
+				return [];
+			}
 			const range = document.getWordRangeAtPosition(position, /([\w/.$]+)/);
 			return this.getFileCompletions('lib', project, requestedModule, range);
 		// Alloy.createController('')
