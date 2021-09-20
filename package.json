@@ -994,7 +994,7 @@
     "@types/which": "^2.0.1",
     "@types/xml2js": "^0.4.9",
     "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.1",
     "@vscode/test-electron": "^1.6.2",
     "chai": "^4.3.4",
     "chai-as-promised": "^7.1.1",
