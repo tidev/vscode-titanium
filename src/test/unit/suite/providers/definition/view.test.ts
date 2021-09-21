@@ -39,6 +39,20 @@ describe('View definition', () => {
 		expect(suggestions.length).to.equal(1);
 		expect(suggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'styles', 'sample.tss'));
 		expect(suggestions[0].range.start.line).to.equal(36);
+
+		const secondPosition = new vscode.Position(19, 33);
+		const secondSuggestions: vscode.Location[] = await testCompletion(secondPosition) as vscode.Location[];
+
+		expect(secondSuggestions.length).to.equal(1);
+		expect(secondSuggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'styles', 'sample.tss'));
+		expect(secondSuggestions[0].range.start.line).to.equal(47);
+
+		const thirdPosition = new vscode.Position(19, 47);
+		const thirdSuggestions: vscode.Location[] = await testCompletion(thirdPosition) as vscode.Location[];
+
+		expect(thirdSuggestions.length).to.equal(1);
+		expect(thirdSuggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'styles', 'app.tss'));
+		expect(thirdSuggestions[0].range.start.line).to.equal(27);
 	});
 
 	it('should provide id definitions', async () => {

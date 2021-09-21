@@ -92,7 +92,7 @@ describe('View suggestions', () => {
 		const position = new vscode.Position(9, 22);
 		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
 
-		expect(suggestions.length).to.equal(1);
+		expect(suggestions.length).to.equal(3);
 
 		expect(suggestions[0].label).to.equal('testClass');
 		expect(suggestions[0].kind).to.equal(17);
