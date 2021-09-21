@@ -17,6 +17,7 @@
 		<ImageView image="/assets/test.png">
 		<View id="noexistid" class="noexistclass" onClick="noExistFunc" text="L('noexist')"/>
 		<Button onClick="btnClick" />
+		<Button class="testClass secondClass thirdClass" />
 
 	</Tab>
 </Alloy>
