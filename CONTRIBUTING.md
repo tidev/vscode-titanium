@@ -77,6 +77,7 @@ To release of the extension the following needs to be followed:
 	- Runs [standard-version](https://github.com/conventional-changelog/standard-version) to bump versions based on commit messages, updates the changelog, commits the files and tags a new release.
 	- Runs `npx vsce package` to generate a new `.vsix` file ready for upload to the marketplace.
 3. Push to the main repo with `git push` and `git push <appc remote> <tag>`.
-4. Upload the `.vsix` file to the [marketplace](https://marketplace.visualstudio.com/manage).
-5. Draft a new release on the [releases page](https://github.com/appcelerator/vscode-appcelerator-titanium/releases).
-6. 🎉
+4. Upload the `.vsix` file to the VS Code [marketplace](https://marketplace.visualstudio.com/manage).
+5. Upload the `.vsix` file to the Open VSX Registry using `npx ovsx publish <file> -p <token>`
+6. Draft a new release on the [releases page](https://github.com/appcelerator/vscode-appcelerator-titanium/releases).
+7. 🎉
