@@ -42,6 +42,7 @@ jobs:
 
   Package:
     runs-on: ubuntu-latest
+    needs: [Lint, Unit-Test]
     steps:
       - uses: actions/checkout@v2
         with:
