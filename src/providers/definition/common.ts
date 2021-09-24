@@ -109,7 +109,6 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 	{ // widget
 		regExp: /<Widget[\s0-9a-zA-Z-_^='"]*src=["']/,
 		files (project: Project, document: TextDocument, text: string): string[] {
-
 			return [ path.join(project.filePath, 'app', 'widgets', text, 'controllers', 'widget.js') ];
 		}
 	},
@@ -140,5 +139,11 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return [ path.join(i18nPath, defaultLang, 'strings.xml') ];
 		},
 		i18nString: true
+	},
+	{ // custom tags
+		regExp: /<\w+[\s0-9a-zA-Z-_^='"]*module=["']/,
+		files (project: Project, document: TextDocument, text: string): string[] {
+			return [ path.join(project.filePath, 'app', 'lib', `${text}.js`) ];
+		}
 	}
 ];
