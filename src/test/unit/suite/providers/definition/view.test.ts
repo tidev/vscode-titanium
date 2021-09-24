@@ -96,6 +96,12 @@ describe('View definition', () => {
 
 		expect(suggestions.length).to.equal(1);
 		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'existing-file.js')));
+
+		const subFolderPosition = new vscode.Position(21, 22);
+		const subFolderSuggestions: vscode.DefinitionLink[] = await testCompletion(subFolderPosition) as vscode.DefinitionLink[];
+
+		expect(subFolderSuggestions.length).to.equal(1);
+		expect(subFolderSuggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'folder', 'test.js')));
 	});
 
 	it('should provide i18n definitions', async () => {
@@ -104,5 +110,13 @@ describe('View definition', () => {
 
 		expect(suggestions.length).to.equal(1);
 		expect(suggestions[0].uri.fsPath).to.equal(path.join(getCommonAlloyProjectDirectory(), 'app', 'i18n', 'en', 'strings.xml'));
+	});
+
+	it('should provide module definitions for custom tags', async () => {
+		const position = new vscode.Position(20, 37);
+		const suggestions: vscode.DefinitionLink[] = await testCompletion(position) as vscode.DefinitionLink[];
+
+		expect(suggestions.length).to.equal(1);
+		expect(suggestions[0].targetUri).to.deep.equal(vscode.Uri.file(path.join(getCommonAlloyProjectDirectory(), 'app', 'lib', 'folder', 'custom-view.js')));
 	});
 });

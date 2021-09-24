@@ -18,6 +18,7 @@
 		<View id="noexistid" class="noexistclass" onClick="noExistFunc" text="L('noexist')"/>
 		<Button onClick="btnClick" />
 		<Button class="testClass secondClass thirdClass" />
-
+		<CustomView top="30" module="folder/custom-view" />
+		<Require src="folder/test"/>
 	</Tab>
 </Alloy>

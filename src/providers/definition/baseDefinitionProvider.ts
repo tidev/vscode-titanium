@@ -47,7 +47,7 @@ export class BaseDefinitionProvider extends BaseProvider implements vscode.Defin
 						return new vscode.Location(vscode.Uri.file(file), range);
 					});
 				} else {
-					const files = await suggestion.files(project, document, word, value);
+					const files = await suggestion.files(project, document, value || word, value || word);
 					for (const file of files) {
 						const link: vscode.DefinitionLink = {
 							originSelectionRange: new vscode.Range(position.line, startIndex, position.line, endIndex),
