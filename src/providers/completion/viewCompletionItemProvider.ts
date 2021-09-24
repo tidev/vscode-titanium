@@ -40,7 +40,7 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 		} else if (/^\s*<\w+[\s+\w*="()']*\s+\w*[/]?[>]?$/.test(linePrefix)) {
 			return this.getAttributeNameCompletions(linePrefix, position, project, prefix);
 			// attribute value <View backgroundColor="_"
-		} else if (/^\s*<\w+\s+[\s+\w*="()']*\w*="[\w('.]*"[/]?[>]$/.test(linePrefix)) {
+		} else if (/^\s*<\w+\s+([\s+\w*="()']*\w*="[\w('./]*"?)*[/]?[>]?$/.test(linePrefix)) {
 			// first attempt Alloy rules (i18n, image etc.)
 			let ruleResult;
 			for (const rule of Object.values(alloyAutoCompleteRules)) {
@@ -269,6 +269,22 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 					});
 				}
 				return completions;
+			}
+		} else if (attribute === 'module') {
+			const libDirectory = path.join(project.filePath, 'app', 'lib');
+			const files = utils.filterJSFiles(libDirectory);
+			const createFunction = `create${tag}`;
+
+			for (const file of files) {
+				const document = await workspace.openTextDocument(file.path);
+				if (document.getText().includes(createFunction)) {
+					const value = utils.toUnixPath(file.path.replace(libDirectory, '').split('.')[0]);
+					completions.push({
+						label: value,
+						kind: CompletionItemKind.Reference,
+						detail: document.fileName
+					});
+				}
 			}
 		}
 

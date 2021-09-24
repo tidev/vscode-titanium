@@ -5,7 +5,7 @@ import * as utils from '../../utils';
 import { CompletionItem, CompletionItemKind, workspace, Range } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { parseXmlString } from '../../common/utils';
-import { Project } from '../..//project';
+import { Project } from '../../project';
 import { pathExists } from 'fs-extra';
 
 interface AlloyAutoCompleteRule {
