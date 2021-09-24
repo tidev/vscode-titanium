@@ -21,5 +21,8 @@
 		<CustomView top="30" module="folder/custom-view" />
 		<Require src="folder/test"/>
 		<CustomView module=""/>
+		<Require text="foo" src="" test="bar"/>
+		<Widget text="foo" src="" test="bar"/>
+		<Label text="foo" color=""/>
 	</Tab>
 </Alloy>

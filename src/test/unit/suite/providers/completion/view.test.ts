@@ -86,6 +86,14 @@ describe('View suggestions', () => {
 
 		expect(suggestions[0].label).to.equal('transparent');
 		expect(suggestions[0].kind).to.equal(11);
+
+		const multiPropertyPosition = new vscode.Position(25, 34);
+		const multiPropertySuggestions: vscode.CompletionItem[] = await testCompletion(multiPropertyPosition);
+
+		expect(multiPropertySuggestions.length).to.equal(24);
+
+		expect(multiPropertySuggestions[0].label).to.equal('transparent');
+		expect(multiPropertySuggestions[0].kind).to.equal(11);
 	});
 
 	it('should provide tss class suggestions', async () => {
@@ -119,6 +127,14 @@ describe('View suggestions', () => {
 
 		expect(suggestions[0].label).to.equal('/existing-file');
 		expect(suggestions[0].kind).to.equal(17);
+
+		const multiPropertyPosition = new vscode.Position(23, 27);
+		const multiPropertySuggestions: vscode.CompletionItem[] = await testCompletion(multiPropertyPosition);
+
+		expect(multiPropertySuggestions.length).to.equal(4);
+
+		expect(multiPropertySuggestions[0].label).to.equal('/existing-file');
+		expect(multiPropertySuggestions[0].kind).to.equal(17);
 	});
 
 	it('should provide widget src suggestions', async () => {
@@ -129,6 +145,14 @@ describe('View suggestions', () => {
 
 		expect(suggestions[0].label).to.equal('widget-test');
 		expect(suggestions[0].kind).to.equal(17);
+
+		const multiPropertyPosition = new vscode.Position(24, 26);
+		const multiPropertySuggestions: vscode.CompletionItem[] = await testCompletion(multiPropertyPosition);
+
+		expect(multiPropertySuggestions.length).to.equal(1);
+
+		expect(multiPropertySuggestions[0].label).to.equal('widget-test');
+		expect(multiPropertySuggestions[0].kind).to.equal(17);
 	});
 
 	it('should provide custom tag module suggestions', async () => {

@@ -361,9 +361,10 @@ export class ViewCompletionItemProvider extends BaseCompletionItemProvider {
 			quoteIndex--;
 		}
 		linePrefix = linePrefix.substring(0, quoteIndex);
-		const matches = /\s+([a-zA-Z][-a-zA-Z]*)\s*=\s*/.exec(linePrefix);
-		if (matches && matches.length >= 2) {
-			return matches[1];
+		const matches = [ ...linePrefix.matchAll(/\s+([a-zA-Z]*)\s*=\s*/g) ];
+		if (matches.length) {
+			const last = matches.length - 1;
+			return matches[last][1];
 		}
 	}
 }
