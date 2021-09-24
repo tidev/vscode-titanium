@@ -130,4 +130,14 @@ describe('View suggestions', () => {
 		expect(suggestions[0].label).to.equal('widget-test');
 		expect(suggestions[0].kind).to.equal(17);
 	});
+
+	it('should provide custom tag module suggestions', async () => {
+		const position = new vscode.Position(22, 37);
+		const suggestions: vscode.CompletionItem[] = await testCompletion(position);
+
+		expect(suggestions.length).to.equal(1);
+
+		expect(suggestions[0].label).to.equal('/folder/custom-view');
+		expect(suggestions[0].kind).to.equal(17);
+	});
 });
