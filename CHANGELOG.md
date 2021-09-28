@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.12.4](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.3...v0.12.4) (2021-09-28)
+
+
+### Features
+
+* **providers/completion:** support import suggestions ([f041715](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/f041715a523a6d8321e9b48ed6a4c52a2fe48879))
+* **providers/completion:** support suggesting custom tags ([9238528](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/9238528a228656ecd2fe4e78c5ab25d36551e38b))
+* **providers/definition:** support ES6 import file lookups ([#844](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/844)) ([7752c22](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/7752c228c14e30ba7df0c7a093b6ea5273a51fe2)), closes [#843](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/843)
+* **providers/definition:** support navigating to a custom tag based on the module property ([aca634b](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/aca634b8d066f67e73bb19b33fc7888258facf62))
+
+
+### Bug Fixes
+
+* **providers:** improve attribute detection ([05f6657](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/05f66570b4dc8b267cd678c567a3d1e6c11bdd1d))
+* **providers/definition:** correctly parse out individual classes from view tags ([71d4f56](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/71d4f561c7509d801d97323703837ff41e84f380)), closes [#848](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/848)
+
 ### [0.12.3](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.2...v0.12.3) (2021-09-17)
 
 
