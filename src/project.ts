@@ -1,6 +1,5 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as xml2js from 'xml2js';
 import * as utils from './utils';
 
 import { Range, window, workspace } from 'vscode';
@@ -9,7 +8,7 @@ import { Platform, ProjectType } from './types/common';
 import { parseXmlString } from './common/utils';
 
 const TIAPP_FILENAME = 'tiapp.xml';
-const TIMODULEXML_FILENAME = 'timodule.xml';
+const TIMODULE_FILENAME = 'timodule.xml';
 const MANIFEST_FILENAME = 'manifest';
 
 interface ModuleInformation {
@@ -18,17 +17,32 @@ interface ModuleInformation {
 	[ key: string ]: string;
 }
 
+interface TiModule {
+	'ti:module': {
+		[ key: string ]: string
+	}
+}
+
+interface TiApp {
+	'ti:app': TiAppData
+}
+
+interface TiAppData {
+	[ key: string ]: string|string[]
+}
+
 export class Project {
 	public isValidTiapp = false;
 	public filePath: string;
 	public type: ProjectType;
 
-	private tiapp: any;
+	private tiapp: TiAppData;
 	private modules: ModuleInformation[] = [];
 
 	constructor(filePath: string, type: ProjectType) {
 		this.filePath = filePath;
 		this.type = type;
+		this.tiapp = {};
 	}
 
 	/**
@@ -106,7 +120,7 @@ export class Project {
 	 */
 	public sdk (): string[] {
 		if (this.type === 'app') {
-			return this.tiapp['sdk-version'];
+			return this.tiapp['sdk-version'] as string[];
 		}
 		return [];
 	}
@@ -125,7 +139,7 @@ export class Project {
 
 		try {
 			const fileData = await fs.readFile(filePath, 'utf-8');
-			const json = await parseXmlString(fileData) as any;
+			const json = await parseXmlString<TiApp>(fileData);
 			this.isValidTiapp = true;
 
 			if (json && json['ti:app']) {
@@ -170,15 +184,15 @@ export class Project {
 	/**
 	 * Attempt to find module projects by loading timodule.xml and manifest files
 	 */
-	private loadModules (): void {
+	private async loadModules (): Promise<void> {
 		const paths = [
 			path.join(this.filePath),
 			path.join(this.filePath, 'android'),
 			path.join(this.filePath, 'ios'),
 			path.join(this.filePath, 'iphone'),
 		];
-		for (let i = 0, numPaths = paths.length; i < numPaths; i++) {
-			this.loadModuleAt(paths[i]);
+		for (const filePath of paths) {
+			await this.loadModuleAt(filePath);
 		}
 	}
 
@@ -188,35 +202,30 @@ export class Project {
 	 * @param {String} modulePath		path to module
 	 */
 	private async loadModuleAt (modulePath: string): Promise<void> {
-		const timodulePath = path.join(modulePath, TIMODULEXML_FILENAME);
+		const timodulePath = path.join(modulePath, TIMODULE_FILENAME);
 		const manifestPath = path.join(modulePath, MANIFEST_FILENAME);
 
 		if (!await fs.pathExists(timodulePath)) {
 			return;
 		}
 
-		const fileData = fs.readFileSync(timodulePath, 'utf-8');
-		const parser = new xml2js.Parser();
-		let json;
-		parser.parseString(fileData, (err: Error, result: unknown) => {
-			if (!err) {
-				json = result;
-			}
-		});
+		const fileData = await fs.readFile(timodulePath, 'utf-8');
+		const json = await parseXmlString<TiModule>(fileData);
+
 		if (json && json['ti:module']) {
 
-			if (!fs.existsSync(manifestPath)) {
+			if (!await fs.pathExists(manifestPath)) {
 				return;
 			}
 
 			const manifestData: { [ key: string ]: string; } = {};
-
-			fs.readFileSync(manifestPath).toString().split(/\r?\n/).forEach(line => {
+			const manifestContents = await fs.readFile(manifestPath, 'utf8');
+			for (const line of manifestContents.split(/\r?\n/)) {
 				const match = line.match(/^(\S+)\s*:\s*(.*)$/);
 				if (match) {
 					manifestData[match[1].trim()] = match[2].trim();
 				}
-			});
+			}
 
 			const moduleInformation: ModuleInformation = {
 				path: modulePath,
