@@ -49,7 +49,7 @@ describe('Keystore creation', function () {
 		const input = await InputBox.create();
 		await input.setText(basename(tempDirectory.name));
 		await input.confirm();
-		await driver.sleep(1000);
+		await creator.waitForEditorTab('Create Keystore');
 
 		webview = new WebView();
 		await webview.switchToFrame();

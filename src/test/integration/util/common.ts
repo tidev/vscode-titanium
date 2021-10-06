@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, EditorTab, EditorView, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -85,7 +85,6 @@ export async function dismissNotifications(): Promise<void> {
 	}
 }
 
-let activityView: ViewControl|undefined;
 /**
  * Common class for classes that wrap UI functionality to extend
  */
@@ -194,7 +193,12 @@ export class CommonUICreator {
 					}
 				}
 
-				if (!section || !section.isDisplayed()) {
+				try {
+					// It's possible for the section to become stale between the retrieval and isDisplayed check
+					if (!section || !section.isDisplayed()) {
+						return false;
+					}
+				} catch (error) {
 					return false;
 				}
 
@@ -248,9 +252,9 @@ export class CommonUICreator {
 	}
 
 	public async reset(): Promise<void> {
-		if (activityView) {
-			await activityView.closeView();
-		}
+		const activityView = await this.getActivityView();
+		await activityView.closeView();
+
 		const activityBar = new ActivityBar();
 		const activity = await this.driver.wait<ViewControl>(async () => {
 			const activityViews = await activityBar.getViewControls();
@@ -270,10 +274,6 @@ export class CommonUICreator {
 	 * @memberof CommonUICreator
 	 */
 	public async getActivityView (): Promise<ViewControl> {
-		if (activityView) {
-			return activityView;
-		}
-
 		const activityBar = new ActivityBar();
 		const tiActivity = await this.driver.wait<ViewControl>(async () => {
 			const activity = await activityBar.getViewControl('Titanium');
@@ -282,7 +282,7 @@ export class CommonUICreator {
 			}
 			return activity;
 		}, 10000);
-		return activityView = tiActivity;
+		return tiActivity;
 	}
 
 	public async trustWorkspace(): Promise<void> {
@@ -318,7 +318,28 @@ export class CommonUICreator {
 		} catch (error) {
 			// ignore
 		}
+	}
 
+	/**
+	 * Waits for an editor tab of a specific name to be appear
+	 *
+	 * @param {string} tabName - The name of the editor tab
+	 * @returns {Promise<EditorTab>}
+	 */
+	public async waitForEditorTab(tabName: string): Promise<EditorTab> {
+		const editorTab = await this.driver.wait(async () => {
+			const editorView = new EditorView();
+			const tabs = await editorView.getOpenEditorTitles();
+			if (tabs.includes(tabName)) {
+				return editorView.getTabByTitle(tabName);
+			}
+		}, 5000);
+
+		if (!editorTab) {
+			throw new Error(`Tab ${tabName} was not visible`);
+		}
+
+		return editorTab;
 	}
 }
 
