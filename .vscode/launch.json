@@ -76,6 +76,21 @@
             }
         },
         {
+            "name": "Extension UI Tests - Insider",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/test/integration/runTests.js",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "presentation": {
+                "group": "2_tests",
+                "order": 1
+            },
+            "env": {
+                "CODE_VERSION": "insider"
+            }
+        },
+        {
             "name": "Extension UI Smokes",
             "type": "node",
             "request": "launch",
