@@ -1027,7 +1027,7 @@
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
     "@redhat-developer/vscode-wizard": "^0.2.19",
     "detect-indent": "^6.1.0",
-    "find-up": "^5.0.0",
+    "find-up": "^6.2.0",
     "fs-extra": "^10.0.0",
     "get-port": "^5.1.1",
     "got": "^11.8.2",
