@@ -41,6 +41,7 @@ describe('TerminalLinkProvider', () => {
 
 	beforeEach(async function () {
 		sandbox = sinon.createSandbox();
+		await fs.ensureDir(path.dirname(mapFile));
 		await fs.writeJSON(mapFile, mapContents);
 	});
 
