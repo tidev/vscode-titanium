@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { SourceMapConsumer } from 'source-map';
 
 import { ExtensionContainer } from '../container';
-import { normalisedPlatform } from '../utils';
+import { normalisedPlatform, normalizeDriveLetter } from '../utils';
 import { Platform } from 'src/types/common';
 
 interface TiTerminalLink extends vscode.TerminalLink {
@@ -64,9 +64,9 @@ export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
 
 		const { column, filename, line } = mappedInfo;
 
+		const document = await vscode.workspace.openTextDocument(filename);
 		const range = new vscode.Range(line, column, line, column);
-		const uri = vscode.Uri.parse(filename);
-		await vscode.window.showTextDocument(uri, { selection: range });
+		await vscode.window.showTextDocument(document, { selection: range });
 	}
 
 	/**
@@ -148,12 +148,12 @@ export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
 
 		const openLine = position.line || line;
 		const openColumn = position.column || column;
+		const sourceFilename = process.platform === 'win32' ? normalizeDriveLetter(path.normalize(position.source)) : position.source;
 
 		return {
 			column: openColumn,
-			filename: position.source,
+			filename: sourceFilename,
 			line: openLine - 1
 		};
 	}
 }
-

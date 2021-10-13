@@ -26,7 +26,7 @@ const mapContents = {
 	],
 	names: [],
 	mappings: 'AAAA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;ACjDA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AD4CA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA;AACA',
-	file: `${getCommonAlloyProjectDirectory()}/Resources/android/alloy/controllers/index.js`,
+	file: path.join(getCommonAlloyProjectDirectory(), 'Resources', 'android', 'alloy', 'controllers', 'index.js'),
 	sourceRoot: getCommonAlloyProjectDirectory(),
 	sourcesContent: [
 		'var Alloy = require(\'/alloy\'),\n\tBackbone = Alloy.Backbone,\n\t_ = Alloy._;\n\n\n\n\nfunction __processArg(obj, key) {\n\tvar arg = null;\n\tif (obj) {\n\t\targ = obj[key] || null;\n\t}\n\treturn arg;\n}\n\nfunction Controller() {\n\t\n\trequire(\'/alloy/controllers/\' + \'BaseController\').apply(this, Array.prototype.slice.call(arguments));\n\tthis.__controllerPath = \'index\';\n\tthis.args = arguments[0] || {};\n\n\tif (arguments[0]) {\n\t\tvar __parentSymbol = __processArg(arguments[0], \'__parentSymbol\');\n\t\tvar $model = __processArg(arguments[0], \'$model\');\n\t\tvar __itemTemplate = __processArg(arguments[0], \'__itemTemplate\');\n\t}\n\tvar $ = this;\n\tvar exports = {};\n\tvar __defers = {};\n\n\t// Generated code that must be executed before all UI and/or\n\t// controller code. One example is all model and collection\n\t// declarations from markup.\n\t\n\n\t// Generated UI code\n\t$.__views[\'index\'] = Ti.UI.createWindow(\n{id:\'index\',}\n);\n$.__views[\'index\'] && $.addTopLevelView($.__views[\'index\']);\ndoClick?$.addListener($.__views[\'index\'],\'click\',doClick):__defers[\'$.__views[\'index\']!click!doClick\']=true;$.__views[\'widg\'] = Alloy.createWidget(\'test\',\'widget\',{id:\'widg\',__parentSymbol:$.__views[\'index\'],});\n$.__views[\'widg\'].setParent($.__views[\'index\']);\nexports.destroy = function () {};\n\n\t// make all IDed elements in $.__views available right on the $ in a\n\t// controller\'s internal code. Externally the IDed elements will\n\t// be accessed with getView().\n\t_.extend($, $.__views);\n\n\t// Controller code directly from the developer\'s controller file\n\t__MAPMARKER_CONTROLLER_CODE__\n\n\t// Generated code that must be executed after all UI and\n\t// controller code. One example deferred event handlers whose\n\t// functions are not defined until after the controller code\n\t// is executed.\n\t__defers[\'$.__views[\'index\']!click!doClick\'] && $.addListener($.__views[\'index\'],\'click\',doClick);\n\n\t// Extend the $ instance with all functions and properties\n\t// defined on the exports object.\n\t_.extend($, exports);\n}\n\nmodule.exports = Controller;\n',
@@ -34,7 +34,7 @@ const mapContents = {
 	]
 };
 
-describe('TerminalLinkProvider', () => {
+describe.only('TerminalLinkProvider', () => {
 	const provider = new TiTerminalLinkProvider();
 	let sandbox: sinon.SinonSandbox;
 	const mapFile = path.join(getCommonAlloyProjectDirectory(), 'build', 'map', 'Resources', 'android', 'alloy', 'controllers', 'index.js.map');
@@ -165,10 +165,10 @@ describe('TerminalLinkProvider', () => {
 			const stub = sandbox.stub(vscode.window, 'showTextDocument');
 			await provider.handleTerminalLink(link);
 
-			const uri = vscode.Uri.parse(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'index.js'));
+			const document = await vscode.workspace.openTextDocument(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'index.js'));
 			const range = new vscode.Range(1, 17, 1, 17);
 			expect(stub.callCount).to.equal(1);
-			expect(stub).to.have.been.calledWith(uri, { selection: range });
+			expect(stub).to.have.been.calledWith(document, { selection: range });
 		});
 
 		it('should try to detect platform if not provided', async () => {
@@ -186,10 +186,10 @@ describe('TerminalLinkProvider', () => {
 			const stub = sandbox.stub(vscode.window, 'showTextDocument');
 			await provider.handleTerminalLink(link);
 
-			const uri = vscode.Uri.parse(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'index.js'));
+			const document = await vscode.workspace.openTextDocument(path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'index.js'));
 			const range = new vscode.Range(1, 17, 1, 17);
 			expect(stub.callCount).to.equal(1);
-			expect(stub).to.have.been.calledWith(uri, { selection: range });
+			expect(stub).to.have.been.calledWith(document, { selection: range });
 		});
 	});
 });
