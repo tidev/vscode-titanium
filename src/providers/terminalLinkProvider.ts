@@ -64,9 +64,9 @@ export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
 
 		const { column, filename, line } = mappedInfo;
 
-		const document = await vscode.workspace.openTextDocument(filename);
 		const range = new vscode.Range(line, column, line, column);
-		await vscode.window.showTextDocument(document, { selection: range });
+		const uri = vscode.Uri.parse(filename);
+		await vscode.window.showTextDocument(uri, { selection: range });
 	}
 
 	/**
@@ -139,6 +139,8 @@ export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
 			line,
 			column
 		});
+
+		SM.destroy();
 
 		if (!position || !position.source) {
 			return;
