@@ -34,7 +34,7 @@ const mapContents = {
 	]
 };
 
-describe.only('TerminalLinkProvider', () => {
+describe('TerminalLinkProvider', () => {
 	const provider = new TiTerminalLinkProvider();
 	let sandbox: sinon.SinonSandbox;
 	const mapFile = path.join(getCommonAlloyProjectDirectory(), 'build', 'map', 'Resources', 'android', 'alloy', 'controllers', 'index.js.map');
