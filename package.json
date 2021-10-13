@@ -1035,6 +1035,7 @@
     "klaw-sync": "^6.0.0",
     "ms": "^2.1.3",
     "semver": "^7.3.5",
+    "source-map": "^0.7.3",
     "titanium-editor-commons": "^1.2.5",
     "uuid": "^8.3.2",
     "vscode-chrome-debug-core": "^6.8.11",

@@ -20,6 +20,7 @@ import { ViewCodeActionProvider } from './code-action/viewCodeActionProvider';
 import { ViewDefinitionProvider } from './definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './hover/viewHoverProvider';
 import { ExtensionContainer } from '../container';
+import { TiTerminalLinkProvider } from './terminalLinkProvider';
 
 const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
 const styleFilePattern = '**/*.tss';
@@ -50,6 +51,11 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 	// register code action providers
 	context.subscriptions.push(
 		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider())
+	);
+
+	// register our TerminalLink provider
+	context.subscriptions.push(
+		vscode.window.registerTerminalLinkProvider(new TiTerminalLinkProvider())
 	);
 
 	// register code action commands
