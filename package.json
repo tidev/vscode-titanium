@@ -979,7 +979,7 @@
     "@types/chai": "^4.2.22",
     "@types/chai-as-promised": "^7.1.4",
     "@types/fs-extra": "^9.0.13",
-    "@types/glob": "^7.1.4",
+    "@types/glob": "^7.2.0",
     "@types/got": "^9.6.12",
     "@types/klaw-sync": "^6.0.1",
     "@types/mocha": "^9.0.0",
