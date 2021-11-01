@@ -1039,7 +1039,7 @@
     "titanium-editor-commons": "^1.2.5",
     "uuid": "^8.3.2",
     "vscode-chrome-debug-core": "^6.8.11",
-    "vscode-debugadapter": "^1.49.0",
+    "vscode-debugadapter": "^1.50.0",
     "which": "^2.0.2",
     "xml2js": "^0.4.23"
   }
