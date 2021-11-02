@@ -1,6 +1,6 @@
 {
   "name": "vscode-titanium",
-  "version": "0.12.5-1",
+  "version": "0.12.4",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",
   "icon": "images/logo-titanium.png",
