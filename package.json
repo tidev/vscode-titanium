@@ -1,6 +1,6 @@
 {
   "name": "vscode-titanium",
-  "version": "0.12.4",
+  "version": "0.12.5-1",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",
   "icon": "images/logo-titanium.png",
@@ -35,12 +35,7 @@
     "node": ">=14.16.0"
   },
   "activationEvents": [
-    "*",
-    "onDebug",
-    "onCommand:titanium.create.application",
-    "onCommand:titanium.create.module",
-    "workspaceContains:tiapp.xml",
-    "workspaceContains:**/timodule.xml"
+    "*"
   ],
   "capabilities": {
     "untrustedWorkspaces": {
