@@ -35,12 +35,7 @@
     "node": ">=14.16.0"
   },
   "activationEvents": [
-    "*",
-    "onDebug",
-    "onCommand:titanium.create.application",
-    "onCommand:titanium.create.module",
-    "workspaceContains:tiapp.xml",
-    "workspaceContains:**/timodule.xml"
+    "*"
   ],
   "capabilities": {
     "untrustedWorkspaces": {
