@@ -10,6 +10,7 @@ export enum Commands {
 	Build = 'titanium.build.run',
 	CheckForUpdates = 'titanium.updates.checkAll',
 	Clean = 'titanium.clean',
+	ClearRecentBuilds = 'titanium.explorer.clearRecent',
 	CreateApp = 'titanium.create.application',
 	CreateKeystore = 'titanium.create.keystore',
 	CreateModule = 'titanium.create.module',
