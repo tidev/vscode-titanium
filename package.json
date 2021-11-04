@@ -969,7 +969,7 @@
     "compile": "rimraf out/ && tsc -p ./",
     "generate-docs": "node ./scripts/render.js",
     "lint": "eslint src/ scripts/",
-    "release": "npm run generate-docs && standard-version && npx vsce package",
+    "release": "npm run generate-docs && standard-version && npx --yes vsce@latest package",
     "test": "cross-env COVERAGE=1 node ./out/test/unit/runTest.js",
     "test:integration": "npm run compile && node ./out/test/integration/runTests.js",
     "test:smoke": "npm run compile && cross-env SMOKE=1 node ./out/test/integration/runTests.js",
