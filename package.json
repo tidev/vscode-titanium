@@ -192,6 +192,12 @@
         "icon": "$(refresh)"
       },
       {
+        "command": "titanium.explorer.clearRecent",
+        "title": "Clear recent builds",
+        "category": "Titanium",
+        "icon": "$(clear-all)"
+      },
+      {
         "command": "titanium.build.setLiveViewEnabled",
         "title": "Enable LiveView",
         "category": "Titanium",
@@ -531,6 +537,10 @@
           "when": "isWorkspaceTrusted && titanium:enabled"
         },
         {
+          "command": "titanium.explorer.clearRecent",
+          "when": "false"
+        },
+        {
           "command": "titanium.build.setLiveViewEnabled",
           "when": "isWorkspaceTrusted && titanium:enabled"
         },
@@ -772,6 +782,11 @@
         {
           "command": "titanium.task.generate",
           "when": "view == titanium.view.buildExplorer && viewItem =~ /DeviceNode|DistributeNode/"
+        },
+        {
+          "command": "titanium.explorer.clearRecent",
+          "when": "view == titanium.view.buildExplorer && viewItem == RecentNode",
+          "group": "inline"
         }
       ]
     },
