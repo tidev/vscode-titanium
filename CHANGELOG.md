@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.13.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.4...v0.13.0) (2021-11-04)
+
+
+### Features
+
+* **explorer/recent:** allow removing all recent builds ([bc63b1b](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/bc63b1b7566df0a88a098b381c18fb82a4c68fac)), closes [#889](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/889)
+* add TerminalLinkProvider to support opening files from stacktraces ([#870](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/870)) ([504ff41](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/504ff41d2a62fa0e1f0aff358689858ea9767769))
+
+
+### Bug Fixes
+
+* reduce activation events ([#888](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/888)) ([a1628ea](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/a1628eac6548247a8c5a4cb9e2e5c92273c9ef3a)), closes [#887](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/887)
+
 ### [0.12.4](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.3...v0.12.4) (2021-09-28)
 
 
