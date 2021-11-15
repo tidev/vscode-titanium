@@ -4,10 +4,8 @@ import * as vscode from 'vscode';
 
 import Appc from '../appc';
 import { ExtensionContainer } from '../container';
-import { ValidatorResponse, WebviewWizard, WizardDefinition, WizardPageSectionDefinition } from '@redhat-developer/vscode-wizard';
-import { PerformFinishResponse } from '@redhat-developer/vscode-wizard/lib/IWizardWorkflowManager';
+import { ValidatorResponse, WebviewWizard, WizardDefinition, WizardPageSectionDefinition, BUTTONS, SEVERITY, PerformFinishResponse } from 'vscode-wizard';
 import { getValidWorkspaceFolders, quickPick } from '../quickpicks';
-import { BUTTONS, SEVERITY } from '@redhat-developer/vscode-wizard/lib/WebviewWizard';
 import { KeystoreInfo } from '../types/common';
 import { CommandBuilder } from '../tasks/commandBuilder';
 import { CommandError } from '../common/utils';
