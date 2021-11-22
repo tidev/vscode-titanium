@@ -1030,7 +1030,7 @@
     "sinon-chai": "^3.7.0",
     "standard-version": "^9.3.2",
     "tmp": "^0.2.1",
-    "typescript": "^4.4.4",
+    "typescript": "^4.5.2",
     "vscode-extension-tester": "^4.2.3"
   },
   "dependencies": {
