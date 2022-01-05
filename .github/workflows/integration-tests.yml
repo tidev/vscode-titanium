@@ -36,7 +36,7 @@ jobs:
           npm ci
           npm i titanium alloy -g
           ti sdk install latest
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run Integration Tests
         run: npm run test:integration
