@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { DistributeNode, PlatformNode } from '../explorer/nodes';
-import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { handleInteractionError, InteractionError } from './common';
 
 import { promptForWorkspaceFolder, selectPlatform } from '../quickpicks/common';
 import { getPackageTask } from '../tasks/tasksHelper';
@@ -24,7 +24,6 @@ function isDistributeNode(node?: PlatformNode | DistributeNode): node is Distrib
 
 export async function packageApplication (node?: PlatformNode | DistributeNode, folder?: vscode.WorkspaceFolder): Promise<void> {
 	try {
-		checkLogin();
 
 		const lastState = ExtensionContainer.context.workspaceState.get<LastState>(WorkspaceState.LastPackageState);
 		let lastDescription: string|undefined;

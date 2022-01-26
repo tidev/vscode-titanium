@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
-import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { handleInteractionError, InteractionError } from './common';
 
 import { promptForWorkspaceFolder, selectPlatform } from '../quickpicks/common';
 import { getPackageTask } from '../tasks/tasksHelper';
@@ -9,7 +9,6 @@ import { Platform } from '../types/common';
 
 export async function packageModule (node: DeviceNode | OSVerNode | PlatformNode | TargetNode, folder?: vscode.WorkspaceFolder): Promise<void> {
 	try {
-		checkLogin();
 
 		if (!folder) {
 			folder = (await promptForWorkspaceFolder()).folder;

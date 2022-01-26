@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { DeviceNode, OSVerNode, PlatformNode, TargetNode } from '../explorer/nodes';
-import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { handleInteractionError, InteractionError } from './common';
 import { selectPlatform } from '../quickpicks';
 import { getBuildTask } from '../tasks/tasksHelper';
 import { AppBuildTask } from '../tasks/buildTaskProvider';
@@ -12,7 +12,6 @@ import { promptForWorkspaceFolder } from '../quickpicks/common';
 
 export async function buildApplication (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode, folder?: vscode.WorkspaceFolder): Promise<void> {
 	try {
-		checkLogin();
 
 		const lastBuildState = ExtensionContainer.context.workspaceState.get<LastBuildState>(WorkspaceState.LastBuildState);
 		let lastBuildDescription: string|undefined;

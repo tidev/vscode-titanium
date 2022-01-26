@@ -7,11 +7,10 @@ import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createAppArguments, validateAppId } from '../utils';
-import { checkLogin, handleInteractionError,  InteractionError } from './common';
+import { handleInteractionError,  InteractionError } from './common';
 
 export async function createApplication (): Promise<void> {
 	try {
-		checkLogin();
 		let force = false;
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
