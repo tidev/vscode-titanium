@@ -1,5 +1,4 @@
 import { MessageOptions, window } from 'vscode';
-import { ExtensionContainer } from '../container';
 
 export interface InteractionChoice {
 	title: string;

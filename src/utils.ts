@@ -7,7 +7,7 @@ import walkSync from 'klaw-sync';
 
 import { platform } from 'os';
 import { tasks, Task, ShellExecution, TaskScope } from 'vscode';
-import { CreateAppOptions, CreateModuleOptions, PrettyDevelopmentTarget, PrettyTarget, Target } from './types/cli';
+import { CreateOptions, CreateModuleOptions, PrettyDevelopmentTarget, PrettyTarget, Target } from './types/cli';
 import { IosCert, IosCertificateType, Platform, PlatformPretty } from './types/common';
 import { ExtensionContainer } from './container';
 
@@ -231,10 +231,9 @@ export function quoteArgument (arg: string): string {
 	return `"${arg}"`;
 }
 
-export function createAppArguments (options: CreateAppOptions): string[] {
-	const subcommand = ExtensionContainer.isUsingTi() ? 'create' : 'new';
+export function createAppArguments (options: CreateOptions): string[] {
 	const args = [
-		subcommand,
+		'create',
 		'--type', 'app',
 		'--name', options.name,
 		'--id', options.id,
@@ -243,16 +242,7 @@ export function createAppArguments (options: CreateAppOptions): string[] {
 		'--log-level', options.logLevel
 	];
 
-	if (ExtensionContainer.isUsingTi()) {
-		args.push('--workspace-dir', normalizeDriveLetter(options.workspaceDir));
-	} else {
-		args.push('--project-dir', normalizeDriveLetter(path.join(options.workspaceDir, options.name)));
-		if (!options.enableServices) {
-			args.push('--no-services');
-		} else {
-			args.push('--no-enable-services');
-		}
-	}
+	args.push('--workspace-dir', normalizeDriveLetter(options.workspaceDir));
 
 	if (options.force) {
 		args.push('--force');
@@ -262,11 +252,9 @@ export function createAppArguments (options: CreateAppOptions): string[] {
 }
 
 export function createModuleArguments (options: CreateModuleOptions): string[] {
-	const subcommand = ExtensionContainer.isUsingTi() ? 'create' : 'new';
-	const type = ExtensionContainer.isUsingTi() ? 'module' : 'timodule';
 	const args = [
-		subcommand,
-		'--type', type,
+		'create',
+		'--type', 'module',
 		'--name', options.name,
 		'--id', options.id,
 		'--platforms', options.platforms.join(','),
@@ -274,11 +262,7 @@ export function createModuleArguments (options: CreateModuleOptions): string[] {
 		'--log-level', options.logLevel
 	];
 
-	if (ExtensionContainer.isUsingTi()) {
-		args.push('--workspace-dir', normalizeDriveLetter(options.workspaceDir));
-	} else {
-		args.push('--project-dir', normalizeDriveLetter(path.join(options.workspaceDir, options.name)));
-	}
+	args.push('--workspace-dir', normalizeDriveLetter(options.workspaceDir));
 
 	if (options.codeBases?.android) {
 		args.push('--android-code-base', options.codeBases.android);

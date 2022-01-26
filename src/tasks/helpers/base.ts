@@ -160,11 +160,8 @@ export abstract class TaskHelper {
 	}
 
 	public createBuilder (): CommandBuilder {
-		if (ExtensionContainer.isUsingTi()) {
-			return CommandBuilder.create('ti', 'build');
-		} else {
-			return CommandBuilder.create('appc', 'run');
-		}
+		return CommandBuilder.create('ti', 'build');
+
 	}
 
 	public getProject(projectDir: string): Project {

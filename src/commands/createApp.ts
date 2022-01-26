@@ -26,10 +26,6 @@ export async function createApplication (): Promise<void> {
 			}
 		});
 		const platforms = await selectPlatforms();
-		let enableServices = false;
-		if (!ExtensionContainer.isUsingTi()) {
-			enableServices = await yesNoQuestion({ placeHolder: 'Enable services?' });
-		}
 		const workspaceDir = await selectCreationLocation(lastCreationPath);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir.fsPath);
 		if (await fs.pathExists(path.join(workspaceDir.fsPath, name))) {
@@ -41,7 +37,6 @@ export async function createApplication (): Promise<void> {
 
 		const args = createAppArguments({
 			id,
-			enableServices,
 			force,
 			logLevel,
 			name,
@@ -51,17 +46,13 @@ export async function createApplication (): Promise<void> {
 
 		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (progress) => {
 			progress.report({ message: 'Creating application' });
-			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
-			await ExtensionContainer.terminal.runInBackground(command, args);
-
-			if (ExtensionContainer.isUsingTi()) {
-				progress.report({ message: 'Creating Alloy project' });
-				const alloyArgs =  [ 'new' ];
-				if (force) {
-					alloyArgs.push('--force');
-				}
-				await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
+			await ExtensionContainer.terminal.runInBackground('ti', args);
+			progress.report({ message: 'Creating Alloy project' });
+			const alloyArgs =  [ 'new' ];
+			if (force) {
+				alloyArgs.push('--force');
 			}
+			await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
 			return;
 		});
 

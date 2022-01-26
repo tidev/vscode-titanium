@@ -2,8 +2,6 @@ import * as semver from 'semver';
 import Appc from '../appc';
 import { nameForPlatform, platforms } from '../utils';
 import { CustomQuickPick, quickPick } from './common';
-import { appc } from 'titanium-editor-commons/updates';
-import { ExtensionContainer } from '../container';
 import { InteractionError } from '../commands';
 
 export interface CodeBase {
@@ -45,20 +43,6 @@ export async function selectCodeBases(platforms: string[]): Promise<CodeBase|und
 	// Support for this was only added in SDK 9.1.0
 	if (semver.lt(selectedSdk.version, '9.1.0')) {
 		return undefined;
-	}
-
-	if (!ExtensionContainer.isUsingTi()) {
-		// CLI 8.1.1 did not correctly handle the --ios-code-base option, so only ask for codebase
-		// options if they're using 8.1.1 or above
-		const selectedCLI = await appc.core.checkInstalledVersion();
-
-		if (!selectedCLI) {
-			return;
-		}
-
-		if (semver.lt(selectedCLI, '8.1.1')) {
-			return undefined;
-		}
 	}
 
 	if (platforms.includes('android')) {
