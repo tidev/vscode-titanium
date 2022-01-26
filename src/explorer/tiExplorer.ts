@@ -16,7 +16,7 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 	private recentNode = new RecentNode('Recent Builds');
 
 	public async refresh (): Promise<void> {
-		return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Appcelerator environment ...' }, async () => {
+		return vscode.window.withProgress({ location: vscode.ProgressLocation.Window, title: 'Reading Titanium environment ...' }, async () => {
 			// fire a change event so that the child nodes of targets display the refresh message
 			this._onDidChangeTreeData.fire(undefined);
 			try {
@@ -25,7 +25,7 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 				vscode.window.showInformationMessage('Updated device explorer');
 				return Promise.resolve();
 			} catch (error) {
-				vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+				vscode.window.showErrorMessage('Error fetching Titanium environment');
 				return Promise.reject();
 			}
 		});

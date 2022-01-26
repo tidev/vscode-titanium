@@ -54,8 +54,7 @@ export async function createModule (): Promise<void> {
 
 		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (progress) => {
 			progress.report({ message: 'Creating module' });
-			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
-			await ExtensionContainer.terminal.runInBackground(command, args);
+			await ExtensionContainer.terminal.runInBackground('ti', args);
 			return;
 		});
 

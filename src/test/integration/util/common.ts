@@ -102,7 +102,7 @@ export class CommonUICreator {
 	public async getErrorOutput (): Promise<string> {
 		try {
 			const outputView = await new BottomBarPanel().openOutputView();
-			// TODO: do we need to make sure it's highlighted await outputView.selectChannel('Appcelerator');
+			// TODO: do we need to make sure it's highlighted await outputView.selectChannel('Titanium');
 			return await outputView.getText();
 		} catch (error) {
 			return 'Failed to obtain error output';

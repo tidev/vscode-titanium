@@ -12,11 +12,6 @@ export interface CreateOptions extends BaseCLIOptions {
 	platforms: string[];
 	workspaceDir: string;
 }
-
-export interface CreateAppOptions extends CreateOptions {
-	enableServices: boolean;
-}
-
 export interface CreateModuleOptions extends CreateOptions {
 	codeBase?: 'swift' | 'objc';
 	codeBases?: CodeBase

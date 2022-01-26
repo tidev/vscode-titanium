@@ -8,7 +8,7 @@ export default class Terminal {
 	private terminal: VSTerminal|undefined;
 	private command: string;
 
-	constructor (name: string, command = 'appc') {
+	constructor (name: string, command = 'ti') {
 
 		this.name = name;
 		this.terminal = window.createTerminal({ name });

@@ -15,12 +15,10 @@ export interface Config {
 		tssTag: string;
 	};
 	general: {
-		appcCommandPath: string;
 		defaultCreationDirectory?: string;
 		displayBuildCommandInConsole: boolean;
 		logLevel: LogLevel;
 		useTerminalForBuild: boolean;
-		useTi: boolean;
 		updateFrequency: string;
 	};
 	package: {

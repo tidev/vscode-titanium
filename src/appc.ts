@@ -1,10 +1,7 @@
-import * as fs from 'fs-extra';
-import * as path from 'path';
 import * as semver from 'semver';
 import * as vscode from 'vscode';
 
 import { spawn } from 'child_process';
-import { homedir } from 'os';
 import { ExtensionContainer } from './container';
 import { IosCert, IosCertificateType, IosProvisioningType, ProvisioningProfile } from './types/common';
 import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
@@ -40,20 +37,6 @@ export class Appc {
 	public info: AppcInfo|undefined;
 
 	/**
-	 * Returns true if user has active session
-	 *
-	 * @returns {Boolean}
-	 */
-	public isUserLoggedIn (): boolean {
-		const session = this.session();
-		if (session && Object.prototype.hasOwnProperty.call(session, 'session') && Object.prototype.hasOwnProperty.call(session, 'expiry')) {
-			return (session.expiry - +new Date() > 0);
-		} else {
-			return false;
-		}
-	}
-
-	/**
 	 * Get info
 	 *
 	 * @param {Function} callback	callback function
@@ -64,14 +47,7 @@ export class Appc {
 			let result = '';
 			let output = '';
 
-			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
-			const args = [ 'info', '-o', 'json' ];
-			if (!ExtensionContainer.isUsingTi()) {
-				args.unshift('ti');
-				args.push('--no-prompt');
-			}
-
-			const proc = spawn(command, args, { shell: true });
+			const proc = spawn('ti', [ 'info', '-o', 'json' ], { shell: true });
 			proc.stdout.on('data', data => {
 				result += data;
 				output += data;
@@ -84,7 +60,7 @@ export class Appc {
 					error.interactionChoices.push({
 						title: 'View Error',
 						run() {
-							const channel = vscode.window.createOutputChannel('Appcelerator');
+							const channel = vscode.window.createOutputChannel('Titanium');
 							channel.append(output);
 							channel.show();
 						}
@@ -355,7 +331,7 @@ export class Appc {
 	}
 
 	/**
-	 * Run `appc alloy generate` command
+	 * Run `alloy generate` command
 	 *
 	 * @param {AlloyGenerateOptions|AlloyModelGenerateOptions} options - arguments.
 	 * @param {String} [options.adapterType] - Adapter to use for Alloy model
@@ -367,7 +343,6 @@ export class Appc {
 	 */
 	public generate (options: AlloyGenerateOptions|AlloyModelGenerateOptions): Promise<CommandResponse> {
 		const { cwd, force, name, type } = options;
-		const command = ExtensionContainer.isUsingTi() ? 'alloy' : 'appc';
 		const args = [ 'generate', type, name ];
 
 		if (isModelType(options)) {
@@ -378,11 +353,7 @@ export class Appc {
 			args.push('--force');
 		}
 
-		if (!ExtensionContainer.isUsingTi()) {
-			args.unshift('alloy');
-		}
-
-		return ExtensionContainer.terminal.runInBackground(command, args, { cwd });
+		return ExtensionContainer.terminal.runInBackground('alloy', args, { cwd });
 	}
 
 	public getAdbPath (): string|undefined {
@@ -394,18 +365,6 @@ export class Appc {
 	public getKeytoolPath (): string|undefined {
 		if (this.info?.jdk.executables.keytool) {
 			return this.info?.jdk.executables.keytool;
-		}
-	}
-
-	/**
-	 * Returns appc CLI session for current user.
-	 *
-	 * @returns {Object}
-	 */
-	private session (): { expiry: number }|undefined {
-		const sessionPath = path.join(homedir(), '.appcelerator/appc-cli.json');
-		if (fs.existsSync(sessionPath)) {
-			return JSON.parse(fs.readFileSync(sessionPath, 'utf8'));
 		}
 	}
 }

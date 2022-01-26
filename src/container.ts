@@ -6,7 +6,6 @@ import { Config, configuration } from './configuration';
 import { GlobalState, VSCodeCommands, WorkspaceState } from './constants';
 import { HelpExplorer } from './explorer/helpExplorer';
 import DeviceExplorer from './explorer/tiExplorer';
-import { startup } from './extension';
 import { AppBuildTaskTitaniumBuildBase } from './tasks/buildTaskProvider';
 import { isDistributionAppBuild, RunningTask } from './tasks/tasksHelper';
 import { AppPackageTaskTitaniumBuildBase } from './tasks/packageTaskProvider';
@@ -54,19 +53,13 @@ export class ExtensionContainer {
 
 	static get terminal (): Terminal {
 		if (this._terminal === undefined) {
-			this._terminal = new Terminal('Appcelerator');
+			this._terminal = new Terminal('Titanium');
 		}
 		return this._terminal;
 	}
 
-	public static resetConfig (configEvent: vscode.ConfigurationChangeEvent): void {
+	public static resetConfig (_configEvent: vscode.ConfigurationChangeEvent): void {
 		this._config = configuration.get<Config>();
-
-		// if the config change is for the useTi setting we need to kick off the startup again to
-		// perform environment validation
-		if (configEvent.affectsConfiguration('titanium.general.useTi')) {
-			startup();
-		}
 	}
 
 	static set runningTask (task: vscode.TaskExecution|undefined) {
@@ -145,17 +138,13 @@ export class ExtensionContainer {
 			// ignore
 		}
 
-		this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions }, !ExtensionContainer.isUsingTi());
+		this._updateInfo = await updates.checkAllUpdates({ nodeJS: supportedVersions });
 
 		if (this._updateInfo?.length) {
 			this.setContext(GlobalState.HasUpdates, true);
 		}
 
 		return this._updateInfo;
-	}
-
-	static isUsingTi (): boolean {
-		return this.config.general.useTi;
 	}
 
 	/**

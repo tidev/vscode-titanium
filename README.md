@@ -23,10 +23,6 @@ Appcelerator Titanium build tools and editor additions for [Visual Studio Code](
 
 ## Features
 
-### Selecting tooling
-
-By default this extension will use the Appcelerator CLI tooling. You can switch to the Titanium CLI tooling by enabling the `General: Use Ti` property in the package settings. This can also be set per-project by setting the `titanium.general.useTi` property in a `./vscode/settings.json` file.
-
 ### Commands
 
 This extension makes the following commands available in the Command Palette to enhance your development experience.
@@ -89,12 +85,10 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.codeTemplates.tssId` | Style ID (#) template | `\n'#${text}': {\n}\n` |
 | `titanium.codeTemplates.tssTag` | Style tag template | `\n'${text}': {\n}\n` |
 | `titanium.general.defaultCreationDirectory` | Default directory to use when creating projects | `No Default` |
-| `titanium.general.appcCommandPath` | Set the full path to the `appc` command if VS Code is unable to locate it. | `appc` |
 | `titanium.general.displayBuildCommandInConsole` | The executed build command is written to the output channel to aid debugging. This will include password arguments. | `true` |
 | `titanium.general.logLevel` | Logging level for commands being run | `info` |
 | `titanium.general.updateFrequency` | Controls the frequency for how often to show an alert if there are updates available. Updates can always be viewed in the Titanium activity pane. Accepts values in time formats like 60 minutes, 12 hours, 7 days etc. | `1 day` |
 | `titanium.general.useTerminalForBuild` | When true build/package commands will be run using the integrated terminal as opposed to using an output channel. | `true` |
-| `titanium.general.useTi` | Whether to use the OSS based tooling (alloy + ti) instead of the Appcelerator platform based tool (appc) | `false` |
 | `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
 | `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
 

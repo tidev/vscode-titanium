@@ -21,20 +21,13 @@ export async function cleanApplication (): Promise<void> {
 			projectDir = folder.uri.fsPath;
 		}
 		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification, title: 'Cleaning project' }, async () => {
-			const command = ExtensionContainer.isUsingTi() ? 'ti' : 'appc';
-			const args = [
+			const quotedArgs =  [
 				'clean',
 				'--project-dir', projectDir,
 				'--log-level', logLevel
-			];
+			].map(arg => quoteArgument(arg));
 
-			if (!ExtensionContainer.isUsingTi()) {
-				args.unshift('ti');
-			}
-
-			const quotedArgs =  args.map(arg => quoteArgument(arg));
-
-			await ExtensionContainer.terminal.runInBackground(command, quotedArgs);
+			await ExtensionContainer.terminal.runInBackground('ti', quotedArgs);
 		});
 
 	} catch (error) {

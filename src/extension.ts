@@ -65,18 +65,18 @@ export async function activate (context: vscode.ExtensionContext): Promise<void>
 export async function startup (): Promise<void> {
 
 	if (!vscode.workspace.isTrusted) {
-		// We need to set Enabled here just incase are called by a change to the useTi setting
-		// where the environment was previously valid but now we are missing tooling
+		// We need to set Enabled here just incase the environment was previously valid but now we
+		// are missing tooling
 		ExtensionContainer.setContext(GlobalState.Enabled, false);
 		ExtensionContainer.setContext(GlobalState.NeedsTrustedWorkspace, true);
 		return;
 	}
 
-	const { missing } = await environment.validateEnvironment(undefined, !ExtensionContainer.isUsingTi());
+	const { missing } = await environment.validateEnvironment(undefined);
 
 	if (missing.length) {
-		// We need to set Enabled here just incase are called by a change to the useTi setting
-		// where the environment was previously valid but now we are missing tooling
+		// We need to set Enabled here just incase the environment was previously valid but now we
+		// are missing tooling
 		ExtensionContainer.setContext(GlobalState.Enabled, false);
 		ExtensionContainer.setContext(GlobalState.MissingTooling, true);
 		return;
@@ -111,7 +111,7 @@ export async function startup (): Promise<void> {
 				handleInteractionError(error);
 				return;
 			}
-			vscode.window.showErrorMessage('Error fetching Appcelerator environment');
+			vscode.window.showErrorMessage('Error fetching Titanium environment');
 			return;
 		}
 
