@@ -7,12 +7,11 @@ import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createModuleArguments, validateAppId } from '../utils';
-import { checkLogin, handleInteractionError, InteractionError } from './common';
+import { handleInteractionError, InteractionError } from './common';
 import { CommandError } from '../common/utils';
 
 export async function createModule (): Promise<void> {
 	try {
-		checkLogin();
 
 		// force a refresh of the environment information to make sure that we have the correct
 		// selected SDK and CLI

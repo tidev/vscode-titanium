@@ -54,30 +54,6 @@ export class InteractionError extends Error {
 	public interactionChoices: InteractionChoice[] = [];
 }
 
-/**
- * Check Appcelerator login and prompt if necessary.
- */
-export function checkLogin (): void {
-	if (ExtensionContainer.isUsingTi()) {
-		return;
-	}
-
-	if (!ExtensionContainer.appc.isUserLoggedIn()) {
-		window.showInformationMessage('Please log in to the Appcelerator platform');
-		const error = new InteractionError('You are not logged in. Please log in to continue');
-		error.messageOptions = {
-			modal: true
-		};
-		error.interactionChoices.push({
-			title: 'Login',
-			run: () => {
-				ExtensionContainer.terminal.runCommand([ 'login' ]);
-			}
-		});
-		throw error;
-	}
-}
-
 export async function handleInteractionError (error: InteractionError): Promise<void> {
 	const actionToTake = await window.showErrorMessage(error.message, error.messageOptions, ...error.interactionChoices);
 	if (actionToTake) {

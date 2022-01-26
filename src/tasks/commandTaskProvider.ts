@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { TaskExecutionContext } from './tasksHelper';
 import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { TaskHelper, Helpers } from './helpers';
-import { UserCancellation, handleInteractionError, InteractionError, checkLogin } from '../commands/common';
+import { UserCancellation, handleInteractionError, InteractionError } from '../commands/common';
 import { LogLevel, Platform, ProjectType } from '../types/common';
 import { CommandError } from '../common/utils';
 import { Command } from './commandBuilder';
@@ -63,7 +63,6 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 		// Use this as a centralized place to do things like login checks, analytics etc.
 
 		try {
-			checkLogin();
 
 			task.definition.platform = getPlatform(task);
 
