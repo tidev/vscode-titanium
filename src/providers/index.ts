@@ -1,4 +1,3 @@
-import appc from '../appc';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -139,7 +138,7 @@ export async function generateCompletions (force = false, project: Project): Pro
 		return;
 	}
 	try {
-		const sdkInfo = appc.sdkInfo(sdkVersion);
+		const sdkInfo = ExtensionContainer.environment.sdkInfo(sdkVersion);
 		if (!sdkInfo) {
 			// TODO
 			return;
@@ -169,7 +168,7 @@ export async function generateCompletions (force = false, project: Project): Pro
 					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, async () => {
 						try {
 							await updates.titanium.sdk.installUpdate(sdkVersion as string);
-							await appc.getInfo();
+							await ExtensionContainer.environment.getInfo();
 							await generateCompletions(force, project);
 						} catch (err) {
 							return Promise.reject(err);

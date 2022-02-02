@@ -1,8 +1,8 @@
 import * as semver from 'semver';
-import Appc from '../appc';
 import { nameForPlatform, platforms } from '../utils';
 import { CustomQuickPick, quickPick } from './common';
 import { InteractionError } from '../commands';
+import { ExtensionContainer } from '../container';
 
 export interface CodeBase {
 	android?: 'java' | 'kotlin'
@@ -34,7 +34,7 @@ export async function selectCodeBases(platforms: string[]): Promise<CodeBase|und
 		ios: undefined
 	};
 
-	const selectedSdk = Appc.selectedSdk();
+	const selectedSdk = ExtensionContainer.environment.selectedSdk();
 
 	if (!selectedSdk) {
 		return undefined;

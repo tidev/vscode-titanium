@@ -1,5 +1,5 @@
+import { ExtensionContainer } from '../container';
 import * as vscode from 'vscode';
-import appc from '../appc';
 import { Platform } from '../types/common';
 import { platforms } from '../utils';
 import { BaseNode, PlatformNode } from './nodes';
@@ -20,7 +20,7 @@ export default class DeviceExplorer implements vscode.TreeDataProvider<BaseNode>
 			// fire a change event so that the child nodes of targets display the refresh message
 			this._onDidChangeTreeData.fire(undefined);
 			try {
-				await appc.getInfo();
+				await ExtensionContainer.environment.getInfo();
 				this._onDidChangeTreeData.fire(undefined);
 				vscode.window.showInformationMessage('Updated device explorer');
 				return Promise.resolve();

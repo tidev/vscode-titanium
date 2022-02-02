@@ -8,14 +8,14 @@ import * as vscode from 'vscode';
 
 import { TiappCompletionItemProvider } from '../../../../../providers/completion/tiappCompletionItemProvider';
 import { getCommonAlloyProjectDirectory } from '../../../../../test/common/utils';
-import Appc from '../../../../../appc';
 import info from '../../../fixtures/ti_info';
+import { ExtensionContainer } from '../../../../../container';
 
 let sandbox: sinon.SinonSandbox;
 
 describe('tiapp completion provider', () => {
 	before(() => {
-		Appc.info = info;
+		ExtensionContainer.environment.info = info;
 	});
 
 	const provider = new TiappCompletionItemProvider();

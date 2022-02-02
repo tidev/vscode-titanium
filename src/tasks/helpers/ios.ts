@@ -8,7 +8,6 @@ import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, BuildTaskTitani
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
 
-import appc from '../../appc';
 import { ExtensionContainer } from '../../container';
 
 export interface IosTitaniumBuildDefinition extends BuildTaskDefinitionBase {
@@ -52,7 +51,7 @@ export class IosHelper extends TaskHelper {
 			if (!iosInfo.certificate) {
 				certificate = await selectiOSCertificate('run');
 			} else {
-				certificate = appc.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
+				certificate = ExtensionContainer.environment.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
 			}
 
 			if (!certificate) {
@@ -94,7 +93,7 @@ export class IosHelper extends TaskHelper {
 		if (!iosInfo.certificate) {
 			certificate = await selectiOSCertificate('distribute');
 		} else {
-			certificate = appc.iOSCertificates('distribution').find(cert => cert.fullname === iosInfo.certificate);
+			certificate = ExtensionContainer.environment.iOSCertificates('distribution').find(cert => cert.fullname === iosInfo.certificate);
 		}
 
 		if (!certificate) {

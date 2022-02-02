@@ -4,13 +4,13 @@ import { before, describe, it } from 'mocha';
 
 import * as utils from '../../../utils';
 import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
-import Appc from '../../../appc';
 import info from '../fixtures/ti_info';
+import { ExtensionContainer } from '../../../container';
 
 describe('utils', () => {
 
 	before(() => {
-		Appc.info = info;
+		ExtensionContainer.environment.info = info;
 	});
 
 	describe('iOS provisioning profile matches app ID', () => {

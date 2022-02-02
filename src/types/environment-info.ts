@@ -41,7 +41,7 @@ export interface TitaniumSDK {
 	fullversion?: string;
 }
 
-export interface AppcInfo {
+export interface EnvironmentInfo {
 	android: {
 		devices: AndroidDevice[];
 		emulators: AndroidEmulator[];

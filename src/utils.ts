@@ -1,7 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as semver from 'semver';
-import appc from './appc';
 import findUp from 'find-up';
 import walkSync from 'klaw-sync';
 
@@ -312,7 +311,7 @@ export function matches (text: string, test: string): boolean {
  * @returns {String}
  */
 export function getCorrectCertificateName (certificateName: string, sdkVersion: string, certificateType: IosCertificateType): string {
-	const certificate = appc.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
+	const certificate = ExtensionContainer.environment.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
 
 	if (!certificate) {
 		throw new Error(`Failed to lookup certificate ${certificateName}`);
@@ -345,7 +344,7 @@ export async function getNodeSupportedVersion(): Promise<string|undefined> {
 		return;
 	}
 
-	const sdkInfo = appc.sdkInfo(sdkVersion);
+	const sdkInfo = ExtensionContainer.environment.sdkInfo(sdkVersion);
 	if (!sdkInfo) {
 		return;
 	}
@@ -390,14 +389,14 @@ export async function executeAsTask(command: string, name: string): Promise<void
 export function getDeviceNameFromId (deviceID: string, platform: Platform, target: string): string {
 	let deviceName: string|undefined;
 	if (platform === 'android' && target === 'device') {
-		deviceName = (appc.androidDevices().find(device => device.id === deviceID))?.name;
+		deviceName = (ExtensionContainer.environment.androidDevices().find(device => device.id === deviceID))?.name;
 	} else if (platform === 'android' && target === 'emulator') {
-		deviceName = (appc.androidEmulators().AVDs.find(emulator => emulator.id === deviceID))?.name;
+		deviceName = (ExtensionContainer.environment.androidEmulators().AVDs.find(emulator => emulator.id === deviceID))?.name;
 	} else if (platform === 'ios' && target === 'device') {
-		deviceName = (appc.iOSDevices().find(device => device.udid === deviceID))?.name;
+		deviceName = (ExtensionContainer.environment.iOSDevices().find(device => device.udid === deviceID))?.name;
 	} else if (platform === 'ios' && target === 'simulator') {
-		for (const simVer of appc.iOSSimulatorVersions()) {
-			deviceName = (appc.iOSSimulators()[simVer].find(simulator => simulator.udid === deviceID))?.name;
+		for (const simVer of ExtensionContainer.environment.iOSSimulatorVersions()) {
+			deviceName = (ExtensionContainer.environment.iOSSimulators()[simVer].find(simulator => simulator.udid === deviceID))?.name;
 			if (deviceName) {
 				deviceName = `${deviceName} (${simVer})`;
 				break;

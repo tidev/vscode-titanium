@@ -4,7 +4,6 @@ import { DeviceNode } from './deviceNode';
 import { DistributeNode } from './distributeNode';
 import { OSVerNode } from './osVerNode';
 
-import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
 import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../types/cli';
@@ -39,12 +38,12 @@ export class TargetNode extends BaseNode {
 		if (this.platform === 'ios') {
 			switch (this.label) {
 				case 'Simulator':
-					for (const simVer of appc.iOSSimulatorVersions()) {
+					for (const simVer of ExtensionContainer.environment.iOSSimulatorVersions()) {
 						devices.push(new OSVerNode(simVer, this.platform, this.label));
 					}
 					break;
 				case 'Device':
-					for (const device of appc.iOSDevices()) {
+					for (const device of ExtensionContainer.environment.iOSDevices()) {
 						let label = device.name;
 						if (device.productVersion) {
 							label = `${label} (${device.productVersion})`;
@@ -60,12 +59,12 @@ export class TargetNode extends BaseNode {
 		} else if (this.platform === 'android') {
 			switch (this.label) {
 				case 'Device':
-					for (const device of appc.androidDevices()) {
+					for (const device of ExtensionContainer.environment.androidDevices()) {
 						devices.push(new DeviceNode(device.name, this.platform, this.label, device.id, this.targetId));
 					}
 					break;
 				case 'Emulator':
-					for (const [ type, emulators ] of Object.entries(appc.androidEmulators())) {
+					for (const [ type, emulators ] of Object.entries(ExtensionContainer.environment.androidEmulators())) {
 						for (const emulator of emulators) {
 							let label = `${emulator.name}`;
 							if (type === 'Genymotion') {

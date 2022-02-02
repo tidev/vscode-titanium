@@ -4,37 +4,14 @@ import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import { ExtensionContainer } from './container';
 import { IosCert, IosCertificateType, IosProvisioningType, ProvisioningProfile } from './types/common';
-import { AndroidEmulator, AppcInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
+import { AndroidEmulator, EnvironmentInfo, IosDevice, IosSimulator, TitaniumSDK, AndroidDevice } from './types/environment-info';
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 import { GlobalState } from './constants';
-import { AlloyComponentType, InteractionError } from './commands';
-import { CommandResponse } from './common/utils';
+import { InteractionError } from './commands';
 
-export interface AlloyGenerateOptions {
-	cwd: string;
-	force?: boolean;
-	type: Exclude<AlloyComponentType, AlloyComponentType.Model>;
-	name: string;
-}
+export class Environment {
 
-export interface AlloyModelGenerateOptions {
-	cwd: string;
-	force?: boolean;
-	adapterType: string;
-	type: AlloyComponentType.Model;
-	name: string;
-}
-
-function isModelType(options: AlloyGenerateOptions|AlloyModelGenerateOptions): options is AlloyModelGenerateOptions {
-	if (options.type === AlloyComponentType.Model) {
-		return true;
-	}
-	return false;
-}
-
-export class Appc {
-
-	public info: AppcInfo|undefined;
+	public info: EnvironmentInfo|undefined;
 
 	/**
 	 * Get info
@@ -330,32 +307,6 @@ export class Appc {
 		return profiles;
 	}
 
-	/**
-	 * Run `alloy generate` command
-	 *
-	 * @param {AlloyGenerateOptions|AlloyModelGenerateOptions} options - arguments.
-	 * @param {String} [options.adapterType] - Adapter to use for Alloy model
-	 * @param {String} options.cwd - Directory of the app.
-	 * @param {Boolean} options.force - Force creation of the component, will overwrite existing component.
-	 * @param {String} options.name -  Name of the component.
-	 * @param {String} options.type - Type to generate.
-	 * @returns {Promise}
-	 */
-	public generate (options: AlloyGenerateOptions|AlloyModelGenerateOptions): Promise<CommandResponse> {
-		const { cwd, force, name, type } = options;
-		const args = [ 'generate', type, name ];
-
-		if (isModelType(options)) {
-			args.push(options.adapterType);
-		}
-
-		if (force) {
-			args.push('--force');
-		}
-
-		return ExtensionContainer.terminal.runInBackground('alloy', args, { cwd });
-	}
-
 	public getAdbPath (): string|undefined {
 		if (this.info?.android?.sdk?.executables) {
 			return this.info.android.sdk.executables.adb;
@@ -368,5 +319,3 @@ export class Appc {
 		}
 	}
 }
-
-export default new Appc();

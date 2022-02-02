@@ -1,6 +1,5 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import Appc from '../appc';
 
 import { commands, ProgressLocation, Uri, window, workspace } from 'vscode';
 import { VSCodeCommands, WorkspaceState } from '../constants';
@@ -15,7 +14,7 @@ export async function createModule (): Promise<void> {
 
 		// force a refresh of the environment information to make sure that we have the correct
 		// selected SDK and CLI
-		await Appc.getInfo();
+		await ExtensionContainer.environment.getInfo();
 
 		let force = false;
 		const logLevel = ExtensionContainer.config.general.logLevel;
