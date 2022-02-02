@@ -1,12 +1,13 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import appc from '../appc';
 
 import { window, workspace } from 'vscode';
 import { inputBox, quickPick } from '../quickpicks';
 import { capitalizeFirstLetter } from '../utils';
 import { UserCancellation } from './common';
 import { promptForWorkspaceFolder } from '../quickpicks/common';
+import { CommandResponse } from '../common/utils';
+import { ExtensionContainer } from '../container';
 
 export enum AlloyModelAdapterType {
 	Properties = 'properties',
@@ -37,6 +38,21 @@ export enum AlloyComponentExtension {
 	Style = '.tss',
 	View = '.xml',
 	Widget = ''
+}
+
+export interface AlloyGenerateOptions {
+	cwd: string;
+	force?: boolean;
+	type: Exclude<AlloyComponentType, AlloyComponentType.Model>;
+	name: string;
+}
+
+export interface AlloyModelGenerateOptions {
+	cwd: string;
+	force?: boolean;
+	adapterType: string;
+	type: AlloyComponentType.Model;
+	name: string;
 }
 
 async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension):
@@ -73,7 +89,7 @@ export async function generateComponent (type: Exclude<AlloyComponentType, Alloy
 		const filePaths = creationArgs.filePaths;
 		name = creationArgs.name;
 
-		await appc.generate({
+		await generate({
 			cwd,
 			type,
 			name,
@@ -103,7 +119,7 @@ export async function generateModel (): Promise<void> {
 		const cwd = creationArgs.cwd;
 		const filePaths = creationArgs.filePaths;
 		name = creationArgs.name;
-		await appc.generate({
+		await generate({
 			adapterType: adapterType.id,
 			cwd,
 			type: AlloyComponentType.Model,
@@ -123,4 +139,30 @@ export async function generateModel (): Promise<void> {
 		}
 		window.showErrorMessage(`Failed to create Alloy ${AlloyComponentType.Model} ${name}`);
 	}
+}
+
+/**
+ * Run `alloy generate` command
+ *
+ * @param {AlloyGenerateOptions|AlloyModelGenerateOptions} options - arguments.
+ * @param {String} [options.adapterType] - Adapter to use for Alloy model
+ * @param {String} options.cwd - Directory of the app.
+ * @param {Boolean} options.force - Force creation of the component, will overwrite existing component.
+ * @param {String} options.name -  Name of the component.
+ * @param {String} options.type - Type to generate.
+ * @returns {Promise}
+ */
+async function generate (options: AlloyGenerateOptions|AlloyModelGenerateOptions): Promise<CommandResponse> {
+	const { cwd, force, name, type } = options;
+	const args = [ 'generate', type, name ];
+
+	if (options.type === AlloyComponentType.Model) {
+		args.push(options.adapterType);
+	}
+
+	if (force) {
+		args.push('--force');
+	}
+
+	return ExtensionContainer.terminal.runInBackground('alloy', args, { cwd });
 }

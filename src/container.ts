@@ -1,7 +1,7 @@
 import { updates } from 'titanium-editor-commons';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import * as vscode from 'vscode';
-import appc, { Appc } from './appc';
+import { Environment } from './environment-info';
 import { Config, configuration } from './configuration';
 import { GlobalState, VSCodeCommands, WorkspaceState } from './constants';
 import { HelpExplorer } from './explorer/helpExplorer';
@@ -16,7 +16,7 @@ import Terminal from './terminal';
 import { getNodeSupportedVersion } from './utils';
 
 export class ExtensionContainer {
-	private static _appc: Appc;
+	private static _environment: Environment;
 	private static _buildExplorer: DeviceExplorer;
 	private static _config: Config | undefined;
 	private static _context: vscode.ExtensionContext;
@@ -30,14 +30,14 @@ export class ExtensionContainer {
 	private static _recentBuilds: Map<string, AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase>;
 
 	public static inititalize (context: vscode.ExtensionContext, config: Config): void {
-		this._appc = appc;
+		this._environment = new Environment();
 		this._config = config;
 		this._context = context;
 		this._recentBuilds = new Map(context.workspaceState.get(WorkspaceState.RecentBuilds) || []);
 	}
 
-	static get appc (): Appc {
-		return this._appc;
+	static get environment (): Environment {
+		return this._environment;
 	}
 
 	static get config (): Config {

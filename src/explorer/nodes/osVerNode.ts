@@ -2,10 +2,10 @@ import { TreeItemCollapsibleState } from 'vscode';
 import { BaseNode } from './baseNode';
 import { DeviceNode } from './deviceNode';
 
-import appc from '../../appc';
 import { Platform } from '../../types/common';
 import { targetForName } from '../../utils';
 import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../types/cli';
+import { ExtensionContainer } from '../../container';
 
 export class OSVerNode extends BaseNode {
 
@@ -27,7 +27,7 @@ export class OSVerNode extends BaseNode {
 	public override getChildren (): DeviceNode[] {
 		const simulators: DeviceNode[] = [];
 		if (this.platform === 'ios') {
-			const sims = appc.iOSSimulators();
+			const sims = ExtensionContainer.environment.iOSSimulators();
 			for (const sim of sims[this.version]) {
 				simulators.push(new DeviceNode(sim.name, this.platform, this.targetId, sim.udid, this.targetId, this.version));
 			}

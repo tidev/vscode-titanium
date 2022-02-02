@@ -2,7 +2,6 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-import Appc from '../appc';
 import { ExtensionContainer } from '../container';
 import { ValidatorResponse, WebviewWizard, WizardDefinition, WizardPageSectionDefinition, BUTTONS, SEVERITY, PerformFinishResponse } from 'vscode-wizard';
 import { getValidWorkspaceFolders, quickPick } from '../quickpicks';
@@ -223,7 +222,7 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 					return canFinish;
 				},
 				async performFinish (wizard: WebviewWizard, data: KeystoreCreationProps): Promise<PerformFinishResponse|null> {
-					const keytool = Appc.getKeytoolPath();
+					const keytool = ExtensionContainer.environment.getKeytoolPath();
 					if (!keytool) {
 						return null;
 					}

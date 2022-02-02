@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import appc from '../../appc';
+import { ExtensionContainer } from '../../container';
 
 import { CompletionItem, CompletionItemKind, Position, Range, TextDocument } from 'vscode';
 import { BaseCompletionItemProvider } from './baseCompletionItemProvider';
@@ -41,7 +41,7 @@ export class TiappCompletionItemProvider extends BaseCompletionItemProvider {
 				return completions;
 			}
 			const sdkVersion = sdkVer[1];
-			const sdks = appc.sdks();
+			const sdks = ExtensionContainer.environment.sdks();
 			for (const sdk of sdks) {
 				if (sdkVersion && !sdk.fullversion?.includes(sdkVersion)) {
 					continue;

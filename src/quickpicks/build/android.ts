@@ -1,6 +1,5 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import appc from '../../appc';
 import { enterPassword, inputBox, quickPick, yesNoQuestion } from '../common';
 import { UserCancellation } from '../../commands';
 import { pathExists } from 'fs-extra';
@@ -11,12 +10,12 @@ import { WorkspaceState } from '../../constants';
 import { createKeystore } from '../../commands/createKeystore';
 
 export function selectAndroidDevice (): Promise<DeviceQuickPickItem> {
-	const devices = appc.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
+	const devices = ExtensionContainer.environment.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
 	return deviceQuickPick(devices, { placeHolder: 'Select Android device' });
 }
 
 export function selectAndroidEmulator (): Promise<DeviceQuickPickItem>  {
-	const emulators = appc.androidEmulators();
+	const emulators = ExtensionContainer.environment.androidEmulators();
 	const options = [];
 
 	for (const emulator of emulators.AVDs) {

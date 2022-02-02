@@ -5,7 +5,7 @@ import { SourceMapConsumer } from 'source-map';
 
 import { ExtensionContainer } from '../container';
 import { normalisedPlatform, normalizeDriveLetter } from '../utils';
-import { Platform } from 'src/types/common';
+import { Platform } from '../types/common';
 
 interface TiTerminalLink extends vscode.TerminalLink {
 	terminalName: string;

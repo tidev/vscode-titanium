@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { TitaniumDebugConfigurationProvider } from './titaniumDebugConfigurationProvider';
 import { MESSAGE_STRING, Request, TitaniumLaunchRequestArgs, FeedbackOptions, Response } from '../common/extensionProtocol';
 import { ExtensionContainer } from '../container';
-import appc from '../appc';
 import { Commands } from '../commands';
 
 async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise<void> {
@@ -54,7 +53,7 @@ async function handleCustomEvent(event: vscode.DebugSessionCustomEvent): Promise
 				return;
 			}
 
-			const adbPath = appc.getAdbPath();
+			const adbPath = ExtensionContainer.environment.getAdbPath();
 			if (!adbPath) {
 				return;
 			}

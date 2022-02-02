@@ -1,6 +1,4 @@
 import * as vscode from 'vscode';
-import appc from './appc';
-
 import { Commands, handleInteractionError, InteractionError } from './commands';
 import { GlobalState } from './constants';
 import { ExtensionContainer } from './container';
@@ -105,7 +103,7 @@ export async function startup (): Promise<void> {
 		});
 
 		try {
-			await appc.getInfo();
+			await ExtensionContainer.environment.getInfo();
 		} catch (error) {
 			if (error instanceof InteractionError) {
 				handleInteractionError(error);
