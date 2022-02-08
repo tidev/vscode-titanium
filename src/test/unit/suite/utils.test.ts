@@ -1,16 +1,25 @@
 import * as path from 'path';
 import { expect } from 'chai';
-import { before, describe, it } from 'mocha';
+import { afterEach, beforeEach, describe, it } from 'mocha';
 
 import * as utils from '../../../utils';
 import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
 import info from '../fixtures/ti_info';
 import { ExtensionContainer } from '../../../container';
+import { Environment } from '../../../environment-info';
+import sinon from 'sinon';
 
 describe('utils', () => {
+	const sandbox = sinon.createSandbox();
 
-	before(() => {
-		ExtensionContainer.environment.info = info;
+	beforeEach(() => {
+		const environment = new Environment();
+		environment.info = info;
+		sandbox.stub(ExtensionContainer, 'environment').get(() => environment);
+	});
+
+	afterEach(() => {
+		sandbox.restore();
 	});
 
 	describe('iOS provisioning profile matches app ID', () => {

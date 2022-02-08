@@ -10,13 +10,10 @@ import { TiappCompletionItemProvider } from '../../../../../providers/completion
 import { getCommonAlloyProjectDirectory } from '../../../../../test/common/utils';
 import info from '../../../fixtures/ti_info';
 import { ExtensionContainer } from '../../../../../container';
-
-let sandbox: sinon.SinonSandbox;
+import { Environment } from '../../../../../environment-info';
 
 describe('tiapp completion provider', () => {
-	before(() => {
-		ExtensionContainer.environment.info = info;
-	});
+	const sandbox = sinon.createSandbox();
 
 	const provider = new TiappCompletionItemProvider();
 	const uri = vscode.Uri.file(path.join(getUnitFixturesDirectory(), 'completions', 'tiapp.xml'));
@@ -29,8 +26,11 @@ describe('tiapp completion provider', () => {
 	beforeEach(async function () {
 		this.timeout(5000);
 
-		sandbox = sinon.createSandbox();
 		sandbox.stub(provider, 'getProject').resolves(new Project(getCommonAlloyProjectDirectory(), 'app'));
+
+		const environment = new Environment();
+		environment.info = info;
+		sandbox.stub(ExtensionContainer, 'environment').get(() => environment);
 	});
 
 	afterEach(async function () {
