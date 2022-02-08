@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { afterEach, before, beforeEach, describe, it } from 'mocha';
+import { afterEach, beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { getUnitFixturesDirectory } from '../../../utils';
