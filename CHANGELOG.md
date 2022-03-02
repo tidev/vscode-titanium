@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.14.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.13.0...v0.14.0) (2022-03-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* Appc CLI is no longer supported
+
+### Bug Fixes
+
+* update dependency to fix keystore creation ([52571b4](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/52571b4a5d23f7d5cb9211fc2a22818172ff18d7))
+
+
+* only support titanium tooling ([15cd6e3](https://github.com/appcelerator/vscode-appcelerator-titanium/commit/15cd6e3a9614aadf01de1b8513a78fe162989aea))
+
 ## [0.13.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.12.4...v0.13.0) (2021-11-04)
 
 
