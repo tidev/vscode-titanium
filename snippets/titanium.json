@@ -160,7 +160,7 @@
         "prefix": "ticamera",
         "body": [
             "// Camera access requires user permission:",
-            "// http://docs.appcelerator.com/platform/latest/#!/api/Titanium.Media-method-hasCameraPermissions.",
+            "// https://titaniumsdk.com/api/titanium/media.html#hascamerapermissions",
             "Ti.Media.requestCameraPermissions(function(e) {",
             "    if (e.success) {",
             "        Ti.Media.showCamera({",
@@ -183,4 +183,3 @@
         "description": "Show camera"
     }
 }
-    

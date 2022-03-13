@@ -4,7 +4,7 @@ Interested in contributing? You can follow the information below to ensure your 
 
 ## File an issue
 
-For any contribution we first ask that you [file an issue](https://github.com/appcelerator/vscode-appcelerator-titanium/issues/new/choose), this helps us keep track of any necessary changes, as well as discuss and agree on a plan of action to ensure landing your changes goes as smoothly as possible.
+For any contribution we first ask that you [file an issue](https://github.com/tidev/vscode-titanium/issues/new/choose), this helps us keep track of any necessary changes, as well as discuss and agree on a plan of action to ensure landing your changes goes as smoothly as possible.
 
 ## Getting set up for development
 
@@ -65,7 +65,7 @@ When sending in a PR please make sure you do the following:
 - `npm run lint` passes
 	- This is also validated on a `git commit` using git hooks via husky.
 - When making the PR, please make sure to contain as much relevant info as possible in the PR body.
-- Make sure to sign the [Axway CLA](https://cla.axway.com/).
+- Make sure to sign the [CLA](https://github.com/tidev/organization-docs/blob/main/AUTHORIZED_CONTRIBUTORS.md).
 
 ## Releasing
 
@@ -79,5 +79,5 @@ To release of the extension the following needs to be followed:
 3. Push to the main repo with `git push` and `git push <appc remote> <tag>`.
 4. Upload the `.vsix` file to the VS Code [marketplace](https://marketplace.visualstudio.com/manage).
 5. Upload the `.vsix` file to the Open VSX Registry using `npx ovsx publish <file> -p <token>`
-6. Draft a new release on the [releases page](https://github.com/appcelerator/vscode-appcelerator-titanium/releases).
+6. Draft a new release on the [releases page](https://github.com/tidev/vscode-titanium/releases).
 7. 🎉

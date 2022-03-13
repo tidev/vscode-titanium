@@ -36,7 +36,7 @@ describe('App smoke', function () {
 		this.timeout(90000);
 
 		await project.createApp({
-			id: 'com.axway.e2e',
+			id: 'com.test.e2e',
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android', 'ios' ],

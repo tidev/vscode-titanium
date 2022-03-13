@@ -122,7 +122,7 @@
 					<key>match</key>
 					<string>\b(aqua|black|blue|brown|cyan|darkgray|fuchsia|gray|green|lightgray|lime|magenta|maroon|navy|olive|orange|pink|purple|red|silver|teal|white|yellow)\b</string>
 					<key>comment</key>
-					<string>http://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI</string>
+					<string>https://titaniumsdk.com/api/titanium/ui.html</string>
 				</dict>
 				<dict>
 					<key>begin</key>

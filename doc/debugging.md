@@ -16,7 +16,7 @@
 
 ### General
 
-To debug an Alloy application you must be using Alloy 1.14.0 (Appcelerator CLI 7.1.0) or higher.
+To debug an Alloy application you must be using Alloy 1.14.0 or higher.
 
 ### Android
 

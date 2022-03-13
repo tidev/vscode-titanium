@@ -21,7 +21,8 @@ A clear and concise description of what you expected to happen.
 | Software | Version |
 | ---------------- | ---------- |
 | Titanium SDK | |
-| Appcelerator CLI | |
+| Titanium CLI | |
+| Alloy CLI | |
 | VS Code | |
 | vscode-titanium | |
 
