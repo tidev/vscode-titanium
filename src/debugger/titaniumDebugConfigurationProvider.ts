@@ -96,7 +96,7 @@ export class TitaniumDebugConfigurationProvider implements vscode.DebugConfigura
 					title: 'Open docs'
 				});
 				if (action) {
-					vscode.env.openExternal(vscode.Uri.parse('https://github.com/appcelerator/vscode-appcelerator-titanium/blob/master/doc/debugging.md'));
+					vscode.env.openExternal(vscode.Uri.parse('https://github.com/tidev/vscode-titanium/blob/master/doc/debugging.md'));
 				}
 				throw new Error('Unable to start debugger as ios_webkit_debug_proxy is not installed.');
 			}
