@@ -38,7 +38,7 @@ describe('Application creation', function () {
 		const name = 'vscode-e2e-test-app';
 
 		await creator.createApp({
-			id: 'com.axway.e2e',
+			id: 'com.test.e2e',
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android', 'ios' ]
@@ -60,7 +60,7 @@ describe('Application creation', function () {
 		const name = 'vscode-e2e-test-app';
 
 		await creator.createApp({
-			id: 'com.axway.e2e',
+			id: 'com.test.e2e',
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android' ]

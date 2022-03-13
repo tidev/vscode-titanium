@@ -89,7 +89,7 @@
         {
           "name": "support.constant.color.w3c-standard-color-name.css",
           "match": "\\b(aqua|black|blue|brown|cyan|darkgray|fuchsia|gray|green|lightgray|lime|magenta|maroon|navy|olive|orange|pink|purple|red|silver|teal|white|yellow)\\b",
-          "comment": "http://docs.appcelerator.com/platform/latest/#!/api/Titanium.UI"
+          "comment": "https://titaniumsdk.com/api/titanium/ui.html"
         },
         {
           "begin": "(rgba?)\\s*(\\()",

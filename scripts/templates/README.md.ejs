@@ -1,23 +1,23 @@
-# Appcelerator Titanium Package for Visual Studio Code
+# Titanium Package for Visual Studio Code
 
-[![Version](https://vsmarketplacebadge.apphb.com/version-short/axway.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
-[![Version](https://vsmarketplacebadge.apphb.com/downloads-short/axway.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
+[![Version](https://vsmarketplacebadge.apphb.com/version-short/tidev.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.vscode-titanium)
+[![Version](https://vsmarketplacebadge.apphb.com/downloads-short/tidev.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.vscode-titanium)
 
-Appcelerator Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
+Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
 
-![Appcelerator Titanium extension for VS Code](https://user-images.githubusercontent.com/2697821/37837371-f0fc7bd6-2eac-11e8-822d-049cce038d15.png)
+![Titanium extension for VS Code](https://user-images.githubusercontent.com/2697821/37837371-f0fc7bd6-2eac-11e8-822d-049cce038d15.png)
 
 ## Installation
 
 ### Via the browser
 
-1. [Open the extension on the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=axway.vscode-titanium)
+1. [Open the extension on the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=tidev.vscode-titanium)
 2. Click "Install"
 
 ### In VS Code
 
 1. Open the Extension view, type in Titanium
-2. Select the "Titanium" extension by Axway
+2. Select the "Titanium" extension by TiDev
 3. Click "Install"
 4. Reload VS Code
 

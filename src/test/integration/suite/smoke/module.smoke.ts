@@ -36,7 +36,7 @@ describe('Module smoke', function () {
 		this.timeout(90000);
 
 		await project.createModule({
-			id: 'com.axway.e2e',
+			id: 'com.test.e2e',
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android', 'ios' ],
@@ -62,7 +62,7 @@ describe('Module smoke', function () {
 			platform: 'android'
 		});
 
-		const zipPath = path.join(projectPath, 'android', 'dist', 'com.axway.e2e-android-1.0.0.zip');
+		const zipPath = path.join(projectPath, 'android', 'dist', 'com.test.e2e-android-1.0.0.zip');
 		expect(fs.existsSync(zipPath)).to.equal(true, 'Module zip did not exist');
 	});
 
@@ -88,7 +88,7 @@ describe('Module smoke', function () {
 			platform: 'ios'
 		});
 
-		const zipPath = path.join(projectPath, 'ios', 'dist', 'com.axway.e2e-iphone-1.0.0.zip');
+		const zipPath = path.join(projectPath, 'ios', 'dist', 'com.test.e2e-iphone-1.0.0.zip');
 		expect(fs.existsSync(zipPath)).to.equal(true, 'Module zip did not exist');
 	});
 
