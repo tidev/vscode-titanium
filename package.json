@@ -47,6 +47,18 @@
   "main": "./out/extension",
   "contributes": {
     "commands": [
+      {
+        "command": "titanium-legacy.exportSettings",
+        "title": "Export settings",
+        "description": "Export settings to the new TiDev Titanium extension",
+        "category": "Titanium (Legacy)"
+      },
+      {
+        "command": "titanium-legacy.installNewExtension",
+        "title": "Install TiDev Extension",
+        "description": "Install the new TiDev Titanium extension",
+        "category": "Titanium (Legacy)"
+      }
     ],
     "configuration": {
       "type": "object",
@@ -131,7 +143,51 @@
           "description": "Default language to use for i18n autocomplete."
         }
       }
-    }
+    },
+    "walkthroughs": [
+      {
+        "id": "migrate",
+        "title": "Titanium",
+        "description": "Helps migrate from the Axway Titanium extension to the TiDev Titanium extension",
+        "steps": [
+          {
+            "id": "installNew",
+            "title": "Install",
+            "description": "Lets install the new extension.\n[Install](command:titanium-legacy.installNewExtension)",
+            "completionEvents": [
+              "extensionInstalled:TiDev.vscode-titanium"
+            ],
+            "media": {
+              "markdown": "resources/empty.md"
+            }
+          },
+          {
+            "id": "exportSettings",
+            "title": "Export Settings",
+            "description": "Migrate your settings over to the new extension.\n[Export](command:titanium-legacy.exportSettings)",
+            "media": {
+              "markdown": "resources/empty.md"
+            }
+          },
+          {
+            "id": "exportKeystore",
+            "title": "Export Keystore data",
+            "description": "Select the keystores that you wish to migrate your keystore data over for.\n[Select Keystore](command:titanium-legacy.exportKeystore)",
+            "media": {
+              "markdown": "resources/empty.md"
+            }
+          },
+          {
+            "id": "uninstall",
+            "title": "Uninstall",
+            "description": "Uninstall the legacy extension. This requires you manually uninstall the extension.\n[Uninstall](command:titanium-legacy.uninstall)",
+            "media": {
+              "markdown": "resources/empty.md"
+            }
+          }
+        ]
+      }
+    ]
   },
   "lint-staged": {
     "*.ts": "npm run lint",
