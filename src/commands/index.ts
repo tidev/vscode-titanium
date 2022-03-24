@@ -205,7 +205,7 @@ export function registerCommands (): void {
 		}
 
 		for (const [ key, value ] of Object.entries(settings)) {
-			await vscode.workspace.getConfiguration().update(key, value);
+			await vscode.workspace.getConfiguration().update(key, value, true);
 		}
 	});
 
