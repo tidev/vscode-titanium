@@ -11,7 +11,7 @@ import { sleep } from '../common/utils';
 import { packageApplication } from './packageApp';
 import { packageModule } from './packageModule';
 import { promptForWorkspaceFolder, quickPick } from '../quickpicks';
-import { LogLevel } from '../types/common';
+import { KeystoreInfo, LogLevel } from '../types/common';
 import { configuration } from '../configuration';
 import { AlloyComponentExtension, AlloyComponentFolder, AlloyComponentType, generateComponent, generateModel } from './alloyGenerate';
 import { debugSessionInformation, DEBUG_SESSION_VALUE } from '../tasks/tasksHelper';
@@ -22,6 +22,8 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
 import { generateTask } from './generateTask';
 import { createKeystore } from './createKeystore';
+import { writeFile } from 'fs/promises';
+import { readJSON } from 'fs-extra';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -183,6 +185,32 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.CreateKeystore, async () => {
 		return createKeystore();
+	});
+
+	registerCommand(Commands.ImportSettings, async (settings?: { [key: string]: unknown }): Promise<void> => {
+		if (!settings) {
+			const openFile = await vscode.window.showInformationMessage('Please select the exported settings file', 'Open');
+
+			if (!openFile) {
+				return;
+			}
+
+			const settingsFile = await vscode.window.showOpenDialog({ canSelectFiles: true, canSelectFolders: false, canSelectMany: false });
+
+			if (!settingsFile) {
+				return;
+			}
+
+			settings = await readJSON(settingsFile[0].fsPath) as { [key: string]: unknown };
+		}
+
+		for (const [ key, value ] of Object.entries(settings)) {
+			await vscode.workspace.getConfiguration().update(key, value);
+		}
+	});
+
+	registerCommand(Commands.ImportKeystoreData, async (keystoreData: KeystoreInfo) => {
+		await ExtensionContainer.context.secrets.store(keystoreData.location, JSON.stringify(keystoreData));
 	});
 }
 

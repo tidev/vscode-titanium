@@ -331,6 +331,16 @@
         "command": "titanium.updates.reveal",
         "title": "Reveal Updates",
         "category": "Titanium"
+      },
+      {
+        "command": "titanium.import.settings",
+        "title": "Import settings from legacy Titanium extension",
+        "category": "Titanium"
+      },
+      {
+        "command": "titanium.import.keystore",
+        "title": "Import Keystore data from legacy Titanium extension",
+        "category": "Titanium"
       }
     ],
     "keybindings": [
