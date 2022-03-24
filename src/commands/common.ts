@@ -23,6 +23,8 @@ export enum Commands {
 	GenerateAlloyView = 'titanium.alloy.generate.view',
 	GenerateAlloyWidget = 'titanium.alloy.generate.widget',
 	GenerateTask = 'titanium.task.generate',
+	ImportSettings = 'titanium.import.settings',
+	ImportKeystoreData = 'titanium.import.keystore',
 	InstallAllUpdates = 'titanium.updates.installAll',
 	InstallUpdate = 'titanium.updates.install',
 	InsertCommandId = 'titanium.insertCodeAction',
