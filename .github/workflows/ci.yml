@@ -20,29 +20,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
-  Unit-Test:
-    name: ${{ matrix.os }} - Unit Tests
-    needs: Lint
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-      - name: Install NPM dependencies
-        run: npm ci
-      - name: Run Tests
-        uses: GabrielBB/xvfb-action@v1.0
-        with:
-          run: npm run test
-
   Package:
     runs-on: ubuntu-latest
-    needs: [Lint, Unit-Test]
+    needs: [Lint]
     steps:
       - uses: actions/checkout@v2
         with:
