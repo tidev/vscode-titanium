@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/tidev/vscode-titanium/compare/v0.14.0...v1.0.0) (2022-03-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* Changes extension id, extension is now published under a new id and so will have
+to be reinstalled
+
+### Features
+
+* add commands to allow the legacy extension to import data during the migration walkthrough ([c99a3ad](https://github.com/tidev/vscode-titanium/commit/c99a3adbe46eb45752814faec0e40141200cb0c0))
+
+
+### Bug Fixes
+
+* need to apply to global settings ([50c191b](https://github.com/tidev/vscode-titanium/commit/50c191b2b56e53bed53f770733def0e8c9c1b631))
+
+
+* extension related changes for tidev change ([1114175](https://github.com/tidev/vscode-titanium/commit/1114175d24a5e5e3aef18d5b90f53e1a9d305d53))
+
 ## [0.14.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.13.0...v0.14.0) (2022-03-02)
 
 
