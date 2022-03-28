@@ -1,7 +1,7 @@
 # Titanium Package for Visual Studio Code
 
-[![Version](https://vsmarketplacebadge.apphb.com/version-short/tidev.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.vscode-titanium)
-[![Version](https://vsmarketplacebadge.apphb.com/downloads-short/tidev.vscode-titanium.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.vscode-titanium)
+[![Version](https://vsmarketplacebadge.apphb.com/version-short/tidev.titanium-sdk.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.titanium-sdk)
+[![Version](https://vsmarketplacebadge.apphb.com/downloads-short/tidev.titanium-sdk.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.titanium-sdk)
 
 Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
 
@@ -11,7 +11,7 @@ Titanium build tools and editor additions for [Visual Studio Code](https://code.
 
 ### Via the browser
 
-1. [Open the extension on the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=tidev.vscode-titanium)
+1. [Open the extension on the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=tidev.titanium-sdk)
 2. Click "Install"
 
 ### In VS Code

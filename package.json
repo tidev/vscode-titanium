@@ -1,5 +1,5 @@
 {
-  "name": "vscode-titanium",
+  "name": "titanium-sdk",
   "version": "1.0.0",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",

@@ -1,5 +1,5 @@
 export const ExtensionName = 'titanium';
-export const ExtensionId = 'tidev.vscode-titanium';
+export const ExtensionId = 'tidev.titanium-sdk';
 
 export enum VSCodeCommands {
 	OpenFolder = 'vscode.openFolder',
