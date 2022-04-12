@@ -155,7 +155,7 @@
             "title": "Install",
             "description": "Lets install the new extension.\n[Install](command:titanium-legacy.installNewExtension)",
             "completionEvents": [
-              "extensionInstalled:TiDev.vscode-titanium"
+              "extensionInstalled:tidev.titanium-sdk"
             ],
             "media": {
               "markdown": "resources/empty.md"

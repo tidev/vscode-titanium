@@ -42,7 +42,7 @@ function traverseConfig (config: any, parent?: string) {
 export async function activate (context: vscode.ExtensionContext): Promise<void> {
 	vscode.commands.registerCommand('titanium-legacy.installNewExtension', async () => {
 		try {
-			await vscode.commands.executeCommand('workbench.extensions.installExtension', 'TiDev.vscode-titanium');
+			await vscode.commands.executeCommand('workbench.extensions.installExtension', 'tidev.titanium-sdk');
 		} catch (error) {
 			console.log(error);
 		}
