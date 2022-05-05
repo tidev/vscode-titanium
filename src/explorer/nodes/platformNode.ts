@@ -1,10 +1,13 @@
 import { BaseNode } from './baseNode';
 import { TargetNode } from './targetNode';
+import { DistributeNode } from './distributeNode';
+import { ModuleBuildNode } from './moduleBuildNode';
+import { ModulePackageNode } from './modulePackageNode';
 
 import { TreeItemCollapsibleState } from 'vscode';
 import { Platform, PlatformPretty } from '../../types/common';
 import { nameForPlatform } from '../../utils';
-import { DistributeNode } from './distributeNode';
+import { ExtensionContainer } from '../../container';
 
 export class PlatformNode extends BaseNode {
 
@@ -20,7 +23,16 @@ export class PlatformNode extends BaseNode {
 		this.contextValue = 'PlatformNode';
 	}
 
-	public override getChildren (): Array<DistributeNode|TargetNode> {
+	public override getChildren (): Array<DistributeNode|TargetNode>|Array<ModuleBuildNode|ModulePackageNode> {
+		// Detect the first project to see whether we show the full explorer or a limited explorer
+		const project = Array.from(ExtensionContainer.projects.values())[0];
+		if (project.type === 'module') {
+			return [
+				new ModuleBuildNode('Build', this.platform, this.label),
+				new ModulePackageNode('Package', this.platform, this.label)
+			];
+		}
+
 		switch (this.platform) {
 			case 'android':
 				return [
