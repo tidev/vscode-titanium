@@ -22,6 +22,14 @@ export interface AppBuildTaskDefinitionBase extends TitaniumTaskDefinitionBase {
 	titaniumBuild: AppBuildTaskTitaniumBuildBase;
 }
 
+export interface ModuleBuildTask extends BuildTask {
+	definition: ModuleBuildTaskDefinitionBase;
+}
+
+export interface ModuleBuildTaskDefinitionBase extends TitaniumTaskDefinitionBase {
+	titaniumBuild: ModuleBuildTaskTitaniumBuildBase;
+}
+
 export interface BuildTaskDefinitionBase extends TitaniumTaskDefinitionBase {
 	titaniumBuild: AppBuildTaskTitaniumBuildBase | ModuleBuildTaskTitaniumBuildBase;
 }
@@ -42,6 +50,8 @@ export interface AppBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBas
 }
 
 export interface ModuleBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBase {
+	deviceId?: string;
+	target?: 'device' | 'emulator' | 'simulator';
 	projectType?: 'module';
 }
 
@@ -126,7 +136,12 @@ export class BuildTaskProvider extends CommandTaskProvider {
 
 			return helper.resolveAppBuildCommandLine(context, task.definition.titaniumBuild);
 		} else if (definition.titaniumBuild.projectType === 'module') {
+
 			definition.titaniumBuild.projectDir = path.join(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
+
+			if (!definition.titaniumBuild.target) {
+				definition.titaniumBuild.target = (await selectBuildTarget(definition.titaniumBuild.platform)).id as 'device' | 'emulator' | 'simulator';
+			}
 			return helper.resolveModuleBuildCommandLine(context, task.definition.titaniumBuild);
 		} else {
 			throw new Error(`Unknown project type ${definition.titaniumBuild.projectType}`);

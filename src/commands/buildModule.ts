@@ -4,7 +4,7 @@ import { handleInteractionError, InteractionError } from './common';
 
 import { promptForWorkspaceFolder, selectPlatform } from '../quickpicks/common';
 import { getBuildTask } from '../tasks/tasksHelper';
-import { BuildTask } from '../tasks/buildTaskProvider';
+import { ModuleBuildTask } from '../tasks/buildTaskProvider';
 import { Platform } from '../types/common';
 
 export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode | TargetNode, folder?: vscode.WorkspaceFolder): Promise<void> {
@@ -15,7 +15,7 @@ export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode 
 		}
 		const platform = node?.platform as Platform || (await selectPlatform()).id as Platform;
 
-		const taskDefinition: BuildTask = {
+		const taskDefinition: ModuleBuildTask = {
 			definition: {
 				titaniumBuild: {
 					projectType: 'module',
@@ -33,6 +33,14 @@ export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode 
 			runOptions: {},
 			scope: vscode.TaskScope.Workspace
 		};
+
+		if (node?.targetId) {
+			taskDefinition.definition.titaniumBuild.target = node.targetId as 'device' | 'emulator' | 'simulator';
+		}
+
+		if (node?.deviceId) {
+			taskDefinition.definition.titaniumBuild.deviceId = node.deviceId;
+		}
 
 		const task = await getBuildTask(taskDefinition);
 		await vscode.tasks.executeTask(task);

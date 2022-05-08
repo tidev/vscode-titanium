@@ -9,12 +9,16 @@ import { enterAndroidKeystoreInfo, promptForWorkspaceFolder, selectiOSCertificat
 import { TitaniumTaskDefinitionBase } from '../tasks/commandTaskProvider';
 import { nameForPlatform, nameForTarget } from '../utils';
 import { DeviceNode, DistributeNode } from '../explorer/nodes';
-import { AppBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';
+import { AppBuildTaskDefinitionBase, ModuleBuildTaskDefinitionBase } from '../tasks/buildTaskProvider';
 import { AppPackageTaskDefinitionBase } from '../tasks/packageTaskProvider';
 import { ProjectType } from '../types/common';
 
 function isAppBuild (type: ProjectType, task: Partial<TitaniumTaskDefinitionBase>): task is AppBuildTaskDefinitionBase {
 	return type === 'app';
+}
+
+function isModuleBuild (type: ProjectType, task: Partial<TitaniumTaskDefinitionBase>): task is ModuleBuildTaskDefinitionBase {
+	return type === 'module';
 }
 
 function isAppPackage (type: ProjectType, task: Partial<TitaniumTaskDefinitionBase>): task is AppPackageTaskDefinitionBase {
@@ -46,7 +50,7 @@ export async function generateTask (node: DeviceNode|DistributeNode): Promise<vo
 		}
 	};
 
-	if (node instanceof DeviceNode && isAppBuild(type, task)) {
+	if (node instanceof DeviceNode && (isAppBuild(type, task) || isModuleBuild(type, task))) {
 		task.type = 'titanium-build';
 		task.titaniumBuild.deviceId = node.deviceId;
 		task.titaniumBuild.target = node.targetId;
