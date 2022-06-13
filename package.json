@@ -1003,7 +1003,7 @@
     "@types/xml2js": "^0.4.9",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
-    "@vscode/test-electron": "^2.1.2",
+    "@vscode/test-electron": "^2.1.4",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "commitizen": "^4.2.4",
