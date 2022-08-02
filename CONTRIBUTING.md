@@ -69,15 +69,21 @@ When sending in a PR please make sure you do the following:
 
 ## Releasing
 
-To release of the extension the following needs to be followed:
+Releasing should generally be done through GitHub actions which is described below. However the "manual" process is also documented.
+
+## Through GitHub Actions
+
+1. Navigate to the [Release workflow](https://github.com/tidev/vscode-titanium/actions/workflows/release.yml)
+2. Trigger a workflow run and wait for the run to finish
+3. Verify the release is published on the VS Code marketplace and GitHub releases
+
+## Manually
 
 1. Ensure that your local `master` branch is completely up to date with the main repo.
-2. Run `npm run release`, which performs the following
+2. Validate the following environment are set:
+	- `GITHUB_TOKEN` - An access token that can push to the tidev/vscode-titanium repository. Follow [this documentation](https://github.com/semantic-release/github#github-authentication) for how to create this. 
+	- `VSCE_PAT` - An access token that is able to publish to VS Code Marketplace. Follow [this documentation](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#get-a-personal-access-token) for how to create this.
+3. Run `npm run release`, which performs the following:
 	- Runs `scripts/render.js` to ensure the documentation is up to date.
-	- Runs [standard-version](https://github.com/conventional-changelog/standard-version) to bump versions based on commit messages, updates the changelog, commits the files and tags a new release.
-	- Runs `npx vsce package` to generate a new `.vsix` file ready for upload to the marketplace.
-3. Push to the main repo with `git push` and `git push <appc remote> <tag>`.
-4. Upload the `.vsix` file to the VS Code [marketplace](https://marketplace.visualstudio.com/manage).
-5. Upload the `.vsix` file to the Open VSX Registry using `npx ovsx publish <file> -p <token>`
-6. Draft a new release on the [releases page](https://github.com/tidev/vscode-titanium/releases).
-7. 🎉
+	- Runs [standard-version](https://github.com/semantic-release/semantic-release) to bump versions based on commit messages, updates the changelog, commits the files and tags a new release, publishes to VS Code Marketplace.
+4. Verify the release is published on the VS Code marketplace and GitHub releases
