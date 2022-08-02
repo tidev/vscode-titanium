@@ -22,8 +22,8 @@ import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { installUpdates } from '../updates';
 import { generateTask } from './generateTask';
 import { createKeystore } from './createKeystore';
-import { writeFile } from 'fs/promises';
 import { readJSON } from 'fs-extra';
+import { startup } from '../extension';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -215,6 +215,10 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.ShowOutputChannel, () => {
 		ExtensionContainer.outputChannel.show();
+	});
+
+	registerCommand(Commands.FixEnvironmentIssues, async () => {
+		startup();
 	});
 }
 

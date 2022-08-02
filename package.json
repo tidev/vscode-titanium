@@ -292,6 +292,11 @@
         "category": "Titanium"
       },
       {
+        "command": "titanium.environment.fixIssues",
+        "title": "Fix environment issues",
+        "category": "Titanium"
+      },
+      {
         "command": "titanium.task.generate",
         "title": "Generate task",
         "category": "Titanium"
@@ -521,6 +526,11 @@
         "view": "titanium.view.welcome",
         "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage)\n[Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
         "when": "titanium:needsTrustedWorkspace"
+      },
+      {
+        "view": "titanium.view.welcome",
+        "contents": "There are issues with your environment. Please fix them in order for the extension to load.\n[Fix Issues](command:titanium.environment.fixIssues)",
+        "when": "titanium:environmentIssues"
       }
     ],
     "menus": {
@@ -608,6 +618,10 @@
         {
           "command": "titanium.alloy.generate.widget",
           "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
+        },
+        {
+          "command": "titanium.environment.fixIssues",
+          "when": "isWorkspaceTrusted && titanium:environmentIssues"
         },
         {
           "command": "titanium.updates.openReleaseNotes",
