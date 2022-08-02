@@ -25,7 +25,7 @@ export class HelpExplorer implements vscode.TreeDataProvider<BaseNode> {
 
 		return [
 			new UrlNode('Titanium SDK Documentation', 'https://titaniumsdk.com/api/', 'book'),
-			new UrlNode('Titanium Extension Documentation', 'https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_How-tos/Visual_Studio_Code_Extension_for_Titanium/', 'book'),
+			new UrlNode('Titanium Extension Documentation', 'https://titaniumsdk.com/guide/Editor_IDE/VSCode_Extension/', 'book'),
 			new UrlNode('TiSlack', 'https://tislack.org', 'comment-discussion'),
 			new CommandNode('Report Extension Issue', VSCodeCommands.ReportIssue, [ ExtensionId ], 'report'),
 			new CommandNode('Configure Settings', VSCodeCommands.OpenSettings, [ `@ext:${ExtensionId}` ], 'settings-gear'),
