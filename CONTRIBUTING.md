@@ -71,6 +71,8 @@ When sending in a PR please make sure you do the following:
 
 Releasing should generally be done through GitHub actions which is described below. However the "manual" process is also documented.
 
+:bulb: The token used for the `VSCE_PAT` variable must have an expiry date. The maximum time it can last for is 1 year. The current token in CI is associated with Ewan Harris (@ewanharris) and will expire on 2023/08/01
+
 ## Through GitHub Actions
 
 1. Navigate to the [Release workflow](https://github.com/tidev/vscode-titanium/actions/workflows/release.yml)
