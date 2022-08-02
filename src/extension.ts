@@ -73,7 +73,7 @@ export async function startup (): Promise<void> {
 
 	ExtensionContainer.setContext(GlobalState.NeedsTrustedWorkspace, false);
 
-	const { missing } = await environment.validateEnvironment(undefined);
+	const { issues, missing } = await environment.validateEnvironment(undefined);
 
 	if (missing.length) {
 		// We need to set Enabled here just incase the environment was previously valid but now we
@@ -84,6 +84,23 @@ export async function startup (): Promise<void> {
 	}
 
 	ExtensionContainer.setContext(GlobalState.MissingTooling, false);
+
+	// Resolve any potential issues before startup
+	for (const { actions, title } of issues) {
+		ExtensionContainer.setContext(GlobalState.EnvironmentIssues, true);
+		const choice = await vscode.window.showWarningMessage(title, ...actions.map(action => action.title));
+		if (!choice) {
+			vscode.window.showErrorMessage('Cannot continue startup until all issues are resolved');
+			return;
+		}
+		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+		const chosenAction = actions.find(action => action.title === choice)!;
+		await vscode.window.withProgress({ cancellable: false, location: vscode.ProgressLocation.Notification, title: chosenAction.title }, async () => {
+			await chosenAction.run();
+		});
+	}
+
+	ExtensionContainer.setContext(GlobalState.EnvironmentIssues, false);
 
 	await ExtensionContainer.loadProjects();
 
