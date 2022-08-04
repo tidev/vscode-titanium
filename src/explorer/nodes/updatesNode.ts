@@ -4,6 +4,7 @@ import { UpdateNode } from './updateNode';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { BlankNode } from './blankNode';
 import { ExtensionContainer } from '../../container';
+import { ErrorNode } from './errorNode';
 
 export class UpdatesNode extends BaseNode {
 
@@ -16,7 +17,14 @@ export class UpdatesNode extends BaseNode {
 		try {
 			this.updateInfo = await ExtensionContainer.getUpdates();
 		} catch (error) {
-			return [ new BlankNode('Failed to get updates') ];
+			ExtensionContainer.outputChannel.appendLine('Failed to get updates, error was:');
+			if (error instanceof Error) {
+				ExtensionContainer.outputChannel.appendLine(error?.stack || '');
+			} else {
+				ExtensionContainer.outputChannel.appendLine(error as string);
+			}
+
+			return [ new ErrorNode('Failed to get updates') ];
 		}
 
 		if (!this.updateInfo.length) {

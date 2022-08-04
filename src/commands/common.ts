@@ -40,6 +40,7 @@ export enum Commands {
 	RefreshHelp = 'titanium.helpExplorer.refresh',
 	SelectUpdates = 'titanium.updates.select',
 	SetLogLevel = 'titanium.build.setLogLevel',
+	ShowOutputChannel = 'titanium.showOutputChannel',
 	StopBuild = 'titanium.build.stop',
 	ShowUpdates = 'titanium.updates.reveal',
 }

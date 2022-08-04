@@ -248,10 +248,9 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 							vscode.window.showErrorMessage('There was an error creating the keystore', 'View')
 								.then(view => {
 									if (view) {
-										const output = vscode.window.createOutputChannel('Titanium - Keystore creation');
-										output.appendLine((error as CommandError).command);
-										output.appendLine((error as CommandError).output || '');
-										output.show();
+										ExtensionContainer.outputChannel.appendLine((error as CommandError).command);
+										ExtensionContainer.outputChannel.appendLine((error as CommandError).output || '');
+										ExtensionContainer.outputChannel.show();
 									}
 									return;
 								});

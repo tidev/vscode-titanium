@@ -1,5 +1,4 @@
 import * as semver from 'semver';
-import * as vscode from 'vscode';
 
 import { spawn } from 'child_process';
 import { ExtensionContainer } from './container';
@@ -37,9 +36,8 @@ export class Environment {
 					error.interactionChoices.push({
 						title: 'View Error',
 						run() {
-							const channel = vscode.window.createOutputChannel('Titanium');
-							channel.append(output);
-							channel.show();
+							ExtensionContainer.outputChannel.append(output);
+							ExtensionContainer.outputChannel.show();
 						}
 					});
 					return reject(error);

@@ -212,6 +212,10 @@ export function registerCommands (): void {
 	registerCommand(Commands.ImportKeystoreData, async (keystoreData: KeystoreInfo) => {
 		await ExtensionContainer.context.secrets.store(keystoreData.location, JSON.stringify(keystoreData));
 	});
+
+	registerCommand(Commands.ShowOutputChannel, () => {
+		ExtensionContainer.outputChannel.show();
+	});
 }
 
 export * from './common';
