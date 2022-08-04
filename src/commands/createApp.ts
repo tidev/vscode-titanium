@@ -74,10 +74,9 @@ export async function createApplication (): Promise<void> {
 
 			const action = await window.showErrorMessage('Failed to create application', ...choices);
 			if (error.output && action === 'View Error') {
-				const channel = window.createOutputChannel('Titanium');
-				channel.append(`${error.command}\n`);
-				channel.append(error.output);
-				channel.show();
+				ExtensionContainer.outputChannel.append(`${error.command}\n`);
+				ExtensionContainer.outputChannel.append(error.output);
+				ExtensionContainer.outputChannel.show();
 			}
 			console.log(error);
 		}

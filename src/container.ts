@@ -28,6 +28,7 @@ export class ExtensionContainer {
 	private static _terminal: Terminal;
 	private static _updateInfo: UpdateInfo[];
 	private static _recentBuilds: Map<string, AppBuildTaskTitaniumBuildBase|AppPackageTaskTitaniumBuildBase>;
+	private static _outputChannel: vscode.OutputChannel;
 
 	public static inititalize (context: vscode.ExtensionContext, config: Config): void {
 		this._environment = new Environment();
@@ -103,6 +104,13 @@ export class ExtensionContainer {
 
 	static get debugPorts(): Map<string, number> {
 		return this._debugPorts;
+	}
+
+	static get outputChannel(): vscode.OutputChannel {
+		if (!this._outputChannel) {
+			this._outputChannel =  vscode.window.createOutputChannel('Titanium');
+		}
+		return this._outputChannel;
 	}
 
 	/**

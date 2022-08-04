@@ -341,6 +341,12 @@
         "command": "titanium.import.keystore",
         "title": "Import Keystore data from legacy Titanium extension",
         "category": "Titanium"
+      },
+      {
+        "command": "titanium.showOutputChannel",
+        "title": "Show Output Channel",
+        "category": "Titanium",
+        "icon": "$(link-external)"
       }
     ],
     "keybindings": [
@@ -784,6 +790,11 @@
         {
           "command": "titanium.explorer.clearRecent",
           "when": "view == titanium.view.buildExplorer && viewItem == RecentNode",
+          "group": "inline"
+        },
+        {
+          "command": "titanium.showOutputChannel",
+          "when": "viewItem == ErrorNode",
           "group": "inline"
         }
       ]
