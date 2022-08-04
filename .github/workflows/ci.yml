@@ -57,4 +57,4 @@ jobs:
       - name: Archive VSIX
         uses: actions/upload-artifact@v2
         with:
-          path: vscode-titanium-*.vsix
+          path: titanium-sdk-*.vsix
