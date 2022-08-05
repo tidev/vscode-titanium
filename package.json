@@ -978,7 +978,7 @@
     "compile": "rimraf out/ && tsc -p ./",
     "generate-docs": "node ./scripts/render.js",
     "lint": "eslint src/ scripts/",
-    "release": "npm run generate-docs && semantic-release",
+    "release": "npm run generate-docs && cross-env HUSKY=0 semantic-release",
     "test": "cross-env COVERAGE=1 node ./out/test/unit/runTest.js",
     "test:integration": "npm run compile && node ./out/test/integration/runTests.js",
     "test:smoke": "npm run compile && cross-env SMOKE=1 node ./out/test/integration/runTests.js",
