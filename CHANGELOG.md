@@ -1,3 +1,11 @@
+## [1.0.1](https://github.com/tidev/vscode-titanium/compare/v1.0.0...v1.0.1) (2022-08-05)
+
+
+### Bug Fixes
+
+* **explorer/help:** update VS Code documentation link ([#1022](https://github.com/tidev/vscode-titanium/issues/1022)) ([4514f6c](https://github.com/tidev/vscode-titanium/commit/4514f6cc831bc77d6a9ba5a4526bdbd6af9db518))
+* **updates:** output error to output channel and allow viewing it ([99d86d8](https://github.com/tidev/vscode-titanium/commit/99d86d86bd170381d5fb1947341e5f06441a9bdb))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
