@@ -1035,7 +1035,7 @@
     "mocha-jenkins-reporter": "^0.4.7",
     "mocha-multi-reporters": "^1.5.1",
     "nyc": "^15.1.0",
-    "pinst": "^2.1.6",
+    "pinst": "^3.0.0",
     "rimraf": "^3.0.2",
     "semantic-release": "^19.0.3",
     "semantic-release-vsce": "^5.1.0",
