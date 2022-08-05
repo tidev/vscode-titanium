@@ -7,7 +7,7 @@ module.exports = {
 			'semantic-release-vsce',
 			{
 				packageVsix: true
-			},
+			}
 		],
 		'@semantic-release/git',
 		[
