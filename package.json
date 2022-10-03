@@ -1042,7 +1042,7 @@
     "sinon": "^13.0.1",
     "sinon-chai": "^3.7.0",
     "tmp": "^0.2.1",
-    "typescript": "^4.5.5",
+    "typescript": "^4.8.4",
     "vscode-extension-tester": "^4.2.3"
   },
   "dependencies": {
