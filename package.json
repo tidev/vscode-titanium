@@ -491,17 +491,17 @@
         {
           "id": "titanium.view.welcome",
           "name": "Get Started",
-          "when": "!isWorkspaceTrusted || !titanium:enabled"
+          "when": "titanium:needsTrustedWorkspace || !titanium:enabled"
         },
         {
           "id": "titanium.view.buildExplorer",
           "name": "Build",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "id": "titanium.view.helpExplorer",
           "name": "Help and Feedback",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         }
       ]
     },
@@ -519,26 +519,26 @@
       {
         "view": "titanium.view.welcome",
         "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage)\n[Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
-        "when": "!isTrustedWorkspace"
+        "when": "titanium:needsTrustedWorkspace"
       }
     ],
     "menus": {
       "commandPalette": [
         {
           "command": "titanium.create.application",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         },
         {
           "command": "titanium.create.keystore",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         },
         {
           "command": "titanium.create.module",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         },
         {
           "command": "titanium.explorer.refresh",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.explorer.clearRecent",
@@ -546,67 +546,67 @@
         },
         {
           "command": "titanium.build.setLiveViewEnabled",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.build.setLiveViewDisabled",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.build.run",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.package.run",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.build.stop",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.build.setLogLevel",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.open.relatedView",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.open.relatedStyle",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.open.relatedController",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.open.allRelatedFiles",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.controller",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.migration",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.model",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.style",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.view",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.widget",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.updates.openReleaseNotes",
@@ -618,7 +618,7 @@
         },
         {
           "command": "titanium.clean",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.build.debug",
@@ -630,15 +630,15 @@
         },
         {
           "command": "titanium.updates.checkAll",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         },
         {
           "command": "titanium.updates.installAll",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         },
         {
           "command": "titanium.updates.select",
-          "when": "isWorkspaceTrusted"
+          "when": "!titanium:needsTrustedWorkspace"
         },
         {
           "command": "titanium.updates.reveal",
@@ -671,22 +671,22 @@
         {
           "command": "titanium.alloy.generate.controller",
           "group": "2_workspace",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.model",
           "group": "2_workspace",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.style",
           "group": "2_workspace",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "command": "titanium.alloy.generate.view",
           "group": "2_workspace",
-          "when": "isWorkspaceTrusted && titanium:enabled"
+          "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         }
       ],
       "view/title": [
