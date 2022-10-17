@@ -62,13 +62,16 @@ export async function activate (context: vscode.ExtensionContext): Promise<void>
  */
 export async function startup (): Promise<void> {
 
-	if (!vscode.workspace.isTrusted) {
+	const isTrustEnabled = vscode.workspace.getConfiguration('security').get('workspace.trust.enabled');
+	if (isTrustEnabled && !vscode.workspace.isTrusted) {
 		// We need to set Enabled here just incase the environment was previously valid but now we
 		// are missing tooling
 		ExtensionContainer.setContext(GlobalState.Enabled, false);
 		ExtensionContainer.setContext(GlobalState.NeedsTrustedWorkspace, true);
 		return;
 	}
+
+	ExtensionContainer.setContext(GlobalState.NeedsTrustedWorkspace, false);
 
 	const { missing } = await environment.validateEnvironment(undefined);
 
