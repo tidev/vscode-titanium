@@ -1022,7 +1022,7 @@
     "commitizen": "^4.2.4",
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
-    "danger": "^11.0.2",
+    "danger": "^11.2.1",
     "ejs": "^3.1.6",
     "eslint": "^7.32.0",
     "eslint-config-axway": "^6.0.2",
