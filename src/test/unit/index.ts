@@ -1,4 +1,4 @@
-import * as glob from 'glob';
+import { globSync } from 'glob';
 import Mocha from 'mocha';
 import * as path from 'path';
 
@@ -27,24 +27,17 @@ function setupCoverage () {
 export async function run (): Promise<void> {
 	const nyc = process.env.COVERAGE ? setupCoverage() : null;
 	const timeout = process.env.DEBUG ? 99999 : undefined;
-	const reportPath = path.join(__dirname, '..', '..', '..', 'junit_report.xml');
 
 	const mocha = new Mocha({
 		ui: 'tdd',
-		reporter: 'mocha-multi-reporters',
-		reporterOptions: {
-			reporterEnabled: 'mocha-jenkins-reporter, spec',
-			mochaJenkinsReporterReporterOptions: {
-				junit_report_path: reportPath
-			}
-		},
+		reporter: 'spec',
 		color: true,
 		timeout
 	});
 
 	const testsRoot = path.resolve(__dirname);
 
-	const files = glob.sync('**/**.test.js', { cwd: testsRoot });
+	const files = globSync('**/**.test.js', { cwd: testsRoot });
 
 	// Add files to the test suite
 	files.forEach(f => mocha.addFile(path.resolve(testsRoot, f)));

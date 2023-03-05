@@ -7,7 +7,7 @@ import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
 import info from '../fixtures/ti_info';
 import { ExtensionContainer } from '../../../container';
 import { Environment } from '../../../environment-info';
-import sinon from 'sinon';
+import * as sinon from 'sinon';
 
 describe('utils', () => {
 	const sandbox = sinon.createSandbox();

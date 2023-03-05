@@ -33,5 +33,5 @@ export class StyleDefinitionProvider extends BaseDefinitionProvider {
 				return [ ];
 			}
 		}
-	]
+	];
 }

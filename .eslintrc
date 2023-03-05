@@ -8,7 +8,7 @@
 				"project": "./tsconfig.json"
 			},
 			"rules": {
-				"node/no-unsupported-features/es-syntax": ["warn", {
+				"n/no-unsupported-features/es-syntax": ["warn", {
 					"ignores": [
 						"modules"
 					]
