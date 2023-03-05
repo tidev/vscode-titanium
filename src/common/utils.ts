@@ -20,7 +20,7 @@ export async function getAppName (projectDirectory: string): Promise<string> {
 export function parseXmlString<T>(xmlString: string): Promise<T> {
 	return new Promise((resolve, reject) => {
 		const parser = new xml2js.Parser();
-		parser.parseString(xmlString, (err: Error, result: T) => {
+		parser.parseString(xmlString, (err, result) => {
 			if (!err) {
 				return resolve(result);
 			} else {
