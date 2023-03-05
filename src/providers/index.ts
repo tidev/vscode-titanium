@@ -4,8 +4,7 @@ import * as vscode from 'vscode';
 
 import { Commands, handleInteractionError, InteractionChoice, InteractionError, registerCommand } from '../commands';
 import { Project } from '../project';
-import { completion, updates  } from 'titanium-editor-commons';
-import { CustomError } from 'titanium-editor-commons/completions/util';
+import { completion, updates, Errors } from 'titanium-editor-commons';
 
 // Import the various providers
 import { CompletionsFormat } from './completion/baseCompletionItemProvider';
@@ -161,7 +160,7 @@ export async function generateCompletions (force = false, project: Project): Pro
 		}
 	} catch (error) {
 		const actions: InteractionChoice[] = [];
-		if (error instanceof CustomError && error.code === 'ESDKNOTINSTALLED') {
+		if (error instanceof Errors.CustomError && error.code === 'ESDKNOTINSTALLED') {
 			actions.push({
 				title: 'Install',
 				run: () => {
