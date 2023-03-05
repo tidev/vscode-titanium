@@ -1,7 +1,7 @@
 # Titanium Package for Visual Studio Code
 
-[![Version](https://vsmarketplacebadge.apphb.com/version-short/tidev.titanium-sdk.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.titanium-sdk)
-[![Version](https://vsmarketplacebadge.apphb.com/downloads-short/tidev.titanium-sdk.svg)](https://marketplace.visualstudio.com/items?itemName=tidev.titanium-sdk)
+![Version](https://img.shields.io/visual-studio-marketplace/v/tidev.titanium-sdk)
+![Installs](https://img.shields.io/visual-studio-marketplace/i/tidev.titanium-sdk)
 
 Titanium build tools and editor additions for [Visual Studio Code](https://code.visualstudio.com).
 
