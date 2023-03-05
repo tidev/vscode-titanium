@@ -309,7 +309,8 @@ export class Project extends CommonUICreator {
 		}
 
 		let opened = false;
-		for (const button of await notification?.getActions()) {
+		const actions = await notification?.getActions() || [];
+		for (const button of actions) {
 			const text = await button.getTitle();
 			if (text.includes('workspace')) {
 				await button.click();
