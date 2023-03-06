@@ -1041,7 +1041,7 @@
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
-    "detect-indent": "^6.1.0",
+    "detect-indent": "^7.0.1",
     "find-up": "^5.0.0",
     "fs-extra": "^11.1.0",
     "get-port": "^5.1.1",
