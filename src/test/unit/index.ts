@@ -26,7 +26,7 @@ function setupCoverage () {
 
 export async function run (): Promise<void> {
 	const nyc = process.env.COVERAGE ? setupCoverage() : null;
-	const timeout = process.env.DEBUG ? 99999 : undefined;
+	const timeout = process.env.DEBUG ? 99999 : 5000;
 
 	const mocha = new Mocha({
 		ui: 'tdd',
