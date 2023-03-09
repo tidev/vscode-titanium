@@ -3,8 +3,42 @@ on:
   schedule:
     - cron: 0 10 * * *
   workflow_dispatch:
+  issue_comment:
+    types: [ created ]
 
 jobs:
+
+  Check-Comments:
+    name: Check for comments
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.result }}
+    steps:
+      - name: Get PR SHA
+        if: ${{ github.event.issue.pull_request && github.event.comment.body == '/test' }}
+        id: sha
+        uses: actions/github-script@v6
+        with:
+          result-encoding: string
+          script: |
+            const { owner, repo, number } = context.issue;
+            const pr = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: number,
+            });
+            return pr.data.head.sha
+      - name: Post comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `Tests are running at https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            })
+
   Check-For-Changes:
     name: Check for changes
     runs-on: ubuntu-latest
@@ -20,14 +54,16 @@ jobs:
   Integration-Test:
     name: ${{ matrix.version }} - Integration Tests
     runs-on: macos-latest
-    needs: Check-For-Changes
-    if: ${{ needs.Check-For-Changes.outputs.changes > 0 }}
+    needs: [ Check-Comments, Check-For-Changes ]
+    if: ${{ needs.Check-For-Changes.outputs.changes > 0 || needs.Check-Comments.outputs.sha || github.event_name == 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       matrix:
         version: [ 1.56.0, latest, insider ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.Check-Comments.outputs.sha || github.sha }}
       - uses: actions/setup-node@v3
         with:
           node-version: '18.x'
