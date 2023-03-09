@@ -29,6 +29,7 @@ jobs:
             });
             return pr.data.head.sha
       - name: Post comment
+        if: ${{ github.event.issue.pull_request && github.event.comment.body == '/test' }}
         uses: actions/github-script@v6
         with:
           script: |
