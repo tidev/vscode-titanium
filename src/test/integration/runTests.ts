@@ -13,10 +13,10 @@ async function main (): Promise<void> {
 
 		// When setting the version to "insider" we want to actually use "latest" and then switch
 		// to the ReleaseQuality.Insider stream, not set the version as "insider"
-		const vsCodeVersion = (!process.env.CODE_VERSION || process.env.CODE_VERSION === 'insider') ? 'latest' : process.env.CODE_VERSION;
+		const vsCodeVersion = (!process.env.CODE_STREAM || process.env.CODE_STREAM === 'insider') ? 'latest' : process.env.CODE_STREAM;
 		const mochaConfig = path.join(__dirname, '.mocharc.js');
 		const settings = path.join(getIntegrationFixturesDirectory(), 'settings.json');
-		const releaseQuality = process.env.CODE_VERSION === 'insider' ? ReleaseQuality.Insider : ReleaseQuality.Stable;
+		const releaseQuality = process.env.CODE_STREAM === 'insider' ? ReleaseQuality.Insider : ReleaseQuality.Stable;
 
 		const tester = new ExTester(undefined, releaseQuality, tempDirectory.name);
 		const files = process.env.SMOKE ? 'out/test/integration/suite/**/*.smoke.js' : 'out/test/integration/suite/**/*.test.js';

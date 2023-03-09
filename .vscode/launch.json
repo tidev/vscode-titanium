@@ -87,7 +87,7 @@
                 "order": 1
             },
             "env": {
-                "CODE_VERSION": "insider"
+                "CODE_STREAM": "insider"
             }
         },
         {
