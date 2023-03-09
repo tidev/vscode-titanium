@@ -8,20 +8,20 @@ jobs:
   Check-For-Changes:
     name: Check for changes
     runs-on: ubuntu-latest
+    outputs:
+      changes: ${{ steps.commits.outputs.changes }}
     steps:
       - uses: actions/checkout@v3
-      - name: Check for commit
-        run:  |
-          gitLog="$(git log --since='24 hours ago')"
-          if [ -z "$gitLog"]
-          then
-            exit 1
-          fi
+      - name: Check for commits
+        run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '24 hours ago' | wc -l)" >> $GITHUB_ENV
+      - id: commits
+        run: echo "changes=$NEW_COMMIT_COUNT" >> "$GITHUB_OUTPUT"
 
   Integration-Test:
     name: ${{ matrix.version }} - Integration Tests
     runs-on: macos-latest
     needs: Check-For-Changes
+    if: ${{ needs.Check-For-Changes.outputs.changes > 0 }}
     strategy:
       fail-fast: false
       matrix:
@@ -41,4 +41,4 @@ jobs:
       - name: Run Integration Tests
         run: npm run test:integration
         env:
-          CODE_VERSION: ${{ matrix.version }}
+          CODE_STREAM: ${{ matrix.version }}
