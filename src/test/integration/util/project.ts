@@ -49,7 +49,7 @@ export class Project extends CommonUICreator {
 
 		try {
 			await this.driver.wait(async () => {
-				await this.driver.sleep(250);
+				await this.driver.sleep(100);
 				return notificationExists('Creating application');
 			}, 10000);
 		} catch (error) {
@@ -64,7 +64,7 @@ export class Project extends CommonUICreator {
 				// We need to sleep here as there are times when the 'Creating application' notification
 				// is still shown but is dismissed by the time we get the text in notificationExists and
 				// causes errors to be thrown that can't be handled
-				await this.driver.sleep(250);
+				await this.driver.sleep(100);
 				return notificationExists('Project created');
 			}, 60000);
 		} catch (error) {
@@ -109,7 +109,7 @@ export class Project extends CommonUICreator {
 
 		try {
 			await this.driver.wait(async () => {
-				await this.driver.sleep(250);
+				await this.driver.sleep(100);
 				return notificationExists('Creating module');
 			}, 10000);
 		} catch (error) {
@@ -124,7 +124,7 @@ export class Project extends CommonUICreator {
 				// We need to sleep here as there are times when the 'Creating module' notification
 				// is still shown but is dismissed by the time we get the text in notificationExists and
 				// causes errors to be thrown that can't be handled
-				await this.driver.sleep(250);
+				await this.driver.sleep(100);
 				return notificationExists('Project created');
 			}, 60000);
 		} catch (error) {

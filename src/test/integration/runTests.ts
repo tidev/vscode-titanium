@@ -21,7 +21,7 @@ async function main (): Promise<void> {
 		const tester = new ExTester(undefined, releaseQuality, tempDirectory.name);
 		const files = process.env.SMOKE ? 'out/test/integration/suite/**/*.smoke.js' : 'out/test/integration/suite/**/*.test.js';
 
-		tester.setupAndRunTests(files, vsCodeVersion, undefined, { config: mochaConfig, settings });
+		tester.setupAndRunTests(files, vsCodeVersion, undefined, { config: mochaConfig, settings, resources: [] });
 	} finally {
 		fs.removeSync(tempDirectory.name);
 	}
