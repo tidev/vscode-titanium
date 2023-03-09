@@ -1,0 +1,26 @@
+diff --git a/node_modules/vscode-extension-tester-locators/out/lib/1.76.0.d.ts b/node_modules/vscode-extension-tester-locators/out/lib/1.76.0.d.ts
+new file mode 100644
+index 0000000..9ac0163
+--- /dev/null
++++ b/node_modules/vscode-extension-tester-locators/out/lib/1.76.0.d.ts
+@@ -0,0 +1,2 @@
++import { LocatorDiff } from "monaco-page-objects";
++export declare const diff: LocatorDiff;
+diff --git a/node_modules/vscode-extension-tester-locators/out/lib/1.76.0.js b/node_modules/vscode-extension-tester-locators/out/lib/1.76.0.js
+new file mode 100644
+index 0000000..4bc5fa6
+--- /dev/null
++++ b/node_modules/vscode-extension-tester-locators/out/lib/1.76.0.js
+@@ -0,0 +1,12 @@
++"use strict";
++Object.defineProperty(exports, "__esModule", { value: true });
++exports.diff = void 0;
++const selenium_webdriver_1 = require("selenium-webdriver");
++exports.diff = {
++    locators: {
++        Input: {
++            quickPickIndex: (index) => selenium_webdriver_1.By.xpath(`.//div[@role='checkbox' and @data-index='${index}']`)
++        }
++    }
++};
++//# sourceMappingURL=1.76.0.js.map
