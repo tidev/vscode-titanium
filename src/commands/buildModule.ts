@@ -38,6 +38,10 @@ export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode 
 			taskDefinition.definition.titaniumBuild.target = node.targetId as 'device' | 'emulator' | 'simulator';
 		}
 
+		if (node?.version) {
+			taskDefinition.definition.titaniumBuild.ios = { simulatorVersion: node.version };
+		}
+
 		if (node?.deviceId) {
 			taskDefinition.definition.titaniumBuild.deviceId = node.deviceId;
 		}

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as semver from 'semver';
 import { CommandTaskProvider, TitaniumTaskBase, TitaniumTaskDefinitionBase, TitaniumBuildBase } from './commandTaskProvider';
 import { selectBuildTarget } from '../quickpicks/build/common';
 import { TaskExecutionContext, debugSessionInformation, DEBUG_SESSION_VALUE } from './tasksHelper';
@@ -9,6 +10,7 @@ import { TaskPseudoTerminal } from './taskPseudoTerminal';
 import { Platform } from '../types/common';
 import { Command } from './commandBuilder';
 import { getValidWorkspaceFolders, promptForWorkspaceFolder } from '../quickpicks';
+import { ExtensionContainer } from '../container';
 
 export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
@@ -53,6 +55,16 @@ export interface ModuleBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuild
 	deviceId?: string;
 	target?: 'device' | 'emulator' | 'simulator';
 	projectType?: 'module';
+}
+
+function sdkSupportsModuleBuildTargets (): boolean {
+	const sdk = ExtensionContainer.environment.selectedSdk();
+
+	if (sdk && semver.gte(sdk.version, '11.0.0')) {
+		return true;
+	}
+
+	return false;
 }
 
 export class BuildTaskProvider extends CommandTaskProvider {
@@ -139,7 +151,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 
 			definition.titaniumBuild.projectDir = path.join(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
 
-			if (!definition.titaniumBuild.target) {
+			if (!definition.titaniumBuild.target && sdkSupportsModuleBuildTargets()) {
 				definition.titaniumBuild.target = (await selectBuildTarget(definition.titaniumBuild.platform)).id as 'device' | 'emulator' | 'simulator';
 			}
 			return helper.resolveModuleBuildCommandLine(context, task.definition.titaniumBuild);
