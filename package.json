@@ -1034,7 +1034,7 @@
     "commitizen": "^4.3.0",
     "cross-env": "^7.0.3",
     "cz-conventional-changelog": "^3.3.0",
-    "ejs": "^3.1.8",
+    "ejs": "^3.1.9",
     "eslint": "^8.36.0",
     "eslint-config-axway": "^8.0.0",
     "eslint-plugin-chai-friendly": "^0.7.2",
