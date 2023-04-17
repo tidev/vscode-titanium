@@ -1041,7 +1041,7 @@
     "eslint-plugin-mocha": "^10.1.0",
     "glob": "^10.1.0",
     "husky": "^8.0.3",
-    "lint-staged": "^13.2.0",
+    "lint-staged": "^13.2.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "patch-package": "^6.5.1",
