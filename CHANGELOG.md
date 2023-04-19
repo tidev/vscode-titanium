@@ -1,3 +1,16 @@
+# [1.1.0](https://github.com/tidev/vscode-titanium/compare/v1.0.1...v1.1.0) (2023-04-19)
+
+
+### Bug Fixes
+
+* check if workspace trust is enabled when determining trust status ([3dfba26](https://github.com/tidev/vscode-titanium/commit/3dfba26112500def68deb9c6500289bf4b29160f))
+
+
+### Features
+
+* add environment issues handling ([d1082db](https://github.com/tidev/vscode-titanium/commit/d1082dba465c5e00f06f933fc13976116f167535))
+* **explorer/build:** only show relevant build options when module project is selected ([f6a7208](https://github.com/tidev/vscode-titanium/commit/f6a7208de1a6dbbabcef4befc8576ad41ff3b940)), closes [#993](https://github.com/tidev/vscode-titanium/issues/993)
+
 ## [1.0.1](https://github.com/tidev/vscode-titanium/compare/v1.0.0...v1.0.1) (2022-08-05)
 
 
