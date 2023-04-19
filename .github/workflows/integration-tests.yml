@@ -48,8 +48,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Check for commits
+        if: ${{ github.event.schedule }}
         run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '24 hours ago' | wc -l)" >> $GITHUB_ENV
       - id: commits
+        if: ${{ github.event.schedule }}
         run: echo "changes=$NEW_COMMIT_COUNT" >> "$GITHUB_OUTPUT"
 
   Integration-Test:
