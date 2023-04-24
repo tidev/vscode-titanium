@@ -60,7 +60,7 @@ export interface ModuleBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuild
 function sdkSupportsModuleBuildTargets (): boolean {
 	const sdk = ExtensionContainer.environment.selectedSdk();
 
-	if (sdk && semver.gte(sdk.version, '11.0.0')) {
+	if (sdk && semver.gte(sdk.version, '12.1.0')) {
 		return true;
 	}
 

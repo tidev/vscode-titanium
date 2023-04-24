@@ -1,8 +1,8 @@
-import { BaseNode } from './baseNode';
+import { BaseNode } from '../baseNode';
 
 import { TreeItemCollapsibleState } from 'vscode';
-import { Platform } from '../../types/common';
-import { DevelopmentTarget } from '../../types/cli';
+import { Platform, ProjectType } from '../../../types/common';
+import { DevelopmentTarget } from '../../../types/cli';
 
 export class DeviceNode extends BaseNode {
 
@@ -15,9 +15,14 @@ export class DeviceNode extends BaseNode {
 		public readonly target: string,
 		public override readonly deviceId: string,
 		public override readonly targetId: DevelopmentTarget,
-		public override readonly version?: string
+		public override readonly version?: string,
+		public readonly projectType?: ProjectType
 	) {
 		super(label);
+
+		if (projectType === 'module') {
+			this.contextValue = 'ModuleDeviceNode';
+		}
 	}
 
 	get tooltip (): string {

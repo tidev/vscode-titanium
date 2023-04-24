@@ -1,4 +1,4 @@
-import { BaseNode } from './baseNode';
+import { BaseNode } from '../baseNode';
 
 import { UpdateInfo } from 'titanium-editor-commons/updates';
 import { TreeItemCollapsibleState } from 'vscode';
