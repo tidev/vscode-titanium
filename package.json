@@ -768,17 +768,17 @@
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.buildExplorer && viewItem =~ /DeviceNode|ModuleBuildNode/",
-          "group": "inline"
-        },
-        {
-          "command": "titanium.build.debug",
-          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode",
+          "when": "view == titanium.view.buildExplorer && viewItem =~ /PlatformNode|TargetNode|OSVerNode|DeviceNode|ModuleBuildNode/",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
           "when": "view == titanium.view.buildExplorer && viewItem =~ /PlatformNode|TargetNode|OSVerNode|DeviceNode|ModuleBuildNode/"
+        },
+        {
+          "command": "titanium.build.debug",
+          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode",
+          "group": "inline"
         },
         {
           "command": "titanium.build.debug",

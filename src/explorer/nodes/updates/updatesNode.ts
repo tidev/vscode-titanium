@@ -1,10 +1,10 @@
-import { BaseNode } from './baseNode';
+import { BaseNode } from '../baseNode';
 import { TreeItemCollapsibleState } from 'vscode';
 import { UpdateNode } from './updateNode';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { BlankNode } from './blankNode';
-import { ExtensionContainer } from '../../container';
-import { ErrorNode } from './errorNode';
+import { BlankNode } from '../blankNode';
+import { ExtensionContainer } from '../../../container';
+import { ErrorNode } from '../errorNode';
 
 export class UpdatesNode extends BaseNode {
 

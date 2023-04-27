@@ -1,11 +1,11 @@
 import { TreeItemCollapsibleState } from 'vscode';
-import { BaseNode } from './baseNode';
+import { BaseNode } from '../baseNode';
 import { DeviceNode } from './deviceNode';
 
-import { Platform } from '../../types/common';
-import { targetForName } from '../../utils';
-import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../types/cli';
-import { ExtensionContainer } from '../../container';
+import { Platform, ProjectType } from '../../../types/common';
+import { targetForName } from '../../../utils';
+import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../../types/cli';
+import { ExtensionContainer } from '../../../container';
 
 export class OSVerNode extends BaseNode {
 
@@ -17,7 +17,8 @@ export class OSVerNode extends BaseNode {
 	constructor (
 		public override readonly label: string,
 		public readonly platform: Platform,
-		public readonly target: PrettyDevelopmentTarget
+		public readonly target: PrettyDevelopmentTarget,
+		public readonly projectType?: ProjectType
 	) {
 		super(label);
 		this.version = label;
@@ -29,7 +30,7 @@ export class OSVerNode extends BaseNode {
 		if (this.platform === 'ios') {
 			const sims = ExtensionContainer.environment.iOSSimulators();
 			for (const sim of sims[this.version]) {
-				simulators.push(new DeviceNode(sim.name, this.platform, this.targetId, sim.udid, this.targetId, this.version));
+				simulators.push(new DeviceNode(sim.name, this.platform, this.targetId, sim.udid, this.targetId, this.version, this.projectType));
 			}
 		}
 		return simulators;
