@@ -29,7 +29,7 @@
     "url": "https://github.com/tidev/vscode-titanium.git"
   },
   "engines": {
-    "vscode": "^1.56.0",
+    "vscode": "^1.73.0",
     "node": ">=14.16.0"
   },
   "activationEvents": [
@@ -44,6 +44,7 @@
   },
   "license": "Apache 2.0",
   "main": "./out/extension",
+  "l10n": "./l10n",
   "contributes": {
     "debuggers": [
       {
@@ -496,17 +497,17 @@
       "titanium": [
         {
           "id": "titanium.view.welcome",
-          "name": "Get Started",
+          "name": "%titanium.view.welcome.getStarted%",
           "when": "titanium:needsTrustedWorkspace || !titanium:enabled"
         },
         {
           "id": "titanium.view.buildExplorer",
-          "name": "Build",
+          "name": "%titanium.view.buildExplorer%",
           "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "id": "titanium.view.helpExplorer",
-          "name": "Help and Feedback",
+          "name": "%titanium.view.helpExplorer%",
           "when": "!titanium:needsTrustedWorkspace"
         }
       ]
@@ -514,17 +515,17 @@
     "viewsWelcome": [
       {
         "view": "titanium.view.welcome",
-        "contents": "Titanium tooling not installed, click below to install it.\nThis will not install any platform specific tooling. To install the required platform tooling please visit [the Android](https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_Getting_Started/Installation_and_Configuration/Installing_Platform_SDKs/Installing_the_Android_SDK.html) or [iOS documentation](https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_Getting_Started/Installation_and_Configuration/Installing_Platform_SDKs/Installing_the_iOS_SDK.html)\n[Install Tooling](command:titanium.updates.select)",
+        "contents": "%titanium.view.welcome.toolingMissing%",
         "when": "titanium:toolingMissing"
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "To use the Titanium extension you must have a Titanium project open\n[Open Project](command:workbench.action.addRootFolder)\nYou can also create a new Application or Module project\n[Create App](command:titanium.create.application)\n[Create Module](command:titanium.create.module)",
+        "contents": "%titanium.view.welcome.notProject%",
         "when": "titanium:notProject"
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage)\n[Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
+        "contents": "%titanium.view.welcome.trust%",
         "when": "titanium:needsTrustedWorkspace"
       },
       {
@@ -1023,7 +1024,7 @@
     "@types/sinon-chai": "^3.2.9",
     "@types/tmp": "^0.2.3",
     "@types/uuid": "^9.0.1",
-    "@types/vscode": "1.56.0",
+    "@types/vscode": "1.73.0",
     "@types/which": "^3.0.0",
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
@@ -1073,6 +1074,7 @@
     "vscode-debugadapter": "^1.51.0",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.0",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.5.0",
+    "@vscode/l10n": "^0.0.14"
   }
 }

@@ -2,12 +2,13 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import { CommandError } from '../common/utils';
 
-import { commands, ProgressLocation, Uri, window, workspace } from 'vscode';
+import { commands, ProgressLocation, Uri, window, workspace, l10n } from 'vscode';
 import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createAppArguments, validateAppId } from '../utils';
 import { handleInteractionError,  InteractionError } from './common';
+import { LOADIPHLPAPI } from 'dns';
 
 export async function createApplication (): Promise<void> {
 	try {
@@ -15,13 +16,13 @@ export async function createApplication (): Promise<void> {
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 
-		const name = await inputBox({ prompt: 'Enter your application name' });
+		const name = await inputBox({ prompt: l10n.t('Enter your application name') });
 		const id = await inputBox({
-			prompt: 'Enter your application ID',
+			prompt: l10n.t('Enter your application ID'),
 			validateInput: currentAppId => {
 				const isValid = validateAppId(currentAppId);
 				if (!isValid) {
-					return 'Invalid app id!';
+					return l10n.t('Invalid app id!');
 				}
 			}
 		});
@@ -29,9 +30,9 @@ export async function createApplication (): Promise<void> {
 		const workspaceDir = await selectCreationLocation(lastCreationPath);
 		ExtensionContainer.context.workspaceState.update(WorkspaceState.LastCreationPath, workspaceDir.fsPath);
 		if (await fs.pathExists(path.join(workspaceDir.fsPath, name))) {
-			force = await yesNoQuestion({ placeHolder: 'That app already exists. Would you like to overwrite?' }, true);
+			force = await yesNoQuestion({ placeHolder: l10n.t('That app already exists. Would you like to overwrite?') }, true);
 			if (!force) {
-				throw new InteractionError('App already exists and chose to not overwrite');
+				throw new InteractionError(l10n.t('App already exists and chose to not overwrite'));
 			}
 		}
 
@@ -45,9 +46,9 @@ export async function createApplication (): Promise<void> {
 		});
 
 		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (progress) => {
-			progress.report({ message: 'Creating application' });
+			progress.report({ message: l10n.t('Creating application') });
 			await ExtensionContainer.terminal.runInBackground('ti', args);
-			progress.report({ message: 'Creating Alloy project' });
+			progress.report({ message: l10n.t('Creating Alloy project') });
 			const alloyArgs =  [ 'new' ];
 			if (force) {
 				alloyArgs.push('--force');
@@ -57,7 +58,7 @@ export async function createApplication (): Promise<void> {
 		});
 
 		const projectDir = Uri.file(path.join(workspaceDir.fsPath, name));
-		const dialog = await window.showInformationMessage('Project created. Would you like to open it?', { title: 'Open in new window', id: 'window' }, { title: 'Open in workspace', id: 'workspace' });
+		const dialog = await window.showInformationMessage(l10n.t('Project created. Would you like to open it?'), { title: l10n.t('Open in new window'), id: 'window' }, { title: l10n.t('Open in workspace'), id: 'workspace' });
 		if (dialog?.id === 'window') {
 			await commands.executeCommand(VSCodeCommands.OpenFolder, projectDir, true);
 		} else if (dialog?.id === 'workspace') {
@@ -72,7 +73,7 @@ export async function createApplication (): Promise<void> {
 				choices.push('View Error');
 			}
 
-			const action = await window.showErrorMessage('Failed to create application', ...choices);
+			const action = await window.showErrorMessage(l10n.t('Failed to create application'), ...choices);
 			if (error.output && action === 'View Error') {
 				ExtensionContainer.outputChannel.append(`${error.command}\n`);
 				ExtensionContainer.outputChannel.append(error.output);

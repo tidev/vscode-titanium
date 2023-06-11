@@ -1,0 +1,16 @@
+{
+    "Enter your application name": "Wie lautet der Name der neuen App",
+    "Enter your application ID": "Wie lautet die Bundle-ID der neuen App (z.B. de.app.name)",
+    "Invalid app id!": "Ungültige Bundle-ID",
+    "That app already exists. Would you like to overwrite?": "App existiert bereits. Soll diese überschrieben werden?",
+    "App already exists and chose to not overwrite": "App existiert und kann nicht überschrieben werden.",
+    "Creating application": "App wird erstellt",
+    "Creating Alloy project": "Alloy Projekt wird erstellt",
+    "Project created. Would you like to open it?": "Projekt wurde erstellt. Soll es jetzt geöffnet werden?",
+    "Open in new window": "In einem neuen Fenster öffnen",
+    "Open in workspace": "Im aktuellen Arbeitsbereich öffnen",
+    "Failed to create application": "Fehler beim Anlegen der App",
+    "Choose platforms": "Plattform wählen",
+    "At least one platform must be selected": "Mindestens eine Plattform muss ausgewählt sein",
+    "Select where to create your project": "Wo soll das Projekt gespeichert werden"
+}

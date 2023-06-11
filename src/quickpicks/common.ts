@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import { pathExists, ensureDir } from 'fs-extra';
 import { UpdateInfo } from 'titanium-editor-commons/updates';
-import { InputBoxOptions, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceFolder } from 'vscode';
+import { InputBoxOptions, l10n, QuickPickItem, QuickPickOptions, Uri, window, workspace, WorkspaceFolder } from 'vscode';
 import { UserCancellation } from '../commands/common';
 import { ExtensionContainer } from '../container';
 import { Platform, ProjectType } from '../types/common';
@@ -106,7 +106,7 @@ export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
 		});
 	}
 
-	const directory = await quickPick(items, { placeHolder: 'Select where to create your project' }, { forceShow: true });
+	const directory = await quickPick(items, { placeHolder: l10n.t('Select where to create your project') }, { forceShow: true });
 
 	if (directory.id === 'browse') {
 		const filePath = await window.showOpenDialog({ canSelectMany: false, canSelectFolders: true });

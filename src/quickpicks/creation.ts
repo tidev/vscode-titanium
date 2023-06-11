@@ -3,6 +3,7 @@ import { nameForPlatform, platforms } from '../utils';
 import { CustomQuickPick, quickPick } from './common';
 import { InteractionError } from '../commands';
 import { ExtensionContainer } from '../container';
+import { l10n } from 'vscode';
 
 export interface CodeBase {
 	android?: 'java' | 'kotlin'
@@ -19,10 +20,10 @@ interface iOSCodeBaseQuickPickItem extends CustomQuickPick {
 
 export async function selectPlatforms (): Promise<string[]> {
 	const choices: CustomQuickPick[] = platforms().map(platform => ({ label: nameForPlatform(platform), id: platform, picked: true }));
-	const selected = await quickPick(choices, { canPickMany: true, placeHolder: 'Choose platforms' }, { forceShow: true });
+	const selected = await quickPick(choices, { canPickMany: true, placeHolder: l10n.t('Choose platforms') }, { forceShow: true });
 
 	if (!selected.length) {
-		throw new InteractionError('At least one platform must be selected');
+		throw new InteractionError(l10n.t('At least one platform must be selected'));
 	}
 
 	return selected.map((platform: CustomQuickPick) => platform.id);
