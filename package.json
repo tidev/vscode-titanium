@@ -170,9 +170,9 @@
     "commands": [
       {
         "command": "titanium.create.application",
-        "title": "Create application",
+        "title": "%titanium.create.application%",
         "category": "Titanium",
-        "description": "Create a new Titanium application project"
+        "description": "%titanium.create.application.text%"
       },
       {
         "command": "titanium.create.keystore",
@@ -211,7 +211,7 @@
       },
       {
         "command": "titanium.build.run",
-        "title": "Build",
+        "title": "%titanium.build.run%",
         "category": "Titanium",
         "icon": "$(play)",
         "description": "Build a Titanium project"
@@ -310,13 +310,13 @@
       },
       {
         "command": "titanium.updates.checkAll",
-        "title": "Check For Updates",
+        "title": "%titanium.updates.checkAll%",
         "category": "Titanium",
         "icon": "$(refresh)"
       },
       {
         "command": "titanium.updates.installAll",
-        "title": "Install All Updates",
+        "title": "%titanium.updates.installAll%",
         "category": "Titanium"
       },
       {
@@ -331,7 +331,7 @@
       },
       {
         "command": "titanium.clean",
-        "title": "Clean project",
+        "title": "%itanium.clean%",
         "category": "Titanium"
       },
       {
