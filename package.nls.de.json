@@ -10,5 +10,6 @@
   "titanium.clean": "Projekt bereinigen",
   "titanium.create.application": "Neue Titanium App erstellen",
   "titanium.create.application.text": "Erstellt eine neue Titanium App",
-  "titanium.build.run": "Kompilieren"
+  "titanium.build.run": "Kompilieren",
+  "titanium.explorer.refresh": "Geräte aktualisieren"
 }

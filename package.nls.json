@@ -10,5 +10,6 @@
   "titanium.clean": "Clean project",
   "titanium.create.application": "Create application",
   "titanium.create.application.text": "Create a new Titanium application project",
-  "titanium.build.run": "Build"
+  "titanium.build.run": "Build",
+  "titanium.explorer.refresh": "Refresh devices"
 }

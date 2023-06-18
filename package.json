@@ -187,7 +187,7 @@
       },
       {
         "command": "titanium.explorer.refresh",
-        "title": "Refresh devices",
+        "title": "%titanium.explorer.refresh%",
         "category": "Titanium",
         "icon": "$(refresh)"
       },
@@ -331,7 +331,7 @@
       },
       {
         "command": "titanium.clean",
-        "title": "%itanium.clean%",
+        "title": "%titanium.clean%",
         "category": "Titanium"
       },
       {
