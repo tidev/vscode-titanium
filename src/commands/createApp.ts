@@ -8,7 +8,6 @@ import { ExtensionContainer } from '../container';
 import { inputBox, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
 import { createAppArguments, validateAppId } from '../utils';
 import { handleInteractionError,  InteractionError } from './common';
-import { LOADIPHLPAPI } from 'dns';
 
 export async function createApplication (): Promise<void> {
 	try {
