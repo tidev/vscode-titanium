@@ -1,0 +1,15 @@
+{
+  "titanium.commands.updates.checkAll.title": "Schaue nach Updates",
+  "titanium.commands.updates.installAll.title": "Installiere alle Updates",
+  "titanium.commands.clean.title": "Projekt bereinigen",
+  "titanium.commands.create.application.title": "Neue Titanium App erstellen",
+  "titanium.commands.create.application.description": "Erstellt eine neue Titanium App",
+  "titanium.commands.build.run.title": "Kompilieren",
+  "titanium.commands.explorer.refresh.title": "Geräte aktualisieren",
+  "titanium.view.welcome.notProject": "Öffne ein Titanium Projekt, um die Erweiterung zu nutzen\n[Projekt öffnen](command:workbench.action.addRootFolder)\noder starte ein neue App oder ein Erweiterung/Modul\n[neue App erstellen](command:titanium.create.application)\n[neues Modul erstellen](command:titanium.create.module)",
+  "titanium.view.welcome.trust": "Bitte vertraue diesem Arbeitsbereich um die Titanium Erweiterung zu nutzen.\n[Arbeitsbereiche verwalten](command:workbench.trust.manage)\n[Erfahre mehr über die Sicherheisteinstellungen der Arbeitsbereiche](https://aka.ms/vscode-workspace-trust)",
+  "titanium.view.welcome.toolingMissing": "Einige benötigte Titanium Tools sind noch nicht installiert. Drücke den unteren Button um diese zu installieren.\nEs werden keine Android oder iOS Tools installiert. Schaue dafür in die offizielle Dokumentation für [Android](https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_Getting_Started/Installation_and_Configuration/Installing_Platform_SDKs/Installing_the_Android_SDK.html) oder [iOS](https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_Getting_Started/Installation_and_Configuration/Installing_Platform_SDKs/Installing_the_iOS_SDK.html)\n[Titanium Tools installieren](command:titanium.updates.select)",
+  "titanium.view.helpExplorer": "Hilfe und Feedback",
+  "titanium.view.buildExplorer": "App kompilieren",
+  "titanium.view.welcome": "Erste Schritte"
+}
