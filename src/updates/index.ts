@@ -9,11 +9,11 @@ import { GlobalState } from '../constants';
 import { startup } from '../extension';
 
 export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice?: boolean): Promise<void> {
-	vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium Updates', cancellable: false }, async progress => {
+	vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: vscode.l10n.t('Titanium Updates'), cancellable: false }, async progress => {
 		if (!updateInfo) {
-			progress.report({ message: 'Checking for latest updates' });
+			progress.report({ message: vscode.l10n.t('Checking for latest updates') });
 			updateInfo = await ExtensionContainer.getUpdates();
-			progress.report({ message: 'Please select updates' });
+			progress.report({ message: vscode.l10n.t('Please select updates') });
 		}
 
 		if (promptForChoice) {
@@ -36,12 +36,12 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 		for (const update of updateInfo) {
 			const label = `${update.productName}: ${update.latestVersion}`;
 			progress.report({
-				message: `Installing ${label} (${counter}/${selectedUpdates})`
+				message: vscode.l10n.t('Installing {0} ({1}/{2})', label, counter, selectedUpdates)
 			});
 			try {
 				await update.action(update.latestVersion);
 				progress.report({
-					message: `Installed ${label} (${counter}/${selectedUpdates})`,
+					message: vscode.l10n.t('Installed {label} ({counter}/{selectedUpdates})', label, counter, selectedUpdates),
 					increment: 100 / selectedUpdates
 				});
 				succeeded++;
@@ -53,14 +53,14 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 				if (error instanceof InstallError && error.metadata) {
 					const { metadata } = error;
 					if (metadata.errorCode === 'EACCES') {
-						const runWithSudo = await vscode.window.showErrorMessage(`Failed to update to ${label} as it must be ran with sudo`, {
+						const runWithSudo = await vscode.window.showErrorMessage(vscode.l10n.t('Failed to update to {0} as it must be ran with sudo', label), {
 							title: 'Install with Sudo'
 						});
 						if (runWithSudo) {
 							await executeAsTask(`sudo ${metadata.command}`, update.productName);
 						}
 					} else if (metadata.errorCode === 'ESELECTERROR') {
-						const select = await vscode.window.showErrorMessage(`Failed to set ${update.latestVersion} as the selected SDK. Would you like to manually select it?`, { title: 'Select' });
+						const select = await vscode.window.showErrorMessage(vscode.l10n.t('Failed to set {0} as the selected SDK. Would you like to manually select it?', update.latestVersion), { id: 'select', title: vscode.l10n.t('Select') });
 						if (select) {
 							await executeAsTask(`${metadata.command}`, update.productName);
 						}
@@ -68,7 +68,7 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 					failed++;
 				} else {
 					// TODO should we show the error that we got passed?
-					await vscode.window.showErrorMessage(`Failed to update to ${label}`);
+					await vscode.window.showErrorMessage(vscode.l10n.t('Failed to update to {0}', label));
 				}
 			}
 			counter++;
@@ -88,10 +88,14 @@ export async function installUpdates (updateInfo?: UpdateInfo[], promptForChoice
 		vscode.commands.executeCommand(Commands.RefreshExplorer);
 		vscode.commands.executeCommand(Commands.RefreshHelp);
 
-		let message = `Installed ${succeeded} ${succeeded === 1 ? 'update' : 'updates'}`;
+		let message = succeeded === 1
+			? vscode.l10n.t('Installed {0} update', succeeded)
+			: vscode.l10n.t('Installed {0} updates', succeeded);
 
 		if (failed) {
-			message = `${message} and failed to install ${failed} ${failed === 1 ? 'update' : 'updates'}`;
+			message = failed === 1
+				? vscode.l10n.t('{0} and failed to install {1} update', message, failed)
+				: vscode.l10n.t('{0}and failed to install {1} updates', message, failed);
 		}
 
 		vscode.window.showInformationMessage(message);
