@@ -5,7 +5,7 @@ import findUp from 'find-up';
 import walkSync from 'klaw-sync';
 
 import { platform } from 'os';
-import { tasks, Task, ShellExecution, TaskScope } from 'vscode';
+import { tasks, Task, ShellExecution, TaskScope, l10n } from 'vscode';
 import { CreateOptions, CreateModuleOptions, PrettyDevelopmentTarget, PrettyTarget, Target } from './types/cli';
 import { IosCert, IosCertificateType, Platform, PlatformPretty } from './types/common';
 import { ExtensionContainer } from './container';
@@ -314,7 +314,7 @@ export function getCorrectCertificateName (certificateName: string, sdkVersion: 
 	const certificate = ExtensionContainer.environment.iOSCertificates(certificateType).find((cert: IosCert) => cert.fullname === certificateName);
 
 	if (!certificate) {
-		throw new Error(`Failed to lookup certificate ${certificateName}`);
+		throw new Error(l10n.t('Failed to lookup certificate {0}', certificateName));
 	}
 
 	const coerced = semver.coerce(sdkVersion);
@@ -405,7 +405,7 @@ export function getDeviceNameFromId (deviceID: string, platform: Platform, targe
 	}
 
 	if (!deviceName) {
-		throw new Error(`Unable to find a name for ${deviceID}`);
+		throw new Error(l10n.t('Unable to find a name for {0}', deviceID));
 	}
 
 	return deviceName;
@@ -424,7 +424,7 @@ export async function findProjectDirectory (filePath: string): Promise<string> {
 	try {
 		const tiappFile = await findUp('tiapp.xml', { cwd: filePath, type: 'file' });
 		if (!tiappFile) {
-			throw new Error(`Unable to find project dir for ${filePath}`);
+			throw new Error(l10n.t('Unable to find project dir for {0}', filePath));
 		}
 
 		return path.dirname(tiappFile);

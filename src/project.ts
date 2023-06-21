@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as utils from './utils';
 
-import { Range, window, workspace } from 'vscode';
+import { Range, l10n, window, workspace } from 'vscode';
 import { handleInteractionError, InteractionError } from './commands/common';
 import { Platform, ProjectType } from './types/common';
 import { parseXmlString } from './common/utils';
@@ -73,7 +73,7 @@ export class Project {
 		if (this.type === 'app') {
 			return String(this.tiapp.id);
 		}
-		throw new Error('Project is not a Titanium application');
+		throw new Error(l10n.t('Project is not a Titanium application'));
 	}
 
 	/**
@@ -151,7 +151,7 @@ export class Project {
 			}
 			let line: number;
 			let column: number;
-			let message = 'Errors found in tiapp.xml';
+			let message = l10n.t('Errors found in tiapp.xml');
 			const columnExp = /Column: (.*?)(?:\s|$)/g;
 			const lineExp = /Line: (.*?)(?:\s|$)/g;
 			const columnMatch = columnExp.exec(err.message);
@@ -159,17 +159,17 @@ export class Project {
 
 			if (lineMatch) {
 				line = parseInt(lineMatch[1], 10);
-				message = `${message} on line ${line + 1}`;
+				message = l10n.t('{0} on line {1}', message, line + 1);
 			}
 
 			if (columnMatch) {
 				column = parseInt(columnMatch[1], 10);
-				message = `${message} in column ${column + 1}`;
+				message = l10n.t('{0} on line {1}', message, column + 1);
 			}
 
 			const error = new InteractionError(message);
 			error.interactionChoices.push({
-				title: 'Open tiapp.xml',
+				title: l10n.t('Open tiapp.xml'),
 				run: async () => {
 					const file = path.join(this.filePath, 'tiapp.xml');
 					const document = await workspace.openTextDocument(file);

@@ -90,7 +90,7 @@ export async function startup (): Promise<void> {
 		ExtensionContainer.setContext(GlobalState.EnvironmentIssues, true);
 		const choice = await vscode.window.showWarningMessage(title, ...actions.map(action => action.title));
 		if (!choice) {
-			vscode.window.showErrorMessage('Cannot continue startup until all issues are resolved');
+			vscode.window.showErrorMessage(vscode.l10n.t('Cannot continue startup until all issues are resolved'));
 			return;
 		}
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -119,7 +119,7 @@ export async function startup (): Promise<void> {
 		}
 
 		progress.report({
-			message: 'Fetching environment information'
+			message: vscode.l10n.t('Fetching environment information')
 		});
 
 		try {
@@ -129,7 +129,7 @@ export async function startup (): Promise<void> {
 				handleInteractionError(error);
 				return;
 			}
-			vscode.window.showErrorMessage('Error fetching Titanium environment');
+			vscode.window.showErrorMessage(vscode.l10n.t('Error fetching Titanium environment'));
 			return;
 		}
 
