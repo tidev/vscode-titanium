@@ -74,8 +74,8 @@ export async function packageApplication (node?: PlatformNode | DistributeNode, 
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
-			const choice = await vscode.window.showErrorMessage('Package App failed', { title: 'Rerun' });
-			if (choice?.title === 'Rerun') {
+			const choice = await vscode.window.showErrorMessage(vscode.l10n.t('Package App failed'), { id: 'rerun', title: vscode.l10n.t('Rerun') });
+			if (choice?.id === 'rerun') {
 				packageApplication(node);
 			}
 		}

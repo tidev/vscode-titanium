@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-import { commands, ProgressLocation, Uri, window, workspace } from 'vscode';
+import { commands, l10n, ProgressLocation, Uri, window, workspace } from 'vscode';
 import { VSCodeCommands, WorkspaceState } from '../constants';
 import { ExtensionContainer } from '../container';
 import { inputBox, selectCodeBases, selectCreationLocation, selectPlatforms, yesNoQuestion } from '../quickpicks';
@@ -20,9 +20,9 @@ export async function createModule (): Promise<void> {
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 
-		const name = await inputBox({ prompt: 'Enter your module name' });
+		const name = await inputBox({ prompt: l10n.t('Enter your module name') });
 		const id = await inputBox({
-			prompt: 'Enter your module ID',
+			prompt: l10n.t('Enter your module ID'),
 			validateInput: currentAppId => {
 				const isValid = validateAppId(currentAppId);
 				if (!isValid) {

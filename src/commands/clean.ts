@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { ProgressLocation, window } from 'vscode';
+import { ProgressLocation, l10n, window } from 'vscode';
 import * as fs from 'fs-extra';
 import { ExtensionContainer } from '../container';
 import { selectPlatform, promptForWorkspaceFolder } from '../quickpicks/common';
@@ -20,7 +20,7 @@ export async function cleanApplication (): Promise<void> {
 		} else {
 			projectDir = folder.uri.fsPath;
 		}
-		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification, title: 'Cleaning project' }, async () => {
+		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification, title: l10n.t('Cleaning project') }, async () => {
 			const quotedArgs =  [
 				'clean',
 				'--project-dir', projectDir,

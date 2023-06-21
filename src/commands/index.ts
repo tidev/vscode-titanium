@@ -41,7 +41,7 @@ export function registerCommands (): void {
 			await sleep(100);
 		}
 
-		const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: 'Please select a project to build' });
+		const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: vscode.l10n.t('Please select a project to build') });
 
 		if (type === 'app') {
 			return buildApplication(node, folder);
@@ -56,7 +56,7 @@ export function registerCommands (): void {
 			await sleep(100);
 		}
 
-		const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: 'Please select a project to package' });
+		const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: vscode.l10n.t('Please select a project to package') });
 
 		if (type === 'app') {
 			return packageApplication(node, folder);
@@ -74,7 +74,7 @@ export function registerCommands (): void {
 
 	// register set log level command
 	registerCommand(Commands.SetLogLevel, async () => {
-		const level = await quickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: 'Select log level' }) as keyof typeof LogLevel;
+		const level = await quickPick([ 'Trace', 'Debug', 'Info', 'Warn', 'Error' ], { placeHolder: vscode.l10n.t('Select log level') }) as keyof typeof LogLevel;
 		const actualLevel = LogLevel[level];
 		if (actualLevel) {
 			await configuration.update('general.logLevel', actualLevel, vscode.ConfigurationTarget.Global);
@@ -97,12 +97,12 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.EnableLiveView, async () => {
 		await configuration.update('build.liveview', true, vscode.ConfigurationTarget.Global);
-		vscode.window.showInformationMessage('Enabled LiveView');
+		vscode.window.showInformationMessage(vscode.l10n.t('Enabled LiveView'));
 	});
 
 	registerCommand(Commands.DisableLiveView, async () => {
 		await configuration.update('build.liveview', false, vscode.ConfigurationTarget.Global);
-		vscode.window.showInformationMessage('Disabled LiveView');
+		vscode.window.showInformationMessage(vscode.l10n.t('Disabled LiveView'));
 	});
 
 	registerCommand(Commands.GenerateAlloyController, () => generateComponent(AlloyComponentType.Controller, AlloyComponentFolder.Controller, AlloyComponentExtension.Controller));
@@ -137,7 +137,7 @@ export function registerCommands (): void {
 
 		debugSessionInformation.set(DEBUG_SESSION_VALUE, node);
 
-		const { folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: 'Please select a project to debug' });
+		const { folder } = await promptForWorkspaceFolder({ apps: true, modules: true, placeHolder: vscode.l10n.t('Please select a project to debug') });
 		await vscode.debug.startDebugging(folder, debugConfig);
 	});
 
@@ -150,19 +150,19 @@ export function registerCommands (): void {
 			}
 			ExtensionContainer.context.globalState.update(GlobalState.HasUpdates, true);
 			vscode.commands.executeCommand('setContext', GlobalState.HasUpdates, true);
-			const message = numberOfUpdates > 1 ? `There are ${numberOfUpdates} updates available` : `There is ${numberOfUpdates} update available`;
-			const choice = await vscode.window.showInformationMessage(message, { title: 'Install' }, { title: 'View' });
+			const message = numberOfUpdates > 1 ? vscode.l10n.t('There are {0} updates available', numberOfUpdates) : vscode.l10n.t('There is {0} update available', numberOfUpdates);
+			const choice = await vscode.window.showInformationMessage(message, { id: 'install', title: vscode.l10n.t('Install') }, { id: 'view', title: vscode.l10n.t('View') });
 			if (!choice) {
 				return;
 			}
-			if (choice.title === 'Install') {
+			if (choice.title === 'install') {
 				vscode.commands.executeCommand(Commands.SelectUpdates, updateInfo);
-			} else if (choice.title === 'View') {
+			} else if (choice.title === 'view') {
 				// Focus the update view
 				await vscode.commands.executeCommand(Commands.ShowUpdates);
 			}
 		} catch (error) {
-			vscode.window.showWarningMessage('Failed to check for updates');
+			vscode.window.showWarningMessage(vscode.l10n.t('Failed to check for updates'));
 		}
 
 	});
@@ -189,7 +189,7 @@ export function registerCommands (): void {
 
 	registerCommand(Commands.ImportSettings, async (settings?: { [key: string]: unknown }): Promise<void> => {
 		if (!settings) {
-			const openFile = await vscode.window.showInformationMessage('Please select the exported settings file', 'Open');
+			const openFile = await vscode.window.showInformationMessage(vscode.l10n.t('Please select the exported settings file'), 'Open');
 
 			if (!openFile) {
 				return;

@@ -51,8 +51,8 @@ export async function buildModule (node?: DeviceNode | OSVerNode | PlatformNode 
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
-			const choice = await vscode.window.showErrorMessage('Build Module failed.', { title: 'Rerun' });
-			if (choice?.title === 'Rerun') {
+			const choice = await vscode.window.showErrorMessage(vscode.l10n.t('Build Module failed.'), { id: 'rerun', title: vscode.l10n.t('Rerun') });
+			if (choice?.id === 'rerun') {
 				buildModule(node);
 			}
 		}

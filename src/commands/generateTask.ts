@@ -26,7 +26,7 @@ function isAppPackage (type: ProjectType, task: Partial<TitaniumTaskDefinitionBa
 }
 
 export async function generateTask (node: DeviceNode|DistributeNode): Promise<void> {
-	const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: false, placeHolder: 'Select a project to generate a task definition for' });
+	const { type, folder } = await promptForWorkspaceFolder({ apps: true, modules: false, placeHolder: vscode.l10n.t('Select a project to generate a task definition for') });
 
 	const tasksFileLocation = path.join(folder.uri.fsPath, '.vscode', 'tasks.json');
 	let fileContents;
@@ -55,7 +55,7 @@ export async function generateTask (node: DeviceNode|DistributeNode): Promise<vo
 		task.titaniumBuild.deviceId = node.deviceId;
 		task.titaniumBuild.target = node.targetId;
 		if (node.platform === 'ios' && node.target === 'device') {
-			const selectSigning = await yesNoQuestion({ placeHolder: 'Select signing information?' });
+			const selectSigning = await yesNoQuestion({ placeHolder: vscode.l10n.t('Select signing information?') });
 
 			if (selectSigning) {
 				const certificate = await selectiOSCertificate('run');
@@ -71,7 +71,7 @@ export async function generateTask (node: DeviceNode|DistributeNode): Promise<vo
 		task.type = 'titanium-package';
 		task.titaniumBuild.target = node.targetId;
 		if (node.platform === 'ios') {
-			const selectSigning = await yesNoQuestion({ placeHolder: 'Select signing information?' });
+			const selectSigning = await yesNoQuestion({ placeHolder: vscode.l10n.t('Select signing information?') });
 
 			if (selectSigning) {
 				const certificate = await selectiOSCertificate('package');
@@ -83,7 +83,7 @@ export async function generateTask (node: DeviceNode|DistributeNode): Promise<vo
 				};
 			}
 		} else if (node.platform === 'android') {
-			const selectKeystore = await yesNoQuestion({ placeHolder: 'Select keystore information?' });
+			const selectKeystore = await yesNoQuestion({ placeHolder: vscode.l10n.t('Select keystore information?') });
 
 			if (selectKeystore) {
 				const keystoreInfo = await enterAndroidKeystoreInfo(folder);
@@ -105,13 +105,13 @@ export async function generateTask (node: DeviceNode|DistributeNode): Promise<vo
 		const editedContents = jsonc.applyEdits(fileContents, edits);
 		await fs.writeFile(tasksFileLocation, editedContents);
 
-		const choice = await vscode.window.showInformationMessage(`Generated task ${task.label}`, { title: 'Show' });
+		const choice = await vscode.window.showInformationMessage(vscode.l10n.t('Generated task {0}', task.label), { id: 'show', title: vscode.l10n.t('Show') });
 
-		if (choice?.title === 'Show') {
+		if (choice?.id === 'show') {
 			const document = await vscode.workspace.openTextDocument(tasksFileLocation);
 			await vscode.window.showTextDocument(document);
 		}
 	} catch (error) {
-		vscode.window.showErrorMessage(`Failed to generate task ${error}`);
+		vscode.window.showErrorMessage(vscode.l10n.t('Failed to generate task {0}', error as string));
 	}
 }

@@ -34,7 +34,7 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 		const choices = [
 			{
 				id: 'browse',
-				label: 'Browse for location'
+				label: vscode.l10n.t('Browse for location')
 			}
 		];
 
@@ -45,13 +45,13 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 			});
 		}
 
-		const choice = await quickPick(choices, { placeHolder: 'Select an open project to create the keystore in or browse for folder' }, { forceShow: true });
+		const choice = await quickPick(choices, { placeHolder: vscode.l10n.t('Select an open project to create the keystore in or browse for folder') }, { forceShow: true });
 
 		if (choice.id === 'browse') {
 			const selection = await vscode.window.showOpenDialog({ canSelectFolders: true, canSelectFiles: false, canSelectMany: false });
 
 			if (!selection) {
-				await vscode.window.showErrorMessage('No folder was selected');
+				await vscode.window.showErrorMessage(vscode.l10n.t('No folder was selected'));
 				return;
 			}
 
@@ -63,7 +63,7 @@ export async function createKeystore (): Promise<KeystoreInfo> {
 		const keystorePath = path.join(folder, 'keystore');
 
 		if (await fs.pathExists(keystorePath)) {
-			vscode.window.showErrorMessage(`Keystore already exists at ${keystorePath}. Please delete it or choose a new location`);
+			vscode.window.showErrorMessage(vscode.l10n.t('Keystore already exists at {0}. Please delete it or choose a new location', keystorePath));
 			return reject();
 		}
 
