@@ -1,6 +1,6 @@
 import * as utils from '../../utils';
 import { Commands } from '../../commands/common';
-import { commands, QuickPickOptions } from 'vscode';
+import { commands, l10n, QuickPickOptions } from 'vscode';
 import { quickPick, CustomQuickPick } from '../common';
 import { selectAndroidDevice, selectAndroidEmulator } from './android';
 import { selectiOSDevice, selectiOSSimulator } from './ios';
@@ -14,12 +14,12 @@ export interface DeviceQuickPickItem extends CustomQuickPick {
 
 export async function deviceQuickPick (deviceList: DeviceQuickPickItem[], quickPickOptions: QuickPickOptions): Promise<DeviceQuickPickItem> {
 	if (!deviceList.length) {
-		quickPickOptions.placeHolder = `${quickPickOptions.placeHolder}. None detected, refresh device information?`;
+		quickPickOptions.placeHolder = l10n.t('No devices detected, refresh device information?');
 	}
 
 	deviceList.push({
 		id: 'refresh',
-		label: 'Refresh Devices',
+		label: l10n.t('Refresh Devices'),
 		udid: 'refresh'
 	});
 	return quickPick<DeviceQuickPickItem>(deviceList, quickPickOptions, { forceShow: true });

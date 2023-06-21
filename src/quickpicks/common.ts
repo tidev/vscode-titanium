@@ -122,7 +122,7 @@ export async function selectCreationLocation (lastUsed?: string): Promise<Uri> {
 		}
 		return Uri.file(defaultPath);
 	} else if (directory.id === 'enter') {
-		const directory = await inputBox({ placeHolder: 'Enter your path' });
+		const directory = await inputBox({ placeHolder: l10n.t('Enter your path') });
 		if (!await pathExists(directory)) {
 			throw new Error(`${directory} does not exist`);
 		}
@@ -219,7 +219,7 @@ interface FolderDetails {
  * @param {Object} [options.modules=false] - Detect Titanium module projects
  * @returns {Promise<WorkspaceFolder>}
  */
-export async function promptForWorkspaceFolder ({ apps = true, modules = false, placeHolder = 'Please select a folder to perform action within' }: WorkspaceFolderPromptOptions = {}): Promise<FolderDetails> {
+export async function promptForWorkspaceFolder ({ apps = true, modules = false, placeHolder = l10n.t('Please select a folder to perform action within') }: WorkspaceFolderPromptOptions = {}): Promise<FolderDetails> {
 	const folders = await getValidWorkspaceFolders({ apps, modules });
 	if (!folders.length) {
 		throw new Error('No workspace folders are present');

@@ -11,7 +11,7 @@ import { createKeystore } from '../../commands/createKeystore';
 
 export function selectAndroidDevice (): Promise<DeviceQuickPickItem> {
 	const devices = ExtensionContainer.environment.androidDevices().map(({ id, name }: { id: string; name: string }) => ({ id, label: name, udid: id }));
-	return deviceQuickPick(devices, { placeHolder: 'Select Android device' });
+	return deviceQuickPick(devices, { placeHolder: vscode.l10n.t('Select Android device') });
 }
 
 export function selectAndroidEmulator (): Promise<DeviceQuickPickItem>  {
@@ -34,33 +34,33 @@ export function selectAndroidEmulator (): Promise<DeviceQuickPickItem>  {
 		});
 	}
 
-	return deviceQuickPick(options, { placeHolder: 'Select emulator' });
+	return deviceQuickPick(options, { placeHolder: vscode.l10n.t('Select emulator') });
 }
 
 export async function selectAndroidKeystore (workspaceFolder: vscode.WorkspaceFolder, lastUsed?: string, savedKeystorePath?: string): Promise<string|KeystoreInfo> {
 	const items = [
 		{
-			label: 'Browse for keystore',
+			label: vscode.l10n.t('Browse for keystore'),
 			id: 'browse'
 		},
 		{
-			label: 'Create keystore',
+			label: vscode.l10n.t('Create keystore'),
 			id: 'create'
 		}
 	];
 	if (lastUsed) {
 		items.push({
-			label: `Last used ${lastUsed}`,
+			label: vscode.l10n.t('Last used {0}', lastUsed),
 			id: 'last'
 		});
 	}
 	if (savedKeystorePath) {
 		items.push({
-			label: `Saved ${savedKeystorePath}`,
+			label: vscode.l10n.t('Saved {0}', savedKeystorePath),
 			id: 'saved'
 		});
 	}
-	const keystoreAction = await quickPick(items, { placeHolder: 'Browse, create, or use last keystore' });
+	const keystoreAction = await quickPick(items, { placeHolder: vscode.l10n.t('Browse, create, or use last keystore') });
 	if (keystoreAction.id === 'browse') {
 		const uri = await vscode.window.showOpenDialog({ canSelectFolders: false, canSelectMany: false });
 		if (!uri) {
@@ -77,7 +77,7 @@ export async function selectAndroidKeystore (workspaceFolder: vscode.WorkspaceFo
 	} else if (lastUsed) {
 		return lastUsed;
 	} else {
-		throw new Error('No keystore was selected');
+		throw new Error(vscode.l10n.t('No keystore was selected'));
 	}
 }
 
@@ -101,7 +101,7 @@ async function resolveKeystorePath (keystorePath: string, folder: vscode.Workspa
 		return resolvedPath;
 	}
 
-	throw new Error(`Provided keystorePath value "${keystorePath}" does not exist`);
+	throw new Error(vscode.l10n.t('Provided keystorePath value "{0}" does not exist', keystorePath));
 }
 
 /**
@@ -141,14 +141,14 @@ export async function enterAndroidKeystoreInfo (workspaceFolder: vscode.Workspac
 
 	if (storedInformation) {
 		// eslint-disable-next-line promise/catch-or-return
-		vscode.window.showInformationMessage(`Using stored information for ${keystoreInfo.location}. If this is unexpected or your build errors, clear this information using the button below`, 'Delete Information')
+		vscode.window.showInformationMessage(vscode.l10n.t('Using stored information for {0}. If this is unexpected or your build errors, clear this information using the button below', keystoreInfo.location), vscode.l10n.t('Delete Information'))
 			.then(async del => {
 				if (del) {
 					if (!keystoreInfo.location) {
-						return vscode.window.showErrorMessage('No keystore location was provided, so could not delete');
+						return vscode.window.showErrorMessage(vscode.l10n.t('No keystore location was provided, so could not delete'));
 					}
 					await ExtensionContainer.context.secrets.delete(keystoreInfo.location);
-					await vscode.window.showInformationMessage(`Deleted stored information for ${keystoreInfo.location}`);
+					await vscode.window.showInformationMessage(vscode.l10n.t('Deleted stored information for {0}', keystoreInfo.location));
 				}
 				return;
 			});
@@ -157,19 +157,19 @@ export async function enterAndroidKeystoreInfo (workspaceFolder: vscode.Workspac
 	}
 
 	if (!keystoreInfo.alias) {
-		keystoreInfo.alias = await inputBox({ placeHolder: 'Enter your keystore alias', value: ExtensionContainer.config.android.keystoreAlias || '' });
+		keystoreInfo.alias = await inputBox({ placeHolder: vscode.l10n.t('Enter your keystore alias'), value: ExtensionContainer.config.android.keystoreAlias || '' });
 	}
 
 	if (!keystoreInfo.password) {
-		keystoreInfo.password = await enterPassword({ placeHolder: 'Enter your keystore password' });
+		keystoreInfo.password = await enterPassword({ placeHolder: vscode.l10n.t('Enter your keystore password') });
 	}
 
 	if (!keystoreInfo.privateKeyPassword) {
-		keystoreInfo.privateKeyPassword = await enterPassword({ placeHolder: 'Enter your keystore private key password (optional)' });
+		keystoreInfo.privateKeyPassword = await enterPassword({ placeHolder: vscode.l10n.t('Enter your keystore private key password (optional)') });
 	}
 
 	if (!storedInformation) {
-		const store = await yesNoQuestion({ placeHolder: 'Would you like to store this information?' });
+		const store = await yesNoQuestion({ placeHolder: vscode.l10n.t('Would you like to store this information?') });
 
 		if (store) {
 			ExtensionContainer.context.secrets.store(keystoreInfo.location, JSON.stringify(keystoreInfo));
