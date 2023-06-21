@@ -69,7 +69,7 @@ export abstract class TaskHelper {
 		}
 
 		if (!definition.target) {
-			throw new Error('No target provided');
+			throw new Error(vscode.l10n.t('No "target" value provided'));
 		}
 
 		builder.addOption('--target', definition.target);
@@ -92,7 +92,7 @@ export abstract class TaskHelper {
 		}
 
 		if (!definition.target) {
-			throw new Error('No target provided');
+			throw new Error(vscode.l10n.t('No "target" value provided'));
 		}
 
 		builder.addOption('--target', definition.target);
@@ -140,15 +140,15 @@ export abstract class TaskHelper {
 			const defaultOutput = path.join(definition.projectDir, 'dist');
 			const defaultLabel = `Default: ${defaultOutput}`;
 
-			const options = [ defaultLabel, 'Browse' ];
+			const options = [ defaultLabel, vscode.l10n.t('Browse') ];
 
 			if ((definition as AppPackageTaskTitaniumBuildBase).target === 'dist-appstore') {
-				options.push('Output Into Xcode');
+				options.push(vscode.l10n.t('Output Into Xcode'));
 			}
 
 			const selected = await quickPick(options, {
 				canPickMany: false,
-				placeHolder: 'Choose output location'
+				placeHolder: vscode.l10n.t('Choose output location')
 			}, {
 				forceShow: true
 			});
@@ -164,7 +164,7 @@ export abstract class TaskHelper {
 				definition.outputDirectory = defaultOutput;
 			}
 		} else if (!await fs.pathExists(definition.outputDirectory)) {
-			throw new Error(`Provided output directory ${definition.outputDirectory} cannot be found`);
+			throw new Error(vscode.l10n.t('Provided output directory {0} cannot be found', definition.outputDirectory));
 		}
 		if (definition.outputDirectory) {
 			builder.addQuotedOption('--output-dir', definition.outputDirectory);
@@ -173,7 +173,7 @@ export abstract class TaskHelper {
 
 	public async determineProjectType (directory: string, platform: string): Promise<ProjectType> {
 		if (!await fs.pathExists(directory)) {
-			throw new Error(`Project directory ${directory} does not exist`);
+			throw new Error(vscode.l10n.t('Project directory {0} does not exist', directory));
 		}
 
 		if (await fs.pathExists(path.join(directory, 'tiapp.xml'))) {
@@ -181,7 +181,7 @@ export abstract class TaskHelper {
 		} else if (await fs.pathExists(path.join(directory, platform, 'timodule.xml'))) {
 			return 'module';
 		} else {
-			throw new Error(`Unable to determine project type from ${directory}`);
+			throw new Error(vscode.l10n.t('Unable to determine project type from {0}', directory));
 		}
 	}
 
@@ -201,7 +201,7 @@ export abstract class TaskHelper {
 	public getProject(projectDir: string): Project {
 		const project = ExtensionContainer.projects.get(projectDir);
 		if (!project) {
-			throw new Error(`Unable to find loaded project for ${projectDir}, please ensure it is active in the workspace`);
+			throw new Error(vscode.l10n.t('Unable to find loaded project for {0}, please ensure it is active in the workspace', projectDir));
 		}
 		return project;
 	}

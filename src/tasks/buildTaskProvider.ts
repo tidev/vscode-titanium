@@ -157,7 +157,7 @@ export class BuildTaskProvider extends CommandTaskProvider {
 			}
 			return helper.resolveModuleBuildCommandLine(context, task.definition.titaniumBuild);
 		} else {
-			throw new Error(`Unknown project type ${definition.titaniumBuild.projectType}`);
+			throw new Error(vscode.l10n.t('Unknown project type {0}', definition.titaniumBuild.projectType));
 		}
 
 	}
