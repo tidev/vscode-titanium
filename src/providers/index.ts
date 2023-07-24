@@ -144,20 +144,10 @@ export async function generateCompletions (force = false, project: Project): Pro
 		}
 		const sdkPath = sdkInfo.path;
 		// Generate the completions
-		const [ alloy, sdk ] = await Promise.all([
+		await Promise.all([
 			completion.generateAlloyCompletions(force, CompletionsFormat),
 			completion.generateSDKCompletions(force, sdkVersion, sdkPath, CompletionsFormat)
 		]);
-		if (sdk || alloy) {
-			let message = 'Autocomplete suggestions generated for';
-			if (sdk) {
-				message = `${message} Titanium ${sdk}`;
-			}
-			if (alloy) {
-				message = `${message} Alloy ${alloy}`;
-			}
-			vscode.window.showInformationMessage(message);
-		}
 	} catch (error) {
 		const actions: InteractionChoice[] = [];
 		if (error instanceof Errors.CustomError && error.code === 'ESDKNOTINSTALLED') {
