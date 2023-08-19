@@ -11,6 +11,7 @@ import { Platform } from '../types/common';
 import { Command } from './commandBuilder';
 import { getValidWorkspaceFolders, promptForWorkspaceFolder } from '../quickpicks';
 import { ExtensionContainer } from '../container';
+import { DevelopmentTarget } from '../types/cli';
 
 export interface BuildTask extends TitaniumTaskBase {
 	definition: BuildTaskDefinitionBase;
@@ -43,7 +44,7 @@ export interface BuildTaskTitaniumBuildBase extends TitaniumBuildBase {
 
 export interface AppBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBase {
 	deviceId?: string;
-	target?: 'device' | 'emulator' | 'simulator';
+	target?: DevelopmentTarget;
 	projectType?: 'app';
 	liveview?: boolean;
 	deployType?: 'development' | 'test';
@@ -53,7 +54,7 @@ export interface AppBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBas
 
 export interface ModuleBuildTaskTitaniumBuildBase extends BuildTaskTitaniumBuildBase {
 	deviceId?: string;
-	target?: 'device' | 'emulator' | 'simulator';
+	target?: DevelopmentTarget;
 	projectType?: 'module';
 }
 

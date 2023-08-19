@@ -9,6 +9,7 @@ import { TreeItemCollapsibleState } from 'vscode';
 import { Platform, PlatformPretty } from '../../../types/common';
 import { nameForPlatform } from '../../../utils';
 import { ExtensionContainer } from '../../../container';
+import { DeviceNode } from './deviceNode';
 
 export class PlatformNode extends BaseNode {
 
@@ -77,8 +78,10 @@ export class PlatformNode extends BaseNode {
 				return [
 					new TargetNode('Device', this.platform),
 					new TargetNode('Simulator', this.platform),
+					new DeviceNode('macOS', this.platform, 'macos', '', 'macos'),
 					new DistributeNode('Ad Hoc', this.platform, this.label, 'dist-adhoc'),
-					new DistributeNode('App Store', this.platform, this.label, 'dist-appstore')
+					new DistributeNode('App Store', this.platform, this.label, 'dist-appstore'),
+					new DistributeNode('macOS App Store', this.platform, this.label, 'dist-macappstore'),
 
 				];
 			default:

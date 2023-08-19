@@ -111,13 +111,15 @@ export abstract class TaskHelper {
 				builder.addFlag('--build-only');
 			}
 
-			if (!definition.deviceId) {
+			if (definition.target !== 'macos' && !definition.deviceId) {
 				const simulatorVersion = definition.ios ? (definition as IosBuildTaskTitaniumBuildBase).ios.simulatorVersion : undefined;
 				const deviceInfo = await selectDevice(definition.platform, definition.target, simulatorVersion);
 				definition.deviceId = deviceInfo.udid;
 			}
 
-			builder.addOption('--device-id', definition.deviceId);
+			if (definition.deviceId) {
+				builder.addOption('--device-id', definition.deviceId);
+			}
 		}
 
 		const project = this.getProject(definition.projectDir);
