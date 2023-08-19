@@ -78,10 +78,10 @@ export class PlatformNode extends BaseNode {
 				return [
 					new TargetNode('Device', this.platform),
 					new TargetNode('Simulator', this.platform),
-					new DeviceNode('Mac OS', this.platform, 'macos', '', 'macos'),
+					new DeviceNode('macOS', this.platform, 'macos', '', 'macos'),
 					new DistributeNode('Ad Hoc', this.platform, this.label, 'dist-adhoc'),
 					new DistributeNode('App Store', this.platform, this.label, 'dist-appstore'),
-					new DistributeNode('MacOS App Store', this.platform, this.label, 'dist-macappstore'),
+					new DistributeNode('macOS App Store', this.platform, this.label, 'dist-macappstore'),
 
 				];
 			default:
