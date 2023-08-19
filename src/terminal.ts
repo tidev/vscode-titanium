@@ -1,5 +1,5 @@
 import { spawn, SpawnOptions } from 'child_process';
-import { Terminal as VSTerminal, window } from 'vscode';
+import { l10n, Terminal as VSTerminal, window } from 'vscode';
 import { CommandError, CommandResponse } from './common/utils';
 
 export default class Terminal {
@@ -56,7 +56,7 @@ export default class Terminal {
 
 			proc.on('close', code => {
 				if (code) {
-					const error = new CommandError('Failed to run command', `${command} ${args.join(' ')}`, code, output);
+					const error = new CommandError(l10n.t('Failed to run command'), `${command} ${args.join(' ')}`, code, output);
 					return reject(error);
 				}
 				return resolve({ output });

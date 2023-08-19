@@ -9,6 +9,7 @@ import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTask
 import { WorkspaceState } from '../../constants';
 
 import { ExtensionContainer } from '../../container';
+import { l10n } from 'vscode';
 
 export interface IosTitaniumBuildDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: IosBuildTaskTitaniumBuildBase;
@@ -55,7 +56,7 @@ export class IosHelper extends TaskHelper {
 			}
 
 			if (!certificate) {
-				throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
+				throw new Error(l10n.t('Unable to find certificate {0}', iosInfo.certificate as string));
 			}
 
 			iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], 'developer');
@@ -65,7 +66,7 @@ export class IosHelper extends TaskHelper {
 			}
 
 			if (!iosInfo.provisioningProfile) {
-				throw new Error(`Unable to find valid provisioning profile for ${iosInfo.certificate}`);
+				throw new Error(l10n.t('Unable to find valid provisioning profile for {0}', iosInfo.certificate));
 			}
 
 			definition.ios = iosInfo;
@@ -97,7 +98,7 @@ export class IosHelper extends TaskHelper {
 		}
 
 		if (!certificate) {
-			throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
+			throw new Error(l10n.t('Unable to find certificate {0}', iosInfo.certificate));
 		}
 
 		iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], 'distribution');
@@ -107,7 +108,7 @@ export class IosHelper extends TaskHelper {
 		}
 
 		if (!iosInfo.provisioningProfile) {
-			throw new Error(`Unable to find valid provisioning profile for ${iosInfo.certificate}`);
+			throw new Error(l10n.t('Unable to find valid provisioning profile for {0}', iosInfo.certificate));
 		}
 
 		definition.ios = iosInfo;

@@ -51,7 +51,7 @@ export class ViewHoverProvider extends BaseProvider implements vscode.HoverProvi
 				filter: item => item.stats.isDirectory() || fileNameRegExp.test(item.path)
 			});
 			let imageFile;
-			let imageString = 'Image not found';
+			let imageString = vscode.l10n.t('Image not found');
 			if (files.length > 0) {
 				imageFile = files[0];
 				imageString = `![${imageFile.path}](${imageFile.path}|height=100)`;

@@ -42,10 +42,10 @@ async function spawnCommand (command: string, args: string[], options: cp.SpawnO
 			}
 
 			if (token && token.isCancellationRequested) {
-				return reject(new Error('user cancelled'));
+				return reject(new Error(vscode.l10n.t('user cancelled')));
 			} else if (code) {
 				// throw nice error
-				const error = new CommandError(`Process exited with ${code}`, command, code, output, signal);
+				const error = new CommandError(vscode.l10n.t('Process exited with {0}', code), command, code, output, signal);
 
 				return reject(error);
 			}
@@ -164,7 +164,7 @@ export class TaskPseudoTerminal implements vscode.Pseudoterminal {
 	private getProject (projectDir: string): vscode.WorkspaceFolder {
 		const workspaceFolder = vscode.workspace.workspaceFolders?.find(folder => folder.uri.fsPath === projectDir);
 		if (!workspaceFolder) {
-			throw new Error(`Unable to resolve workspace folder for ${projectDir}`);
+			throw new Error(vscode.l10n.t('Unable to resolve workspace folder for {0}', projectDir));
 		}
 		return workspaceFolder;
 	}

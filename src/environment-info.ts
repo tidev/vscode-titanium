@@ -7,6 +7,7 @@ import { AndroidEmulator, EnvironmentInfo, IosDevice, IosSimulator, TitaniumSDK,
 import { iOSProvisioningProfileMatchesAppId } from './utils';
 import { GlobalState } from './constants';
 import { InteractionError } from './commands';
+import { l10n } from 'vscode';
 
 export class Environment {
 
@@ -32,9 +33,9 @@ export class Environment {
 			proc.on('close', (code) => {
 				ExtensionContainer.context.globalState.update(GlobalState.RefreshEnvironment, false);
 				if (code) {
-					const error = new InteractionError('Failed to get environment information');
+					const error = new InteractionError(l10n.t('Failed to get environment information'));
 					error.interactionChoices.push({
-						title: 'View Error',
+						title: l10n.t('View Error'),
 						run() {
 							ExtensionContainer.outputChannel.append(output);
 							ExtensionContainer.outputChannel.show();

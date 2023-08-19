@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as related from '../../related';
-import { TextDocument } from 'vscode';
+import { TextDocument, l10n } from 'vscode';
 import { ExtensionContainer } from '../../container';
 import { Project } from '../../project';
 
@@ -36,7 +36,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return new RegExp(`["']\\.${text}["'[]`, 'g');
 		},
 		title (fileName: string): string {
-			return `Generate style (${fileName})`;
+			return l10n.t('Generate style ({0})', fileName);
 		},
 		insertText (text: string): string {
 			// eslint-disable-next-line no-template-curly-in-string
@@ -55,7 +55,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return new RegExp(`["']#${text}["'[]`, 'g');
 		},
 		title (fileName: string): string {
-			return `Generate style (${fileName})`;
+			return l10n.t('Generate style ({0})', fileName);
 		},
 		insertText (text: string): string {
 			// eslint-disable-next-line no-template-curly-in-string
@@ -74,7 +74,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return new RegExp(`["']${text}`, 'g');
 		},
 		title (fileName: string): string {
-			return `Generate style (${fileName})`;
+			return l10n.t('Generate style ({0})', fileName);
 		},
 		insertText (text: string): string|undefined {
 			if ([ 'Alloy', 'Annotation', 'Collection', 'Menu', 'Model', 'Require', 'Widget' ].indexOf(text) !== -1
@@ -97,7 +97,7 @@ export const viewSuggestions: DefinitionSuggestion[] = [
 			return new RegExp(`(?:function ${text}\\s*?\\(|(?:var|let|const)\\s*?${text}\\s*?=\\s*?\\()`);
 		},
 		title (fileName: string): string {
-			return `Generate function (${fileName})`;
+			return l10n.t('Generate function ({0})', fileName);
 		},
 		insertText (text: string): string {
 			// eslint-disable-next-line no-template-curly-in-string

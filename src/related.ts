@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as utils from './utils';
 
-import { Uri, window, TextEditor, TextDocument } from 'vscode';
+import { Uri, window, TextEditor, TextDocument, l10n } from 'vscode';
 import { ExtensionContainer } from './container';
 import { Project } from './project';
 import { handleInteractionError, InteractionError } from './commands';
@@ -23,19 +23,19 @@ const alloyDirectoryMap: { [key: string]: string } = {
  */
 export async function getTargetPath (project: Project, type: string, currentFilePath = window.activeTextEditor?.document.fileName): Promise<string> {
 	if (!currentFilePath) {
-		throw new InteractionError('No active edtor');
+		throw new InteractionError(l10n.t('No active edtor'));
 	}
 
 	const alloyRootPath = path.join(project.filePath, 'app');
 
 	if (!currentFilePath.includes(alloyRootPath)) {
-		throw new InteractionError('File is not part of an Alloy project');
+		throw new InteractionError(l10n.t('File is not part of an Alloy project'));
 	}
 
 	const pathUnderAlloy = path.relative(alloyRootPath, currentFilePath);
 
 	if (!/^(controllers|styles|views|widgets)/.test(pathUnderAlloy)) {
-		throw new InteractionError('File is not a controller, style, view or widget');
+		throw new InteractionError(l10n.t('File is not a controller, style, view or widget'));
 	}
 
 	const pathSplitArr = pathUnderAlloy.split(path.sep);
@@ -62,7 +62,7 @@ export async function getTargetPath (project: Project, type: string, currentFile
 		}
 	}
 
-	throw new InteractionError('Unable to find related file');
+	throw new InteractionError(l10n.t('Unable to find related file'));
 }
 
 /**
@@ -74,7 +74,7 @@ export async function getTargetPath (project: Project, type: string, currentFile
  */
 export async function openRelatedFile (type: string, project?: Project): Promise<TextEditor|undefined> {
 	if (!window.activeTextEditor) {
-		window.showErrorMessage('No active editor');
+		window.showErrorMessage(l10n.t('No active editor'));
 		return;
 	}
 

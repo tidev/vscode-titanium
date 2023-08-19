@@ -77,8 +77,8 @@ export async function buildApplication (node?: DeviceNode | OSVerNode | Platform
 	} catch (error) {
 		if (error instanceof InteractionError) {
 			await handleInteractionError(error);
-			const choice = await vscode.window.showErrorMessage('Build App failed', { title: 'Rerun' });
-			if (choice?.title === 'Rerun') {
+			const choice = await vscode.window.showErrorMessage(vscode.l10n.t('Build App failed'), { id: 'rerun', title: vscode.l10n.t('Rerun') });
+			if (choice?.id === 'rerun') {
 				buildApplication(node);
 			}
 		}

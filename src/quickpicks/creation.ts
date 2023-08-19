@@ -47,11 +47,11 @@ export async function selectCodeBases(platforms: string[]): Promise<CodeBase|und
 	}
 
 	if (platforms.includes('android')) {
-		codeBases.android = (await quickPick<AndroidCodeBaseQuickPickItem>([ { id: 'java', label: 'Java' }, { id: 'kotlin', label: 'Kotlin' } ], { canPickMany: false, placeHolder: 'Select Android codebase' })).id;
+		codeBases.android = (await quickPick<AndroidCodeBaseQuickPickItem>([ { id: 'java', label: 'Java' }, { id: 'kotlin', label: 'Kotlin' } ], { canPickMany: false, placeHolder: l10n.t('Select Android codebase') })).id;
 	}
 
 	if (platforms.includes('ios')) {
-		codeBases.ios = (await quickPick<iOSCodeBaseQuickPickItem>([ { id: 'objc', label: 'Objective-C' }, { id: 'swift', label: 'Swift' } ], { canPickMany: false, placeHolder: 'Select iOS codebase' })).id;
+		codeBases.ios = (await quickPick<iOSCodeBaseQuickPickItem>([ { id: 'objc', label: 'Objective-C' }, { id: 'swift', label: 'Swift' } ], { canPickMany: false, placeHolder: l10n.t('Select iOS codebase') })).id;
 
 	}
 

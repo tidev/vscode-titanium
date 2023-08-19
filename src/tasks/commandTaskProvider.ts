@@ -13,9 +13,9 @@ function getPlatform (task: TitaniumTaskBase): Platform {
 	} else if (task.definition.titaniumBuild.platform === 'ios' || task.definition.titaniumBuild.ios !== undefined) {
 		return 'ios';
 	} else if (task.definition.titaniumBuild.platform) {
-		throw new Error(`Unknown platform ${task.definition.titaniumBuild.platform}`);
+		throw new Error(vscode.l10n.t('Unknown platform {0}', task.definition.titaniumBuild.platform));
 	} else {
-		throw new Error('Invalid configuration, please specify a platform');
+		throw new Error(vscode.l10n.t('Invalid configuration, please specify a platform'));
 	}
 }
 
@@ -68,13 +68,13 @@ export abstract class CommandTaskProvider implements vscode.TaskProvider {
 
 			await this.executeTaskInternal(context, task);
 		} catch (error) {
-			let message = 'Error running task';
+			let message = vscode.l10n.t('Error running task');
 			if (error instanceof CommandError) {
 				message = error.message;
 			} else if (error instanceof InteractionError) {
 				await handleInteractionError(error);
 			} else if (error instanceof UserCancellation) {
-				context.terminal.writeWarningLine('Task cancelled as no selection occurred');
+				context.terminal.writeWarningLine(vscode.l10n.t('Task cancelled as no selection occurred'));
 				return 0;
 			} else if (error instanceof Error) {
 				message = `${message}\n${error.message}`;

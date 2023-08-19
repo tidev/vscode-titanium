@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
-import { window, workspace } from 'vscode';
+import { l10n, window, workspace } from 'vscode';
 import { inputBox, quickPick } from '../quickpicks';
 import { capitalizeFirstLetter } from '../utils';
 import { UserCancellation } from './common';
@@ -57,7 +57,7 @@ export interface AlloyModelGenerateOptions {
 
 async function promptForDetails (type: AlloyComponentType, folder: AlloyComponentFolder, extension: AlloyComponentExtension):
 Promise<{ cwd: string; filePaths: string[]; name: string; type: AlloyComponentType }> {
-	const name = await inputBox({ prompt: `Enter the name for your ${type}` });
+	const name = await inputBox({ prompt: l10n.t('Enter the name for your {0}', type) });
 
 	const { folder: workspaceFolder } = await promptForWorkspaceFolder();
 	const cwd = workspaceFolder.uri.fsPath;
@@ -73,7 +73,7 @@ Promise<{ cwd: string; filePaths: string[]; name: string; type: AlloyComponentTy
 		filePaths.push(mainFile);
 	}
 	if (await fs.pathExists(mainFile)) {
-		const shouldDelete = await quickPick([ { id: 'yes', label: 'Yes' }, { id: 'no', label: 'No' } ], { placeHolder: `${name} already exists. Overwrite it?` });
+		const shouldDelete = await quickPick([ { id: 'yes', label: l10n.t('Yes') }, { id: 'no', label: l10n.t('No') } ], { placeHolder: l10n.t('{0} already exists. Overwrite it?') });
 		if (shouldDelete.id === 'no') {
 			throw new UserCancellation();
 		}
@@ -95,7 +95,7 @@ export async function generateComponent (type: Exclude<AlloyComponentType, Alloy
 			name,
 			force: true
 		});
-		const shouldOpen = await window.showInformationMessage(`${capitalizeFirstLetter(type)} ${name} created successfully`, { title: 'Open' });
+		const shouldOpen = await window.showInformationMessage(l10n.t('{0} {name} created successfully', capitalizeFirstLetter(type), name), { title: l10n.t('Open') });
 		if (shouldOpen) {
 			for (const file of filePaths) {
 				const document = await workspace.openTextDocument(file);
@@ -107,7 +107,7 @@ export async function generateComponent (type: Exclude<AlloyComponentType, Alloy
 		if (error instanceof UserCancellation) {
 			return;
 		}
-		window.showErrorMessage(`Failed to create Alloy ${type} ${name}`);
+		window.showErrorMessage(l10n.t('Failed to create Alloy {0} {1}', type, name as string));
 	}
 }
 
@@ -115,7 +115,7 @@ export async function generateModel (): Promise<void> {
 	let name;
 	try {
 		const creationArgs = await promptForDetails(AlloyComponentType.Model, AlloyComponentFolder.Model, AlloyComponentExtension.Model);
-		const adapterType = await quickPick([ { id: 'properties', label: 'properties' }, { id: 'sql', label: 'sql' } ], { canPickMany: false, placeHolder: 'Which adapter type?' });
+		const adapterType = await quickPick([ { id: 'properties', label: 'properties' }, { id: 'sql', label: 'sql' } ], { canPickMany: false, placeHolder: l10n.t('Which adapter type?') });
 		const cwd = creationArgs.cwd;
 		const filePaths = creationArgs.filePaths;
 		name = creationArgs.name;
@@ -126,7 +126,7 @@ export async function generateModel (): Promise<void> {
 			name,
 			force: true
 		});
-		const shouldOpen = await window.showInformationMessage(`${capitalizeFirstLetter(AlloyComponentType.Model)} ${name} created successfully`, { title: 'Open' });
+		const shouldOpen = await window.showInformationMessage(l10n.t('{0} {1} created successfully', capitalizeFirstLetter(AlloyComponentType.Model), name), { title: l10n.t('Open') });
 		if (shouldOpen) {
 			for (const file of filePaths) {
 				const document = await workspace.openTextDocument(file);
@@ -137,7 +137,7 @@ export async function generateModel (): Promise<void> {
 		if (error instanceof UserCancellation) {
 			return;
 		}
-		window.showErrorMessage(`Failed to create Alloy ${AlloyComponentType.Model} ${name}`);
+		window.showErrorMessage(l10n.t('Failed to create Alloy {0} {1}', AlloyComponentType.Model, name as string));
 	}
 }
 

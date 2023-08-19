@@ -7,6 +7,7 @@ import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, ModuleBuildTask
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
 import { ExtensionContainer } from '../../container';
+import { l10n } from 'vscode';
 
 export interface AndroidBuildTaskDefinition extends BuildTaskDefinitionBase {
 	titaniumBuild: AndroidBuildTaskTitaniumBuildBase;
@@ -38,7 +39,7 @@ export class AndroidHelper extends TaskHelper {
 		if (definition.debug) {
 			const port = definition.debugPort || ExtensionContainer.debugPorts.get(definition.projectDir);
 			if (!port) {
-				throw new Error(`Failed to find debug port associated with ${definition.projectDir}. Please try setting a "port" property in the configuration.`);
+				throw new Error(l10n.t('Failed to find debug port associated with {0}. Please try setting a "port" property in the configuration.', definition.projectDir));
 			}
 			builder.addOption('--debug-host', `/localhost:${port}`);
 		}

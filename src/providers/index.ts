@@ -105,9 +105,9 @@ export async function generateCompletions (force = false, project: Project): Pro
 	try {
 		sdkVersion = project.sdk();
 		if (!sdkVersion) {
-			const error = new InteractionError('Errors found in tiapp.xml: no sdk-version found');
+			const error = new InteractionError(vscode.l10n.t('Errors found in tiapp.xml: no sdk-version found'));
 			error.interactionChoices.push({
-				title: 'Open tiapp.xml',
+				title: vscode.l10n.t('Open tiapp.xml'),
 				run: async () => {
 					const file = path.join(project.filePath, 'tiapp.xml');
 					const document = await vscode.workspace.openTextDocument(file);
@@ -116,9 +116,9 @@ export async function generateCompletions (force = false, project: Project): Pro
 			});
 			throw error;
 		} else if (sdkVersion.length > 1) {
-			const error = new InteractionError('Errors found in tiapp.xml: multiple sdk-version tags found.');
+			const error = new InteractionError(vscode.l10n.t('Errors found in tiapp.xml: multiple sdk-version tags found.'));
 			error.interactionChoices.push({
-				title: 'Open tiapp.xml',
+				title: vscode.l10n.t('Open tiapp.xml'),
 				run: async () => {
 					const file = path.join(project.filePath, 'tiapp.xml');
 					const document = await vscode.workspace.openTextDocument(file);
@@ -154,7 +154,7 @@ export async function generateCompletions (force = false, project: Project): Pro
 			actions.push({
 				title: 'Install',
 				run: () => {
-					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: 'Titanium SDK Installation', cancellable: false }, async () => {
+					vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title: vscode.l10n.t('Titanium SDK Installation'), cancellable: false }, async () => {
 						try {
 							await updates.titanium.sdk.installUpdate(sdkVersion as string);
 							await ExtensionContainer.environment.getInfo();
@@ -167,7 +167,7 @@ export async function generateCompletions (force = false, project: Project): Pro
 			});
 		}
 		const message = error instanceof Error ? error.message : '';
-		const install = await vscode.window.showErrorMessage(`Error generating autocomplete suggestions. ${message}`, ...actions);
+		const install = await vscode.window.showErrorMessage(vscode.l10n.t('Error generating autocomplete suggestions. {0}', message), ...actions);
 		if (install) {
 			await install.run();
 		}

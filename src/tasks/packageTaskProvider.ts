@@ -6,6 +6,7 @@ import { selectDistributionTarget } from '../quickpicks/build/common';
 import { DeploymentTarget } from '../types/cli';
 import { Command } from './commandBuilder';
 import { promptForWorkspaceFolder } from '../quickpicks';
+import { l10n } from 'vscode';
 
 export interface PackageTask extends TitaniumTaskBase {
 	definition: PackageTaskDefinitionBase;
@@ -70,7 +71,7 @@ export class PackageTaskProvider extends CommandTaskProvider {
 			definition.titaniumBuild.projectDir = path.join(definition.titaniumBuild.projectDir, definition.titaniumBuild.platform);
 			return helper.resolveModulePackageCommandLine(context, definition.titaniumBuild);
 		} else {
-			throw new Error(`Unknown project type ${definition.projectType}`);
+			throw new Error(l10n.t('Unknown project type {0}', definition.projectType));
 		}
 	}
 

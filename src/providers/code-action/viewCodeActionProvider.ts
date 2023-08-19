@@ -50,7 +50,7 @@ export class ViewCodeActionProvider extends BaseProvider implements vscode.CodeA
 					}
 				} else if (!definitions?.length && suggestion.i18nString) {
 					codeActions.push({
-						title: 'Generate i18n string',
+						title: vscode.l10n.t('Generate i18n string'),
 						command: Commands.InsertI18nStringCommandId,
 						arguments: [ word, project ]
 					});
