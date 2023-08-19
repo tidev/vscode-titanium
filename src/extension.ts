@@ -133,6 +133,13 @@ export async function startup (): Promise<void> {
 			return;
 		}
 
+		// Generate completions for all SDK versions in app projects
+		for (const [ , project ] of ExtensionContainer.projects) {
+			if (project.type === 'app') {
+				await generateCompletions(false, project);
+			}
+		}
+
 		// Call refresh incase the Titanium Explorer activity pane became active before info
 		vscode.commands.executeCommand(Commands.RefreshExplorer);
 
