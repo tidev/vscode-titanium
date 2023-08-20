@@ -1,6 +1,6 @@
 {
   "name": "titanium-sdk",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",
   "icon": "images/logo-titanium.png",

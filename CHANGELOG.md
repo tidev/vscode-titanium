@@ -1,3 +1,18 @@
+# [1.2.0](https://github.com/tidev/vscode-titanium/compare/v1.1.0...v1.2.0) (2023-08-20)
+
+
+### Bug Fixes
+
+* more de strings ([#1159](https://github.com/tidev/vscode-titanium/issues/1159)) ([4aace01](https://github.com/tidev/vscode-titanium/commit/4aace01b542bc1ffd9e9d0cb9ddd08a97dba7c3b))
+* **providers:** always generate completion data after info load ([#1171](https://github.com/tidev/vscode-titanium/issues/1171)) ([4688458](https://github.com/tidev/vscode-titanium/commit/4688458b203abb57f362c96ef9b9fd7edee5376f)), closes [#1165](https://github.com/tidev/vscode-titanium/issues/1165)
+
+
+### Features
+
+* **explorer/build:** allow building modules to specific targets ([#1000](https://github.com/tidev/vscode-titanium/issues/1000)) ([4af0313](https://github.com/tidev/vscode-titanium/commit/4af031317a57ea90177c8917969801a5c977ce15))
+* support building for macos ([#1130](https://github.com/tidev/vscode-titanium/issues/1130)) ([5a269a8](https://github.com/tidev/vscode-titanium/commit/5a269a89188b2013ca807ec686b161c31b261bb1)), closes [#1129](https://github.com/tidev/vscode-titanium/issues/1129)
+* support German language ([#1148](https://github.com/tidev/vscode-titanium/issues/1148)) ([42da08d](https://github.com/tidev/vscode-titanium/commit/42da08d63a77ba190a3cdb146b942d96b98d2614))
+
 # [1.1.0](https://github.com/tidev/vscode-titanium/compare/v1.0.1...v1.1.0) (2023-04-19)
 
 
