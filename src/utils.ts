@@ -85,6 +85,8 @@ export function nameForTarget (target: Target): PrettyTarget {
 			return 'Ad-Hoc';
 		case 'dist-appstore':
 			return 'App Store';
+		case 'dist-macappstore':
+			return 'App Store';	
 		case 'dist-playstore':
 			return 'Play Store';
 		default:
@@ -121,7 +123,7 @@ export function targetsForPlatform (platformName: Platform): Target[] {
 		case 'android':
 			return [ 'emulator', 'device', 'dist-playstore' ];
 		case 'ios':
-			return [ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ];
+			return [ 'simulator', 'device', 'dist-adhoc', 'dist-appstore', 'dist-macappstore' ];
 		default:
 			return [];
 	}

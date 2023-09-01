@@ -27,7 +27,7 @@ export async function selectiOSProvisioningProfile (certificate: IosCert, target
 	let deployment: IosProvisioningType = 'development';
 	if (target === 'dist-adhoc') {
 		deployment = 'distribution';
-	} else if (target === 'dist-appstore') {
+	} else if (target === 'dist-appstore' || target === 'dist-macappstore') {
 		deployment = 'appstore';
 	}
 	const profiles = ExtensionContainer.environment.iOSProvisioningProfiles(deployment, certificate, appId);
