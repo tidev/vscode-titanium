@@ -81,10 +81,14 @@ export function nameForTarget (target: Target): PrettyTarget {
 		case 'emulator':
 		case 'simulator':
 			return capitalizeFirstLetter(target) as PrettyDevelopmentTarget;
+		case 'macos':
+			return 'macOS';
 		case 'dist-adhoc':
 			return 'Ad-Hoc';
 		case 'dist-appstore':
 			return 'App Store';
+		case 'dist-macappstore':
+			return 'macOS App Store';
 		case 'dist-playstore':
 			return 'Play Store';
 		default:
@@ -107,6 +111,8 @@ export function targetForName (name: PrettyTarget): Target {
 			return 'dist-appstore';
 		case 'play store':
 			return 'dist-playstore';
+		case 'macos app store':
+			return 'dist-macappstore';
 		case 'device':
 		case 'emulator':
 		case 'simulator':
@@ -121,7 +127,7 @@ export function targetsForPlatform (platformName: Platform): Target[] {
 		case 'android':
 			return [ 'emulator', 'device', 'dist-playstore' ];
 		case 'ios':
-			return [ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ];
+			return [ 'simulator', 'device', 'macos', 'dist-adhoc', 'dist-appstore', 'dist-macappstore' ];
 		default:
 			return [];
 	}

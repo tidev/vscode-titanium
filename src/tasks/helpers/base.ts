@@ -142,7 +142,7 @@ export abstract class TaskHelper {
 
 			const options = [ defaultLabel, 'Browse' ];
 
-			if ((definition as AppPackageTaskTitaniumBuildBase).target === 'dist-appstore') {
+			if ((definition as AppPackageTaskTitaniumBuildBase).target === 'dist-appstore' || (definition as AppPackageTaskTitaniumBuildBase).target === 'dist-macappstore') {
 				options.push('Output Into Xcode');
 			}
 
