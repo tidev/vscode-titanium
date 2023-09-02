@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/tidev/vscode-titanium/compare/v1.2.0...v1.2.1) (2023-09-02)
+
+
+### Bug Fixes
+
+* **build/ios:** add macOS targets to quickpicks ([#1173](https://github.com/tidev/vscode-titanium/issues/1173)) ([cdd570e](https://github.com/tidev/vscode-titanium/commit/cdd570e357e22f615e7ec8d3fd21ae9d2e80d020))
+
 # [1.2.0](https://github.com/tidev/vscode-titanium/compare/v1.1.0...v1.2.0) (2023-08-20)
 
 
