@@ -48,6 +48,7 @@ This extension makes the following commands available in the Command Palette to 
 | `Titanium: Open related style` | Open related style |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>s</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>s</kbd> |
 | `Titanium: Open related controller` | Open related controller |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>x</kbd> |
 | `Titanium: Open related files` | Open related files |  Mac: <kbd>cmd</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> <br> Windows/Linux: <kbd>ctrl</kbd>+<kbd>alt</kbd>+<kbd>a</kbd> |
+| `Titanium: Fix environment issues` | Fix environment issues | - |
 | `Titanium: Check For Updates` | Check For Updates | - |
 | `Titanium: Install All Updates` | Install All Updates | - |
 | `Titanium: Select Updates` | Select Updates | - |

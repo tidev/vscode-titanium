@@ -2,6 +2,7 @@ const ejs = require('ejs');
 const fs = require('fs-extra');
 const packageJson = require('../package.json');
 const path = require('path');
+const strings = fs.readJSONSync(path.join(__dirname, '..', 'package.nls.json'));
 
 const renderObject = {
 	commands: generateCommands(),
@@ -40,8 +41,8 @@ function generateCommands() {
 			continue;
 		}
 		commandInformation.push({
-			name: `\`${category}: ${title}\``,
-			description: description || title,
+			name: `\`${category}: ${getEnglishl10nValue(title)}\``,
+			description: getEnglishl10nValue(description || title),
 			keybinding
 		});
 
@@ -56,7 +57,7 @@ function generateSettings() {
 		const defaultValue = settingInfo.default === null || settingInfo.default.length === 0 ? 'No Default' : settingInfo.default;
 		settingsInformation.push({
 			name: `\`${name}\``,
-			description: settingInfo.description,
+			description: getEnglishl10nValue(settingInfo.description),
 			defaultValue: `\`${defaultValue}\``
 		});
 	}
@@ -104,7 +105,7 @@ function generateSnippets() {
 		for (const { description, prefix } of Object.values(snippetDefinitions)) {
 			snippetInfo.push({
 				prefix: `\`${prefix}\``,
-				description
+				description: description
 			});
 		}
 		if (description.includes('Titanium')) {
@@ -127,7 +128,7 @@ function generateDebugProperties () {
 	for (const [ name, information ] of Object.entries(properties)) {
 		debuggingInformation.launch.push({
 			name,
-			description: information.description,
+			description: getEnglishl10nValue(information.description),
 			defaultValue: information.defaultValue,
 			required: required.includes(name)
 		});
@@ -186,7 +187,7 @@ function recurseProperties(properties, platform, taskType, propertyPrefix = 'tit
 		}
 		propertyData.push({
 			name: `\`${propertyPrefix}.${name}\``,
-			description: information.description,
+			description: getEnglishl10nValue(information.description),
 			defaultValue: information.defaultValue,
 			validValues: information.enum ? information.enum.map(value => `\`${value}\``).join(', ') : 'N/A'
 		});
@@ -195,4 +196,13 @@ function recurseProperties(properties, platform, taskType, propertyPrefix = 'tit
 		return `There are no ${platform} specific configuration properties for the ${taskType} task.`;
 	}
 	return propertyData;
+}
+
+function getEnglishl10nValue(name) {
+	const val = strings[name.replaceAll('%', '')];
+	if (!val) {
+		console.warn(`Failed to lookup ${name} in package.nls.json`);
+		return '';
+	}
+	return val;
 }
