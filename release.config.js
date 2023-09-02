@@ -9,7 +9,12 @@ module.exports = {
 				packageVsix: true
 			}
 		],
-		'@semantic-release/git',
+		[
+			'@semantic-release/git',
+			{
+				assets: [ 'doc/', 'README.md', 'CHANGELOG.md', 'package.json', 'package-lock.json' ]
+			}
+		],
 		[
 			'@semantic-release/github',
 			{
