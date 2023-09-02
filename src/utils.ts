@@ -86,7 +86,7 @@ export function nameForTarget (target: Target): PrettyTarget {
 		case 'dist-appstore':
 			return 'App Store';
 		case 'dist-macappstore':
-			return 'App Store';	
+			return 'macOS App Store';
 		case 'dist-playstore':
 			return 'Play Store';
 		default:
