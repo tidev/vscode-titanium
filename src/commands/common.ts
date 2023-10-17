@@ -16,6 +16,7 @@ export enum Commands {
 	Debug = 'titanium.build.debug',
 	DisableLiveView = 'titanium.build.setLiveViewDisabled',
 	EnableLiveView = 'titanium.build.setLiveViewEnabled',
+	ExtractStyle = 'titanium.extractToTss',
 	FixEnvironmentIssues = 'titanium.environment.fixIssues',
 	GenerateAlloyController = 'titanium.alloy.generate.controller',
 	GenerateAlloyMigration = 'titanium.alloy.generate.migration',
