@@ -105,13 +105,13 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			contents = document.lineAt(selection.start.line).text;
 		}
 
-		const lineMatches = contents.match(/(\s+)?(?:<(\w+))? ?((?:\w+="[\w./]+" ?)+)(?:(\/?>|>.*<\/\w+>)?)/);
+		const lineMatches = contents.match(/(\s+)?(?:<(\w+))? ?((?:[.\w]+="[\w./]+" ?)+)(?:(\/>|>(?:.*<\/\w+>)?)?)/);
 		if (!lineMatches) {
 			return;
 		}
 		const [ , spaces, tag, propertiesString, endingTag ] = lineMatches;
 
-		const properties: { name: string, value: string }[] = [];
+		const properties: Record<string, string|Record<string, string>> = {};
 		const persistProperties: Record<string, string> = {};
 		for (const property of propertiesString.trim().split(' ')) {
 			const [ name, value ] = property.split('=');
@@ -119,7 +119,18 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 				persistProperties[name] = value;
 				continue;
 			}
-			properties.push({ name, value });
+
+			if (property.includes('.')) {
+				const [ parent, child ] = name.split('.');
+				if (!properties[parent]) {
+					properties[parent] = {};
+				}
+
+				(properties[parent] as Record<string, string>)[child] = value;
+			} else {
+				properties[name] = value;
+			}
+
 		}
 		let styleName;
 		const extractChoices = [ 'class', 'id' ];
@@ -153,9 +164,17 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 		}
 
 		let styleString = `\n"${styleName}": {`;
-
-		for (const { name, value } of properties) {
-			styleString = `${styleString}\n\t${name}: ${value}`;
+		for (const [ name, value ] of Object.entries(properties)) {
+			if (typeof value === 'string') {
+				styleString = `${styleString}\n\t${name}: ${value}`;
+			} else {
+				let subObject = `\n\t${name}: {`;
+				for (const [ subName, subValue ] of Object.entries(value)) {
+					subObject = `${subObject}\n\t\t${subName}: ${subValue}`;
+				}
+				subObject = `${subObject}\n\t}`;
+				styleString = `${styleString}${subObject}`;
+			}
 		}
 
 		styleString = `${styleString}\n}`;
