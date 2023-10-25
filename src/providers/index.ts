@@ -111,7 +111,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 		}
 		const [ , spaces, tag, propertiesString, endingTag ] = lineMatches;
 
-		const properties: Record<string, string|Record<string, string>> = {};
+		const properties: Record<string, string|number|Record<string, string|number>> = {};
 		const persistProperties: Record<string, string> = {};
 		for (const property of propertiesString.replace(/\s+/g, ' ').trim().split(' ')) {
 			const [ name, value ] = property.split('=');
@@ -120,15 +120,22 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 				continue;
 			}
 
-			if (property.includes('.')) {
+			let cleanValue;
+			if (!isNaN(Number(value))) {
+				cleanValue = Number(value);
+			} else {
+				cleanValue = value.replaceAll('"', '');
+			}
+
+			if (name.includes('.')) {
 				const [ parent, child ] = name.split('.');
 				if (!properties[parent]) {
 					properties[parent] = {};
 				}
 
-				(properties[parent] as Record<string, string>)[child] = value;
+				(properties[parent] as Record<string, string|number>)[child] = cleanValue;
 			} else {
-				properties[name] = value;
+				properties[name] = cleanValue;
 			}
 
 		}
@@ -163,14 +170,19 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			styleName = tag;
 		}
 
-		let styleString = `\n"${styleName}": {`;
+		let quoteType = '"';
+		if (tssDocument.getText().includes('\'')) {
+			quoteType = '\'';
+		}
+
+		let styleString = `\n${quoteType}${styleName}${quoteType}: {`;
 		for (const [ name, value ] of Object.entries(properties)) {
 			if (typeof value === 'string') {
-				styleString = `${styleString}\n\t${name}: ${value}`;
+				styleString = `${styleString}\n\t${name}: ${wrapValue(value, quoteType)}`;
 			} else {
 				let subObject = `\n\t${name}: {`;
 				for (const [ subName, subValue ] of Object.entries(value)) {
-					subObject = `${subObject}\n\t\t${subName}: ${subValue}`;
+					subObject = `${subObject}\n\t\t${subName}: ${wrapValue(subValue, quoteType)}`;
 				}
 				subObject = `${subObject}\n\t}`;
 				styleString = `${styleString}${subObject}`;
@@ -209,6 +221,14 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 		edit.replace(vscode.Uri.file(document.uri.fsPath), replaceRange, newLine);
 		vscode.workspace.applyEdit(edit, { isRefactoring: true });
 	});
+}
+
+function wrapValue(value: string|number, quote: string) {
+	if (typeof value !== 'string' || (value.startsWith('Alloy.') || value.startsWith('Ti.') || value.startsWith('Titanium.'))) {
+		return value;
+	} else {
+		return `${quote}${value}${quote}`;
+	}
 }
 
 /**
