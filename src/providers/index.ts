@@ -105,7 +105,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			contents = document.lineAt(selection.start.line).text;
 		}
 
-		const lineMatches = contents.match(/(\s+)?(?:<(\w+))? ?((?:[.\w]+="[\w./]+" ?)+)(?:(\/>|>(?:.*<\/\w+>)?)?)/);
+		const lineMatches = contents.match(/(\s+)?(?:<(\w+))?((?:\s*[.\w]+="[\w./]+")+)\s*(?:(\/>|>(?:.*<\/\w+>)?)?)/);
 		if (!lineMatches) {
 			return;
 		}
@@ -113,7 +113,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 
 		const properties: Record<string, string|Record<string, string>> = {};
 		const persistProperties: Record<string, string> = {};
-		for (const property of propertiesString.trim().split(' ')) {
+		for (const property of propertiesString.replace(/\s+/g, ' ').trim().split(' ')) {
 			const [ name, value ] = property.split('=');
 			if (/^(?:on|id|class|platform|ns)/.test(name)) {
 				persistProperties[name] = value;
