@@ -105,7 +105,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			contents = document.lineAt(selection.start.line).text;
 		}
 
-		const lineMatches = contents.match(/(\s+)?(?:<(\w+))?((?:\s*[.\w]+="[\w./]+")+)\s*(?:(\/>|>(?:.*<\/\w+>)?)?)/);
+		const lineMatches = contents.match(/(\s+)?(?:<(\w+))?((?:\s*[.\w]+="[\w./%]+")+)\s*(?:(\/>|>(?:.*<\/\w+>)?)?)/);
 		if (!lineMatches) {
 			return;
 		}
