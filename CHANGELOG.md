@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/tidev/vscode-titanium/compare/v1.2.1...v1.3.0) (2023-10-29)
+
+
+### Features
+
+* add support for extracting styles to tss from views ([#1177](https://github.com/tidev/vscode-titanium/issues/1177)) ([67fa837](https://github.com/tidev/vscode-titanium/commit/67fa8373581504b929a080779ffaca497253b6d0))
+
 ## [1.2.1](https://github.com/tidev/vscode-titanium/compare/v1.2.0...v1.2.1) (2023-09-02)
 
 
