@@ -189,7 +189,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			}
 		}
 
-		styleString = `${styleString}\n}`;
+		styleString = `${styleString.slice(0, -1)}\n}`;
 
 		const position = new vscode.Position(tssDocument.lineCount, 0);
 		if (tssDocument.lineAt(position.line - 1).text.trim().length) {
