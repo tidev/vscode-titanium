@@ -178,11 +178,11 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 		let styleString = `\n${quoteType}${styleName}${quoteType}: {`;
 		for (const [ name, value ] of Object.entries(properties)) {
 			if (typeof value === 'string') {
-				styleString = `${styleString}\n\t${name}: ${wrapValue(value, quoteType)}`;
+				styleString = `${styleString}\n\t${name}: ${wrapValue(value, quoteType)},`;
 			} else {
 				let subObject = `\n\t${name}: {`;
 				for (const [ subName, subValue ] of Object.entries(value)) {
-					subObject = `${subObject}\n\t\t${subName}: ${wrapValue(subValue, quoteType)}`;
+					subObject = `${subObject}\n\t\t${subName}: ${wrapValue(subValue, quoteType)},`;
 				}
 				subObject = `${subObject}\n\t}`;
 				styleString = `${styleString}${subObject}`;
