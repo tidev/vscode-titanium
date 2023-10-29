@@ -105,7 +105,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			contents = document.lineAt(selection.start.line).text;
 		}
 
-		const lineMatches = contents.match(/(\s+)?(?:<(\w+))?((?:\s*[.\w]+="[\w./%]+")+)\s*(?:(\/>|>(?:.*<\/\w+>)?)?)/);
+		const lineMatches = contents.match(/(\s+)?(?:<(\w+))?((?:\s*[\w.]+="(?:\$\.\args\.[\w./%]+|[\w./%]+)")+)\s*(?:(\/>|>(?:.*<\/\w+>)?)?)/);
 		if (!lineMatches) {
 			return;
 		}
@@ -224,7 +224,7 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 }
 
 function wrapValue(value: string|number, quote: string) {
-	if (typeof value !== 'string' || (value.startsWith('Alloy.') || value.startsWith('Ti.') || value.startsWith('Titanium.'))) {
+	if (typeof value !== 'string' || (value.startsWith('Alloy.') || value.startsWith('Ti.') || value.startsWith('Titanium.') || value.startsWith('$.args.') || !isNaN(Number(value)))) {
 		return value;
 	} else {
 		return `${quote}${value}${quote}`;
