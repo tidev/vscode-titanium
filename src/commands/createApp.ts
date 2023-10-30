@@ -12,6 +12,7 @@ import { handleInteractionError,  InteractionError } from './common';
 export async function createApplication (): Promise<void> {
 	try {
 		let force = false;
+		let alloy = true;
 		const logLevel = ExtensionContainer.config.general.logLevel;
 		const lastCreationPath = ExtensionContainer.context.workspaceState.get<string>(WorkspaceState.LastCreationPath);
 
@@ -47,12 +48,16 @@ export async function createApplication (): Promise<void> {
 		await window.withProgress({ cancellable: false, location: ProgressLocation.Notification }, async (progress) => {
 			progress.report({ message: l10n.t('Creating application') });
 			await ExtensionContainer.terminal.runInBackground('ti', args);
-			progress.report({ message: l10n.t('Creating Alloy project') });
-			const alloyArgs =  [ 'new' ];
-			if (force) {
-				alloyArgs.push('--force');
+
+			alloy = await yesNoQuestion({ placeHolder: l10n.t('Create an Alloy project?') }, false);
+			if (alloy) {
+				progress.report({ message: l10n.t('Creating Alloy project') });
+				const alloyArgs =  [ 'new' ];
+				if (force) {
+					alloyArgs.push('--force');
+				}
+				await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
 			}
-			await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
 			return;
 		});
 
