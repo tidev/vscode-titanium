@@ -57,8 +57,6 @@ export async function createApplication (): Promise<void> {
 					alloyArgs.push('--force');
 				}
 				await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
-			} else {
-				progress.report({ message: l10n.t('Creating Classic project') });
 			}
 			return;
 		});
