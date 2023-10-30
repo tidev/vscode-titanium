@@ -49,7 +49,7 @@ export async function createApplication (): Promise<void> {
 			progress.report({ message: l10n.t('Creating application') });
 			await ExtensionContainer.terminal.runInBackground('ti', args);
 
-			alloy = await yesNoQuestion({ placeHolder: l10n.t('Create an Alloy project?') }, true);
+			alloy = await yesNoQuestion({ placeHolder: l10n.t('Create an Alloy project?') }, false);
 			if (alloy) {
 				progress.report({ message: l10n.t('Creating Alloy project') });
 				const alloyArgs =  [ 'new' ];
@@ -57,6 +57,8 @@ export async function createApplication (): Promise<void> {
 					alloyArgs.push('--force');
 				}
 				await ExtensionContainer.terminal.runInBackground('alloy', [ 'new' ], { cwd: path.join(workspaceDir.fsPath, name) });
+			} else {
+				progress.report({ message: l10n.t('Creating Classic project') });
 			}
 			return;
 		});
