@@ -6,7 +6,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { UserCancellation } from '../../commands/common';
-import { BuildTaskTitaniumBuildBase, AppBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
+import { BuildTaskTitaniumBuildBase, AppBuildTaskTitaniumBuildBase, ModuleBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { PackageTaskTitaniumBuildBase, AppPackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { TitaniumBuildBase } from '../commandTaskProvider';
 import { WorkspaceState } from '../../constants';
@@ -17,6 +17,13 @@ import { ProjectType } from '../../types/common';
 
 function isAppBuild<T extends TitaniumBuildBase>(definition: TitaniumBuildBase): definition is T {
 	if (definition.projectType === 'app') {
+		return true;
+	}
+	return false;
+}
+
+function isModuleBuild<T extends TitaniumBuildBase>(definition: TitaniumBuildBase): definition is T {
+	if (definition.projectType === 'module') {
 		return true;
 	}
 	return false;
@@ -54,6 +61,29 @@ export abstract class TaskHelper {
 		}
 	}
 
+	public async resolveCommonModuleOptions (context: TaskExecutionContext, definition: ModuleBuildTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
+		this.resolveCommonOptions(context, definition, builder);
+
+		if (definition.projectType !== 'module') {
+			return;
+		}
+
+		if (!definition.target) {
+			throw new Error('No target provided');
+		}
+
+		builder.addOption('--target', definition.target);
+
+		if (!definition.deviceId) {
+			const simulatorVersion = definition.ios ? (definition as IosBuildTaskTitaniumBuildBase).ios.simulatorVersion : undefined;
+			const deviceInfo = await selectDevice(definition.platform, definition.target, simulatorVersion);
+			definition.deviceId = deviceInfo.udid;
+		}
+
+		builder.addOption('--device-id', definition.deviceId);
+
+	}
+
 	public async resolveCommonAppOptions (context: TaskExecutionContext, definition: AppBuildTaskTitaniumBuildBase | AppPackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
 		this.resolveCommonOptions(context, definition, builder);
 
@@ -81,13 +111,15 @@ export abstract class TaskHelper {
 				builder.addFlag('--build-only');
 			}
 
-			if (!definition.deviceId) {
+			if (definition.target !== 'macos' && !definition.deviceId) {
 				const simulatorVersion = definition.ios ? (definition as IosBuildTaskTitaniumBuildBase).ios.simulatorVersion : undefined;
 				const deviceInfo = await selectDevice(definition.platform, definition.target, simulatorVersion);
 				definition.deviceId = deviceInfo.udid;
 			}
 
-			builder.addOption('--device-id', definition.deviceId);
+			if (definition.deviceId) {
+				builder.addOption('--device-id', definition.deviceId);
+			}
 		}
 
 		const project = this.getProject(definition.projectDir);
@@ -98,6 +130,8 @@ export abstract class TaskHelper {
 	public async resolveCommonPackagingOptions (context: TaskExecutionContext, definition: PackageTaskTitaniumBuildBase, builder: CommandBuilder): Promise<void> {
 		if (isAppBuild<AppPackageTaskTitaniumBuildBase>(definition)) {
 			await this.resolveCommonAppOptions(context, definition, builder);
+		} else if (isModuleBuild<ModuleBuildTaskTitaniumBuildBase>(definition)) {
+			await this.resolveCommonModuleOptions(context, definition, builder);
 		} else {
 			this.resolveCommonOptions(context, definition, builder);
 		}
@@ -108,7 +142,7 @@ export abstract class TaskHelper {
 
 			const options = [ defaultLabel, 'Browse' ];
 
-			if ((definition as AppPackageTaskTitaniumBuildBase).target === 'dist-appstore') {
+			if ((definition as AppPackageTaskTitaniumBuildBase).target === 'dist-appstore' || (definition as AppPackageTaskTitaniumBuildBase).target === 'dist-macappstore') {
 				options.push('Output Into Xcode');
 			}
 

@@ -13,9 +13,9 @@ export interface DefinitionSuggestion {
 	insertText? (text: string): string|undefined;
 }
 
-async function getRelatedFiles(project: Project, fileType: string): Promise<string[]> {
+export async function getRelatedFiles(project: Project, fileType: string, includeAppTss = true): Promise<string[]> {
 	const relatedFiles: string[] = [];
-	if (fileType === 'tss') {
+	if (fileType === 'tss' && includeAppTss) {
 		relatedFiles.push(path.join(project.filePath, 'app', 'styles', 'app.tss'));
 	}
 	const relatedFile = await related.getTargetPath(project, fileType);

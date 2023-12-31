@@ -1,6 +1,6 @@
 {
   "name": "titanium-sdk",
-  "version": "1.1.1",
+  "version": "1.3.0",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",
   "icon": "images/logo-titanium.png",
@@ -29,8 +29,8 @@
     "url": "https://github.com/tidev/vscode-titanium.git"
   },
   "engines": {
-    "vscode": "^1.56.0",
-    "node": ">=14.16.0"
+    "vscode": "^1.73.0",
+    "node": ">=16.14.2"
   },
   "activationEvents": [
     "workspaceContains:**/tiapp.xml",
@@ -44,6 +44,7 @@
   },
   "license": "Apache 2.0",
   "main": "./out/extension",
+  "l10n": "./l10n",
   "contributes": {
     "debuggers": [
       {
@@ -123,20 +124,20 @@
             "properties": {
               "platform": {
                 "type": "string",
-                "description": "Platform to debug"
+                "description": "%titanium.debug.platform%"
               },
               "projectDir": {
                 "type": "string",
-                "description": "Directory of the Titanium project to debug",
+                "description": "%titanium.debug.projectDir%",
                 "defaultValue": "[${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables)"
               },
               "port": {
                 "type": "number",
-                "description": "Port number to use for the debugger"
+                "description": "%titanium.debug.port%"
               },
               "preLaunchTask": {
                 "type": "string",
-                "description": "Name of the task to build the application"
+                "description": "%titanium.debug.preLaunchTask%"
               }
             }
           }
@@ -165,188 +166,188 @@
     "commands": [
       {
         "command": "titanium.create.application",
-        "title": "Create application",
+        "title": "%titanium.commands.create.application.title%",
         "category": "Titanium",
-        "description": "Create a new Titanium application project"
+        "description": "%titanium.commands.create.application.description%"
       },
       {
         "command": "titanium.create.keystore",
-        "title": "Create keystore",
+        "title": "%titanium.commands.create.keystore.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.create.module",
-        "title": "Create module",
+        "title": "%titanium.commands.create.module.title%",
         "category": "Titanium",
-        "description": "Create a new Titanium module project"
+        "description": "%titanium.commands.create.module.description%"
       },
       {
         "command": "titanium.explorer.refresh",
-        "title": "Refresh devices",
+        "title": "%titanium.commands.explorer.refresh.title%",
         "category": "Titanium",
         "icon": "$(refresh)"
       },
       {
         "command": "titanium.explorer.clearRecent",
-        "title": "Clear recent builds",
+        "title": "%titanium.commands.explorer.clearRecent.title%",
         "category": "Titanium",
         "icon": "$(clear-all)"
       },
       {
         "command": "titanium.build.setLiveViewEnabled",
-        "title": "Enable LiveView",
+        "title": "%titanium.commands.build.setLiveViewEnabled.title%",
         "category": "Titanium",
         "icon": "$(sync-ignored)"
       },
       {
         "command": "titanium.build.setLiveViewDisabled",
-        "title": "Disable LiveView",
+        "title": "%titanium.commands.build.setLiveViewDisabled.title%",
         "category": "Titanium",
         "icon": "$(sync)"
       },
       {
         "command": "titanium.build.run",
-        "title": "Build",
+        "title": "%titanium.commands.build.run.title%",
         "category": "Titanium",
         "icon": "$(play)",
-        "description": "Build a Titanium project"
+        "description": "%titanium.commands.build.run.description%"
       },
       {
         "command": "titanium.build.debug",
-        "title": "Debug",
+        "title": "%titanium.commands.build.debug.title%",
         "category": "Titanium",
         "icon": "$(debug)",
-        "description": "Debug a Titanium project"
+        "description": "%titanium.commands.build.debug.description%"
       },
       {
         "command": "titanium.package.run",
-        "title": "Package",
+        "title": "%titanium.commands.package.run.title%",
         "category": "Titanium",
         "icon": "$(package)",
-        "description": "Package a Titanium project"
+        "description": "%titanium.commands.package.run.description%"
       },
       {
         "command": "titanium.build.stop",
-        "title": "Stop",
+        "title": "%titanium.commands.build.stop.title%",
         "category": "Titanium",
         "icon": "$(debug-stop)",
-        "description": "Stop a running build or package process"
+        "description": "%titanium.commands.build.stop.description%"
       },
       {
         "command": "titanium.build.setLogLevel",
-        "title": "Set log level",
+        "title": "%titanium.commands.build.setLogLevel.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.generate.controller",
-        "title": "Generate Alloy controller",
+        "title": "%titanium.commands.alloy.generate.controller.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.generate.migration",
-        "title": "Generate Alloy migration",
+        "title": "%titanium.commands.alloy.generate.migration.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.generate.model",
-        "title": "Generate Alloy model",
+        "title": "%titanium.commands.alloy.generate.model.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.generate.style",
-        "title": "Generate Alloy style",
+        "title": "%titanium.commands.alloy.generate.style.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.generate.view",
-        "title": "Generate Alloy view",
+        "title": "%titanium.commands.alloy.generate.view.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.generate.widget",
-        "title": "Generate Alloy widget",
+        "title": "%titanium.commands.alloy.generate.widget.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.open.relatedView",
-        "title": "Open related view",
+        "title": "%titanium.commands.alloy.open.relatedView.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.open.relatedStyle",
-        "title": "Open related style",
+        "title": "%titanium.commands.alloy.open.relatedStyle.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.open.relatedController",
-        "title": "Open related controller",
+        "title": "%titanium.commands.alloy.open.relatedController.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.alloy.open.allRelatedFiles",
-        "title": "Open related files",
+        "title": "%titanium.commands.alloy.open.allRelatedFiles.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.environment.fixIssues",
-        "title": "Fix environment issues",
+        "title": "%titanium.commands.environment.fixIssues.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.task.generate",
-        "title": "Generate task",
+        "title": "%titanium.commands.task.generate.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.updates.openReleaseNotes",
-        "title": "Open release notes",
+        "title": "%titanium.commands.updates.openReleaseNotes.title%",
         "category": "Titanium",
         "icon": "$(link-external)"
       },
       {
         "command": "titanium.updates.checkAll",
-        "title": "Check For Updates",
+        "title": "%titanium.commands.updates.checkAll.title%",
         "category": "Titanium",
         "icon": "$(refresh)"
       },
       {
         "command": "titanium.updates.installAll",
-        "title": "Install All Updates",
+        "title": "%titanium.commands.updates.installAll.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.updates.select",
-        "title": "Select Updates",
+        "title": "%titanium.commands.updates.select.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.updates.install",
-        "title": "Install Update",
+        "title": "%titanium.commands.updates.install.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.clean",
-        "title": "Clean project",
+        "title": "%titanium.commands.clean.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.updates.reveal",
-        "title": "Reveal Updates",
+        "title": "%titanium.commands.updates.reveal.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.import.settings",
-        "title": "Import settings from legacy Titanium extension",
+        "title": "%titanium.commands.import.settings.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.import.keystore",
-        "title": "Import Keystore data from legacy Titanium extension",
+        "title": "%titanium.commands.import.keystore.title%",
         "category": "Titanium"
       },
       {
         "command": "titanium.showOutputChannel",
-        "title": "Show Output Channel",
+        "title": "%titanium.commands.showOutputChannel.title%",
         "category": "Titanium",
         "icon": "$(link-external)"
       }
@@ -402,53 +403,53 @@
         "titanium.android.keystoreAlias": {
           "type": "string",
           "default": null,
-          "description": "Keystore alias used for packaging Android applications"
+          "description": "%titanium.config.android.keystoreAlias%"
         },
         "titanium.android.keystorePath": {
           "type": "string",
           "default": null,
-          "description": "Path to keystore used for packaging Android applications"
+          "description": "%titanium.config.android.keystorePath%"
         },
         "titanium.build.liveview": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to enable LiveView when building applications",
+          "description": "%titanium.config.build.liveview%",
           "scope": "window"
         },
         "titanium.codeTemplates.jsFunction": {
           "type": "string",
           "default": "\\nfunction ${text}(e){\\n}\\n",
-          "description": "Event handler function template"
+          "description": "%titanium.config.codeTemplates.jsFunction%"
         },
         "titanium.codeTemplates.tssClass": {
           "type": "string",
           "default": "\\n'.${text}': {\\n}\\n",
-          "description": "Style class (.) template"
+          "description": "%titanium.config.codeTemplates.tssClass%"
         },
         "titanium.codeTemplates.tssId": {
           "type": "string",
           "default": "\\n'#${text}': {\\n}\\n",
-          "description": "Style ID (#) template"
+          "description": "%titanium.config.codeTemplates.tssId%"
         },
         "titanium.codeTemplates.tssTag": {
           "type": "string",
           "default": "\\n'${text}': {\\n}\\n",
-          "description": "Style tag template"
+          "description": "%titanium.config.codeTemplates.tssTag%"
         },
         "titanium.general.defaultCreationDirectory": {
           "type": "string",
-          "description": "Default directory to use when creating projects",
+          "description": "%titanium.config.general.defaultCreationDirectory%",
           "default": null
         },
         "titanium.general.displayBuildCommandInConsole": {
           "type": "boolean",
           "default": true,
-          "description": "The executed build command is written to the output channel to aid debugging. This will include password arguments."
+          "description": "%titanium.config.general.displayBuildCommandInConsole%"
         },
         "titanium.general.logLevel": {
           "type": "string",
           "default": "info",
-          "description": "Logging level for commands being run",
+          "description": "%titanium.config.general.logLevel%",
           "enum": [
             "debug",
             "error",
@@ -460,17 +461,17 @@
         "titanium.general.updateFrequency": {
           "type": "string",
           "default": "1 day",
-          "description": "Controls the frequency for how often to show an alert if there are updates available. Updates can always be viewed in the Titanium activity pane. Accepts values in time formats like 60 minutes, 12 hours, 7 days etc."
+          "description": "%titanium.config.general.updateFrequency%"
         },
         "titanium.general.useTerminalForBuild": {
           "type": "boolean",
           "default": true,
-          "description": "When true build/package commands will be run using the integrated terminal as opposed to using an output channel."
+          "description": "%titanium.config.general.useTerminalForBuild%"
         },
         "titanium.package.distributionOutputDirectory": {
           "type": "string",
           "default": "dist",
-          "description": "Output directory for package builds."
+          "description": "%titanium.config.package.distributionOutputDirectory%"
         },
         "titanium.project.defaultI18nLanguage": {
           "type": "string",
@@ -497,17 +498,17 @@
       "titanium": [
         {
           "id": "titanium.view.welcome",
-          "name": "Get Started",
+          "name": "%titanium.view.welcome%",
           "when": "titanium:needsTrustedWorkspace || !titanium:enabled"
         },
         {
           "id": "titanium.view.buildExplorer",
-          "name": "Build",
+          "name": "%titanium.view.buildExplorer%",
           "when": "!titanium:needsTrustedWorkspace && titanium:enabled"
         },
         {
           "id": "titanium.view.helpExplorer",
-          "name": "Help and Feedback",
+          "name": "%titanium.view.helpExplorer%",
           "when": "!titanium:needsTrustedWorkspace"
         }
       ]
@@ -515,22 +516,22 @@
     "viewsWelcome": [
       {
         "view": "titanium.view.welcome",
-        "contents": "Titanium tooling not installed, click below to install it.\nThis will not install any platform specific tooling. To install the required platform tooling please visit [the Android](https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_Getting_Started/Installation_and_Configuration/Installing_Platform_SDKs/Installing_the_Android_SDK.html) or [iOS documentation](https://titaniumsdk.com/guide/Titanium_SDK/Titanium_SDK_Getting_Started/Installation_and_Configuration/Installing_Platform_SDKs/Installing_the_iOS_SDK.html)\n[Install Tooling](command:titanium.updates.select)",
+        "contents": "%titanium.view.welcome.toolingMissing%",
         "when": "titanium:toolingMissing"
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "To use the Titanium extension you must have a Titanium project open\n[Open Project](command:workbench.action.addRootFolder)\nYou can also create a new Application or Module project\n[Create App](command:titanium.create.application)\n[Create Module](command:titanium.create.module)",
+        "contents": "%titanium.view.welcome.notProject%",
         "when": "titanium:notProject"
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "Please trust this workspace to use the Titanium extension.\n[Manage Workspace Trust](command:workbench.trust.manage)\n[Learn more about Workspace Trust](https://aka.ms/vscode-workspace-trust)",
+        "contents": "%titanium.view.welcome.trust%",
         "when": "titanium:needsTrustedWorkspace"
       },
       {
         "view": "titanium.view.welcome",
-        "contents": "There are issues with your environment. Please fix them in order for the extension to load.\n[Fix Issues](command:titanium.environment.fixIssues)",
+        "contents": "%titanium.view.welcome.environmentIssues%",
         "when": "titanium:environmentIssues"
       }
     ],
@@ -769,17 +770,17 @@
         },
         {
           "command": "titanium.build.run",
-          "when": "view == titanium.view.buildExplorer && viewItem =~ /DeviceNode|ModuleBuildNode/",
-          "group": "inline"
-        },
-        {
-          "command": "titanium.build.debug",
-          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode",
+          "when": "view == titanium.view.buildExplorer && viewItem =~ /PlatformNode|TargetNode|OSVerNode|DeviceNode|ModuleBuildNode/",
           "group": "inline"
         },
         {
           "command": "titanium.build.run",
           "when": "view == titanium.view.buildExplorer && viewItem =~ /PlatformNode|TargetNode|OSVerNode|DeviceNode|ModuleBuildNode/"
+        },
+        {
+          "command": "titanium.build.debug",
+          "when": "view == titanium.view.buildExplorer && viewItem == DeviceNode",
+          "group": "inline"
         },
         {
           "command": "titanium.build.debug",
@@ -820,14 +821,14 @@
         "type": "titanium-build",
         "properties": {
           "titaniumBuild": {
-            "description": "Properties used to configure the build",
+            "description": "%titanium.tasks.titanium-build.titaniumBuild%",
             "properties": {
               "android": {
-                "description": "Properties used to configure Android builds",
+                "description": "%titanium.tasks.titanium-build.android%",
                 "properties": {}
               },
               "deployType": {
-                "description": "Deploy Type to be used when building",
+                "description": "%titanium.tasks.titanium-build.deployType%",
                 "type": "string",
                 "enum": [
                   "test",
@@ -835,33 +836,33 @@
                 ]
               },
               "deviceId": {
-                "description": "ID or UDID for the device or simulator",
+                "description": "%titanium.tasks.titanium-build.deviceId%",
                 "type": "string"
               },
               "extraArguments": {
                 "type": "array",
-                "description": "Extra arguments to be used in the build"
+                "description": "%titanium.tasks.titanium-build.extraArguments%"
               },
               "ios": {
-                "description": "Properties used to configure iOS builds",
+                "description": "%titanium.tasks.titanium-build.ios%",
                 "properties": {
                   "provisioningProfile": {
-                    "description": "Provisioning Profile UUID to use when signing device builds",
+                    "description": "%titanium.tasks.titanium-build.ios.provisioningProfile%",
                     "type": "string"
                   },
                   "certificate": {
-                    "description": "Certificate name to use when signing device builds",
+                    "description": "%titanium.tasks.titanium-build.ios.provisioningProfile.certificate%",
                     "type": "string"
                   },
                   "simulatorVersion": {
-                    "description": "Simulator version use when performing a simulator build",
+                    "description": "%titanium.tasks.titanium-build.ios.provisioningProfile.certificate.simulatorVersion%",
                     "type": "string"
                   }
                 }
               },
               "platform": {
                 "type": "string",
-                "description": "Platform to build for",
+                "description": "%titanium.tasks.titanium-build.platform%",
                 "enum": [
                   "android",
                   "ios"
@@ -869,7 +870,7 @@
               },
               "projectType": {
                 "type": "string",
-                "description": "Project type to be built",
+                "description": "%titanium.tasks.titanium-build.projectType%",
                 "enum": [
                   "app",
                   "module"
@@ -877,7 +878,7 @@
               },
               "target": {
                 "type": "string",
-                "description": "Target to build for"
+                "description": "%titanium.tasks.titanium-build.target%"
               }
             }
           }
@@ -887,20 +888,20 @@
         "type": "titanium-package",
         "properties": {
           "titaniumBuild": {
-            "description": "Properties used to configure the build",
+            "description": "%titanium.tasks.titanium-package.titaniumBuild%",
             "properties": {
               "android": {
-                "description": "Properties used to configure Android builds",
+                "description": "%titanium.tasks.titanium-package.android%",
                 "properties": {
                   "keystore": {
-                    "description": "Keystore configuration",
+                    "description": "%titanium.tasks.titanium-package.android.keystore%",
                     "properties": {
                       "alias": {
-                        "description": "Alias for the keystore",
+                        "description": "titanium.tasks.titanium-package.android.keystore.alias",
                         "type": "string"
                       },
                       "location": {
-                        "description": "Path of the keystore to be used, must be a full path",
+                        "description": "titanium.tasks.titanium-package.android.keystore.location",
                         "type": "string"
                       }
                     }
@@ -909,28 +910,28 @@
               },
               "extraArguments": {
                 "type": "array",
-                "description": "Extra arguments to be used in the build"
+                "description": "%titanium.tasks.titanium-package.extraArguments%"
               },
               "ios": {
-                "description": "Properties used to configure iOS builds",
+                "description": "%titanium.tasks.titanium-package.ios%",
                 "properties": {
                   "provisioningProfile": {
-                    "description": "Provisioning Profile UUID to be used",
+                    "description": "%titanium.tasks.titanium-package.ios.provisioningProfile%",
                     "type": "string"
                   },
                   "certificate": {
-                    "description": "Certificate name to be used",
+                    "description": "%titanium.tasks.titanium-package.ios.provisioningProfile.certificate%",
                     "type": "string"
                   }
                 }
               },
               "outputDirectory": {
                 "type": "string",
-                "description": "Output directory for the built application"
+                "description": "%titanium.tasks.titanium-package.outputDirectory%"
               },
               "platform": {
                 "type": "string",
-                "description": "Platform to build for",
+                "description": "%titanium.tasks.titanium-package.platform%",
                 "enum": [
                   "android",
                   "ios"
@@ -938,11 +939,11 @@
               },
               "target": {
                 "type": "string",
-                "description": "Target to build for"
+                "description": "%titanium.tasks.titanium-package.target%"
               },
               "projectType": {
                 "type": "string",
-                "description": "Project type to be built",
+                "description": "%titanium.tasks.titanium-package.projectType%",
                 "enum": [
                   "app",
                   "module"
@@ -1024,7 +1025,7 @@
     "@types/sinon-chai": "^3.2.9",
     "@types/tmp": "^0.2.3",
     "@types/uuid": "^9.0.1",
-    "@types/vscode": "1.56.0",
+    "@types/vscode": "1.73.0",
     "@types/which": "^3.0.0",
     "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^5.58.0",
@@ -1074,6 +1075,7 @@
     "vscode-debugadapter": "^1.51.0",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.0",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.5.0",
+    "@vscode/l10n": "^0.0.14"
   }
 }

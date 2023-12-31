@@ -15,7 +15,7 @@ let sandbox: sinon.SinonSandbox;
 describe('View code actions', () => {
 	const provider = new ViewCodeActionProvider();
 
-	async function testCompletion(range: vscode.Range, uri = viewUri): Promise<vscode.Command[]> {
+	async function testCompletion(range: vscode.Range, uri = viewUri): Promise<Array<vscode.CodeAction|vscode.Command>> {
 		await vscode.window.showTextDocument(uri);
 		const text = await vscode.workspace.openTextDocument(uri);
 		return provider.provideCodeActions(text, range);
@@ -34,12 +34,12 @@ describe('View code actions', () => {
 
 	it('should provide code actions for ids', async () => {
 		const range = new vscode.Range(new vscode.Position(17, 19), new vscode.Position(17, 20));
-		const actions = await testCompletion(range);
+		const actions = await testCompletion(range) as vscode.Command[];
 
-		expect(actions.length).to.equal(1);
-		expect(actions[0].command).to.equal('titanium.insertCodeAction');
-		expect(actions[0].title).to.equal('Generate style (sample)');
-		expect(actions[0].arguments).to.deep.equal([
+		expect(actions.length).to.equal(2);
+		expect(actions[1].command).to.equal('titanium.insertCodeAction');
+		expect(actions[1].title).to.equal('Generate style (sample)');
+		expect(actions[1].arguments).to.deep.equal([
 			'\n\'#noexistid\': {\n}\n',
 			path.join(getCommonAlloyProjectDirectory(), 'app', 'styles', 'sample.tss')
 		]);
@@ -47,12 +47,12 @@ describe('View code actions', () => {
 
 	it('should provide code actions for classes', async () => {
 		const range = new vscode.Range(new vscode.Position(17, 37), new vscode.Position(17, 39));
-		const actions = await testCompletion(range);
+		const actions = await testCompletion(range) as vscode.Command[];
 
-		expect(actions.length).to.equal(1);
-		expect(actions[0].command).to.equal('titanium.insertCodeAction');
-		expect(actions[0].title).to.equal('Generate style (sample)');
-		expect(actions[0].arguments).to.deep.equal([
+		expect(actions.length).to.equal(2);
+		expect(actions[1].command).to.equal('titanium.insertCodeAction');
+		expect(actions[1].title).to.equal('Generate style (sample)');
+		expect(actions[1].arguments).to.deep.equal([
 			'\n\'.noexistclass\': {\n}\n',
 			path.join(getCommonAlloyProjectDirectory(), 'app', 'styles', 'sample.tss')
 		]);
@@ -60,12 +60,12 @@ describe('View code actions', () => {
 
 	it('should provide code actions for a tag', async () => {
 		const range = new vscode.Range(new vscode.Position(17, 4), new vscode.Position(17, 6));
-		const actions = await testCompletion(range);
+		const actions = await testCompletion(range) as vscode.Command[];
 
-		expect(actions.length).to.equal(1);
-		expect(actions[0].command).to.equal('titanium.insertCodeAction');
-		expect(actions[0].title).to.equal('Generate style (sample)');
-		expect(actions[0].arguments).to.deep.equal([
+		expect(actions.length).to.equal(2);
+		expect(actions[1].command).to.equal('titanium.insertCodeAction');
+		expect(actions[1].title).to.equal('Generate style (sample)');
+		expect(actions[1].arguments).to.deep.equal([
 			'\n\'View\': {\n}\n',
 			path.join(getCommonAlloyProjectDirectory(), 'app', 'styles', 'sample.tss')
 		]);
@@ -73,12 +73,12 @@ describe('View code actions', () => {
 
 	it('should provide code actions for event handlers', async () => {
 		const range = new vscode.Range(new vscode.Position(17, 55), new vscode.Position(17, 60));
-		const actions = await testCompletion(range);
+		const actions = await testCompletion(range) as vscode.Command[];
 
-		expect(actions.length).to.equal(1);
-		expect(actions[0].command).to.equal('titanium.insertCodeAction');
-		expect(actions[0].title).to.equal('Generate function (sample)');
-		expect(actions[0].arguments).to.deep.equal([
+		expect(actions.length).to.equal(2);
+		expect(actions[1].command).to.equal('titanium.insertCodeAction');
+		expect(actions[1].title).to.equal('Generate function (sample)');
+		expect(actions[1].arguments).to.deep.equal([
 			'\nfunction noExistFunc(e){\n}\n',
 			path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'sample.js')
 		]);

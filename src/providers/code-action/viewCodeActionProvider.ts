@@ -6,17 +6,28 @@ import { viewSuggestions as suggestions } from '../definition/common';
 import { Commands } from '../../commands';
 
 export class ViewCodeActionProvider extends BaseProvider implements vscode.CodeActionProvider {
-	public async provideCodeActions(document: vscode.TextDocument, range: vscode.Range): Promise<vscode.Command[]> {
+	public async provideCodeActions(document: vscode.TextDocument, range: vscode.Range|vscode.Selection): Promise<Array<vscode.Command|vscode.CodeAction>> {
+
 		const project = await this.getProject(document);
 		if (!project) {
 			return [];
 		}
+
 		const linePrefix = document.getText(new vscode.Range(range.end.line, 0, range.end.line, range.end.character));
 		const wordRange = document.getWordRangeAtPosition(range.end);
 		const word = wordRange ? document.getText(wordRange) : null;
-		const codeActions: vscode.Command[] = [];
+		const codeActions: Array<vscode.CodeAction|vscode.Command> = [];
 
-		if (!word || word.length === 0) {
+		const extract = new vscode.CodeAction('Extract style', vscode.CodeActionKind.RefactorExtract);
+		extract.command = {
+			command: Commands.ExtractStyle,
+			title: 'Extract to style',
+			arguments: [ document, range, project ]
+		};
+
+		codeActions.push(extract);
+
+		if (!word) {
 			return codeActions;
 		}
 

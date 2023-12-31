@@ -62,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 1.56.0, latest, insider ]
+        version: [ 1.73.0, latest, insider ]
     steps:
       - uses: actions/checkout@v3
         with:

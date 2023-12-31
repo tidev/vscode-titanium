@@ -19,6 +19,8 @@ import { ViewDefinitionProvider } from './definition/viewDefinitionProvider';
 import { ViewHoverProvider } from './hover/viewHoverProvider';
 import { ExtensionContainer } from '../container';
 import { TiTerminalLinkProvider } from './terminalLinkProvider';
+import { inputBox, quickPick } from '../quickpicks';
+import { getRelatedFiles } from './definition/common';
 
 const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
 const styleFilePattern = '**/*.tss';
@@ -89,6 +91,144 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 			vscode.workspace.applyEdit(edit);
 		}
 	});
+
+	registerCommand(Commands.ExtractStyle, async (document: vscode.TextDocument, selection: vscode.Range|vscode.Selection, project: Project) => {
+		let contents;
+		let isSelection = true;
+		// First try and extract the selected text if its a selection
+		if ((selection as vscode.Selection).anchor) {
+			contents = document.getText(new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character));
+		}
+
+		if (!contents) {
+			isSelection = false;
+			contents = document.lineAt(selection.start.line).text;
+		}
+
+		const lineMatches = contents.match(/(\s+)?(?:<(\w+))?((?:\s*[\w.]+="(?:\$\.args\.[\w./%]+|[\w./%]+)")+)\s*(?:(\/>|>(?:.*<\/\w+>)?)?)/);
+		if (!lineMatches) {
+			return;
+		}
+		const [ , spaces, tag, propertiesString, endingTag ] = lineMatches;
+
+		const properties: Record<string, string|number|Record<string, string|number>> = {};
+		const persistProperties: Record<string, string> = {};
+		for (const property of propertiesString.replace(/\s+/g, ' ').trim().split(' ')) {
+			const [ name, value ] = property.split('=');
+			if (/^(?:on|id|class|platform|ns)/.test(name)) {
+				persistProperties[name] = value;
+				continue;
+			}
+
+			let cleanValue;
+			if (!isNaN(Number(value))) {
+				cleanValue = Number(value);
+			} else {
+				cleanValue = value.replaceAll('"', '');
+			}
+
+			if (name.includes('.')) {
+				const [ parent, child ] = name.split('.');
+				if (!properties[parent]) {
+					properties[parent] = {};
+				}
+
+				(properties[parent] as Record<string, string|number>)[child] = cleanValue;
+			} else {
+				properties[name] = cleanValue;
+			}
+
+		}
+		let styleName;
+		const extractChoices = [ 'class', 'id' ];
+		if (tag) {
+			extractChoices.push('tag');
+		}
+
+		const tssFilePath = (await getRelatedFiles(project, 'tss', false))[0];
+		const tssDocument = await vscode.workspace.openTextDocument(tssFilePath);
+		const extractType = await quickPick(extractChoices, { placeHolder: 'Choose style' });
+		if (extractType === 'class' || extractType === 'id') {
+			const name = await inputBox({ prompt: `Enter the name for your ${extractType}`,
+				validateInput: (value) => {
+					const prefix = extractType === 'class' ? '.' : '#';
+					if (tssDocument.getText().includes(`"${prefix}${value}"`)) {
+						return `The ${extractType} value already exists in the tss`;
+					}
+				}
+			});
+			const prefix = extractType === 'class' ? '.' : '#';
+			styleName = `${prefix}${name}`;
+
+			// handle merging classes if one already exists
+			if (extractType === 'class' && persistProperties.class) {
+				persistProperties.class = `"${persistProperties.class.replaceAll('"', '')} ${name}"`;
+			} else {
+				persistProperties[extractType] = `"${name}"`;
+			}
+		} else {
+			styleName = tag;
+		}
+
+		let quoteType = '"';
+		if (tssDocument.getText().includes('\'')) {
+			quoteType = '\'';
+		}
+
+		let styleString = `\n${quoteType}${styleName}${quoteType}: {`;
+		for (const [ name, value ] of Object.entries(properties)) {
+			if (typeof value === 'string') {
+				styleString = `${styleString}\n\t${name}: ${wrapValue(value, quoteType)},`;
+			} else {
+				let subObject = `\n\t${name}: {`;
+				for (const [ subName, subValue ] of Object.entries(value)) {
+					subObject = `${subObject}\n\t\t${subName}: ${wrapValue(subValue, quoteType)},`;
+				}
+				subObject = `${subObject}\n\t}`;
+				styleString = `${styleString}${subObject}`;
+			}
+		}
+
+		styleString = `${styleString.slice(0, -1)}\n}`;
+
+		const position = new vscode.Position(tssDocument.lineCount, 0);
+		if (tssDocument.lineAt(position.line - 1).text.trim().length) {
+			styleString = `\n${styleString}`;
+		}
+		const edit = new vscode.WorkspaceEdit();
+		edit.insert(vscode.Uri.file(tssFilePath), position, styleString);
+
+		const newPropertiesString = Object.entries(persistProperties).map(([ name, value ]) => `${name}=${value}`).join(' ');
+		let newLine = '';
+		if (tag) {
+			newLine += `<${tag} `;
+		}
+
+		newLine += newPropertiesString;
+
+		if (endingTag) {
+			newLine += ` ${endingTag}`;
+		}
+
+		let replaceRange;
+		if (isSelection) {
+			replaceRange = new vscode.Range(selection.start.line, selection.start.character, selection.start.line, selection.end.character);
+		} else {
+			newLine = `${spaces}${newLine}`;
+			replaceRange = new vscode.Range(selection.start.line, 0, selection.start.line, contents.length);
+		}
+
+		edit.replace(vscode.Uri.file(document.uri.fsPath), replaceRange, newLine);
+		vscode.workspace.applyEdit(edit, { isRefactoring: true });
+	});
+}
+
+function wrapValue(value: string|number, quote: string) {
+	if (typeof value !== 'string' || (value.startsWith('Alloy.') || value.startsWith('Ti.') || value.startsWith('Titanium.') || value.startsWith('$.args.') || !isNaN(Number(value)))) {
+		return value;
+	} else {
+		return `${quote}${value}${quote}`;
+	}
 }
 
 /**
@@ -144,20 +284,10 @@ export async function generateCompletions (force = false, project: Project): Pro
 		}
 		const sdkPath = sdkInfo.path;
 		// Generate the completions
-		const [ alloy, sdk ] = await Promise.all([
+		await Promise.all([
 			completion.generateAlloyCompletions(force, CompletionsFormat),
 			completion.generateSDKCompletions(force, sdkVersion, sdkPath, CompletionsFormat)
 		]);
-		if (sdk || alloy) {
-			let message = 'Autocomplete suggestions generated for';
-			if (sdk) {
-				message = `${message} Titanium ${sdk}`;
-			}
-			if (alloy) {
-				message = `${message} Alloy ${alloy}`;
-			}
-			vscode.window.showInformationMessage(message);
-		}
 	} catch (error) {
 		const actions: InteractionChoice[] = [];
 		if (error instanceof Errors.CustomError && error.code === 'ESDKNOTINSTALLED') {

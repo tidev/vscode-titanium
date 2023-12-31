@@ -3,7 +3,7 @@ import { TaskHelper } from './base';
 import { Command } from '../commandBuilder';
 import { enterAndroidKeystoreInfo } from '../../quickpicks/build/android';
 import { KeystoreInfo } from '../../types/common';
-import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
+import { AppBuildTaskTitaniumBuildBase, BuildTaskDefinitionBase, ModuleBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
 import { ExtensionContainer } from '../../container';
@@ -76,10 +76,10 @@ export class AndroidHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<Command> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: ModuleBuildTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
 
-		this.resolveCommonOptions(context, definition, builder);
+		await this.resolveCommonModuleOptions(context, definition, builder);
 
 		return builder.resolve();
 	}

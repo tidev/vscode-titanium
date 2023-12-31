@@ -90,23 +90,27 @@ describe('utils', () => {
 		expect(utils.nameForTarget('device')).to.equal('Device');
 		expect(utils.nameForTarget('emulator')).to.equal('Emulator');
 		expect(utils.nameForTarget('simulator')).to.equal('Simulator');
+		expect(utils.nameForTarget('macos')).to.equal('macOS');
 		expect(utils.nameForTarget('dist-adhoc')).to.equal('Ad-Hoc');
 		expect(utils.nameForTarget('dist-appstore')).to.equal('App Store');
 		expect(utils.nameForTarget('dist-playstore')).to.equal('Play Store');
+		expect(utils.nameForTarget('dist-macappstore')).to.equal('macOS App Store');
 	});
 
 	it('targetForName', () => {
 		expect(utils.targetForName('Device')).to.equal('device');
 		expect(utils.targetForName('Emulator')).to.equal('emulator');
 		expect(utils.targetForName('Simulator')).to.equal('simulator');
+		expect(utils.targetForName('macOS')).to.equal('macos');
 		expect(utils.targetForName('Ad-Hoc')).to.equal('dist-adhoc');
 		expect(utils.targetForName('App Store')).to.equal('dist-appstore');
 		expect(utils.targetForName('Play Store')).to.equal('dist-playstore');
+		expect(utils.targetForName('macOS App Store')).to.equal('dist-macappstore');
 	});
 
 	it('targetsForPlatform', () => {
 		expect(utils.targetsForPlatform('android')).to.deep.equal([ 'emulator', 'device', 'dist-playstore' ]);
-		expect(utils.targetsForPlatform('ios')).to.deep.equal([ 'simulator', 'device', 'dist-adhoc', 'dist-appstore' ]);
+		expect(utils.targetsForPlatform('ios')).to.deep.equal([ 'simulator', 'device', 'macos', 'dist-adhoc', 'dist-appstore', 'dist-macappstore' ]);
 	});
 
 	it('should be able to retrieve a device name', () => {

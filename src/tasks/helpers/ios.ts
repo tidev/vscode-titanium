@@ -4,7 +4,7 @@ import { getCorrectCertificateName } from '../../utils';
 import { IosCert } from '../../types/common';
 import { TaskHelper } from './base';
 import { Command } from '../commandBuilder';
-import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, BuildTaskTitaniumBuildBase } from '../buildTaskProvider';
+import { BuildTaskDefinitionBase, AppBuildTaskTitaniumBuildBase, ModuleBuildTaskTitaniumBuildBase } from '../buildTaskProvider';
 import { AppPackageTaskTitaniumBuildBase, PackageTaskDefinitionBase, PackageTaskTitaniumBuildBase } from '../packageTaskProvider';
 import { WorkspaceState } from '../../constants';
 
@@ -120,10 +120,10 @@ export class IosHelper extends TaskHelper {
 		return builder.resolve();
 	}
 
-	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: BuildTaskTitaniumBuildBase): Promise<Command> {
+	public async resolveModuleBuildCommandLine (context: TaskExecutionContext, definition: ModuleBuildTaskTitaniumBuildBase): Promise<Command> {
 		const builder = this.createBuilder();
 
-		this.resolveCommonOptions(context, definition, builder);
+		await this.resolveCommonModuleOptions(context, definition, builder);
 
 		return builder.resolve();
 	}

@@ -1,15 +1,15 @@
 import { TreeItemCollapsibleState } from 'vscode';
-import { BaseNode } from './baseNode';
+import { BaseNode } from '../baseNode';
 import { DeviceNode } from './deviceNode';
 import { DistributeNode } from './distributeNode';
 import { OSVerNode } from './osVerNode';
 
-import { Platform } from '../../types/common';
-import { targetForName } from '../../utils';
-import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../types/cli';
-import { BlankNode } from '../nodes';
-import { ExtensionContainer } from '../../container';
-import { GlobalState } from '../../constants';
+import { Platform, ProjectType } from '../../../types/common';
+import { targetForName } from '../../../utils';
+import { DevelopmentTarget, PrettyDevelopmentTarget } from '../../../types/cli';
+import { BlankNode } from '../../nodes';
+import { ExtensionContainer } from '../../../container';
+import { GlobalState } from '../../../constants';
 
 export class TargetNode extends BaseNode {
 
@@ -19,7 +19,8 @@ export class TargetNode extends BaseNode {
 
 	constructor (
 		public override readonly label: PrettyDevelopmentTarget,
-		public readonly platform: Platform
+		public readonly platform: Platform,
+		public readonly projectType?: ProjectType
 	) {
 		super(label);
 		this.targetId = targetForName(this.label) as DevelopmentTarget;
@@ -39,7 +40,7 @@ export class TargetNode extends BaseNode {
 			switch (this.label) {
 				case 'Simulator':
 					for (const simVer of ExtensionContainer.environment.iOSSimulatorVersions()) {
-						devices.push(new OSVerNode(simVer, this.platform, this.label));
+						devices.push(new OSVerNode(simVer, this.platform, this.label, this.projectType));
 					}
 					break;
 				case 'Device':
@@ -48,7 +49,7 @@ export class TargetNode extends BaseNode {
 						if (device.productVersion) {
 							label = `${label} (${device.productVersion})`;
 						}
-						devices.push(new DeviceNode(label, this.platform, this.label, device.udid, this.targetId));
+						devices.push(new DeviceNode(label, this.platform, this.label, device.udid, this.targetId, undefined, this.projectType));
 					}
 					break;
 				case 'Package' as PrettyDevelopmentTarget:
@@ -60,7 +61,7 @@ export class TargetNode extends BaseNode {
 			switch (this.label) {
 				case 'Device':
 					for (const device of ExtensionContainer.environment.androidDevices()) {
-						devices.push(new DeviceNode(device.name, this.platform, this.label, device.id, this.targetId));
+						devices.push(new DeviceNode(device.name, this.platform, this.label, device.id, this.targetId, undefined, this.projectType));
 					}
 					break;
 				case 'Emulator':
@@ -70,7 +71,7 @@ export class TargetNode extends BaseNode {
 							if (type === 'Genymotion') {
 								label = `${label} (Genymotion)`;
 							}
-							devices.push(new DeviceNode(label, this.platform, this.label, emulator.id, this.targetId));
+							devices.push(new DeviceNode(label, this.platform, this.label, emulator.id, this.targetId, undefined, this.projectType));
 						}
 					}
 					break;

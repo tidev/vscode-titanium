@@ -1,19 +1,18 @@
-import { BaseNode } from './baseNode';
+import { BaseNode } from '../../baseNode';
 
 import { TreeItemCollapsibleState } from 'vscode';
-import { Platform } from '../../types/common';
-import { DeploymentTarget } from '../../types/cli';
+import { Platform } from '../../../../types/common';
+import {  } from '../../../../types/cli';
 
-export class DistributeNode extends BaseNode {
+export class ModulePackageNode extends BaseNode {
 
 	public readonly collapsibleState = TreeItemCollapsibleState.None;
-	public readonly contextValue: string = 'DistributeNode';
+	public readonly contextValue: string = 'ModulePackageNode';
 
 	constructor (
 		public override readonly label: string,
 		public readonly platform: Platform,
 		public readonly target: string,
-		public override readonly targetId: DeploymentTarget
 	) {
 		super(label);
 	}
