@@ -1,6 +1,6 @@
 {
   "name": "titanium-sdk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",
   "icon": "images/logo-titanium.png",
@@ -52,11 +52,7 @@
         "languages": [
           "javascript"
         ],
-        "enableBreakpointsFor": {
-          "languageIds": [
-            "javascript"
-          ]
-        },
+        
         "program": "./out/debugger/titaniumDebugger.js",
         "runtime": "node",
         "initialConfigurations": [
@@ -480,6 +476,11 @@
           "type": "string",
           "default": "en",
           "description": "Default language to use for i18n autocomplete."
+        },
+        "titanium.ios.organizations": {
+          "type": "string",
+          "default": "",
+          "description": "Input JSON object with your organization's names and IDs. "
         }
       }
     },
