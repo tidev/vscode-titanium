@@ -234,7 +234,7 @@ export class CommonUICreator {
 					}, 45000);
 
 					const input = await InputBox.create();
-					const choices = await input.getQuickPicks();
+					const choices = await input.getCheckboxes();
 					const items = [];
 					for (const choice of choices) {
 						items.push(await choice.getText());

@@ -210,11 +210,11 @@ export class Project extends CommonUICreator {
 		const placeHolderText = await input.getPlaceHolder();
 		expect(placeHolderText).to.equal('Choose platforms', 'Did not show platform selection');
 
-		const choices = await input.getQuickPicks();
+		const choices = await input.getCheckboxes();
 		for (const choice of choices) {
 			const text = await choice.getText();
 			if (!platforms.includes(text.toLowerCase())) {
-				await input.selectQuickPick(text);
+				await choice.select();
 				await this.driver.sleep(50);
 			}
 		}
