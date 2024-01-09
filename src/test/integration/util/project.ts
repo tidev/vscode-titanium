@@ -59,6 +59,8 @@ export class Project extends CommonUICreator {
 			throw new Error(`Failed to create application, "Creating application" notification did not show. Output error was ${text}`);
 		}
 
+		await this.setClassicOrAlloy(options.classic);
+
 		try {
 			await this.driver.wait(async () => {
 				// We need to sleep here as there are times when the 'Creating application' notification
@@ -162,16 +164,19 @@ export class Project extends CommonUICreator {
 
 	// Creation specific helpers
 
-	public async setEnableServices(enableServices: boolean): Promise<void> {
-		const servicesText = enableServices ? 'Yes' : 'No';
+	public async setClassicOrAlloy(classicApp?: boolean): Promise<void> {
 		const input = await InputBox.create();
 
 		const placeHolderText = await input.getPlaceHolder();
-		expect(placeHolderText).to.equal('Enable services?', 'Did not show enable services prompt');
+		expect(placeHolderText).to.equal('Create an Alloy project?', 'Did not show alloy or classic selection');
 
-		await input.setText(servicesText);
+		if (classicApp) {
+			await input.setText('No');
+		} else {
+			await input.setText('Yes');
+		}
+
 		await input.confirm();
-		await this.driver.sleep(100);
 	}
 
 	public async setFolder(): Promise<void> {

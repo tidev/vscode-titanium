@@ -10,6 +10,7 @@ export type AppCreateOptions = {
 	folder: string;
 	name: string;
 	platforms: string[];
+	classic?: boolean;
 }
 
 export type AppBuildOptions = {
