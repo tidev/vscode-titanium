@@ -15,3 +15,9 @@ updates:
   - dependency-name: "@types/vscode"
     versions:
     - "> 1.49.0"
+  groups:
+    eslint:
+      patterns:
+      - "@typescript-eslint/*"
+      - "eslint*"
+    

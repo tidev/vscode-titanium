@@ -6,56 +6,26 @@ import { deviceQuickPick, DeviceQuickPickItem } from './common';
 import * as vscode from 'vscode';
 export async function selectiOSCertificate (buildType: string): Promise<IosCert> {
 	const certificateType: IosCertificateType = buildType === 'run' ? 'developer' : 'distribution';
-	var organizationName: string = "";
-	var certificates: any[] = [];
-	var configs = vscode.workspace.getConfiguration("titanium.ios");
-	console.log("Workspace settings: "+JSON.stringify(configs));
-	var organizations = JSON.parse(configs.organizations);
-	console.log("oraginzations: "+JSON.stringify(organizations)); 
+	let organizationName = '';
+	const certificates: any[] = [];
+	const configs = vscode.workspace.getConfiguration('titanium.ios');
+	const organizations = JSON.parse(configs.organizations);
 	ExtensionContainer.environment.iOSCertificates(certificateType).forEach(cert => {
-		var organization = cert.name.split("(")[1];
-	 	organization = organization.split(")")[0];
+		let organization = cert.name.split('(')[1];
+		organization = organization.split(')')[0];
 		organizations.forEach((company: { id: string; name: string; }) => {
-			if(company.id == organization)
-			{
-				organizationName = "-> "+company.name;
+			if (company.id === organization) {
+				organizationName = '-> ' + company.name;
 			}
 		});
-		// switch(organization)
-		// {
-		// 	case "TZF9D6738F)":
-		// 		organizationName = "->"+organizations[orga];
-		// 		break;
-		// 	case "73QRFU8MDC)":
-		// 		organizationName = "-> Maxapp";
-		// 		break;
-		// 	case "866XP64YG8)":
-		// 		organizationName = "-> Invictus";
-		// 		break;
-		// 	case "A44NCZA6MJ)":
-		// 		organizationName = "-> Cityrent";
-		// 		break;
-		// 	case "XXGXKPL793)":
-		// 		organizationName = "-> Agevolt";
-		// 		break;
-		// }
-		var certificate = {
-		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
-			label: cert.name+organizationName,
-		pem: cert.pem,
-		id: cert.fullname
+		const certificate = {
+			description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
+			label: cert.name + organizationName,
+			pem: cert.pem,
+			id: cert.fullname
 		};
 		certificates.push(certificate);
-		
-		
 	});
-	
-	// const certificates = ExtensionContainer.environment.iOSCertificates(certificateType).map(cert => ({
-	// 	description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
-	// 	label: cert.name+organizationName,
-	// 	pem: cert.pem,
-	// 	id: cert.fullname
-	// }));
 	const choice = await quickPick(certificates, { placeHolder: 'Select certificate' });
 
 	const certificate = ExtensionContainer.environment.iOSCertificates(certificateType).find(cert => cert.pem === choice.pem);
