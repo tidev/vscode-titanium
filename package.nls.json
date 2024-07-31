@@ -41,6 +41,7 @@
   "titanium.commands.showOutputChannel.title": "Show Output Channel",
   "titanium.config.android.keystoreAlias": "Keystore alias used for packaging Android applications",
   "titanium.config.android.keystorePath": "Path to keystore used for packaging Android applications",
+  "titanium.config.ios.organizations": "Input JSON object with your organization's names and IDs.",
   "titanium.config.build.liveview": "Whether to enable LiveView when building applications",
   "titanium.config.codeTemplates.jsFunction": "Event handler function template",
   "titanium.config.codeTemplates.tssClass": "Style class (.) template",
