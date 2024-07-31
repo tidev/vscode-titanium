@@ -53,11 +53,7 @@
         "languages": [
           "javascript"
         ],
-        "enableBreakpointsFor": {
-          "languageIds": [
-            "javascript"
-          ]
-        },
+        
         "program": "./out/debugger/titaniumDebugger.js",
         "runtime": "node",
         "initialConfigurations": [
@@ -480,7 +476,12 @@
         "titanium.project.defaultI18nLanguage": {
           "type": "string",
           "default": "en",
-          "description": "%titanium.config.project.defaultI18nLanguage%"
+          "description": "Default language to use for i18n autocomplete."
+        },
+        "titanium.ios.organizations": {
+          "type": "string",
+          "default": "",
+          "description": "Input JSON object with your organization's names and IDs. "
         }
       }
     },

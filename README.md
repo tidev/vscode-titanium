@@ -92,6 +92,7 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.general.useTerminalForBuild` | When true build/package commands will be run using the integrated terminal as opposed to using an output channel. | `true` |
 | `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
 | `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
+| `titanium.ios.organizations` | Input JSON object with your organization's names and IDs.  | `No Default` |
 
 ## Snippet definitions
 

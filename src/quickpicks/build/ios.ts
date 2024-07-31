@@ -3,15 +3,29 @@ import { Target } from '../..//types/cli';
 import { IosCert, IosCertificateType, IosProvisioningType, ProvisioningProfile } from '../../types/common';
 import { quickPick, CustomQuickPick } from '../common';
 import { deviceQuickPick, DeviceQuickPickItem } from './common';
-
+import * as vscode from 'vscode';
 export async function selectiOSCertificate (buildType: string): Promise<IosCert> {
 	const certificateType: IosCertificateType = buildType === 'run' ? 'developer' : 'distribution';
-	const certificates = ExtensionContainer.environment.iOSCertificates(certificateType).map(cert => ({
-		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
-		label: cert.fullname,
-		pem: cert.pem,
-		id: cert.fullname
-	}));
+	let organizationName = '';
+	const certificates: any[] = [];
+	const configs = vscode.workspace.getConfiguration('titanium.ios');
+	const organizations = JSON.parse(configs.organizations);
+	ExtensionContainer.environment.iOSCertificates(certificateType).forEach(cert => {
+		let organization = cert.name.split('(')[1];
+		organization = organization.split(')')[0];
+		organizations.forEach((company: { id: string; name: string; }) => {
+			if (company.id === organization) {
+				organizationName = '-> ' + company.name;
+			}
+		});
+		const certificate = {
+			description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
+			label: cert.name + organizationName,
+			pem: cert.pem,
+			id: cert.fullname
+		};
+		certificates.push(certificate);
+	});
 	const choice = await quickPick(certificates, { placeHolder: 'Select certificate' });
 
 	const certificate = ExtensionContainer.environment.iOSCertificates(certificateType).find(cert => cert.pem === choice.pem);
