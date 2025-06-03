@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/tidev/vscode-titanium/compare/v1.3.0...v1.4.0) (2025-06-03)
+
+
+### Features
+
+* **create:** option for Alloy/Classic project creation ([#1179](https://github.com/tidev/vscode-titanium/issues/1179)) ([9929aae](https://github.com/tidev/vscode-titanium/commit/9929aaef429863e8a471b805c15acdf7ee0089fa))
+* update editor commons to use newer node version range in empty state ([b1d2265](https://github.com/tidev/vscode-titanium/commit/b1d2265f0f000e7b89e31afb3034d36fe372febe))
+
 # [1.3.0](https://github.com/tidev/vscode-titanium/compare/v1.2.1...v1.3.0) (2023-10-29)
 
 
