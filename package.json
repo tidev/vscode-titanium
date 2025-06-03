@@ -1,6 +1,6 @@
 {
   "name": "titanium-sdk",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "displayName": "Titanium",
   "description": "Intellisense, snippets, and integrated build tools for Titanium",
   "icon": "images/logo-titanium.png",
@@ -30,7 +30,7 @@
   },
   "engines": {
     "vscode": "^1.73.0",
-    "node": ">=16.14.2"
+    "node": ">=18.0.0"
   },
   "activationEvents": [
     "workspaceContains:**/tiapp.xml",
@@ -1067,7 +1067,7 @@
     "ms": "^2.1.3",
     "semver": "^7.3.5",
     "source-map": "^0.7.4",
-    "titanium-editor-commons": "^2.1.0",
+    "titanium-editor-commons": "^2.2.0",
     "uuid": "^9.0.0",
     "vscode-chrome-debug-core": "^6.8.11",
     "vscode-debugadapter": "^1.51.0",
