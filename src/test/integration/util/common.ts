@@ -292,7 +292,7 @@ export class CommonUICreator {
 			const dialog = await this.driver.findElement(By.className('monaco-dialog-box'));
 
 			if (dialog) {
-				const trustButton = await this.driver.findElement(By.xpath('.//a[starts-with(@title, "Yes")]'));
+				const trustButton = await this.driver.findElement(By.xpath('.//a[starts-with(text(), "Yes")]'));
 				if (trustButton) {
 					await trustButton.click();
 					return;
