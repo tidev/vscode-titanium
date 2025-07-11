@@ -29,7 +29,7 @@
     "url": "https://github.com/tidev/vscode-titanium.git"
   },
   "engines": {
-    "vscode": "^1.73.0",
+    "vscode": "^1.100.0",
     "node": ">=18.0.0"
   },
   "activationEvents": [
