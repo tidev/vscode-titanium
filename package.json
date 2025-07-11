@@ -1053,7 +1053,7 @@
     "sinon-chai": "^3.7.0",
     "tmp": "^0.2.1",
     "typescript": "^5.0.4",
-    "vscode-extension-tester": "^7.0.0"
+    "vscode-extension-tester": "^8.16.2 "
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
