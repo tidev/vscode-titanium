@@ -66,3 +66,16 @@ for (const value of viewsWelcome) {
 
 fs.writeJsonSync(path.join(__dirname, '..', 'package.json'), packageJson, { spaces: 2 });
 fs.writeJsonSync(path.join(__dirname, '..', 'package.nls.json'), existing, { spaces: 2 });
+
+const regexp = /package.nls.(\w+).json/;
+const others = fs.readdirSync(path.join(__dirname, '..')).filter(item => regexp.test(item));
+
+for (const file of others) {
+	const contents = fs.readJsonSync(path.join(__dirname, '..', file));
+	for (const [ key, value ] of Object.entries(existing)) {
+		if (!contents[key]) {
+			contents[key] = value;
+		}
+	}
+	fs.writeJsonSync(path.join(__dirname, '..', file), contents, { spaces: 2 });
+}
