@@ -19,4 +19,11 @@ for (const file of others) {
 	}
 }
 
+if (Object.keys(missing).length === 0) {
+	console.log('All translations are up to date.');
+	process.exit(0);
+}
+
+console.log('The following translations are missing:');
 console.log(JSON.stringify(missing, null, 2));
+process.exit(1);
