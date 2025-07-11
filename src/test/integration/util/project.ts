@@ -98,18 +98,6 @@ export class Project extends CommonUICreator {
 
 		try {
 			await this.driver.wait(async () => {
-				await this.driver.sleep(100);
-				return notificationExists('Creating module');
-			}, 10000);
-		} catch (error) {
-			// If this notification doesn't show then it's due to the command failing,
-			// so lets scoop the output from the output view
-			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create module, "Creating module" notification did not show. Output error was ${text}`);
-		}
-
-		try {
-			await this.driver.wait(async () => {
 				// We need to sleep here as there are times when the 'Creating module' notification
 				// is still shown but is dismissed by the time we get the text in notificationExists and
 				// causes errors to be thrown that can't be handled
