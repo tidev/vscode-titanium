@@ -46,19 +46,6 @@ export class Project extends CommonUICreator {
 		await this.setId(options.id);
 		await this.setPlatforms(options.platforms);
 		await this.setFolder();
-
-		try {
-			await this.driver.wait(async () => {
-				await this.driver.sleep(100);
-				return notificationExists('Creating application');
-			}, 10000);
-		} catch (error) {
-			// If this notification doesn't show then it's due to the command failing,
-			// so lets scoop the output from the output view
-			const text = await this.getErrorOutput();
-			throw new Error(`Failed to create application, "Creating application" notification did not show. Output error was ${text}`);
-		}
-
 		await this.setClassicOrAlloy(options.classic);
 
 		try {

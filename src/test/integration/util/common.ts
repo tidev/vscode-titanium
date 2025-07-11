@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, EditorTab, EditorView, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, EditorTab, EditorView, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser, NotificationsCenter, NotificationType } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -45,17 +45,20 @@ export async function testSetup(): Promise<void> {
 export async function notificationExists(text: string): Promise<Notification | undefined> {
 	// lowercase the text to avoid requiring specific text
 	text = text.toLowerCase();
-	const notifications = await new Workbench().getNotifications();
+	const wb = new Workbench();
+	await wb.openNotificationsCenter();
+	const nc = new NotificationsCenter();
+	const notifications = await nc.getNotifications(NotificationType.Any);
+	// const notifications = await wb.getNotifications();
 	for (const notification of notifications) {
 		try {
 			const message = await notification.getMessage();
 			if (message.toLowerCase().includes(text)) {
+				await notification.dismiss();
+				await nc.close();
 				return notification;
 			}
-		} catch (error) {
-			return notification;
-		}
-
+		} catch (error) {}
 	}
 }
 
