@@ -14,3 +14,9 @@ Jenkinsfile
 scripts/
 junit_report.xml
 test-resources/
+.eslintignore
+release.config.js
+.husky/**
+.nyc_output/**
+coverage/**
+doc/**
