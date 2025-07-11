@@ -40,6 +40,7 @@ describe('App smoke', function () {
 			folder: tempDirectory.name,
 			name,
 			platforms: [ 'android', 'ios' ],
+			dismissNotifications: false
 		});
 
 		expect(fs.existsSync(projectPath)).to.equal(true);
