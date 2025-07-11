@@ -282,11 +282,16 @@ export class CommonUICreator {
 	public async getActivityView (): Promise<ViewControl> {
 		const activityBar = new ActivityBar();
 		const tiActivity = await this.driver.wait<ViewControl>(async () => {
-			const activity = await activityBar.getViewControl('Titanium');
-			if (!activity?.isDisplayed()) {
-				return false;
+			try {
+				const activity = await activityBar.getViewControl('Titanium');
+				if (!activity?.isDisplayed()) {
+					return false;
+				}
+				return activity;
+			} catch (error) {
+				// ignore error while we're waiting for the view to load
 			}
-			return activity;
+
 		}, 10000);
 		return tiActivity;
 	}
