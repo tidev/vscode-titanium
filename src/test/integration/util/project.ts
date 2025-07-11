@@ -29,11 +29,7 @@ export class Project extends CommonUICreator {
 
 	public async cleanApp(): Promise<void> {
 		await this.workbench.executeCommand('Titanium: Clean');
-
-		await this.driver.wait(async () => {
-			await this.driver.sleep(500);
-			return notificationExists('cleaning project');
-		}, 7500);
+		await this.driver.sleep(1000);
 	}
 
 	public async createApp(options: AppCreateOptions): Promise<void> {
@@ -54,7 +50,7 @@ export class Project extends CommonUICreator {
 				// is still shown but is dismissed by the time we get the text in notificationExists and
 				// causes errors to be thrown that can't be handled
 				await this.driver.sleep(100);
-				return notificationExists('Project created');
+				return notificationExists('Project created', options.dismissNotifications);
 			}, 60000);
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
@@ -102,7 +98,7 @@ export class Project extends CommonUICreator {
 				// is still shown but is dismissed by the time we get the text in notificationExists and
 				// causes errors to be thrown that can't be handled
 				await this.driver.sleep(100);
-				return notificationExists('Project created');
+				return notificationExists('Project created', options.dismissNotifications);
 			}, 60000);
 		} catch (error) {
 			// If this notification doesn't show then it's due to the command failing,
@@ -131,10 +127,7 @@ export class Project extends CommonUICreator {
 
 		await this.setPlatform(options.platform);
 
-		await this.driver.wait(async () => {
-			await this.driver.sleep(500);
-			return notificationExists('cleaning project');
-		}, 7500);
+		await this.driver.sleep(1000);
 	}
 
 	// Creation specific helpers
@@ -281,7 +274,7 @@ export class Project extends CommonUICreator {
 
 	public async openInWorkspace (): Promise<void> {
 		const notification = await this.driver.wait(async () => {
-			return await notificationExists('project created');
+			return await notificationExists('project created', false);
 		});
 
 		if (!notification) {
@@ -301,5 +294,7 @@ export class Project extends CommonUICreator {
 		if (!opened) {
 			throw new Error('Failed to open project');
 		}
+
+		await this.driver.sleep(1000);
 	}
 }

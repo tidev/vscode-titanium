@@ -40,9 +40,10 @@ export async function testSetup(): Promise<void> {
  * Check if a notification exists
  *
  * @param {string} text - text that the notification will contain.
+ * @param {boolean} [dismiss=true] - whether to dismiss the notification after finding it.
  * @returns {(Promise<Notification | undefined>)}
  */
-export async function notificationExists(text: string): Promise<Notification | undefined> {
+export async function notificationExists(text: string, dismiss = true): Promise<Notification | undefined> {
 	// lowercase the text to avoid requiring specific text
 	text = text.toLowerCase();
 	const wb = new Workbench();
@@ -54,8 +55,10 @@ export async function notificationExists(text: string): Promise<Notification | u
 		try {
 			const message = await notification.getMessage();
 			if (message.toLowerCase().includes(text)) {
-				await notification.dismiss();
-				await nc.close();
+				if (dismiss) {
+					await notification.dismiss();
+					await nc.close();
+				}
 				return notification;
 			}
 		} catch (error) {}

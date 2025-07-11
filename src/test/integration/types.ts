@@ -11,6 +11,7 @@ export type AppCreateOptions = {
 	name: string;
 	platforms: string[];
 	classic?: boolean;
+	dismissNotifications?: boolean;
 }
 
 export type AppBuildOptions = {
@@ -28,7 +29,8 @@ export type ModuleCreateOptions = {
 	codeBases: {
 		android?: 'java' | 'kotlin';
 		ios?: 'objc' | 'swift';
-	}
+	};
+	dismissNotifications?: boolean;
 }
 
 export type ModuleBuildOptions = {
