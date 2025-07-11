@@ -78,6 +78,8 @@
   "titanium.tasks.titanium-package.titaniumBuild": "Properties used to configure the build",
   "titanium.tasks.titanium-package.android": "Einstellungen für Android Projekte",
   "titanium.tasks.titanium-package.android.keystore": "Android Keystore Einstellungen",
+  "titanium.tasks.titanium-package.android.keystore.alias": "Alias for the keystore",
+  "titanium.tasks.titanium-package.android.keystore.location": "Path of the keystore to be used, must be a full path",
   "titanium.tasks.titanium-package.extraArguments": "Extra arguments to be used in the build",
   "titanium.tasks.titanium-package.ios": "Properties used to configure iOS builds",
   "titanium.tasks.titanium-package.ios.provisioningProfile": "Provisioning Profile UUID to be used",
