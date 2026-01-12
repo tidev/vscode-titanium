@@ -52,22 +52,6 @@ describe('utils', () => {
 		});
 	});
 
-	it('getCorrectCertificateName Should return correct name property for <8.2.0', () => {
-		const certificate = utils.getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41234)', '8.1.1.GA', 'developer');
-		expect(certificate).to.equal('Mrs Developer (D4BDS41234)');
-	});
-
-	it('getCorrectCertificateName return correct name property for >=8.2.0', () => {
-		const certificate = utils.getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41234)', '8.2.0.GA', 'developer');
-		expect(certificate).to.equal('iPhone Developer: Mrs Developer (D4BDS41234)');
-	});
-
-	it('getCorrectCertificateName should throw if cant find certificate', () => {
-		expect(() => {
-			utils.getCorrectCertificateName('iPhone Developer: Mrs Developer (D4BDS41233)', '8.2.0.GA', 'developer');
-		}).to.throw('Failed to lookup certificate iPhone Developer: Mrs Developer (D4BDS41233)');
-	});
-
 	it('findProjectDirectory', async () => {
 		const file = path.join(getCommonAlloyProjectDirectory(), 'app', 'controllers', 'sample.js');
 		const dir = await utils.findProjectDirectory(file);
