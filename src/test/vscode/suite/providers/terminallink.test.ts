@@ -6,7 +6,6 @@ import * as vscode from 'vscode';
 
 import sinonChai from 'sinon-chai';
 import { ExtensionContainer } from '../../../../container';
-import { afterEach, beforeEach, describe, it } from 'mocha';
 import { TiTerminalLinkProvider } from '../../../../providers/terminalLinkProvider';
 import { getCommonAlloyProjectDirectory } from '../../../../test/common/utils';
 import { Platform } from '../../../../types/common';

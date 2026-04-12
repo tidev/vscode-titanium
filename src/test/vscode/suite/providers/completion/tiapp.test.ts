@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { afterEach, beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import * as path from 'path';
 import { getUnitFixturesDirectory } from '../../../utils';
@@ -8,7 +7,7 @@ import * as vscode from 'vscode';
 
 import { TiappCompletionItemProvider } from '../../../../../providers/completion/tiappCompletionItemProvider';
 import { getCommonAlloyProjectDirectory } from '../../../../../test/common/utils';
-import info from '../../../fixtures/ti_info';
+import info from '../../../../unit/fixtures/ti_info';
 import { ExtensionContainer } from '../../../../../container';
 import { Environment } from '../../../../../environment-info';
 

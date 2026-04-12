@@ -995,11 +995,16 @@
     "generate-docs": "node ./scripts/render.js",
     "lint": "eslint src/ scripts/",
     "release": "npm run generate-docs && cross-env HUSKY=0 semantic-release",
-    "test": "cross-env COVERAGE=1 node ./out/test/unit/runTest.js",
+    "test": "npm run test:vscode",
+    "test:ci": "npm run compile && npm run test:unit:compiled && npm run test:vscode:compiled",
+    "test:coverage": "npm run compile && vscode-test --coverage --coverage-reporter cobertura --coverage-reporter html --coverage-reporter text",
     "test:integration": "npm run compile && node ./out/test/integration/runTests.js",
     "test:smoke": "npm run compile && cross-env SMOKE=1 node ./out/test/integration/runTests.js",
+    "test:unit": "npm run compile && npm run test:unit:compiled",
+    "test:unit:compiled": "node ./out/test/unit/run.js",
+    "test:vscode": "npm run compile && npm run test:vscode:compiled",
+    "test:vscode:compiled": "vscode-test",
     "vscode:prepublish": "npm run compile",
-    "pretest": "npm run compile",
     "watch": "tsc -watch -p ./",
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
@@ -1029,6 +1034,7 @@
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "chai": "^4.5.0",
     "chai-as-promised": "^7.1.2",
@@ -1057,6 +1063,7 @@
   },
   "dependencies": {
     "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
+    "@vscode/l10n": "^0.0.14",
     "detect-indent": "^6.1.0",
     "find-up": "^5.0.0",
     "fs-extra": "^11.3.4",
@@ -1073,7 +1080,6 @@
     "vscode-debugadapter": "^1.51.0",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.1",
-    "xml2js": "^0.5.0",
-    "@vscode/l10n": "^0.0.14"
+    "xml2js": "^0.5.0"
   }
 }

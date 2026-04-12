@@ -1,8 +1,6 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { Environment } from '../../../environment-info';
-import info from '../fixtures/ti_info';
+import info from '../../unit/fixtures/ti_info';
 
 describe('appc', () => {
 	const Env = new Environment();
