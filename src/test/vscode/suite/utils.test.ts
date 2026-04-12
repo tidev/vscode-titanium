@@ -1,10 +1,9 @@
 import * as path from 'path';
 import { expect } from 'chai';
-import { afterEach, beforeEach, describe, it } from 'mocha';
 
 import * as utils from '../../../utils';
 import { getCommonAlloyProjectDirectory } from '../../../test/common/utils';
-import info from '../fixtures/ti_info';
+import info from '../../unit/fixtures/ti_info';
 import { ExtensionContainer } from '../../../container';
 import { Environment } from '../../../environment-info';
 import * as sinon from 'sinon';

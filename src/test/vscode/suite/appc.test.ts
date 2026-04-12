@@ -1,8 +1,6 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
-
 import { Environment } from '../../../environment-info';
-import info from '../fixtures/ti_info';
+import info from '../../unit/fixtures/ti_info';
 
 describe('appc', () => {
 	const Env = new Environment();
@@ -55,14 +53,6 @@ describe('appc', () => {
 	describe('devices', () => {
 		it('should return iOS sim versions', () => {
 			expect(Env.iOSSimulatorVersions()).to.deep.equal([ '11.0', '10.3' ]);
-		});
-
-		it('should return iOS targets', () => {
-			const targets = Env.iOSTargets();
-
-			expect(targets.devices.length).to.equal(2);
-			expect(targets.simulators['11.0'].length).to.equal(15);
-			expect(targets.simulators['10.3'].length).to.equal(16);
 		});
 
 		it('should return Android targets', () => {

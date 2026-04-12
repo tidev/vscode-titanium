@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
 import { CommandBuilder } from '../../../../tasks/commandBuilder';
 
 describe('CommandBuilder', () => {

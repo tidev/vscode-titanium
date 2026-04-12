@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import * as vscode from 'vscode';
 
 import { expect } from 'chai';
-import { afterEach, beforeEach, describe, it } from 'mocha';
 import { Project } from '../../../../../project';
 import { StyleDefinitionProvider } from '../../../../../providers/definition/styleDefinitionProvider';
 import { getFileUri } from '../../../utils';

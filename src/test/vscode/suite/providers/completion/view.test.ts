@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import { after, before, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import { Project } from '../../../../../project';
 import * as vscode from 'vscode';

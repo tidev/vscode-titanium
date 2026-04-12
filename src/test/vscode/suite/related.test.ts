@@ -6,7 +6,6 @@ import * as vscode from 'vscode';
 
 import chaiAsPromised from 'chai-as-promised';
 import sinonChai from 'sinon-chai';
-import { afterEach, beforeEach, describe, it } from 'mocha';
 import { ExtensionContainer } from '../../../container';
 import { getFileUri } from '../utils';
 import { Project } from '../../../project';
