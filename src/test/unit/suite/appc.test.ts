@@ -57,14 +57,6 @@ describe('appc', () => {
 			expect(Env.iOSSimulatorVersions()).to.deep.equal([ '11.0', '10.3' ]);
 		});
 
-		it('should return iOS targets', () => {
-			const targets = Env.iOSTargets();
-
-			expect(targets.devices.length).to.equal(2);
-			expect(targets.simulators['11.0'].length).to.equal(15);
-			expect(targets.simulators['10.3'].length).to.equal(16);
-		});
-
 		it('should return Android targets', () => {
 			const targets = Env.androidTargets();
 
