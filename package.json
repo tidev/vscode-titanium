@@ -1062,7 +1062,9 @@
     "vscode-extension-tester": "^8.23.0"
   },
   "dependencies": {
-    "@awam/remotedebug-ios-webkit-adapter": "^0.4.3",
+    "@tidev/remotedebug-ios-webkit-adapter": "file:packages/tidev-remotedebug-ios-webkit-adapter",
+    "@vscode/debugadapter": "^1.68.0",
+    "@vscode/debugprotocol": "^1.68.0",
     "@vscode/l10n": "^0.0.14",
     "detect-indent": "^6.1.0",
     "find-up": "^5.0.0",
@@ -1077,7 +1079,6 @@
     "titanium-editor-commons": "^2.3.0",
     "uuid": "^9.0.1",
     "vscode-chrome-debug-core": "^6.8.11",
-    "vscode-debugadapter": "^1.51.0",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.1",
     "xml2js": "^0.5.0"

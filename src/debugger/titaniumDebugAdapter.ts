@@ -1,10 +1,9 @@
-import { ProxyServer } from '@awam/remotedebug-ios-webkit-adapter';
+import { ProxyServer } from '@tidev/remotedebug-ios-webkit-adapter';
 import { ChromeDebugAdapter, Crdp } from 'vscode-chrome-debug-core';
 import got from 'got';
 import { sleep } from '../common/utils';
-import { URL } from 'url';
-import { Event } from 'vscode-debugadapter';
-import { DebugProtocol } from 'vscode-debugprotocol';
+import { Event } from '@vscode/debugadapter';
+import { DebugProtocol } from '@vscode/debugprotocol';
 import { MESSAGE_STRING, Request, Response, TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 
 interface IWDBResponse {
