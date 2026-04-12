@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { RawSourceMap, SourceMapConsumer } from 'source-map';
 
 import { ExtensionContainer } from '../container';
-import { normalisedPlatform, normalizeDriveLetter } from '../utils';
+import { normalisedPlatform, normalizeDriveLetter, toUnixPath } from '../utils';
 import { Platform } from '../types/common';
 
 interface TiTerminalLink extends vscode.TerminalLink {
@@ -35,11 +35,11 @@ function toSourceMapPath(value: string): string {
 
 function fromSourceMapPath(value: string): string {
 	if (!WINDOWS_FILE_URL_REGEX.test(value)) {
-		return process.platform === 'win32' ? normalizeDriveLetter(path.normalize(value)) : value;
+		return process.platform === 'win32' ? normalizeDriveLetter(toUnixPath(path.normalize(value))) : value;
 	}
 
 	const decodedPath = decodeURIComponent(value.replace('file:///', ''));
-	return normalizeDriveLetter(path.normalize(decodedPath));
+	return normalizeDriveLetter(toUnixPath(decodedPath));
 }
 
 function normalizeSourceMapPaths(sourceMap: RawSourceMap): RawSourceMap {
