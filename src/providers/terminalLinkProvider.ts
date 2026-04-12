@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { SourceMapConsumer } from 'source-map';
+import { RawSourceMap, SourceMapConsumer } from 'source-map';
 
 import { ExtensionContainer } from '../container';
 import { normalisedPlatform, normalizeDriveLetter } from '../utils';
@@ -20,6 +20,35 @@ interface OriginalSourceData {
 	column: number;
 	filename: string;
 	line: number;
+}
+
+const WINDOWS_PATH_REGEX = /^[A-Za-z]:[\\/]/;
+const WINDOWS_FILE_URL_REGEX = /^file:\/\/\/[A-Za-z]:\//;
+
+function toSourceMapPath(value: string): string {
+	if (!WINDOWS_PATH_REGEX.test(value)) {
+		return value;
+	}
+
+	return `file:///${value.replace(/\\/g, '/')}`;
+}
+
+function fromSourceMapPath(value: string): string {
+	if (!WINDOWS_FILE_URL_REGEX.test(value)) {
+		return process.platform === 'win32' ? normalizeDriveLetter(path.normalize(value)) : value;
+	}
+
+	const decodedPath = decodeURIComponent(value.replace('file:///', ''));
+	return normalizeDriveLetter(path.normalize(decodedPath));
+}
+
+function normalizeSourceMapPaths(sourceMap: RawSourceMap): RawSourceMap {
+	return {
+		...sourceMap,
+		file: typeof sourceMap.file === 'string' ? toSourceMapPath(sourceMap.file) : sourceMap.file,
+		sourceRoot: typeof sourceMap.sourceRoot === 'string' ? toSourceMapPath(sourceMap.sourceRoot) : sourceMap.sourceRoot,
+		sources: sourceMap.sources.map(source => toSourceMapPath(source))
+	};
 }
 
 export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
@@ -131,7 +160,7 @@ export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
 
 		const platformFolderName = normalisedPlatform(platform) === 'ios' ? 'iphone' : 'android';
 		const sourceMapFile = path.join(projectDirectory, 'build', 'map', 'Resources', platformFolderName, `${filename}.map`);
-		const sourceMap = await fs.readJSON(sourceMapFile);
+		const sourceMap = normalizeSourceMapPaths(await fs.readJSON(sourceMapFile) as RawSourceMap);
 
 		const SM = await new SourceMapConsumer(sourceMap);
 
@@ -148,7 +177,7 @@ export class TiTerminalLinkProvider implements vscode.TerminalLinkProvider {
 
 		const openLine = position.line || line;
 		const openColumn = position.column || column;
-		const sourceFilename = process.platform === 'win32' ? normalizeDriveLetter(path.normalize(position.source)) : position.source;
+		const sourceFilename = fromSourceMapPath(position.source);
 
 		return {
 			column: openColumn,

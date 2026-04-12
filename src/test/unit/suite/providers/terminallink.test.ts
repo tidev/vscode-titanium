@@ -34,6 +34,12 @@ const mapContents = {
 	]
 };
 
+const windowsMapContents = {
+	...mapContents,
+	file: 'D:\\a\\vscode-titanium\\vscode-titanium\\Resources\\android\\alloy\\controllers\\index.js',
+	sourceRoot: 'D:\\a\\vscode-titanium\\vscode-titanium'
+};
+
 describe('TerminalLinkProvider', () => {
 	const provider = new TiTerminalLinkProvider();
 	let sandbox: sinon.SinonSandbox;
@@ -190,6 +196,30 @@ describe('TerminalLinkProvider', () => {
 			const range = new vscode.Range(1, 17, 1, 17);
 			expect(stub.callCount).to.equal(1);
 			expect(stub).to.have.been.calledWith(document, { selection: range });
+		});
+
+		it('should handle Windows source map roots', async () => {
+			const link = {
+				startIndex: 27,
+				length: 33,
+				tooltip: 'Open file',
+				line: 52,
+				column: 17,
+				terminalName: 'Build android',
+				projectDirectory: getCommonAlloyProjectDirectory(),
+				filename: '/alloy/controllers/index.js',
+				platform: 'android' as Platform
+			};
+
+			await fs.writeJSON(mapFile, windowsMapContents);
+
+			const mappedInfo = await (provider as any).resolveSourceMap(link);
+
+			expect(mappedInfo).to.deep.equal({
+				column: 17,
+				filename: 'D:/a/vscode-titanium/vscode-titanium/app/controllers/index.js',
+				line: 1
+			});
 		});
 	});
 });
