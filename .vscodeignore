@@ -20,3 +20,4 @@ release.config.js
 .nyc_output/**
 coverage/**
 doc/**
+packages/tidev-remotedebug-ios-webkit-adapter/node_modules/**
