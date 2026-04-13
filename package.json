@@ -1077,7 +1077,7 @@
     "semver": "^7.7.4",
     "source-map": "^0.7.6",
     "titanium-editor-commons": "^2.3.0",
-    "uuid": "^9.0.1",
+    "uuid": "^13.0.0",
     "vscode-chrome-debug-core": "^6.8.11",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.1",
