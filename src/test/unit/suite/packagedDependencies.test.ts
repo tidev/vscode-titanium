@@ -1,4 +1,5 @@
 import { execFileSync } from 'child_process';
+import { readFileSync } from 'fs';
 import * as path from 'path';
 import { strict as assert } from 'assert';
 
@@ -18,5 +19,13 @@ describe('packaged dependencies', () => {
 				stdio: 'pipe'
 			});
 		});
+	});
+
+	it('does not install the vendored iOS debugger adapter as a file dependency', () => {
+		const repoRoot = path.resolve(__dirname, '../../../..');
+		const packageJson = JSON.parse(readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+		const adapterDependency = packageJson.dependencies?.['@tidev/remotedebug-ios-webkit-adapter'];
+
+		assert.notEqual(typeof adapterDependency === 'string' && adapterDependency.startsWith('file:'), true);
 	});
 });

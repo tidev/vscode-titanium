@@ -1062,11 +1062,12 @@
     "vscode-extension-tester": "^8.23.0"
   },
   "dependencies": {
-    "@tidev/remotedebug-ios-webkit-adapter": "file:packages/tidev-remotedebug-ios-webkit-adapter",
     "@vscode/debugadapter": "^1.68.0",
     "@vscode/debugprotocol": "^1.68.0",
     "@vscode/l10n": "^0.0.14",
+    "debug": "^4.4.3",
     "detect-indent": "^6.1.0",
+    "express": "^4.21.2",
     "find-up": "^5.0.0",
     "fs-extra": "^11.3.4",
     "get-port": "^5.1.1",
@@ -1081,6 +1082,7 @@
     "vscode-chrome-debug-core": "^6.8.11",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.1",
+    "ws": "^8.18.3",
     "xml2js": "^0.5.0"
   }
 }

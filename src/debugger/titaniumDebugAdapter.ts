@@ -1,4 +1,4 @@
-import { ProxyServer } from '@tidev/remotedebug-ios-webkit-adapter';
+import { ProxyServer } from '../../packages/tidev-remotedebug-ios-webkit-adapter/out/server';
 import { ChromeDebugAdapter, Crdp } from 'vscode-chrome-debug-core';
 import got from 'got';
 import { sleep } from '../common/utils';
