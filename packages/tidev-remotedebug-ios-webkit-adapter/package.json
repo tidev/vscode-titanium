@@ -4,6 +4,7 @@
   "description": "TiDev-maintained fork of the RemoteDebug iOS WebKit Adapter runtime used by vscode-titanium",
   "license": "MIT",
   "main": "./out/server.js",
+  "types": "./out/server.d.ts",
   "dependencies": {
     "debug": "^4.4.3",
     "express": "^4.21.2",
