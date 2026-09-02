@@ -14,7 +14,7 @@ describe('packaged dependencies', () => {
 		];
 
 		requiredFiles.forEach(relativePath => {
-			execFileSync('git', ['ls-files', '--error-unmatch', relativePath], {
+			execFileSync('git', [ 'ls-files', '--error-unmatch', relativePath ], {
 				cwd: repoRoot,
 				stdio: 'pipe'
 			});

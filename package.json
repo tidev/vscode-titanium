@@ -53,11 +53,6 @@
         "languages": [
           "javascript"
         ],
-        "enableBreakpointsFor": {
-          "languageIds": [
-            "javascript"
-          ]
-        },
         "program": "./out/debugger/titaniumDebugger.js",
         "runtime": "node",
         "initialConfigurations": [
@@ -142,6 +137,151 @@
               "preLaunchTask": {
                 "type": "string",
                 "description": "%titanium.debug.preLaunchTask%"
+              }
+            }
+          }
+        }
+      },
+      {
+        "type": "titanium-next",
+        "label": "Titanium (next)",
+        "languages": [
+          "javascript"
+        ],
+        "initialConfigurations": [
+          {
+            "name": "Launch on Android",
+            "type": "titanium-next",
+            "request": "launch",
+            "platform": "android"
+          },
+          {
+            "name": "Launch on iOS",
+            "type": "titanium-next",
+            "request": "launch",
+            "platform": "ios"
+          },
+          {
+            "name": "Attach to running app",
+            "type": "titanium-next",
+            "request": "attach",
+            "platform": "android",
+            "port": 9000
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "Titanium (next): Launch on Android Emulator",
+            "description": "Configuration for launch app on Android emulator",
+            "body": {
+              "name": "Launch on Android emulator",
+              "type": "titanium-next",
+              "request": "launch",
+              "platform": "android",
+              "target": "emulator"
+            }
+          },
+          {
+            "label": "Titanium (next): Launch on Android Device",
+            "description": "Configuration for launch app on Android device",
+            "body": {
+              "name": "Launch on Android device",
+              "type": "titanium-next",
+              "request": "launch",
+              "platform": "android",
+              "target": "device"
+            }
+          },
+          {
+            "label": "Titanium (next): Launch on iOS simulator",
+            "description": "Configuration for launch app on iOS simulator",
+            "body": {
+              "name": "Launch on iOS simulator",
+              "type": "titanium-next",
+              "request": "launch",
+              "platform": "ios",
+              "target": "simulator"
+            }
+          },
+          {
+            "label": "Titanium (next): Launch on iOS device",
+            "description": "Configuration for launch app on iOS device",
+            "body": {
+              "name": "Launch on iOS device",
+              "type": "titanium-next",
+              "request": "launch",
+              "platform": "ios",
+              "target": "device"
+            }
+          },
+          {
+            "label": "Titanium (next): Attach to running app",
+            "description": "Attach to a Titanium app whose debug port is already forwarded to localhost",
+            "body": {
+              "name": "Attach to running app",
+              "type": "titanium-next",
+              "request": "attach",
+              "platform": "android",
+              "port": 9000
+            }
+          }
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "platform"
+            ],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "description": "%titanium.debug.platform%"
+              },
+              "projectDir": {
+                "type": "string",
+                "description": "%titanium.debug.projectDir%",
+                "defaultValue": "[${workspaceFolder}](https://code.visualstudio.com/docs/editor/variables-reference#_predefined-variables)"
+              },
+              "port": {
+                "type": "number",
+                "description": "%titanium.debug.port%"
+              },
+              "preLaunchTask": {
+                "type": "string",
+                "description": "%titanium.debug.preLaunchTask%"
+              }
+            }
+          },
+          "attach": {
+            "required": [
+              "platform",
+              "port"
+            ],
+            "properties": {
+              "platform": {
+                "type": "string",
+                "enum": [
+                  "android"
+                ],
+                "description": "Platform of the target app. iOS attach is not yet supported."
+              },
+              "port": {
+                "type": "number",
+                "description": "Debug port on the host where the V8 inspector is reachable (typically the adb-forwarded port)."
+              },
+              "host": {
+                "type": "string",
+                "default": "localhost",
+                "description": "Host where the V8 inspector is reachable. Defaults to localhost."
+              },
+              "trace": {
+                "type": "boolean",
+                "default": false,
+                "description": "When true, the debug adapter emits per-step diagnostic OutputEvents to the Debug Console. Off by default."
+              },
+              "projectRoot": {
+                "type": "string",
+                "default": "${workspaceFolder}",
+                "description": "Absolute path to the Titanium project root. Used to resolve source maps. Defaults to ${workspaceFolder}."
               }
             }
           }
@@ -1031,6 +1171,7 @@
     "@types/uuid": "^9.0.8",
     "@types/vscode": "1.73.0",
     "@types/which": "^3.0.4",
+    "@types/ws": "^8.18.1",
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
@@ -1082,7 +1223,7 @@
     "vscode-chrome-debug-core": "^6.8.11",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.1",
-    "ws": "^8.18.3",
+    "ws": "^8.21.0",
     "xml2js": "^0.5.0"
   }
 }
