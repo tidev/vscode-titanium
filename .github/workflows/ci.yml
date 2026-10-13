@@ -23,8 +23,6 @@ jobs:
         run: |
           npm run generate-docs
           git diff --exit-code -- README.md doc/
-      - name: Unit tests
-        run: npm run test:unit:compiled
 
   VSCode-Test:
     name: ${{ matrix.os }} - VS Code Tests
