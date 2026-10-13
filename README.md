@@ -90,6 +90,7 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.general.logLevel` | Logging level for commands being run | `info` |
 | `titanium.general.updateFrequency` | Controls the frequency for how often to show an alert if there are updates available. Updates can always be viewed in the Titanium activity pane. Accepts values in time formats like 60 minutes, 12 hours, 7 days etc. | `1 day` |
 | `titanium.general.useTerminalForBuild` | When true build/package commands will be run using the integrated terminal as opposed to using an output channel. | `true` |
+| `titanium.languageServer.enabled` | Use the Titanium language server for completion, hover, go to definition and code actions in Titanium and Alloy projects. When off, the built-in providers answer instead; they will be removed in a future release. Takes effect after reloading the window. | `true` |
 | `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
 | `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
 

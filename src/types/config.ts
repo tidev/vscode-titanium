@@ -14,6 +14,9 @@ export interface Config {
 		tssId: string;
 		tssTag: string;
 	};
+	languageServer: {
+		enabled: boolean;
+	};
 	general: {
 		defaultCreationDirectory?: string;
 		displayBuildCommandInConsole: boolean;

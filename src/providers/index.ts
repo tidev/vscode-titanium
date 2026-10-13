@@ -26,32 +26,21 @@ const viewFilePattern = '**/app/{views,widgets}/**/*.xml';
 const styleFilePattern = '**/*.tss';
 const controllerFilePattern = '{**/app/controllers/**/*.js,**/app/lib/**/*.js,**/app/widgets/**/*.js,**/app/alloy.js}';
 
-export function registerProviders(context: vscode.ExtensionContext): void {
+/** Whether the built-in providers answer, so whether they need completions generated */
+let builtInProviders = false;
 
-	// register completion providers
-	context.subscriptions.push(
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCompletionItemProvider(), '.', '\'', '"', '/'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleCompletionItemProvider(), '.', '\'', '"'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerCompletionItemProvider(), '.', '\'', '"', '/'),
-		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, new TiappCompletionItemProvider(), '.')
-	);
-
-	// register hover providers
-	context.subscriptions.push(
-		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, new ViewHoverProvider()),
-	);
-
-	// register definition providers
-	context.subscriptions.push(
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewDefinitionProvider()),
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleDefinitionProvider()),
-		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerDefinitionProvider())
-	);
-
-	// register code action providers
-	context.subscriptions.push(
-		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider())
-	);
+/**
+ * Registers the terminal links and the code action commands, and the built-in language providers
+ * when the language server is not answering
+ *
+ * @param {vscode.ExtensionContext} context - The extension context
+ * @param {boolean} languageFeatures - Whether to register the built-in language providers
+ */
+export function registerProviders(context: vscode.ExtensionContext, languageFeatures: boolean): void {
+	builtInProviders = languageFeatures;
+	if (languageFeatures) {
+		registerLanguageProviders(context);
+	}
 
 	// register our TerminalLink provider
 	context.subscriptions.push(
@@ -223,6 +212,38 @@ export function registerProviders(context: vscode.ExtensionContext): void {
 	});
 }
 
+/**
+ * Registers the built-in completion, hover, definition and code action providers
+ *
+ * @param {vscode.ExtensionContext} context - The extension context
+ */
+function registerLanguageProviders(context: vscode.ExtensionContext): void {
+	// register completion providers
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCompletionItemProvider(), '.', '\'', '"', '/'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleCompletionItemProvider(), '.', '\'', '"'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerCompletionItemProvider(), '.', '\'', '"', '/'),
+		vscode.languages.registerCompletionItemProvider({ scheme: 'file', pattern: '**/tiapp.xml' }, new TiappCompletionItemProvider(), '.')
+	);
+
+	// register hover providers
+	context.subscriptions.push(
+		vscode.languages.registerHoverProvider({ scheme: 'file', pattern: '**/{*.xml,*.tss,*.js}' }, new ViewHoverProvider()),
+	);
+
+	// register definition providers
+	context.subscriptions.push(
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewDefinitionProvider()),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: styleFilePattern }, new StyleDefinitionProvider()),
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', pattern: controllerFilePattern }, new ControllerDefinitionProvider())
+	);
+
+	// register code action providers
+	context.subscriptions.push(
+		vscode.languages.registerCodeActionsProvider({ scheme: 'file', pattern: viewFilePattern }, new ViewCodeActionProvider())
+	);
+}
+
 function wrapValue(value: string|number, quote: string) {
 	if (typeof value !== 'string' || (value.startsWith('Alloy.') || value.startsWith('Ti.') || value.startsWith('Titanium.') || value.startsWith('$.args.') || !isNaN(Number(value)))) {
 		return value;
@@ -238,7 +259,7 @@ function wrapValue(value: string|number, quote: string) {
 * @param {Project} project - The Titanium project instance
 */
 export async function generateCompletions (force = false, project: Project): Promise<void> {
-	if (!project.isValid()) {
+	if (!builtInProviders || !project.isValid()) {
 		return;
 	}
 	let sdkVersion: string|string[]|undefined;
