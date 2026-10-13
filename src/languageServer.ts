@@ -32,11 +32,10 @@ export function serverModule (): string {
  * @returns {Promise<LanguageClient>} The running client
  */
 export async function startLanguageServer (context: vscode.ExtensionContext): Promise<LanguageClient> {
-	const module = serverModule();
-	const serverOptions: ServerOptions = {
-		run: { module, transport: TransportKind.stdio },
-		debug: { module, transport: TransportKind.stdio, options: { execArgv: [ '--inspect=6009' ] } }
-	};
+	// the same in both modes: a fixed inspector port clashes between two windows, and Node announces
+	// it on stderr, which the client logs as an error
+	const server = { module: serverModule(), transport: TransportKind.stdio };
+	const serverOptions: ServerOptions = { run: server, debug: server };
 	const clientOptions: LanguageClientOptions = { documentSelector };
 
 	const client = new LanguageClient('titanium', 'Titanium Language Server', serverOptions, clientOptions);
