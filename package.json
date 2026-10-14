@@ -476,6 +476,11 @@
           "default": true,
           "description": "%titanium.config.general.useTerminalForBuild%"
         },
+        "titanium.languageServer.diagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "%titanium.config.languageServer.diagnostics%"
+        },
         "titanium.languageServer.enabled": {
           "type": "boolean",
           "default": true,

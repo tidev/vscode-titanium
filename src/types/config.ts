@@ -16,6 +16,7 @@ export interface Config {
 	};
 	languageServer: {
 		enabled: boolean;
+		diagnostics: boolean;
 	};
 	general: {
 		defaultCreationDirectory?: string;

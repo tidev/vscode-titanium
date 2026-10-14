@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
 import { DocumentSelector, LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } from 'vscode-languageclient/node';
+import { DiagnosticsGate } from './diagnosticsGate';
+
+/** The setting that shows or hides the server's warnings, which the server itself has no setting for */
+const DIAGNOSTICS_SETTING = 'titanium.languageServer.diagnostics';
 
 /**
  * The files the server answers for. It decides from the project layout what a file is to
@@ -36,10 +40,24 @@ export async function startLanguageServer (context: vscode.ExtensionContext): Pr
 	// it on stderr, which the client logs as an error
 	const server = { module: serverModule(), transport: TransportKind.stdio };
 	const serverOptions: ServerOptions = { run: server, debug: server };
-	const clientOptions: LanguageClientOptions = { documentSelector };
+	const gate = new DiagnosticsGate(() => vscode.workspace.getConfiguration().get<boolean>(DIAGNOSTICS_SETTING, true));
+	const clientOptions: LanguageClientOptions = {
+		documentSelector,
+		middleware: {
+			handleDiagnostics: (uri, diagnostics, next) => gate.handle(uri, diagnostics, next)
+		}
+	};
 
 	const client = new LanguageClient('titanium', 'Titanium Language Server', serverOptions, clientOptions);
 	context.subscriptions.push(client);
+
+	// applied at once in both directions, rather than after a reload or the next edit
+	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(event => {
+		if (event.affectsConfiguration(DIAGNOSTICS_SETTING)) {
+			gate.reapply((uri, diagnostics) => client.diagnostics?.set(uri, diagnostics));
+		}
+	}));
+
 	await client.start();
 	return client;
 }

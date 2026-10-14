@@ -53,6 +53,7 @@
   "titanium.config.general.useTerminalForBuild": "When true build/package commands will be run using the integrated terminal as opposed to using an output channel.",
   "titanium.config.package.distributionOutputDirectory": "Output directory for package builds.",
   "titanium.config.project.defaultI18nLanguage": "Default language to use for i18n autocomplete.",
+  "titanium.config.languageServer.diagnostics": "Show the Titanium language server's warnings in Alloy views and stylesheets, such as a property the element doesn't have. Only applies while the language server is enabled.",
   "titanium.config.languageServer.enabled": "Use the Titanium language server for completion, hover, go to definition and code actions in Titanium and Alloy projects. When off, the built-in providers answer instead; they will be removed in a future release. Takes effect after reloading the window.",
   "titanium.config.codeTemplates.deprecated": "Only used when `#titanium.languageServer.enabled#` is off, and will be removed with the built-in providers. The language server writes new handlers and styles in the form of the file it writes into.",
   "titanium.config.project.defaultI18nLanguage.deprecated": "Only used when `#titanium.languageServer.enabled#` is off, and will be removed with the built-in providers. The language server offers keys from every language, and adds a new string to `en`, or to a project's only language when that is not `en`.",
