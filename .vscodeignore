@@ -10,7 +10,7 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 # the language server reads these at run time: Alloy's globals, and TypeScript's standard library
-!node_modules/titanium-language-server/assets/*.d.ts
+!node_modules/@titanium-sdk/language-server/assets/*.d.ts
 !node_modules/**/typescript/lib/*.d.ts
 .github/**
 Jenkinsfile

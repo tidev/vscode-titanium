@@ -1074,6 +1074,7 @@
     "vscode-extension-tester": "^8.23.0"
   },
   "dependencies": {
+    "@titanium-sdk/language-server": "^0.1.0",
     "@vscode/debugadapter": "^1.68.0",
     "@vscode/debugprotocol": "^1.68.0",
     "@vscode/l10n": "^0.0.14",
@@ -1090,7 +1091,6 @@
     "semver": "^7.7.4",
     "source-map": "^0.7.6",
     "titanium-editor-commons": "^2.3.0",
-    "titanium-language-server": "github:ewanharris/titanium-language-server#bf7bf06c8909099be78e2cec41a2e8d6f56dd4b5",
     "uuid": "^9.0.1",
     "vscode-chrome-debug-core": "^6.8.11",
     "vscode-languageclient": "^10.1.2",

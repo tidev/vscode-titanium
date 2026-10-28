@@ -25,7 +25,7 @@ export const documentSelector: DocumentSelector = [
  * @returns {string} The absolute path to the server module
  */
 export function serverModule (): string {
-	return require.resolve('titanium-language-server/server');
+	return require.resolve('@titanium-sdk/language-server/server');
 }
 
 /**
