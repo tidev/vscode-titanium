@@ -1074,7 +1074,7 @@
     "vscode-extension-tester": "^8.23.0"
   },
   "dependencies": {
-    "@titanium-sdk/language-server": "^0.1.0",
+    "@titanium-sdk/language-server": "^0.1.1",
     "@vscode/debugadapter": "^1.68.0",
     "@vscode/debugprotocol": "^1.68.0",
     "@vscode/l10n": "^0.0.14",
