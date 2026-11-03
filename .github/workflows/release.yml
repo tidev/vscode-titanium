@@ -47,10 +47,10 @@ jobs:
       - name: Package
         run: npx vsce package --out "$VSIX"
       - name: Publish to Visual Studio Marketplace
-        run: npx vsce publish --packagePath "$VSIX" --oidc
+        run: npx vsce publish --packagePath "$VSIX" --oidc --skip-duplicate
       - name: Publish to Open VSX
-        run: npx ovsx publish "$VSIX" --trusted-publishing
+        run: npx ovsx publish "$VSIX" --trusted-publishing --skip-duplicate
       - name: Attach VSIX to GitHub release
-        run: gh release upload "$TAG" "$VSIX"
+        run: gh release upload "$TAG" "$VSIX" --clobber
         env:
           GH_TOKEN: ${{ github.token }}
