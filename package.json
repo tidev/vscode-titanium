@@ -423,22 +423,26 @@
         "titanium.codeTemplates.jsFunction": {
           "type": "string",
           "default": "\\nfunction ${text}(e){\\n}\\n",
-          "description": "%titanium.config.codeTemplates.jsFunction%"
+          "description": "%titanium.config.codeTemplates.jsFunction%",
+          "markdownDeprecationMessage": "%titanium.config.codeTemplates.deprecated%"
         },
         "titanium.codeTemplates.tssClass": {
           "type": "string",
           "default": "\\n'.${text}': {\\n}\\n",
-          "description": "%titanium.config.codeTemplates.tssClass%"
+          "description": "%titanium.config.codeTemplates.tssClass%",
+          "markdownDeprecationMessage": "%titanium.config.codeTemplates.deprecated%"
         },
         "titanium.codeTemplates.tssId": {
           "type": "string",
           "default": "\\n'#${text}': {\\n}\\n",
-          "description": "%titanium.config.codeTemplates.tssId%"
+          "description": "%titanium.config.codeTemplates.tssId%",
+          "markdownDeprecationMessage": "%titanium.config.codeTemplates.deprecated%"
         },
         "titanium.codeTemplates.tssTag": {
           "type": "string",
           "default": "\\n'${text}': {\\n}\\n",
-          "description": "%titanium.config.codeTemplates.tssTag%"
+          "description": "%titanium.config.codeTemplates.tssTag%",
+          "markdownDeprecationMessage": "%titanium.config.codeTemplates.deprecated%"
         },
         "titanium.general.defaultCreationDirectory": {
           "type": "string",
@@ -472,6 +476,16 @@
           "default": true,
           "description": "%titanium.config.general.useTerminalForBuild%"
         },
+        "titanium.languageServer.diagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "%titanium.config.languageServer.diagnostics%"
+        },
+        "titanium.languageServer.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "%titanium.config.languageServer.enabled%"
+        },
         "titanium.package.distributionOutputDirectory": {
           "type": "string",
           "default": "dist",
@@ -480,7 +494,8 @@
         "titanium.project.defaultI18nLanguage": {
           "type": "string",
           "default": "en",
-          "description": "%titanium.config.project.defaultI18nLanguage%"
+          "description": "%titanium.config.project.defaultI18nLanguage%",
+          "markdownDeprecationMessage": "%titanium.config.project.defaultI18nLanguage.deprecated%"
         }
       }
     },
@@ -1026,7 +1041,7 @@
     "@types/sinon-chai": "^3.2.12",
     "@types/tmp": "^0.2.6",
     "@types/uuid": "^9.0.8",
-    "@types/vscode": "1.73.0",
+    "@types/vscode": "1.100.0",
     "@types/which": "^3.0.4",
     "@types/xml2js": "^0.4.14",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
@@ -1059,6 +1074,7 @@
     "vscode-extension-tester": "^8.23.0"
   },
   "dependencies": {
+    "@titanium-sdk/language-server": "^0.1.1",
     "@vscode/debugadapter": "^1.68.0",
     "@vscode/debugprotocol": "^1.68.0",
     "@vscode/l10n": "^0.0.14",
@@ -1077,6 +1093,7 @@
     "titanium-editor-commons": "^2.3.0",
     "uuid": "^9.0.1",
     "vscode-chrome-debug-core": "^6.8.11",
+    "vscode-languageclient": "^10.1.2",
     "vscode-wizard": "^0.2.20",
     "which": "^3.0.1",
     "ws": "^8.18.3",

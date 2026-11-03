@@ -10,6 +10,7 @@ import { environment } from 'titanium-editor-commons';
 import { registerTaskProviders } from './tasks/tasksHelper';
 import { registerDebugProvider } from './debugger/titaniumDebugHelper';
 import { generateCompletions, registerProviders } from './providers';
+import { startLanguageServer } from './languageServer';
 import { registerCommands } from './commands/index';
 import { registerViews } from './explorer';
 import { dirname } from 'path';
@@ -25,7 +26,7 @@ export async function activate (context: vscode.ExtensionContext): Promise<void>
 	ExtensionContainer.inititalize(context, config);
 
 	registerCommands();
-	registerProviders(context);
+	registerProviders(context, !await languageServerStarted(context, config));
 	registerViews(context);
 	registerTaskProviders(context);
 	registerDebugProvider(context);
@@ -51,6 +52,38 @@ export async function activate (context: vscode.ExtensionContext): Promise<void>
 	vscode.workspace.onDidGrantWorkspaceTrust(async () => {
 		await startup();
 	});
+
+	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(async event => {
+		if (!event.affectsConfiguration('titanium.languageServer.enabled')) {
+			return;
+		}
+		const reload = await vscode.window.showInformationMessage('Reload the window to apply titanium.languageServer.enabled.', 'Reload Window');
+		if (reload) {
+			await vscode.commands.executeCommand('workbench.action.reloadWindow');
+		}
+	}));
+}
+
+/**
+ * Starts the language server unless the settings turn it off. A server that fails to start is
+ * reported, and the built-in providers answer instead.
+ *
+ * @param {vscode.ExtensionContext} context - The extension context
+ * @param {Config} config - The extension's settings
+ * @returns {Promise<boolean>} Whether the server is answering
+ */
+async function languageServerStarted (context: vscode.ExtensionContext, config: Config): Promise<boolean> {
+	if (!config.languageServer.enabled) {
+		return false;
+	}
+	try {
+		await startLanguageServer(context);
+		return true;
+	} catch (error) {
+		const message = error instanceof Error ? error.message : String(error);
+		vscode.window.showErrorMessage(`The Titanium language server failed to start, so the built-in providers are answering instead. ${message}`);
+		return false;
+	}
 }
 
 /**
