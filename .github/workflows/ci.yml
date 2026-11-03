@@ -19,6 +19,10 @@ jobs:
         run: npm run compile
       - name: Lint
         run: npm run lint
+      - name: Check generated docs are up to date
+        run: |
+          npm run generate-docs
+          git diff --exit-code -- README.md doc/
 
   VSCode-Test:
     name: ${{ matrix.os }} - VS Code Tests
