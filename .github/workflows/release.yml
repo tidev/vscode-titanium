@@ -1,21 +1,56 @@
 name: Release
-on: workflow_dispatch
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
-  Release:
+  release-please:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - id: release
+        uses: googleapis/release-please-action@v5
+
+  publish:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write   # attach the .vsix to the GitHub release
+      id-token: write   # Marketplace + Open VSX trusted publishing
+    env:
+      TAG: ${{ needs.release-please.outputs.tag_name }}
+      VSIX: titanium-sdk-${{ needs.release-please.outputs.version }}.vsix
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          ref: ${{ env.TAG }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24.x'
-      - name: Install NPM dependencies
-        run: npm ci
-      - name: Release
-        run: npm run release
+      - run: npm ci
+      - name: Package
+        run: npx vsce package --out "$VSIX"
+      - name: Publish to Visual Studio Marketplace
+        run: npx vsce publish --packagePath "$VSIX" --oidc --skip-duplicate
+      - name: Publish to Open VSX
+        run: npx ovsx publish "$VSIX" --trusted-publishing --skip-duplicate
+      - name: Attach VSIX to GitHub release
+        run: gh release upload "$TAG" "$VSIX" --clobber
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+          GH_TOKEN: ${{ github.token }}

@@ -15,9 +15,10 @@ scripts/
 junit_report.xml
 test-resources/
 .eslintignore
-release.config.js
 .husky/**
 .nyc_output/**
 coverage/**
 doc/**
 packages/tidev-remotedebug-ios-webkit-adapter/node_modules/**
+.release-please-manifest.json
+release-please-config.json
