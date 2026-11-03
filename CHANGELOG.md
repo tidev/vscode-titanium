@@ -5,13 +5,11 @@
 
 ### Features
 
-* add agentic setup ([8728513](https://github.com/tidev/vscode-titanium/commit/87285138fcdc4fe8d6d93472c8c5a15696f1a379))
 * provide language features through titanium-language-server ([#1265](https://github.com/tidev/vscode-titanium/issues/1265)) ([da774b1](https://github.com/tidev/vscode-titanium/commit/da774b157d4b30fb1c36d4000e1038f28121e0b8))
 
 
 ### Bug Fixes
 
-* properly handle debugger fork ([c94d706](https://github.com/tidev/vscode-titanium/commit/c94d706740467e2b11d90a073c98aedabee61b1d))
 * replace vulnerable ios debugger peer dependencies, use fork ([52c5447](https://github.com/tidev/vscode-titanium/commit/52c54471a4c3b6748daeed4841021ea79958913b))
 
 ## [1.4.0](https://github.com/tidev/vscode-titanium/compare/v1.3.0...v1.4.0) (2025-06-03)
