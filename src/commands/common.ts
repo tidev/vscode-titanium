@@ -40,6 +40,7 @@ export enum Commands {
 	Package = 'titanium.package.run',
 	RefreshExplorer = 'titanium.explorer.refresh',
 	RefreshHelp = 'titanium.helpExplorer.refresh',
+	ScanCertificates = 'titanium.ios.scanCertificates',
 	SelectUpdates = 'titanium.updates.select',
 	SetLogLevel = 'titanium.build.setLogLevel',
 	ShowOutputChannel = 'titanium.showOutputChannel',

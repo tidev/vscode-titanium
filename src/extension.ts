@@ -14,10 +14,13 @@ import { startLanguageServer } from './languageServer';
 import { registerCommands } from './commands/index';
 import { registerViews } from './explorer';
 import { dirname } from 'path';
+import { migrateIOSOrganizationSettings } from './iosOrganizationSettings';
 
 import ms = require('ms');
 
 export async function activate (context: vscode.ExtensionContext): Promise<void> {
+
+	await migrateIOSOrganizationSettings();
 
 	Configuration.configure(context);
 

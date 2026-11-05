@@ -1,4 +1,5 @@
 {
+  "titanium.commands.ios.scanCertificates.title": "Scan Certificates and Import Organizations",
   "titanium.commands.create.application.title": "Create application",
   "titanium.commands.create.application.description": "Create a new Titanium application project",
   "titanium.commands.create.keystore.title": "Create keystore",
@@ -41,6 +42,7 @@
   "titanium.commands.showOutputChannel.title": "Show Output Channel",
   "titanium.config.android.keystoreAlias": "Keystore alias used for packaging Android applications",
   "titanium.config.android.keystorePath": "Path to keystore used for packaging Android applications",
+  "titanium.config.ios.organizations": "Map Team IDs or legacy certificate IDs to custom organization names. Add entries manually, or use Scan Certificates and Import Organizations in the Titanium Build App header. Existing names are preserved.",
   "titanium.config.build.liveview": "Whether to enable LiveView when building applications",
   "titanium.config.codeTemplates.jsFunction": "Event handler function template",
   "titanium.config.codeTemplates.tssClass": "Style class (.) template",

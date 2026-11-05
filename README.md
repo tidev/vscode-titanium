@@ -94,6 +94,28 @@ You can learn more about User and Workspace settings in the [VS Code documentati
 | `titanium.languageServer.enabled` | Use the Titanium language server for completion, hover, go to definition and code actions in Titanium and Alloy projects. When off, the built-in providers answer instead; they will be removed in a future release. Takes effect after reloading the window. | `true` |
 | `titanium.package.distributionOutputDirectory` | Output directory for package builds. | `dist` |
 | `titanium.project.defaultI18nLanguage` | Default language to use for i18n autocomplete. | `en` |
+| `titanium.ios.organizations` | Map iOS Team IDs or legacy certificate IDs to custom display names. | `{}` |
+
+### iOS organization names
+
+On macOS, open the Titanium sidebar and hover over the **Build App** header. Click the **Scan Certificates and Import Organizations** search icon beside **Refresh devices**. The same action is available in the Command Palette as **Titanium: Scan Certificates and Import Organizations**.
+
+Choose **User settings** (recommended for local signing certificates) or **Workspace settings**. The scan refreshes Titanium's development and distribution certificates across its discovered keychains and reads their public certificate metadata. Organization names come from subject `O` and real Team IDs from subject `OU`; the ID in parentheses in a certificate name is not always the Team ID. No private keys are exported.
+
+The scan adds missing Team IDs, preserves your existing names and manual entries, and excludes expired, invalid, or unreadable certificates. Identical certificates in multiple keychains are counted once. If certificates have conflicting organization names for the same Team ID, choose a name or press Escape to skip that team. Scanning again adds only missing entries.
+
+You can also search for `titanium.ios.organizations` in VS Code Settings and add, edit, or remove entries manually. Both Team IDs and existing certificate-ID aliases are supported:
+
+```json
+"titanium.ios.organizations": {
+  "TZF9D6738F": "1st Organisation",
+  "73QRFU8MDC": "Second one"
+}
+```
+
+The certificate picker displays the full certificate name, including its type (for example, `Apple Development` or `iPhone Developer`), expiry, Team ID, and a short fingerprint. Identical copies across keychains are collapsed, while distinct certificates remain selectable. A certificate-specific alias takes precedence over a Team ID alias, followed by the organization name read from the certificate. Changes take effect the next time the picker opens.
+
+Older JSON-string arrays of `id`/`name` entries are converted automatically at their original User or Workspace scope when the extension activates. Recoverable numbered-character entries from editing an old string in the object table are converted too. Invalid settings are preserved with a warning so you can correct them in Settings (JSON).
 
 ## Snippet definitions
 

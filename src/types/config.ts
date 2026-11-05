@@ -14,6 +14,9 @@ export interface Config {
 		tssId: string;
 		tssTag: string;
 	};
+	ios: {
+		organizations: Record<string, string>;
+	};
 	languageServer: {
 		enabled: boolean;
 		diagnostics: boolean;
