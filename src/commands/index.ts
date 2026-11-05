@@ -24,6 +24,7 @@ import { generateTask } from './generateTask';
 import { createKeystore } from './createKeystore';
 import { readJSON } from 'fs-extra';
 import { startup } from '../extension';
+import { scanCertificates } from './scanCertificates';
 
 export function registerCommand (commandId: string, callback: (...args: any[]) => unknown): void {
 	ExtensionContainer.context.subscriptions.push(
@@ -64,6 +65,8 @@ export function registerCommands (): void {
 			return packageModule(node, folder);
 		}
 	});
+
+	registerCommand(Commands.ScanCertificates, () => scanCertificates());
 
 	// register stop command
 	registerCommand(Commands.StopBuild, () => {

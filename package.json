@@ -182,6 +182,13 @@
         "description": "%titanium.commands.create.module.description%"
       },
       {
+        "command": "titanium.ios.scanCertificates",
+        "title": "%titanium.commands.ios.scanCertificates.title%",
+        "category": "Titanium",
+        "icon": "$(search)",
+        "enablement": "isMac && isWorkspaceTrusted && !titanium:certificates:scanning"
+      },
+      {
         "command": "titanium.explorer.refresh",
         "title": "%titanium.commands.explorer.refresh.title%",
         "category": "Titanium",
@@ -494,9 +501,13 @@
           "markdownDeprecationMessage": "%titanium.config.project.defaultI18nLanguage.deprecated%"
         },
         "titanium.ios.organizations": {
-          "type": "string",
-          "default": "",
-          "description": "Input JSON object with your organization's names and IDs. "
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "%titanium.config.ios.organizations%"
         }
       }
     },
@@ -552,6 +563,10 @@
     ],
     "menus": {
       "commandPalette": [
+        {
+          "command": "titanium.ios.scanCertificates",
+          "when": "isMac && isWorkspaceTrusted"
+        },
         {
           "command": "titanium.create.application",
           "when": "!titanium:needsTrustedWorkspace"
@@ -723,6 +738,11 @@
       ],
       "view/title": [
         {
+          "command": "titanium.ios.scanCertificates",
+          "when": "view == titanium.view.buildExplorer && isMac",
+          "group": "navigation@4"
+        },
+        {
           "command": "titanium.build.run",
           "when": "view == titanium.view.buildExplorer",
           "group": "navigation@2"
@@ -750,7 +770,7 @@
         {
           "command": "titanium.explorer.refresh",
           "when": "view == titanium.view.buildExplorer",
-          "group": "2_workspace"
+          "group": "navigation@5"
         },
         {
           "command": "titanium.build.setLogLevel",
