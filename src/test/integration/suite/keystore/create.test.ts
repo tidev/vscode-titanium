@@ -40,6 +40,9 @@ describe('Keystore creation', function () {
 			await webview.switchBack();
 			webview = undefined;
 		}
+		if (fs.pathExistsSync(join(tempDirectory.name, 'keystore'))) {
+			await fs.remove(join(tempDirectory.name, 'keystore'));
+		}
 	});
 
 	it('should create a keystore', async () => {
@@ -66,7 +69,10 @@ describe('Keystore creation', function () {
 		(await webview.findWebElement(By.id('country'))).sendKeys('TE');
 		await driver.sleep(2500);
 		(await webview.findWebElement(By.id('buttonFinish'))).click();
+		await driver.sleep(2500);
 
+		await webview.switchBack();
+		webview = undefined;
 		await driver.wait(() => notificationExists('Keystore created successfully'), 5000);
 
 		expect(fs.pathExistsSync(join(tempDirectory.name, 'keystore'))).to.equal(true, 'Keystore did not get created');

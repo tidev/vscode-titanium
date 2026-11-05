@@ -1,3 +1,4 @@
 dangerfile.js
 src/test/**/fixtures/**/*
 node_modules
+packages/tidev-remotedebug-ios-webkit-adapter/out/**

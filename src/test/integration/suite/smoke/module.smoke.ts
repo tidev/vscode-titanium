@@ -43,7 +43,8 @@ describe('Module smoke', function () {
 			codeBases: {
 				android: 'kotlin',
 				ios: 'swift'
-			}
+			},
+			dismissNotifications: false
 		});
 
 		expect(fs.existsSync(projectPath)).to.equal(true);

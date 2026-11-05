@@ -2,7 +2,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import { BasePathTransformer, chromeUtils, IPathMapping, IStackTraceResponseBody, utils } from 'vscode-chrome-debug-core';
-import { DebugProtocol } from 'vscode-debugprotocol';
+import { DebugProtocol } from '@vscode/debugprotocol';
 import { TitaniumAttachRequestArgs, TitaniumLaunchRequestArgs } from '../common/extensionProtocol';
 import { determineProjectType, getAppName } from '../common/utils';
 

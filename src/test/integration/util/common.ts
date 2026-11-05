@@ -1,4 +1,4 @@
-import { ActivityBar, BottomBarPanel, EditorTab, EditorView, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser } from 'vscode-extension-tester';
+import { ActivityBar, BottomBarPanel, EditorTab, EditorView, InputBox, Notification, Workbench, WebDriver, TextSetting, ViewControl, ViewSection, WelcomeContentButton, By, VSBrowser, NotificationsCenter, NotificationType } from 'vscode-extension-tester';
 import { promisify } from 'util';
 import  * as cp from 'child_process';
 import * as path from 'path';
@@ -40,22 +40,28 @@ export async function testSetup(): Promise<void> {
  * Check if a notification exists
  *
  * @param {string} text - text that the notification will contain.
+ * @param {boolean} [dismiss=true] - whether to dismiss the notification after finding it.
  * @returns {(Promise<Notification | undefined>)}
  */
-export async function notificationExists(text: string): Promise<Notification | undefined> {
+export async function notificationExists(text: string, dismiss = true): Promise<Notification | undefined> {
 	// lowercase the text to avoid requiring specific text
 	text = text.toLowerCase();
-	const notifications = await new Workbench().getNotifications();
+	const wb = new Workbench();
+	await wb.openNotificationsCenter();
+	const nc = new NotificationsCenter();
+	const notifications = await nc.getNotifications(NotificationType.Any);
+	// const notifications = await wb.getNotifications();
 	for (const notification of notifications) {
 		try {
 			const message = await notification.getMessage();
 			if (message.toLowerCase().includes(text)) {
+				if (dismiss) {
+					await notification.dismiss();
+					await nc.close();
+				}
 				return notification;
 			}
-		} catch (error) {
-			return notification;
-		}
-
+		} catch (error) {}
 	}
 }
 
@@ -276,11 +282,16 @@ export class CommonUICreator {
 	public async getActivityView (): Promise<ViewControl> {
 		const activityBar = new ActivityBar();
 		const tiActivity = await this.driver.wait<ViewControl>(async () => {
-			const activity = await activityBar.getViewControl('Titanium');
-			if (!activity?.isDisplayed()) {
-				return false;
+			try {
+				const activity = await activityBar.getViewControl('Titanium');
+				if (!activity?.isDisplayed()) {
+					return false;
+				}
+				return activity;
+			} catch (error) {
+				// ignore error while we're waiting for the view to load
 			}
-			return activity;
+
 		}, 10000);
 		return tiActivity;
 	}
@@ -292,7 +303,7 @@ export class CommonUICreator {
 			const dialog = await this.driver.findElement(By.className('monaco-dialog-box'));
 
 			if (dialog) {
-				const trustButton = await this.driver.findElement(By.xpath('.//a[starts-with(@title, "Yes")]'));
+				const trustButton = await this.driver.findElement(By.xpath('.//a[starts-with(text(), "Yes")]'));
 				if (trustButton) {
 					await trustButton.click();
 					return;

@@ -4,6 +4,8 @@ node_modules
 *.vsix
 .DS_Store
 out/
+!packages/tidev-remotedebug-ios-webkit-adapter/out/
+!packages/tidev-remotedebug-ios-webkit-adapter/out/**
 out.json
 junit_report.xml
 coverage/

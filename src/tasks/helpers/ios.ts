@@ -1,6 +1,5 @@
 import { TaskExecutionContext } from '../tasksHelper';
 import { selectiOSCertificate, selectiOSProvisioningProfile } from '../../quickpicks/build/ios';
-import { getCorrectCertificateName } from '../../utils';
 import { IosCert } from '../../types/common';
 import { TaskHelper } from './base';
 import { Command } from '../commandBuilder';
@@ -51,14 +50,14 @@ export class IosHelper extends TaskHelper {
 			if (!iosInfo.certificate) {
 				certificate = await selectiOSCertificate('run');
 			} else {
-				certificate = ExtensionContainer.environment.iOSCertificates().find(cert => cert.fullname === iosInfo.certificate);
+				certificate = ExtensionContainer.environment.iOSCertificates('developer').find(cert => cert.fullname === iosInfo.certificate);
 			}
 
 			if (!certificate) {
 				throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
 			}
 
-			iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], 'developer');
+			iosInfo.certificate = certificate.fullname;
 
 			if (!iosInfo.provisioningProfile) {
 				iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).uuid;
@@ -100,7 +99,7 @@ export class IosHelper extends TaskHelper {
 			throw new Error(`Unable to find certificate ${iosInfo.certificate}`);
 		}
 
-		iosInfo.certificate =  getCorrectCertificateName(certificate.fullname, project.sdk()[0], 'distribution');
+		iosInfo.certificate = certificate.fullname;
 
 		if (!iosInfo.provisioningProfile) {
 			iosInfo.provisioningProfile = (await selectiOSProvisioningProfile(certificate, definition.target, project.appId())).uuid;

@@ -9,8 +9,19 @@ vsc-extension-quickstart.md
 **/tslint.json
 **/*.map
 **/*.ts
+# the language server reads these at run time: Alloy's globals, and TypeScript's standard library
+!node_modules/@titanium-sdk/language-server/assets/*.d.ts
+!node_modules/**/typescript/lib/*.d.ts
 .github/**
 Jenkinsfile
 scripts/
 junit_report.xml
 test-resources/
+.eslintignore
+.husky/**
+.nyc_output/**
+coverage/**
+doc/**
+packages/tidev-remotedebug-ios-webkit-adapter/node_modules/**
+.release-please-manifest.json
+release-please-config.json

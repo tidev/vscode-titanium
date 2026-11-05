@@ -1,4 +1,26 @@
-# [1.3.0](https://github.com/tidev/vscode-titanium/compare/v1.2.1...v1.3.0) (2023-10-29)
+# Changelog
+
+## [1.5.0](https://github.com/tidev/vscode-titanium/compare/v1.4.0...v1.5.0) (2026-11-03)
+
+
+### Features
+
+* provide language features through titanium-language-server ([#1265](https://github.com/tidev/vscode-titanium/issues/1265)) ([da774b1](https://github.com/tidev/vscode-titanium/commit/da774b157d4b30fb1c36d4000e1038f28121e0b8))
+
+
+### Bug Fixes
+
+* replace vulnerable ios debugger peer dependencies, use fork ([52c5447](https://github.com/tidev/vscode-titanium/commit/52c54471a4c3b6748daeed4841021ea79958913b))
+
+## [1.4.0](https://github.com/tidev/vscode-titanium/compare/v1.3.0...v1.4.0) (2025-06-03)
+
+
+### Features
+
+* **create:** option for Alloy/Classic project creation ([#1179](https://github.com/tidev/vscode-titanium/issues/1179)) ([9929aae](https://github.com/tidev/vscode-titanium/commit/9929aaef429863e8a471b805c15acdf7ee0089fa))
+* update editor commons to use newer node version range in empty state ([b1d2265](https://github.com/tidev/vscode-titanium/commit/b1d2265f0f000e7b89e31afb3034d36fe372febe))
+
+## [1.3.0](https://github.com/tidev/vscode-titanium/compare/v1.2.1...v1.3.0) (2023-10-29)
 
 
 ### Features
@@ -12,7 +34,7 @@
 
 * **build/ios:** add macOS targets to quickpicks ([#1173](https://github.com/tidev/vscode-titanium/issues/1173)) ([cdd570e](https://github.com/tidev/vscode-titanium/commit/cdd570e357e22f615e7ec8d3fd21ae9d2e80d020))
 
-# [1.2.0](https://github.com/tidev/vscode-titanium/compare/v1.1.0...v1.2.0) (2023-08-20)
+## [1.2.0](https://github.com/tidev/vscode-titanium/compare/v1.1.0...v1.2.0) (2023-08-20)
 
 
 ### Bug Fixes
@@ -27,7 +49,7 @@
 * support building for macos ([#1130](https://github.com/tidev/vscode-titanium/issues/1130)) ([5a269a8](https://github.com/tidev/vscode-titanium/commit/5a269a89188b2013ca807ec686b161c31b261bb1)), closes [#1129](https://github.com/tidev/vscode-titanium/issues/1129)
 * support German language ([#1148](https://github.com/tidev/vscode-titanium/issues/1148)) ([42da08d](https://github.com/tidev/vscode-titanium/commit/42da08d63a77ba190a3cdb146b942d96b98d2614))
 
-# [1.1.0](https://github.com/tidev/vscode-titanium/compare/v1.0.1...v1.1.0) (2023-04-19)
+## [1.1.0](https://github.com/tidev/vscode-titanium/compare/v1.0.1...v1.1.0) (2023-04-19)
 
 
 ### Bug Fixes
@@ -413,7 +435,7 @@ Closes EDITOR-48
 
 
 <a name="0.3.0"></a>
-# [0.3.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.2.0...v0.3.0) (2019-03-28)
+## [0.3.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.2.0...v0.3.0) (2019-03-28)
 
 
 ### Bug Fixes
@@ -432,7 +454,7 @@ Closes EDITOR-48
 
 
 <a name="0.2.0"></a>
-# [0.2.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.4...v0.2.0) (2019-03-07)
+## [0.2.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/v0.1.4...v0.2.0) (2019-03-07)
 
 
 ### Bug Fixes
@@ -494,7 +516,7 @@ Closes EDITOR-48
 
 
 
-# [0.1.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/ffa6f61...v0.1.0) (2018-12-13)
+## [0.1.0](https://github.com/appcelerator/vscode-appcelerator-titanium/compare/ffa6f61...v0.1.0) (2018-12-13)
 
 
 ### Bug Fixes

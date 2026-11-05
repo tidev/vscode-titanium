@@ -718,10 +718,6 @@ export default
 		},
 		devices: [
 			{
-				udid: 'itunes',
-				name: 'iTunes Sync'
-			},
-			{
 				buildVersion: '15A5354b',
 				cpuArchitecture: 'arm64',
 				deviceClass: 'iPad',
