@@ -1,18 +1,19 @@
 import { ExtensionContainer } from '../../container';
-import { Target } from '../..//types/cli';
+import { Target } from '../../types/cli';
 import { IosCert, IosCertificateType, IosProvisioningType, ProvisioningProfile } from '../../types/common';
 import { quickPick, CustomQuickPick } from '../common';
 import { deviceQuickPick, DeviceQuickPickItem } from './common';
-
+import { configuration, Config } from '../../configuration';
+import { createIOSCertificateChoices } from './iosOrganizations';
 export async function selectiOSCertificate (buildType: string): Promise<IosCert> {
 	const certificateType: IosCertificateType = buildType === 'run' ? 'developer' : 'distribution';
-	const certificates = ExtensionContainer.environment.iOSCertificates(certificateType).map(cert => ({
-		description: `Expires: ${new Date(cert.after).toLocaleString('en-US')}`,
-		label: cert.fullname,
-		pem: cert.pem,
-		id: cert.fullname
-	}));
-	const choice = await quickPick(certificates, { placeHolder: 'Select certificate' });
+	const organizations = configuration.get<Config['ios']['organizations']>('ios.organizations', undefined, {});
+	const certificates = createIOSCertificateChoices(ExtensionContainer.environment.iOSCertificates(certificateType), organizations);
+	const choice = await quickPick(certificates, {
+		placeHolder: 'Select certificate',
+		matchOnDescription: true,
+		matchOnDetail: true
+	});
 
 	const certificate = ExtensionContainer.environment.iOSCertificates(certificateType).find(cert => cert.pem === choice.pem);
 
